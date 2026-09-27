@@ -77,6 +77,13 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    drift:0,cinema:false,dragging:false,lastInteraction:0};
  let gl, program, uniform, frameId=0, previous=0, elapsed=0, toastTimer, hasStarted=false;
  let scale=Math.min(devicePixelRatio||1,embedded?1.3:1.7), slowFrames=0, frameCounter=0;
+ let focusTarget=null,renderVisible=true;
+ const bridge=window.fireAtlasEarth={view:null,onFrame:null,
+   setVisible(value){renderVisible=Boolean(value);if(renderVisible&&hasStarted)startLoop();},
+   focus(lon,lat){if(!Number.isFinite(lon)||!Number.isFinite(lat))return;const target=lon*Math.PI/180;focusTarget={yaw:state.yaw+Math.atan2(Math.sin(target-state.yaw),Math.cos(target-state.yaw)),pitch:Math.max(-1.45,Math.min(1.45,lat*Math.PI/180))};state.playing=false;playUI();},
+   setPlaying(value){state.playing=Boolean(value);focusTarget=null;playUI();},
+   zoom(delta){zoom(delta);},reset(){focusTarget=null;reset();}
+ };
  const textures=[];
  const vertexSource=`#version 300 es
  precision highp float;
@@ -260,22 +267,27 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    img.src='';
  }
  function draw(now){
-   frameId=0;if(document.hidden)return;
+   frameId=0;if(document.hidden||!renderVisible)return;
    const rawDt=previous?(now-previous)/1000:1/60;const dt=Math.min(rawDt,.05);previous=now;elapsed+=dt;
    if(!state.dragging&&state.playing&&now-state.lastInteraction>850){state.yaw+=dt*.027*state.speed;}
    if(state.playing&&!state.dragging)state.drift+=dt*.00020*state.speed;
-   const ease=1.-Math.exp(-dt*7.);state.distance+=(state.targetDistance-state.distance)*ease;state.angle+=(state.targetAngle-state.angle)*ease;
+   const ease=1.-Math.exp(-dt*7.);if(focusTarget){state.yaw+=(focusTarget.yaw-state.yaw)*ease;state.pitch+=(focusTarget.pitch-state.pitch)*ease;}state.distance+=(state.targetDistance-state.distance)*ease;state.angle+=(state.targetAngle-state.angle)*ease;
    resize();gl.useProgram(program);
    gl.uniform2f(uniform.uResolution,canvas.width,canvas.height);
    gl.uniformMatrix3fv(uniform.uRotation,false,rotation(state.yaw,state.pitch));
    const landingDiameter=Math.min(innerHeight*.78,innerWidth*.46);
    const landingDistance=Math.sqrt(1.+Math.pow(2.40*Math.min(innerWidth,innerHeight)/landingDiameter,2.));
-   gl.uniform1f(uniform.uDistance,embedded&&innerWidth>950?Math.max(state.distance,landingDistance):state.distance+(embedded&&innerWidth>650&&innerWidth<=950?.5:0.));
-   gl.uniform1f(uniform.uFraming,embedded?0.:innerWidth>850?.32:0.);
-   gl.uniform1f(uniform.uVertical,embedded?(innerWidth<=760?-.17:innerWidth<=950?-.32:.03):innerWidth<701?-.03:.035);
+   const view={width:innerWidth,height:innerHeight,rotation:rotation(state.yaw,state.pitch),
+     distance:embedded&&innerWidth>950?Math.max(1.65,landingDistance+state.distance-initialDistance):state.distance+(embedded&&innerWidth>650&&innerWidth<=950?.5:0.),
+     framing:embedded?0.:innerWidth>850?.32:0.,vertical:embedded?(innerWidth<=760?-.17:innerWidth<=950?-.32:.03):innerWidth<701?-.03:.035,
+     playing:state.playing};
+   gl.uniform1f(uniform.uDistance,view.distance);
+   gl.uniform1f(uniform.uFraming,view.framing);
+   gl.uniform1f(uniform.uVertical,view.vertical);
    gl.uniform1f(uniform.uSunAngle,state.angle);gl.uniform1f(uniform.uCloudDrift,state.drift);gl.uniform1f(uniform.uTime,elapsed);
    for(const [key,name] of [['clouds','uClouds'],['atmosphere','uAtmosphere'],['lights','uLights'],['stars','uStars']])gl.uniform1f(uniform[name],state[key]);
    gl.drawArrays(gl.TRIANGLES,0,3);
+   bridge.view=view;if(bridge.onFrame)bridge.onFrame(view);
    if(!hasStarted){hasStarted=true;loading.classList.add('done');setTimeout(()=>loading.hidden=true,700);}
    // Lower the pixel count on slower GPUs; the 8K surface stays fully detailed.
    frameCounter++;if(rawDt>.043)slowFrames++;
@@ -306,7 +318,7 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
  $('reload').addEventListener('click',()=>location.reload());
 
  const pointers=new Map();let pinchDistance=0;
- canvas.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType==='mouse')return;canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});state.dragging=true;state.lastInteraction=performance.now();if(pointers.size===2){const p=[...pointers.values()];pinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}canvas.focus({preventScroll:true});});
+ canvas.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType==='mouse')return;focusTarget=null;canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});state.dragging=true;state.lastInteraction=performance.now();if(pointers.size===2){const p=[...pointers.values()];pinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}canvas.focus({preventScroll:true});});
  canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){state.yaw-=(e.clientX-prev.x)*.0045;state.pitch=Math.max(-1.45,Math.min(1.45,state.pitch+(e.clientY-prev.y)*.0045));}else if(pointers.size===2){const p=[...pointers.values()];const dist=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);zoom((pinchDistance-dist)*.007);pinchDistance=dist;}state.lastInteraction=performance.now();});
  function pointerEnd(e){pointers.delete(e.pointerId);state.dragging=pointers.size>0;state.lastInteraction=performance.now();}
  canvas.addEventListener('pointerup',pointerEnd);canvas.addEventListener('pointercancel',pointerEnd);canvas.addEventListener('lostpointercapture',pointerEnd);
@@ -319,7 +331,7 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    else if(key==='escape'){if(state.cinema)setCinema(false);setLayers(false);}
    else if(key===' '&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePlay();}
    else if(key==='+'||key==='='){e.preventDefault();zoom(-.25);}else if(key==='-'||key==='_'){e.preventDefault();zoom(.25);}
-   else if(key.startsWith('arrow')){e.preventDefault();state.lastInteraction=performance.now();if(key==='arrowleft')state.yaw-=.08;if(key==='arrowright')state.yaw+=.08;if(key==='arrowup')state.pitch=Math.min(1.45,state.pitch+.06);if(key==='arrowdown')state.pitch=Math.max(-1.45,state.pitch-.06);}
+   else if(key.startsWith('arrow')){focusTarget=null;e.preventDefault();state.lastInteraction=performance.now();if(key==='arrowleft')state.yaw-=.08;if(key==='arrowright')state.yaw+=.08;if(key==='arrowup')state.pitch=Math.min(1.45,state.pitch+.06);if(key==='arrowdown')state.pitch=Math.max(-1.45,state.pitch-.06);}
  });
  document.addEventListener('visibilitychange',()=>{if(!hasStarted)return;if(document.hidden){cancelAnimationFrame(frameId);frameId=0;}else startLoop();});
  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelAnimationFrame(frameId);frameId=0;loading.hidden=false;error('The graphics context was interrupted. Close other graphics-heavy tabs, then try again.');});

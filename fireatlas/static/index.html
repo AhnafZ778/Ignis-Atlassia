@@ -13,7 +13,10 @@
   <script src="/story.js" defer></script>
   <script src="/events.js" defer></script>
   <script src="/earth-embed.js" defer></script>
+  <script src="/globe-math.js" defer></script>
+  <script src="/globe.js" defer></script>
   <link rel="stylesheet" href="/design.css">
+  <link rel="stylesheet" href="/globe.css">
   <script src="/ui.js" defer></script>
 </head>
 <body class="atlas-page">
@@ -26,20 +29,38 @@
   </header>
 
   <main id="main-content">
-    <section class="hero" id="top">
+    <section class="hero globe-hero" id="top" aria-label="Interactive NASA fire observation globe">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="dot"></span> A NEW PERSPECTIVE ON FIRE</p>
-        <h1>One planet.<br>Every signal<br><em>matters.</em></h1>
-        <p class="intro">See Earth’s burning patterns from orbit.<br>Turn satellite observations into a clearer understanding of our changing planet.</p>
+        <p class="eyebrow"><span class="dot"></span> NASA FIRMS / EARTH OBSERVATORY</p>
+        <h1>A world<br> of <em>fire signals.</em></h1>
+        <p class="intro">Turn the planet. Follow a signal.<br>Explore where NASA satellites observed thermal activity across the world.</p>
         <a class="hero-primary" href="#atlas-section">Explore the atlas <span aria-hidden="true">↗</span></a>
-        <span class="hero-caption">BUILT FOR CURIOSITY. GROUNDED IN EVIDENCE.</span>
+        <span class="hero-caption">SELECT A GLOWING POINT TO INSPECT ITS EVIDENCE.</span>
       </div>
       <div class="hero-art earth-hero">
         <div class="earth-fallback" aria-hidden="true"></div>
         <div id="earth-frame-host" class="earth-frame-host" aria-label="Interactive three-dimensional Earth"></div>
         <div class="earth-controls"><span id="earth-caption">EARTH COMPOSITE · DRAG TO ROTATE</span><a href="/earth.html" target="_blank" rel="noopener noreferrer">Explore full Earth ↗</a></div>
       </div>
-      <div class="hero-coordinate" aria-hidden="true">EARTH / SOL III <span>23.44° AXIAL TILT</span></div>
+      <div class="hero-coordinate">NASA FIRMS / EARTH<span id="globe-stamp">LOADING IMPORTED OBSERVATIONS</span></div>
+      <div class="globe-toolbar" aria-label="Globe navigation">
+        <div class="globe-regions" role="group" aria-label="Look at a region"><button type="button" data-globe-region="20,-5">Africa</button><button type="button" data-globe-region="-60,-12">S. America</button><button type="button" data-globe-region="-110,40">N. America</button><button type="button" data-globe-region="100,25">Asia</button><button type="button" data-globe-region="135,-25">Australia</button></div>
+        <div class="globe-tools"><button id="globe-rotate" type="button" aria-pressed="false">Pause rotation</button><button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">＋</button><button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button><label><input id="globe-markers" type="checkbox" checked> Detections</label></div>
+        <p class="globe-legend"><i></i> Earlier in snapshot <i></i> Latest observed day · size indicates detection count</p>
+      </div>
+      <aside class="globe-console" aria-labelledby="globe-console-title">
+        <div class="globe-console-head"><span class="globe-kicker">IMPORTED NASA SNAPSHOT</span><a href="/data.html" aria-label="Inspect NASA data sources">↗</a></div>
+        <h2 id="globe-console-title">The observed world.</h2>
+        <p id="globe-period" class="globe-period">Reading satellite records…</p>
+        <div class="globe-filters"><label>OBSERVATION DATE<select id="globe-date" disabled><option value="all">All imported dates</option></select></label><label>SATELLITE<select id="globe-source" disabled><option value="all">All NASA satellites</option></select></label></div>
+        <div class="globe-total"><strong id="globe-total">—</strong><span>thermal detections<br><small id="globe-cell-count">Grouping nearby records…</small></span></div>
+        <p id="globe-status" role="status">Loading the globe snapshot…</p>
+        <button id="globe-retry" type="button" hidden>Retry data</button>
+        <label class="globe-browse">BROWSE DETECTION CLUSTERS<select id="globe-location"><option value="">Select a point on Earth…</option></select></label>
+        <div id="globe-selection" hidden aria-live="polite"></div>
+        <p class="globe-truth">Satellite detections can include agricultural burning and other heat sources. They do not establish ignition time, burned area, or whether a fire is still active. Unmarked areas may have no observations.</p>
+        <a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">How to read NASA fire detections ↗</a>
+      </aside>
       <aside class="orbital-note" id="demo-source-note" aria-label="Observation sources"><span class="orbital-kicker">A SHARED VIEW</span><div class="orbital-diagram" aria-hidden="true"><svg viewBox="0 0 180 130"><circle cx="90" cy="65" r="30"/><ellipse cx="90" cy="65" rx="78" ry="24" transform="rotate(-30 90 65)"/><ellipse cx="90" cy="65" rx="67" ry="37" transform="rotate(40 90 65)"/><path d="M60 65h60M90 35c-20 15-20 45 0 60 20-15 20-45 0-60"/><circle class="sat-dot" cx="151" cy="32" r="4"/><circle class="sat-dot secondary" cx="45" cy="26" r="3"/></svg></div><div class="sensor-caption"><span>01</span><strong>MODIS<small>TERRA + AQUA</small></strong><i></i></div><div class="sensor-caption"><span>02</span><strong>VIIRS<small>SUOMI NPP</small></strong><i></i></div><p>Different sensors.<br>A more complete perspective.</p></aside>
       <aside class="orbital-note real-source-note" id="real-source-note" aria-label="Authentic satellite data" hidden><span class="orbital-kicker">VERIFIED ARCHIVE / NOAA</span><strong id="hero-real-count">—</strong><span class="real-source-unit">VIIRS FIRE POINTS</span><div class="real-source-rule"></div><p>Four complete July archives.<br>One Northern California window.</p><a href="/data.html">Inspect provenance ↗</a></aside>
       <div class="hero-bottom"><a class="hero-atlas-link" href="#atlas-section"><span aria-hidden="true">↓</span> SCROLL TO DISCOVER</a><button id="hero-start-tour" class="hero-tour-link" type="button" disabled>✦ &nbsp; Start the guided tour <span aria-hidden="true">↗</span></button></div>

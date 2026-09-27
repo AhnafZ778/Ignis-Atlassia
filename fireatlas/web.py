@@ -12,6 +12,7 @@ import sqlite3
 import threading
 import contextlib
 import tempfile
+import time
 from collections import defaultdict
 from datetime import date, timedelta
 from http import HTTPStatus
@@ -29,6 +30,7 @@ from .pilots import PilotSync, PILOTS
 from .events import latest as latest_events
 from .bootstrap import populate_showcase
 from .presentation import ensure_presentation, provenance as presentation_provenance, context_fixture, DEFAULT_VIEW
+from .globe import snapshot as globe_snapshot, detail as globe_detail
 
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
@@ -47,6 +49,9 @@ ASSETS = {
     "/story.js": ("story.js", "text/javascript; charset=utf-8"),
     "/events.js": ("events.js", "text/javascript; charset=utf-8"),
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
+    "/globe.js": ("globe.js", "text/javascript; charset=utf-8"),
+    "/globe-math.js": ("globe-math.js", "text/javascript; charset=utf-8"),
+    "/globe.css": ("globe.css", "text/css; charset=utf-8"),
     "/earth-poster-1440.webp": ("earth-poster-1440.webp", "image/webp"),
     "/earth-poster-820.webp": ("earth-poster-820.webp", "image/webp"),
     "/earth-poster-390.webp": ("earth-poster-390.webp", "image/webp"),
@@ -109,6 +114,8 @@ def handler_factory(database: Path):
     demo_database = database.with_name("demo.sqlite3")
     demo_lock = threading.Lock()
     demo_ready = False
+    globe_lock = threading.Lock()
+    globe_cache = {}
     event_lock = threading.Lock()
     event_cache = database.with_suffix(".events.json")
     pilot_sync = PilotSync(database)
@@ -238,6 +245,27 @@ def handler_factory(database: Path):
                 return
             try:
                 params = parse_qs(url.query)
+                if url.path in ("/api/globe", "/api/globe/detail"):
+                    if params.get("demo", ["0"])[0] != "0":
+                        raise ValueError("The landing globe displays authentic NASA imports only")
+                    source, day = params.get("source", ["all"])[0], params.get("date", ["all"])[0]
+                    # Bound both cache size and age; database/WAL changes invalidate the snapshot.
+                    stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
+                                   for p in (database, Path(str(database) + "-wal")))
+                    cell = params.get("cell", [""])[0]
+                    key = (url.path, source, day, cell, stamps)
+                    with globe_lock:
+                        cached = globe_cache.get(key)
+                        if cached and time.monotonic() - cached[0] < 300:
+                            body = cached[1]
+                        else:
+                            with contextlib.closing(connect(database)) as db:
+                                body = globe_detail(db, cell=cell, source=source, day=day) if url.path.endswith("/detail") else globe_snapshot(db, source=source, day=day)
+                            if len(globe_cache) >= 24:
+                                globe_cache.pop(next(iter(globe_cache)))
+                            globe_cache[key] = (time.monotonic(), body)
+                    self._json(body)
+                    return
                 if url.path == "/api/training/scenario":
                     self._json(public_scenario())
                     return

@@ -31,11 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timer);
         host.classList.add("ready");
         hero.classList.add("model-ready");
-        caption.textContent = "DRAG TO ROTATE · COMPOSITE IMAGERY";
+        caption.textContent = "DRAG TO ROTATE · SELECT A FIRE SIGNAL";
+        window.dispatchEvent(new CustomEvent("earth-ready", {detail:{frame}}));
       } else if (performance.now() - started > 20000 || loader?.classList.contains("error")) {
         clearInterval(timer);
         frame.remove();
         caption.textContent = "EARTH PREVIEW · OPEN FULL MODEL ↗";
+        window.dispatchEvent(new CustomEvent("earth-unavailable"));
       }
     }, 250);
   });
