@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FireAtlas — Burning Activity Calendar</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/vendor/leaflet.css">
+  <script src="/vendor/leaflet.js" defer></script>
+  <script src="/app.js" defer></script>
+  <script src="/study-ui.js" defer></script>
+  <script src="/story.js" defer></script>
+  <script src="/events.js" defer></script>
+  <script src="/earth-embed.js" defer></script>
+  <link rel="stylesheet" href="/design.css">
+  <script src="/ui.js" defer></script>
+</head>
+<body class="atlas-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><span></span><span></span><span class="menu-label">Menu</span></button>
+    <nav id="site-navigation" aria-label="Project navigation"><a href="/" class="active" aria-current="page">Overview</a><a href="/#atlas-section">Atlas</a><a href="/training.html">Training lab</a><a href="/research.html">Research lab</a><a href="/data.html">Data sources</a></nav>
+    <span class="header-tag"><i></i> A NASA SPACE APPS PROJECT <span>↗</span></span>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span> A NEW PERSPECTIVE ON FIRE</p>
+        <h1>One planet.<br>Every signal<br><em>matters.</em></h1>
+        <p class="intro">See Earth’s burning patterns from orbit.<br>Turn satellite observations into a clearer understanding of our changing planet.</p>
+        <a class="hero-primary" href="#atlas-section">Explore the atlas <span aria-hidden="true">↗</span></a>
+        <span class="hero-caption">BUILT FOR CURIOSITY. GROUNDED IN EVIDENCE.</span>
+      </div>
+      <div class="hero-art earth-hero">
+        <div class="earth-fallback" aria-hidden="true"></div>
+        <div id="earth-frame-host" class="earth-frame-host" aria-label="Interactive three-dimensional Earth"></div>
+        <div class="earth-controls"><span id="earth-caption">EARTH COMPOSITE · DRAG TO ROTATE</span><a href="/earth.html" target="_blank" rel="noopener noreferrer">Explore full Earth ↗</a></div>
+      </div>
+      <div class="hero-coordinate" aria-hidden="true">EARTH / SOL III <span>23.44° AXIAL TILT</span></div>
+      <aside class="orbital-note" aria-label="Observation sources"><span class="orbital-kicker">A SHARED VIEW</span><div class="orbital-diagram" aria-hidden="true"><svg viewBox="0 0 180 130"><circle cx="90" cy="65" r="30"/><ellipse cx="90" cy="65" rx="78" ry="24" transform="rotate(-30 90 65)"/><ellipse cx="90" cy="65" rx="67" ry="37" transform="rotate(40 90 65)"/><path d="M60 65h60M90 35c-20 15-20 45 0 60 20-15 20-45 0-60"/><circle class="sat-dot" cx="151" cy="32" r="4"/><circle class="sat-dot secondary" cx="45" cy="26" r="3"/></svg></div><div class="sensor-caption"><span>01</span><strong>MODIS<small>TERRA + AQUA</small></strong><i></i></div><div class="sensor-caption"><span>02</span><strong>VIIRS<small>SUOMI NPP</small></strong><i></i></div><p>Different sensors.<br>A more complete perspective.</p></aside>
+      <div class="hero-bottom"><a class="hero-atlas-link" href="#atlas-section"><span aria-hidden="true">↓</span> SCROLL TO DISCOVER</a><button id="hero-start-tour" class="hero-tour-link" type="button" disabled>✦ &nbsp; Start the guided tour <span aria-hidden="true">↗</span></button></div>
+    </section>
+    <div class="mission-strip"><span>FROM ORBIT TO UNDERSTANDING</span><div><strong>01</strong> Explore the planet</div><div><strong>02</strong> Follow the patterns</div><div><strong>03</strong> Inspect the evidence</div><a href="/research.html">Go deeper ↗</a></div>
+    <div class="shell">
+    <div class="workspace-intro"><div><p class="eyebrow">THE OBSERVATION WORKSPACE</p><h2>A world of signals.<br><span>A place to make sense of them.</span></h2></div><p>Start with a place. Follow a season.<br>Look closer at the observations behind every pattern.</p></div>
+    <section class="tour-entry" aria-labelledby="tour-entry-title"><div class="tour-orbit" aria-hidden="true"><i></i><i></i><i></i><span>✦</span></div><div class="tour-copy"><p class="eyebrow">A FIVE STOP EXPLORATION</p><h3 id="tour-entry-title">Follow a signal from orbit<br>to original evidence.</h3><p>Experience the atlas through a guided synthetic example. Each stop changes the real controls on this page.</p></div><button id="start-tour" type="button" disabled>Start guided tour <span aria-hidden="true">↗</span></button></section>
+    <section class="live-events" id="live-events" aria-labelledby="live-events-title">
+      <div class="live-events-heading"><div><p class="eyebrow">A LIVE NASA WINDOW <span class="live-pulse" aria-hidden="true"></span></p><h2 id="live-events-title">Fire events,<br><em>as NASA tracks them.</em></h2><p>Explore recent locations from NASA EONET’s wildfire category. Select an event to find it on the map.</p></div><div class="live-events-summary"><strong id="event-count">—</strong><span>RECENT LOCATIONS LOADED</span><small id="event-updated">Connecting to NASA EONET…</small></div></div>
+      <div class="live-events-grid"><div class="event-map-wrap"><div id="event-map" role="application" aria-label="Map of reported wildfire event locations"></div><div class="event-map-legend"><span><i></i> REPORTED WILDFIRE EVENTS</span><button id="event-reset" type="button">↺ &nbsp; Event overview</button></div></div><div class="event-side"><div class="event-side-heading"><span>RECENT EVENT LOCATIONS</span><button id="event-refresh" type="button">↻ &nbsp; Refresh</button></div><p id="events-status" role="status">Loading recent events…</p><div id="event-list" class="event-list"></div><a href="https://eonet.gsfc.nasa.gov/docs/v3" target="_blank" rel="noopener noreferrer">Explore NASA EONET ↗</a></div></div>
+      <p class="live-events-note">Dates mark EONET event locations. Its wildfire category includes some prescribed fires. These points are not FIRMS satellite pixels, a complete global incident count, or inputs to the MODIS/VIIRS calendar below.</p>
+    </section>
+    <div class="dataset-switch"><div><p class="eyebrow">CHOOSE YOUR SOURCE</p><h3>One interface. Two clear contexts.</h3><p id="mode-description">Loading source information…</p></div><div class="dataset-tabs" role="group" aria-label="Atlas data mode"><button data-demo="1" type="button" class="selected" aria-pressed="true"><span class="mode-pip"></span> Explore demo <small>Generated example</small></button><button data-demo="0" type="button" aria-pressed="false"><span class="mode-pip"></span> Authentic data <small>NASA imports</small></button></div></div>
+    <nav class="workspace-nav" aria-label="Observation workspace"><a class="current" href="#atlas-section"><span>01</span> Geographic atlas</a><a href="#calendar-section"><span>02</span> Activity calendar</a><a href="#evidence-section"><span>03</span> Source evidence</a></nav>
+    <a class="dataset-status" id="dataset-status" href="/data.html">NASA FIRMS · data sources ↗</a>
+    <div class="demo-alert" id="data-alert"><strong>● CHECKING SOURCE DATA</strong><span>Loading imported observations and export completeness for this selection.</span></div>
+
+    <section class="atlas-section" id="atlas-section" aria-label="Geographic atlas">
+      <div class="section-heading"><div><p class="eyebrow">01 / LOCATE</p><h2>Global fire atlas</h2><p>Explore imported hotspot records and set your area of interest.</p></div><span class="timezone">◉ &nbsp; OBSERVATIONS, NOT PERIMETERS</span></div>
+      <div class="atlas-panel">
+        <div class="map-toolbar"><div class="layer-buttons" role="group" aria-label="Map context layer"><button data-layer="none" class="selected" type="button">Hotspots</button><button data-layer="ndvi" type="button">Vegetation NDVI</button><button data-layer="landcover" type="button">Land cover</button><button data-layer="fwi" type="button">Fire weather</button></div><button id="use-map-aoi" class="map-action" type="button">Use map view as AOI ↗</button></div>
+        <div id="map" role="application" aria-label="FireAtlas map with imported fire observations"></div>
+        <div class="map-footer"><span id="map-status">Loading imported observations…</span><span id="layer-status">Map points show FIRMS-shaped detection locations.</span></div>
+      </div>
+      <p class="map-note">Low zoom groups imported pixels for browsing; zoom in to inspect individual detections. Satellite imagery and land cover are dated visual context, not verified wildfire classification. Fire-weather data are currently unavailable. <a href="https://gibs.earthdata.nasa.gov/layer-metadata/v1.0/" target="_blank" rel="noopener noreferrer">NASA GIBS layers ↗</a></p>
+    </section>
+
+    <section class="workspace" id="calendar-section" aria-label="Burning calendar">
+      <div class="section-heading"><div><p class="eyebrow">02 / COMPARE</p><h2>Burning activity calendar</h2><p>Detection centroids in shared 1 km cells, counted once per UTC day.</p></div><div class="timezone">◷ &nbsp; TIMES SHOWN IN UTC</div></div>
+
+      <div class="controls">
+        <label>YEAR<select id="year"><option>2015</option></select></label>
+        <label class="bbox-label">AREA OF INTEREST <span>W, S, E, N</span><input id="bbox" value="-122,39,-120,41" spellcheck="false" aria-label="Area bounding box west south east north"></label>
+        <button id="analyze" class="primary-button" type="button">Analyze area <span>↗</span></button>
+      </div>
+
+      <div class="series-row"><span>SENSOR VIEW</span><div class="segmented" role="group" aria-label="Sensor series"><button data-series="joint" class="selected" type="button">Joint</button><button data-series="modis" type="button">MODIS</button><button data-series="viirs-snpp" type="button">VIIRS S-NPP</button></div><p>Separate series preserve the sensor transition.</p></div>
+      <div class="source-compare" aria-label="Sensor comparison for selected month"><button class="source-signal" data-source-target="modis" type="button"><span class="signal-index">01 / MODIS</span><strong id="compare-modis">—</strong><span class="signal-unit">Original pixels</span><i id="compare-modis-bar"></i></button><div class="signal-connector" aria-hidden="true"><span>↔</span><small>TWO<br>SENSORS</small></div><button class="source-signal" data-source-target="viirs-snpp" type="button"><span class="signal-index">02 / VIIRS S-NPP</span><strong id="compare-viirs">—</strong><span class="signal-unit">Original pixels</span><i id="compare-viirs-bar"></i></button><div class="signal-equals" aria-hidden="true"><span>→</span><small>1 KM GRID</small></div><button class="source-signal joint-signal" data-source-target="joint" type="button"><span class="signal-index">03 / JOINT VIEW</span><strong id="compare-joint">—</strong><span class="signal-unit">Detected cell-days</span><i id="compare-joint-bar"></i></button></div>
+      <p class="source-compare-note" id="source-compare-note">Loading the shared-grid comparison…</p>
+
+      <div class="export-row"><span id="aoi-status">Selected AOI: −122, 39, −120, 41</span><div><button id="export-calendar" type="button">↓ Calendar CSV</button><button id="export-observations" type="button">↓ Raw observations CSV</button></div></div>
+
+      <div class="stats" aria-live="polite">
+        <article class="stat"><span>DETECTED CELL-DAYS</span><strong id="metric-count">—</strong><small id="metric-month">Selected month</small></article>
+        <article class="stat"><span>PRIOR-YEAR MEDIAN</span><strong id="metric-baseline">—</strong><small id="baseline-years">Same month · same sources</small></article>
+        <article class="stat"><span>CHANGE FROM MEDIAN</span><strong id="metric-change">—</strong><small>Detected cell-days, not a forecast</small></article>
+        <article class="stat coverage"><span>SATELLITE COVERAGE</span><strong id="metric-coverage">Unknown</strong><small>Pass and cloud masks not loaded</small></article>
+      </div>
+
+      <div class="content-grid">
+        <section class="panel monthly-panel" aria-labelledby="monthly-title"><div class="panel-head"><div><p class="eyebrow">YEAR AT A GLANCE</p><h3 id="monthly-title">Monthly activity</h3></div><span class="panel-note">SELECT A MONTH</span></div><div id="monthly-bars" class="month-list"></div><p class="footnote">Gray means the full source export has not been loaded. It does not mean zero burning.</p></section>
+        <section class="panel days-panel" aria-labelledby="days-title"><div class="panel-head"><div><p class="eyebrow">DAILY RECORD</p><h3 id="days-title">July 2015</h3></div><span class="panel-note">UTC CALENDAR</span></div><div class="weekday-row"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div id="day-grid" class="day-grid"></div><div class="legend"><span><i class="legend-swatch none"></i> Not loaded</span><span><i class="legend-swatch zero"></i> No detections in export</span><span><i class="legend-swatch active"></i> Detected cell-day</span></div></section>
+      </div>
+      <section class="study-tools panel" aria-labelledby="study-title">
+        <div class="study-heading"><div><p class="eyebrow">KEEP THE EVIDENCE</p><h3 id="study-title">A view worth returning to.</h3><p>Save your place, share a selection, or take the underlying study with you.</p></div><div class="study-actions"><button id="copy-view" type="button">Copy view link ↗</button><button id="download-study" type="button">↓ Download study</button></div></div>
+        <div id="share-fallback" hidden><label for="share-url">VIEW LINK</label><input id="share-url" readonly aria-label="Shareable view link"><small>A localhost link works only on this computer. Other people need access to the same hosted dataset.</small></div>
+        <div class="saved-view-controls"><label>NAME THIS VIEW<input id="view-name" maxlength="80" placeholder="e.g. California · July comparison"></label><button id="save-view" type="button">Save view</button><label>SAVED ON THIS BROWSER<select id="saved-views"><option value="">Choose a saved view</option></select></label><button id="restore-view" type="button" disabled>Open</button><button id="delete-view" type="button" disabled>Remove</button></div>
+        <p id="saved-note" class="study-note"></p>
+        <details class="study-provenance"><summary>Source ledger <span id="study-source-count"></span></summary><p>Imports for the selected year. The study ZIP also includes the prior-year inputs used by the baseline, complete export windows, file checksums, and the UTC calendar. Satellite context images are not bundled.</p><div id="study-sources"></div></details>
+      </section>
+
+    </section>
+
+    <section class="evidence-section" id="evidence-section"><div class="section-heading"><div><p class="eyebrow">03 / VERIFY</p><h2>What is behind this day?</h2><p>Inspect the original sensor records and their acquisition time.</p></div><span class="evidence-date" id="evidence-date">SELECT A DAY</span></div>
+      <div class="evidence-grid"><div class="panel evidence-panel"><div class="panel-head"><h3>Source observations</h3><span id="record-count" class="panel-note">—</span></div><div id="records" class="records"><p class="empty-message">Choose a calendar day to see its source observations.</p></div></div>
+      <aside class="panel method-panel"><p class="eyebrow">READ THE SIGNAL CORRECTLY</p><h3>A hotspot is an observation.</h3><p>A cell-day counts a common grid cell with one or more detected thermal pixels on a UTC day. It is a sampling proxy. It does not count individual fires or burned area.</p><div class="method-divider"></div><p><strong>Why two sensors?</strong> VIIRS can detect smaller hotspots than MODIS. Switch sources to compare their raw evidence; the joint view counts a shared cell/day once.</p><p><strong>What does gray mean?</strong> Missing source exports or unknown satellite pass/cloud coverage must not be read as a fire-free day.</p><div id="provenance" class="provenance"></div></aside></div>
+    </section>
+    <div class="labs-heading"><p class="eyebrow">TAKE THE NEXT STEP</p><h2>Beyond observation.</h2><p>Turn what you see into a better question. Or a more informed decision.</p></div><div class="lab-grid"><section class="training-entry lab-training"><div class="lab-art" aria-hidden="true"><svg viewBox="0 0 400 190"><path d="M-10 140Q60-50 160 70T420 40M-10 160Q60-30 160 90T420 60M-10 180Q60-10 160 110T420 80M-10 200Q60 10 160 130T420 100M-10 220Q60 30 160 150T420 120M-10 240Q60 50 160 170T420 140"/><path class="route-line" d="M50 155L120 100 200 118 300 45"/><circle cx="120" cy="100" r="6"/><circle cx="300" cy="45" r="6"/></svg></div><div><p class="eyebrow">04 / REHEARSE</p><h2>Put the evidence into perspective.</h2><p>Explore a simulated incident with timed observations, crew check-ins, and connection-failure drills.</p></div><a href="/training.html">Open training lab ↗</a></section>
+    <section class="training-entry lab-research"><div class="lab-art" aria-hidden="true"><svg viewBox="0 0 400 190"><path d="M35 150H370M35 105H370M35 60H370M70 20V165M140 20V165M210 20V165M280 20V165M350 20V165"/><path class="research-line" d="M45 135L100 112 160 128 225 62 280 87 355 30"/><circle cx="100" cy="112" r="5"/><circle cx="225" cy="62" r="5"/><circle cx="355" cy="30" r="5"/></svg></div><div><p class="eyebrow">05 / RESEARCH</p><h2>Question the signal.</h2><p>Compare source overlap, test candidate groups, and inspect observation-mask denominators.</p></div><a id="open-research-study" href="/research.html">Open research lab ↗</a></section></div>
+    <footer><span>✦ FIREATLAS</span><p>Historical detection context. Not an emergency warning or operational fire perimeter.</p><p>Earth textures: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p></footer>
+    </div>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <section id="story-dock" class="story-dock" aria-label="Guided atlas tour" hidden><div class="story-header"><span id="story-progress">01 / 05</span><button id="story-close" type="button" aria-label="Close guided tour">×</button></div><div class="story-line"><span id="story-icon" aria-hidden="true">✦</span><span id="story-topic">THE ATLAS</span></div><h2 id="story-title" tabindex="-1">Choose a place.</h2><p id="story-description"></p><div class="story-progress-track" aria-hidden="true"><span id="story-progress-fill"></span></div><div class="story-actions"><button id="story-back" type="button">← Back</button><button id="story-next" type="button">Next stop <span aria-hidden="true">→</span></button></div></section>
+</body>
+</html>
