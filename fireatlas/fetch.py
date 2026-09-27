@@ -17,6 +17,7 @@ from .settings import firms_key
 
 BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 AVAILABILITY_URL = "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv"
+FIRMS_SOURCES = {source for source in SOURCES if source != "NOAA_HMS_VIIRS"}
 
 
 def _download(url: str, label: str) -> str:
@@ -30,7 +31,7 @@ def _download(url: str, label: str) -> str:
 
 
 def availability(source_id="ALL"):
-    if source_id != "ALL" and source_id not in SOURCES:
+    if source_id != "ALL" and source_id not in FIRMS_SOURCES:
         raise ValueError("unsupported FIRMS source")
     key = firms_key()
     if not key:
@@ -51,7 +52,7 @@ def availability(source_id="ALL"):
 
 def fetch_month(db, *, month: str, source_id: str, bbox: tuple[float, float, float, float], directory: Path, refresh: bool = False, available_sources=None) -> dict:
     """Fetch/ingest one complete month. The MAP_KEY remains only in the request URL."""
-    if source_id not in SOURCES:
+    if source_id not in FIRMS_SOURCES:
         raise ValueError(f"unsupported source: {source_id}")
     validate_bbox(bbox)
     start = date.fromisoformat(month + "-01")

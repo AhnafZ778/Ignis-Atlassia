@@ -9,7 +9,7 @@ uv sync
 uv run python -m fireatlas.web --db data/fireatlas.sqlite3 --port 8000
 ```
 
-Open **http://127.0.0.1:8000/**. The landing page opens in a clearly labelled synthetic demo mode so visitors can use the whole atlas immediately. A separate NASA EONET map now shows authentic, recent reported fire events. Switch to **Authentic data** to see FIRMS imports from the separate real-data database. Open **http://127.0.0.1:8000/data.html** to check NASA connectivity and sync the pilots. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
+Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact, verified NOAA HMS VIIRS pilot slice from July 2021–2024 in Northern California. The landing page opens on its real July 2024 atlas and calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect both authentic source paths and FIRMS connectivity. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
 
 **Guided tour:** Use **Start the guided tour** on the landing page. Five interactive stops move through the AOI map, monthly activity, sensor switch, original evidence, and the Training Lab. The example shows four MODIS raw pixels, twelve VIIRS raw pixels, and four joint cell-days in July 2015; the measures and synthetic source are labelled. This tour uses the normal controls and queries. Shared atlas links, CSV exports and study bundles retain the selected demo/authentic context. The Research Lab also opens the same mode from the atlas.
 
@@ -17,7 +17,21 @@ The homepage uses the interactive WebGL Earth from the supplied `earth.html` fil
 
 The atlas, Training Lab, and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
 
-The FIRMS sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete FIRMS source exports remain unknown. The app does not provide global satellite coverage, live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. The Fire weather layer explicitly says no GFWED data are loaded. To run the existing synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations must remain in separate databases.
+The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NOAA pilot covers one Northern California bounding box and four July months, not global satellite coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. The Fire weather layer explicitly says no GFWED data are loaded. To run the synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations remain in separate databases.
+
+### Authentic NOAA satellite showcase
+
+The bundled [`NOAA HMS historical fire-point archive`](https://www.ospo.noaa.gov/products/land/hms.html) slice contains 49,420 VIIRS point records inside `-122,39,-120,41`. The importer verified all 31 daily archives in each July 2021–2024 month before declaring that **AOI/month export** complete. The package includes the derived CSVs, source ZIP URLs and SHA-256 hashes in `fireatlas/samples/`; the much larger original ZIPs and SQLite database remain local and ignored by Git. The 2024 view has 2,197 detected 1 km cell-days and a 2021–2023 median of 109. These are detection centroid counts, not fire incidents, burned area, or scientific anomaly calibration. Pass/cloud coverage remains unknown. The HMS `scan` and `track` values use the nominal 375 m VIIRS I-band resolution because the archive does not provide an individual pixel footprint; confidence and day/night are labelled unavailable.
+
+To refresh any historical month directly from NOAA, run:
+
+```bash
+uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 harvest-hms --month 2024-07 --bbox -122 39 -120 41
+```
+
+The harvester caches the daily ZIPs in ignored `data/downloads/`, validates the point schema, records the original ZIP hashes in a manifest and in each selected row, and imports only the VIIRS method on Suomi NPP, NOAA-20 and NOAA-21. A failed or missing daily download never marks the month complete. Repeating the command is idempotent. On first default launch the bundled slice loads automatically into an empty authentic database; pass `--no-showcase` to start without it. HMS covers North America and remains a separate source cohort from NASA FIRMS MODIS/VIIRS.
+
+The atlas map's **Replay the archive** control steps through actual acquisition dates. Select a daily bar to focus the map on that day's imported points, drag the slider, or play the month. The same dates appear in the calendar and lead to original source rows. Large monthly point sets are sampled across the entire month for display; the calendar and exports use all imported observations.
 
 To launch with your own imported FIRMS data, pass `--db data/fireatlas.sqlite3`; the AOI field accepts `west,south,east,north`. The server reads the database and does not call FIRMS from browsers. Download authentic data with the instructions below, then restart or refresh the site.
 
@@ -71,7 +85,7 @@ uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 sync-pilots
 
 The sync exits nonzero on failure. Status is retained in `data/fireatlas.sync.json`, and successful checks in `data/fireatlas.validation.json`. CSV downloads are cached under `data/downloads/`. Completed imports are retained and reused; incomplete monthly requests never receive a complete-export marker. A demo database is rejected before authentic imports can begin.
 
-**Development environment note (27 September 2026):** FIRMS connections timed out during local checks, including a check against NASA's documented secondary host. A key's presence does not verify its validity or source availability. No authentic pilot observations or scientific results are claimed. Retry from the Data sources page when connectivity is restored. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
+**Development environment note (27 September 2026):** FIRMS connections timed out during local checks, including a check against NASA's documented secondary host. A key's presence does not verify its validity or source availability. No authentic **FIRMS** pilot observations or scientific calibration results are claimed; the independent NOAA HMS pilot above is real satellite data. Retry FIRMS from the Data sources page when connectivity is restored. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
 
 ### Reachable NASA event-feed workaround
 

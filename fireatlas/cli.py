@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 
 from .core import SERIES, SOURCES, calendar, connect, ingest
-from .fetch import fetch_month
+from .fetch import FIRMS_SOURCES, fetch_month
 from .research import report as research_report
 from .fetch import availability
 from .pilots import PilotSync
 from .events import harvest as harvest_events
+from .hms import harvest_month as harvest_hms_month
 
 
 def main() -> None:
@@ -22,6 +23,11 @@ def main() -> None:
     commands.add_parser("firms-status", help="check NASA source availability using the server credential")
     commands.add_parser("sync-pilots", help="import July 2021–2024 standard-product pilots and verify totals")
     commands.add_parser("harvest-events", help="cache recent reported wildfire events from NASA EONET")
+    hms_parser = commands.add_parser("harvest-hms", help="import a complete NOAA HMS VIIRS historical month")
+    hms_parser.add_argument("--month", required=True, help="finished month, YYYY-MM")
+    hms_parser.add_argument("--bbox", nargs=4, type=float, required=True, metavar=("W", "S", "E", "N"))
+    hms_parser.add_argument("--directory", type=Path, default=Path("data/downloads"))
+    hms_parser.add_argument("--refresh", action="store_true")
     import_parser = commands.add_parser("ingest", help="import a NASA FIRMS CSV file")
     import_parser.add_argument("csv", type=Path)
     import_parser.add_argument("--source", choices=sorted(SOURCES), required=True)
@@ -35,7 +41,7 @@ def main() -> None:
     view_parser.add_argument("--output", type=Path, help="write JSON to this file")
     fetch_parser = commands.add_parser("fetch-month", help="download a complete AOI month from NASA FIRMS")
     fetch_parser.add_argument("--month", required=True, help="YYYY-MM")
-    fetch_parser.add_argument("--source", choices=sorted(SOURCES), required=True)
+    fetch_parser.add_argument("--source", choices=sorted(FIRMS_SOURCES), required=True)
     fetch_parser.add_argument("--bbox", nargs=4, type=float, required=True, metavar=("W", "S", "E", "N"))
     fetch_parser.add_argument("--directory", type=Path, default=Path("data/downloads"))
     fetch_parser.add_argument("--refresh", action="store_true")
@@ -59,6 +65,9 @@ def main() -> None:
     elif args.command == "harvest-events":
         snapshot = harvest_events(Path(args.db).with_suffix(".events.json"))
         result = {"source": snapshot["source"], "events_cached": snapshot["count"], "fetched_utc": snapshot["fetched_utc"]}
+    elif args.command == "harvest-hms":
+        result = harvest_hms_month(db, month=args.month, bbox=tuple(args.bbox),
+                                   directory=args.directory, refresh=args.refresh)
     elif args.command == "init":
         result = {"database": str(Path(args.db).resolve()), "initialized": True}
     elif args.command == "ingest":

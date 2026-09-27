@@ -53,6 +53,12 @@ class WebMvpTests(unittest.TestCase):
         self.assertEqual(json.loads(body)["mode"], "aggregates")
         _, body = self.get("/api/map?" + query + "&month=7&zoom=8")
         self.assertEqual(len(json.loads(body)["features"]), 16)
+        _, body = self.get("/api/map?" + query + "&month=7&day=1&zoom=8")
+        daily_map = json.loads(body)
+        self.assertEqual(daily_map["scope_date"], "2015-07-01")
+        self.assertEqual(len(daily_map["features"]), 4)
+        with self.assertRaises(HTTPError):
+            self.get("/api/map?" + query + "&month=7&day=32&zoom=8")
         _, body = self.get("/api/observations?date=2015-07-01&series=joint&bbox=-122,39,-120,41")
         self.assertEqual(len(json.loads(body)["observations"]), 4)
         headers, body = self.get("/api/export?kind=calendar&" + query)

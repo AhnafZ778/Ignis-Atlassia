@@ -25,6 +25,7 @@ from .research import report as research_report, coverage_example
 from .study import build_bundle
 from .pilots import PilotSync, PILOTS
 from .events import latest as latest_events
+from .bootstrap import populate_showcase
 
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
@@ -223,6 +224,9 @@ def handler_factory(database: Path):
                                         "bbox": [latest[k] for k in ("west", "south", "east", "north")] if latest else PILOTS[0]["bbox"]}
                         self._json({"years": [row["year"] for row in rows], "series": list(SERIES),
                                     "default_view": default_view, "pilots": PILOTS,
+                                    "default_series": "hms-viirs" if latest and latest["source_id"] == "NOAA_HMS_VIIRS" else "joint",
+                                    "available_sources": [row[0] for row in db.execute("SELECT DISTINCT source_id FROM batches ORDER BY source_id")],
+                                    "source_counts": {row[0]: row[1] for row in db.execute("SELECT source_id,COUNT(*) FROM observations GROUP BY source_id")},
                                     "synthetic": bool(db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone())})
                     elif url.path == "/api/calendar":
                         year = int(params.get("year", ["2015"])[0])
@@ -256,9 +260,16 @@ def handler_factory(database: Path):
                             raise ValueError("invalid zoom")
                         start = f"{year}-{month:02d}-01"
                         end = (date(year, month, 1) + timedelta(days=32)).replace(day=1).isoformat()
-                        raw = _records(db, SERIES[series], bbox, start, end, 10001)
-                        truncated = len(raw) > 10000
-                        raw = raw[:10000]
+                        selected_day = params.get("day", [None])[0]
+                        if selected_day is not None:
+                            selected = date(year, month, int(selected_day))
+                            start = selected.isoformat()
+                            end = (selected + timedelta(days=1)).isoformat()
+                        raw = _records(db, SERIES[series], bbox, start, end, 60001)
+                        truncated = len(raw) > 60000
+                        raw = raw[:60000]
+                        point_bounds = ([min(row["lon"] for row in raw), min(row["lat"] for row in raw),
+                                         max(row["lon"] for row in raw), max(row["lat"] for row in raw)] if raw else None)
                         if zoom < 6:
                             step = 4 if zoom < 4 else 1
                             bins = defaultdict(lambda: {"count": 0, "sensors": set()})
@@ -271,16 +282,18 @@ def handler_factory(database: Path):
                                         for (lat, lon), info in bins.items()]
                             mode = "aggregates"
                         else:
+                            stride = max(1, math.ceil(len(raw) / 1000))
                             features = [{"lat": row["lat"], "lon": row["lon"],
                                          "sensor": row["sensor"], "platform": row["platform"],
                                          "acquisition_utc": row["acquisition_utc"],
                                          "confidence_raw": row["confidence_raw"],
                                          "product_version": row["product_version"],
-                                         "demo": bool(row["demo"])} for row in raw[:1000]]
-                            truncated = truncated or len(raw) > 1000
+                                         "demo": bool(row["demo"])} for row in raw[::stride]][:1000]
                             mode = "points"
                         self._json({"mode": mode, "features": features, "truncated": truncated,
-                                    "month": start[:7], "record_scope": "imported records only"})
+                                    "records_in_sample": len(raw), "point_bounds": point_bounds,
+                                    "month": start[:7], "scope_date": start if selected_day is not None else None,
+                                    "record_scope": "imported records only"})
                     elif url.path == "/api/export":
                         year, month, series, bbox = _request_context(params)
                         kind = params.get("kind", ["calendar"])[0]
@@ -344,9 +357,14 @@ def main():
     parser.add_argument("--db", type=Path, default=Path("data/fireatlas.sqlite3"))
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--no-showcase", action="store_true", help="leave the default authentic database empty on first launch")
     args = parser.parse_args()
     if not args.db.exists() and args.db == Path("data/demo.sqlite3"):
         make_demo(Path("data/demo"), args.db)
+    if args.db == Path("data/fireatlas.sqlite3") and not args.no_showcase:
+        result = populate_showcase(args.db)
+        if result["loaded"]:
+            print("Loaded verified NOAA HMS historical showcase into the authentic database.", flush=True)
     server = ThreadingHTTPServer((args.host, args.port), handler_factory(args.db))
     print(f"FireAtlas web MVP: http://{args.host}:{args.port}", flush=True)
     try:

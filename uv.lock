@@ -24,10 +24,14 @@ dependencies = [
     { name = "pyproj", version = "3.7.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pyproj", version = "3.7.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
     { name = "pyproj", version = "3.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pyshp" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyproj", specifier = ">=3.4,<4" }]
+requires-dist = [
+    { name = "pyproj", specifier = ">=3.4,<4" },
+    { name = "pyshp", specifier = ">=2.3,<3" },
+]
 
 [[package]]
 name = "pyproj"
@@ -209,4 +213,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ed/7a/faad58c948947b217fcf06f80d308fff27bab5730ad6c9cd4c35bcf8bc90/pyproj-3.8.0-cp315-cp315t-win32.whl", hash = "sha256:0ff22ad49d1f59e18a57384926aabcb0ee8bbe9213e5abe375fd18b1b6ace194", size = 6471511, upload-time = "2026-09-05T20:05:04.113Z" },
     { url = "https://files.pythonhosted.org/packages/cf/a8/5ed4f4042031e13a0fede12e81af1e4143102221c373f966a24f38b0d284/pyproj-3.8.0-cp315-cp315t-win_amd64.whl", hash = "sha256:d5a408b215ef98c9ae19e58ec512360b8ad9b25f8792138f983a58d159ac7157", size = 6940114, upload-time = "2026-09-05T20:05:05.737Z" },
     { url = "https://files.pythonhosted.org/packages/12/14/9c291ad92b565629cf4eacee72cbc8071ca8d93c9d719b47f304b1b2ea76/pyproj-3.8.0-cp315-cp315t-win_arm64.whl", hash = "sha256:bbf8a786ebfa9a904802dfde0e95e1325df8efbb573a19686c1937499a8f04e8", size = 6843958, upload-time = "2026-09-05T20:05:07.527Z" },
+]
+
+[[package]]
+name = "pyshp"
+version = "2.4.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/66/dc/8d5c654580a7398702026b6e34fdbe622bfdaef3b50e7f3f4244a11a90a0/pyshp-2.4.2.tar.gz", hash = "sha256:50d56ca9301960b00da7158e8428f64054da504f3c507b54df878232c9902232", size = 1739226, upload-time = "2026-06-06T16:46:42.895Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bd/22/ffcd94c7d57cb5dc0c45d0a158237f4c991ab3e187a75842e04ea3c94f6c/pyshp-2.4.2-py2.py3-none-any.whl", hash = "sha256:7a013b5e8333f5923a9eb012e2048ae15b3399f11abf2e0044b10176decbd68a", size = 49071, upload-time = "2026-06-06T16:46:41.37Z" },
 ]

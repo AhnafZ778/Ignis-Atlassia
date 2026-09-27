@@ -1,5 +1,6 @@
 const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null, demo: true };
 let map, markers, aoiOutline, contextLayer, contextChoice = "none", mapRequest = 0;
+let mapDay = null, mapPlayback = null, mapInputTimer = null, focusMapOnDay = false;
 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const shortMonths = monthNames.map(name => name.slice(0, 3).toUpperCase());
 const $ = selector => document.querySelector(selector);
@@ -29,16 +30,26 @@ async function loadMeta() {
     yearSelect.append(option);
   }
   state.year = defaultView.year; state.month = defaultView.month - 1; state.bbox = defaultView.bbox.join(",");
+  state.series = meta.default_series || "joint";
   yearSelect.value = String(state.year);
   const status = $("#dataset-status");
-  status.textContent = meta.synthetic ? "Guided demo · generated example data" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
+  status.textContent = meta.synthetic ? "Guided demo · generated example data" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
+  const showRealProof = !state.demo && meta.available_sources?.includes("NOAA_HMS_VIIRS");
+  $("#demo-source-note").hidden = showRealProof;
+  $("#real-source-note").hidden = !showRealProof;
+  if (showRealProof) $("#hero-real-count").textContent = (meta.source_counts?.NOAA_HMS_VIIRS || 0).toLocaleString();
   document.querySelectorAll("[data-demo]").forEach(button => {
     const active = button.dataset.demo === String(Number(state.demo));
     button.classList.toggle("selected", active);
     button.setAttribute("aria-pressed", String(active));
   });
+  document.querySelectorAll('[data-series="hms-viirs"]').forEach(button => { button.hidden = state.demo || !meta.available_sources?.includes("NOAA_HMS_VIIRS"); });
+  const hasFirms = state.demo || meta.available_sources?.some(source => source !== "NOAA_HMS_VIIRS");
+  document.querySelectorAll('[data-series="joint"],[data-series="modis"],[data-series="viirs-snpp"]').forEach(button => { button.hidden = !hasFirms; });
+  $(".series-row p").textContent = state.demo || hasFirms ? "Separate series preserve the sensor transition." : "A verified NOAA VIIRS cohort from the historical daily archive.";
   $("#mode-description").textContent = state.demo
     ? "Explore generated observations that demonstrate the complete workflow. Every example is marked synthetic."
+    : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Browse real NOAA HMS VIIRS fire points from complete historical daily archives. NASA EONET reports remain a separate layer."
     : meta.years.length ? "Browsing imported source records. Check the source ledger for retrieval and coverage details."
       : "NASA imports have not arrived on this server. Try the guided demo while the connection is restored.";
 }
@@ -46,12 +57,13 @@ async function loadMeta() {
 async function selectDataset(demo) {
   if (state.demo === demo && state.data) return;
   const previous = state.demo;
+  stopMapPlayback(); mapDay = null;
   state.demo = demo;
   state.data = null;
   state.comparison = null;
   try {
     await loadMeta();
-    state.series = "joint"; state.day = null; contextChoice = "none";
+    state.day = null; contextChoice = "none";
     await loadCalendar();
     drawAoi(true);
   } catch (error) {
@@ -64,11 +76,14 @@ async function selectDataset(demo) {
 async function loadCalendar(next = {}) {
   const request = ++calendarRequest;
   const config = {...state, ...next};
+  if (state.data && (config.year !== state.year || config.month !== state.month || config.series !== state.series || config.bbox !== state.bbox || config.demo !== state.demo)) {
+    stopMapPlayback(); mapDay = null;
+  }
   const params = new URLSearchParams({ year: config.year, series: config.series, bbox: config.bbox, demo: config.demo ? 1 : 0 });
   const data = await getJson(`/api/calendar?${params}`);
   const key = `${Number(config.demo)}:${config.year}:${config.bbox}`;
-  let comparison = jointCache.get(key);
-  if (!comparison) {
+  let comparison = config.series === "hms-viirs" ? data : jointCache.get(key);
+  if (!comparison && config.series !== "hms-viirs") {
     comparison = config.series === "joint" ? data : await getJson(`/api/calendar?${new URLSearchParams({year:config.year,series:"joint",bbox:config.bbox,demo:config.demo ? 1 : 0})}`);
     jointCache.set(key, comparison);
   }
@@ -101,6 +116,19 @@ function renderStats() {
 }
 
 function renderSourceComparison() {
+  const isHms = state.series === "hms-viirs";
+  $("#hms-source-compare").hidden = !isHms;
+  $("#firms-source-compare").hidden = isHms;
+  $("#source-compare-note").hidden = isHms;
+  if (isHms) {
+    const month = state.data.monthly[state.month];
+    const records = state.data.daily.filter(day => Number(day.date_utc.slice(5,7)) === state.month + 1);
+    const pixels = records.reduce((sum, day) => sum + (day.raw_pixels_by_sensor.VIIRS || 0), 0);
+    $("#hms-raw").textContent = month.export_window_complete ? pixels.toLocaleString() : "—";
+    $("#hms-cells").textContent = month.detected_cell_days === null ? "—" : month.detected_cell_days.toLocaleString();
+    $("#hms-period").textContent = `${monthNames[state.month]} ${state.year} · ${month.export_window_complete ? "complete daily archive" : "archive not loaded"}`;
+    return;
+  }
   const month = state.comparison.monthly[state.month];
   const known = month.export_window_complete;
   const records = state.comparison.daily.filter(day => Number(day.date_utc.slice(5,7)) === state.month + 1);
@@ -136,7 +164,7 @@ function renderMonths() {
     track.append(fill);
     const count = document.createElement("span"); count.className = "month-count"; count.textContent = showValue(item.detected_cell_days);
     button.append(label, track, count);
-    button.addEventListener("click", () => { state.month = index; state.day = null; render(); clearDay(); });
+    button.addEventListener("click", () => { stopMapPlayback(); mapDay = null; state.month = index; state.day = null; render(); clearDay(); });
     container.append(button);
   });
 }
@@ -159,7 +187,7 @@ function renderDays() {
     const number = document.createElement("span"); number.textContent = dayNumber;
     const count = document.createElement("small"); count.textContent = item.detected_cell_days === null ? "·" : item.detected_cell_days > 0 ? `${item.detected_cell_days} cell` : "0";
     button.append(number, count);
-    button.addEventListener("click", async () => { state.day = stamp; renderDays(); syncView(); updateContextLayer(); await loadDay(stamp); document.querySelector("#evidence-section").scrollIntoView({behavior:"smooth",block:"start"}); });
+    button.addEventListener("click", async () => { state.day = stamp; mapDay = dayNumber; renderDays(); renderTimeline(); syncView(); updateContextLayer(); updateMap(); await loadDay(stamp); document.querySelector("#evidence-section").scrollIntoView({behavior:"smooth",block:"start"}); });
     grid.append(button);
   }
 }
@@ -275,6 +303,56 @@ function mapViewport() {
   return [west, south, east, north].map(number => number.toFixed(4)).join(",");
 }
 
+function stopMapPlayback() {
+  if (mapPlayback) clearTimeout(mapPlayback);
+  mapPlayback = null;
+  const button = $("#map-play");
+  if (button) button.textContent = "▶ Play month";
+}
+
+function renderTimeline() {
+  if (!state.data) return;
+  const month = state.month + 1;
+  const days = new Date(Date.UTC(state.year, month, 0)).getUTCDate();
+  const entries = state.data.daily.filter(item => Number(item.date_utc.slice(5, 7)) === month);
+  const counts = entries.map(item => item.detected_cell_days ?? item.partial_import_detected_cell_days ?? 0);
+  const max = Math.max(1, ...counts);
+  const bars = $("#map-timeline-bars"); bars.replaceChildren();
+  counts.forEach((count, index) => {
+    const button = document.createElement("button"); button.type = "button";
+    button.className = "map-timeline-bar" + (mapDay === index + 1 ? " active" : "");
+    button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${count} detected cell-days`);
+    button.title = `${monthNames[state.month]} ${index + 1} · ${count} cell-days`;
+    const fill = document.createElement("span"); fill.style.height = `${Math.max(5, count / max * 100)}%`;
+    button.append(fill); button.addEventListener("click", () => { stopMapPlayback(); setMapDay(index + 1, true); });
+    bars.append(button);
+  });
+  const dateText = mapDay ? `${monthNames[state.month]} ${mapDay}, ${state.year} · observed pixels` : `${monthNames[state.month]} ${state.year} · all dates`;
+  $("#map-timeline-title").textContent = dateText;
+  $("#map-day").max = String(days); $("#map-day").value = String(mapDay || 1);
+  $("#map-all").disabled = mapDay === null;
+}
+
+function setMapDay(day, focus = false) {
+  mapDay = day;
+  focusMapOnDay = focus;
+  renderTimeline();
+  updateMap();
+}
+
+function playMapMonth() {
+  if (mapPlayback) { stopMapPlayback(); return; }
+  if (mapDay === null || mapDay >= Number($("#map-day").max)) mapDay = 0;
+  $("#map-play").textContent = "Ⅱ Pause replay";
+  const step = () => {
+    mapDay += 1;
+    renderTimeline(); updateMap();
+    if (mapDay >= Number($("#map-day").max)) { stopMapPlayback(); return; }
+    mapPlayback = setTimeout(step, 950);
+  };
+  step();
+}
+
 async function updateMap() {
   if (!map || !state.data) return;
   const request = ++mapRequest;
@@ -283,6 +361,7 @@ async function updateMap() {
     bbox: mapViewport(), zoom: map.getZoom(),
     demo: state.demo ? 1 : 0,
   });
+  if (mapDay !== null) params.set("day", String(mapDay));
   try {
     const result = await getJson(`/api/map?${params}`);
     if (request !== mapRequest) return;
@@ -310,23 +389,45 @@ async function updateMap() {
         body.append(title, line, action); marker.bindPopup(body); markers.addLayer(marker);
       }
     }
-    $("#map-status").textContent = `${result.features.length}${result.truncated ? "+" : ""} ${result.mode === "aggregates" ? "groups" : "points"} from imported ${result.month} records · ${state.series}`;
+    const scope = result.scope_date || result.month;
+    $("#map-status").textContent = result.mode === "aggregates"
+      ? `${result.features.length} map groups from ${result.records_in_sample.toLocaleString()} imported ${scope} points${result.truncated ? "+" : ""}`
+      : `${result.features.length.toLocaleString()} displayed across ${result.records_in_sample.toLocaleString()} imported ${scope} points${result.truncated ? "+" : ""} · ${state.series}`;
+    if (focusMapOnDay && mapDay !== null && result.features.length) {
+      focusMapOnDay = false;
+      const [west, south, east, north] = result.point_bounds;
+      const bounds = L.latLngBounds([[south, west], [north, east]]);
+      map.fitBounds(bounds.pad(.25), {padding: [45, 45], maxZoom: 11});
+    }
     if (result.truncated) toast("Map sample capped. Zoom in for a smaller area.");
   } catch (error) { if (request === mapRequest) $("#map-status").textContent = error.message; }
 }
 
 function render() {
   syncView(); renderStudySources();
-  renderStats(); renderSourceComparison(); renderMonths(); renderDays(); renderProvenance(); drawAoi(false); updateContextLayer(); updateMap();
+  renderStats(); renderSourceComparison(); renderMonths(); renderDays(); renderTimeline(); renderProvenance(); drawAoi(false); updateContextLayer(); updateMap();
   const research = $("#open-research-study");
-  const researchUrl = `/research.html?${new URLSearchParams({year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0})}`;
+  const researchUsesDemo = state.series === "hms-viirs";
+  const researchContext = researchUsesDemo
+    ? {year: 2015, month: 7, bbox: "-122,39,-120,41", demo: 1}
+    : {year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0};
+  const researchUrl = `/research.html?${new URLSearchParams(researchContext)}`;
   if (research) research.href = researchUrl;
+  $("#research-entry-copy").textContent = researchUsesDemo
+    ? "Explore source overlap and candidate groups in a clearly labelled synthetic MODIS/VIIRS example. The NOAA archive stays in the atlas."
+    : "Compare source overlap, test candidate groups, and inspect observation-mask denominators.";
   document.querySelectorAll('a[href^="/research.html"]:not(#open-research-study)').forEach(link => { link.href = researchUrl; });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   initMap();
   initStudyTools();
+  $("#map-play").addEventListener("click", playMapMonth);
+  $("#map-all").addEventListener("click", () => { stopMapPlayback(); setMapDay(null); });
+  $("#map-day").addEventListener("input", event => {
+    stopMapPlayback(); mapDay = Number(event.target.value); renderTimeline();
+    clearTimeout(mapInputTimer); mapInputTimer = setTimeout(updateMap, 120);
+  });
   document.querySelectorAll("[data-demo]").forEach(button => button.addEventListener("click", () => selectDataset(button.dataset.demo === "1")));
   $("#analyze").addEventListener("click", async () => {
     try {
@@ -359,8 +460,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }));
   try {
     const initialParams = new URLSearchParams(location.search);
+    const realMeta = !initialParams.has("demo") && !initialParams.has("year") && !initialParams.has("bbox") && !initialParams.has("series")
+      ? await getJson("/api/meta?demo=0") : null;
     state.demo = initialParams.has("demo") ? initialParams.get("demo") !== "0"
-      : !(initialParams.has("year") || initialParams.has("bbox") || initialParams.has("series"));
+      : initialParams.has("year") || initialParams.has("bbox") || initialParams.has("series") ? false
+      : !realMeta?.available_sources?.includes("NOAA_HMS_VIIRS");
     await loadMeta();
     let next = {};
     if (location.search) {

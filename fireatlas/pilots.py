@@ -64,6 +64,8 @@ class PilotSync:
         self.directory = self.database.parent / "downloads"
         self.lock = Lock()
         self.running = False
+        self.hms_validation_batch = None
+        self.hms_validation = None
         try:
             self.state = json.loads(self.status_path.read_text())
         except (OSError, ValueError):
@@ -92,7 +94,26 @@ class PilotSync:
                             "complete": _complete_month(db, f"{year}-07", (source,), tuple(pilot["bbox"]))}
                            for year in YEARS for source in SERIES["joint"]]
                 pilots.append({**pilot, "windows": windows})
+            hms_windows = [{"year": year, "complete": _complete_month(db, f"{year}-07", ("NOAA_HMS_VIIRS",), tuple(PILOTS[0]["bbox"]))}
+                           for year in YEARS]
+            hms_batch = db.execute("SELECT MAX(id) FROM batches WHERE source_id='NOAA_HMS_VIIRS'").fetchone()[0]
+            if hms_batch != self.hms_validation_batch:
+                self.hms_validation_batch = hms_batch
+                self.hms_validation = None
+                if hms_batch and all(item["complete"] for item in hms_windows):
+                    try:
+                        area = tuple(PILOTS[0]["bbox"])
+                        july = calendar(db, bbox=area, year=2024, series="hms-viirs")["monthly"][6]
+                        result = verify_bundle(io.BytesIO(build_bundle(db, year=2024, month=7, series="hms-viirs", bbox=area)))
+                        self.hms_validation = {"status": "reproduced", "cell_days": july["detected_cell_days"],
+                                               "baseline_median": july["baseline_median"],
+                                               "baseline_years": july["baseline_years"],
+                                               "observations_verified": result["observations"],
+                                               "bundle_verified": result["verified"]}
+                    except (ValueError, OSError, KeyError):
+                        self.hms_validation = {"status": "failed"}
         return {"credential_configured": bool(firms_key()), "sync": state, "sources": sources, "pilots": pilots,
+                "hms_windows": hms_windows, "hms_validation": self.hms_validation,
                 "synthetic": any(row["demo"] for row in sources)}
 
     def start(self):

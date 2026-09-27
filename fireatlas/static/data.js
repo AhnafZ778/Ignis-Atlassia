@@ -26,6 +26,11 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not read source status.");
       $("data-error").hidden = true;
+      const noaa = data.sources.find(source => source.source_id === "NOAA_HMS_VIIRS");
+      $("noaa-count").textContent = noaa ? noaa.observations.toLocaleString() : "0";
+      $("noaa-state").textContent = noaa ? "AUTHENTIC ARCHIVE LOADED" : "ARCHIVE READY TO IMPORT";
+      $("noaa-open").hidden = !noaa;
+      $("noaa-years").replaceChildren(...(data.hms_windows || []).map(item => node("span", `${item.year} ${item.complete ? "✓" : "·"}`, item.complete ? "ready" : "")));
       $("credential-state").textContent = data.credential_configured ? "KEY CONFIGURED ON SERVER" : "KEY NOT CONFIGURED";
       const sync = data.sync;
       const running = ["checking", "downloading", "validating"].includes(sync.status);
@@ -63,19 +68,26 @@
       if (!data.sources.length) $("source-list").append(node("p", "No source observations have been imported into this dataset yet.", "data-empty"));
       for (const source of data.sources) {
         const card = node("article", "", "source-card");
-        card.append(node("p", source.demo ? "SYNTHETIC" : "IMPORTED", "eyebrow"), node("h3", source.source_id),
+        card.append(node("p", source.demo ? "SYNTHETIC" : "IMPORTED", "eyebrow"), node("h3", source.source_id === "NOAA_HMS_VIIRS" ? "NOAA HMS · VIIRS" : source.source_id),
           node("strong", source.observations.toLocaleString()), node("p", `${source.imports} imports · ${source.observations.toLocaleString()} observations`),
           node("small", `Latest retrieval ${new Date(source.retrieved_utc).toLocaleString()}`));
         $("source-list").append(card);
       }
       $("pilot-validation").replaceChildren();
+      if (data.hms_validation?.status === "reproduced") {
+        const line = node("article", "", "validation-pilot");
+        line.append(node("h3", "NOAA HMS · Northern California"),
+          node("p", `${data.hms_validation.cell_days.toLocaleString()} detected cell-days in July 2024 · prior-year median ${data.hms_validation.baseline_median.toLocaleString()} from ${data.hms_validation.baseline_years.join(", ")}`),
+          node("strong", `${data.hms_validation.observations_verified.toLocaleString()} observations verified against study checksums and calendar totals`));
+        $("pilot-validation").append(line);
+      }
       if (sync.validation?.status === "reproduced") {
         for (const pilot of sync.validation.pilots) {
           const line = node("article", "", "validation-pilot");
           line.append(node("h3", pilot.name), node("p", `${pilot.cell_days.toLocaleString()} detected cell-days · prior-year median ${pilot.baseline_median.toLocaleString()} · baseline years ${pilot.baseline_years.join(", ")}`), node("strong", "Bundle checksums and calendar totals reproduced"));
           $("pilot-validation").append(line);
         }
-      } else $("pilot-validation").append(node("p", "Awaiting complete pilot imports. No authentic-data validation result has been produced."));
+      } else $("pilot-validation").append(node("p", "NASA FIRMS MODIS/VIIRS pilot validation awaits complete source imports."));
       if (running) timer = setTimeout(refresh, 2500);
     } catch (error) {
       $("data-error").hidden = false; $("data-error").textContent = error.message;

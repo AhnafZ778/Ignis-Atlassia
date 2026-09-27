@@ -32,11 +32,13 @@ SOURCES = {
     "VIIRS_NOAA20_SP": ("VIIRS", "SP"),
     "VIIRS_NOAA20_NRT": ("VIIRS", "NRT"),
     "VIIRS_NOAA21_NRT": ("VIIRS", "NRT"),
+    "NOAA_HMS_VIIRS": ("VIIRS", "NOAA HMS"),
 }
 SERIES = {
     "modis": ("MODIS_SP",),
     "viirs-snpp": ("VIIRS_SNPP_SP",),
     "joint": ("MODIS_SP", "VIIRS_SNPP_SP"),
+    "hms-viirs": ("NOAA_HMS_VIIRS",),
 }
 REQUIRED_COLUMNS = {
     "latitude", "longitude", "acq_date", "acq_time", "satellite",
