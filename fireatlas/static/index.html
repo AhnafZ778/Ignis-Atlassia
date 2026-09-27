@@ -65,7 +65,6 @@
           </div>
         </div>
         <div class="globe-dock-sub">
-          <button id="globe-documented-toggle" type="button" aria-pressed="false" aria-controls="globe-documented"><span aria-hidden="true">◇</span> Documented wildfires</button>
           <div class="globe-legend" role="group" aria-label="Detection legend">
             <button type="button" data-tooltip="Amber marks groups whose last observation is before the latest day in this selection. Color shows recency, not fire intensity."><span class="legend-dot earlier" aria-hidden="true"></span> Earlier</button>
             <button id="globe-latest-key" type="button" data-tooltip="Gold marks groups observed on the latest day in this selection. It does not mean a fire is still burning."><span class="legend-dot latest" aria-hidden="true"></span> Latest</button>
@@ -81,6 +80,7 @@
         </div>
       </div>
       <aside class="globe-console" aria-labelledby="globe-console-title">
+        <button id="globe-documented-toggle" type="button" aria-pressed="false" aria-controls="globe-documented"><span class="documented-toggle-icon" aria-hidden="true">◇</span><span class="documented-toggle-copy"><strong>Documented wildfires</strong><small>Explore the stories behind the fires</small></span><span class="documented-toggle-state">Show</span></button>
         <div class="globe-console-head"><h2 id="globe-console-title">NASA observations</h2><a href="/data.html" aria-label="Inspect data sources">↗</a></div>
         <div id="globe-overview">
           <div class="globe-total"><strong id="globe-total">—</strong><span>thermal detections<small id="globe-cell-count">Imported snapshot</small></span></div>
@@ -95,9 +95,10 @@
         <button id="globe-retry" type="button" hidden>Retry data</button>
         <div id="globe-selection" hidden aria-live="polite"></div>
         <section id="globe-documented" hidden aria-label="Documented historical wildfires">
-          <p class="documented-note">Selected historical cases · not current fire activity.</p>
+          <p class="documented-note">Historical events · not live fire activity.</p>
           <p id="documented-status" role="status"></p>
           <div id="documented-list" class="documented-list"></div>
+          <p class="documented-scroll-hint" aria-hidden="true">Scroll to browse more wildfires ↓</p>
           <div id="documented-detail" hidden></div>
           <p class="documented-location-note">Blue diamonds mark approximate affected communities, not ignition points or boundaries.</p>
         </section>

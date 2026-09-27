@@ -835,30 +835,56 @@
  .globe-hero *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
 
-/* Historical reporting is a separate, explicitly dated layer. */
-#globe-documented-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;min-height:34px;padding:7px 10px;border:1px solid #83cfff36;border-radius:7px;background:#83cfff08;color:#b5cbd7;font:11px var(--sans);cursor:pointer;white-space:nowrap}
-#globe-documented-toggle>span{font-size:18px;color:#83cfff;line-height:1}
-#globe-documented-toggle[aria-pressed=true]{background:#83cfff1a;color:#e5f5ff;border-color:#83cfff85}
-.globe-dock-sub{flex-wrap:wrap;gap:8px}
-.globe-console.documented-view>#globe-status,.globe-console.documented-view>#globe-retry,.globe-console.documented-view>.globe-about{display:none}
-#globe-documented{padding-top:10px}
-.documented-note{font-size:11px;line-height:1.6;color:#b4cbd6;margin:0 0 12px}
-#documented-status{font-size:11px;line-height:1.6;color:#8cb0c5;margin:8px 0}
-.documented-list{display:grid;gap:5px}
-.documented-list button{display:grid;gap:4px;width:100%;text-align:left;padding:9px 10px;border-color:#83cfff1c;background:#83cfff05}
-.documented-list strong{font-size:12px;font-weight:500;color:#e0edf3}
-.documented-list span{font-size:10px;color:#91aebb;line-height:1.5}
-.documented-list button:hover{border-color:#83cfff80;background:#83cfff10}
-.documented-location-note{font-size:10px;line-height:1.6;color:#91a7b4;border-top:1px solid #ffffff12;padding-top:11px;margin:14px 0 0}
-#documented-detail .documented-back{border:0;background:none;padding:2px 0 13px;color:#a9c9db;font-size:11px}
-#documented-detail h3{font:400 24px/1.25 var(--display);letter-spacing:-.04em;color:#e2f1f7;margin:8px 0 5px}
-.documented-place{font-size:12px;color:#94b6c8;margin:0 0 12px}
-.documented-summary{font-size:12px;color:#bfced5;line-height:1.75;margin:12px 0 16px}
-#documented-detail h4{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#89b5ca;margin:0 0 8px}
+/* Historical reports: a prominent entry point and a browsable casebook. */
+.globe-console{width:316px;padding:16px}
+#globe-documented-toggle{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;margin:0 0 18px;padding:12px;text-align:left;border:1px solid #70c5ed8c;border-radius:10px;background:linear-gradient(120deg,#183b50,#142733);color:#effaff;cursor:pointer;box-shadow:0 4px 20px #0003}
+#globe-documented-toggle:hover{background:linear-gradient(120deg,#21516b,#193548);border-color:#a8e1ff}
+.documented-toggle-icon{font-size:29px;color:#9adeff;line-height:1}
+.documented-toggle-copy{display:grid;gap:5px;flex:1;min-width:0}
+.documented-toggle-copy strong{font-size:13px;font-weight:600;letter-spacing:-.01em}
+.documented-toggle-copy small{font-size:10px;line-height:1.4;color:#b4d4e5}
+.documented-toggle-state{border:1px solid #a8e1ff55;border-radius:5px;padding:5px 7px;font-size:10px;color:#d7f2ff}
+#globe-documented-toggle[aria-pressed=true]{border-color:#9addff;background:linear-gradient(120deg,#204b62,#163342)}
+#globe-documented-toggle[aria-pressed=true] .documented-toggle-state{background:#bce9ff;color:#102c3d;border-color:transparent}
+.globe-console.documented-view>#globe-status,.globe-console.documented-view>#globe-retry,.globe-console.documented-view>.globe-about,.globe-console.documented-view .globe-console-head>a{display:none}
+.globe-console.documented-reading .globe-console-head{display:none}
+.globe-console.documented-reading #globe-documented-toggle{margin-bottom:4px}
+.globe-console.documented-view .globe-console-head h2{font-size:19px;color:#f0f7fa}
+#globe-documented{padding-top:8px}
+.documented-note{font-size:11px;line-height:1.5;color:#aac2ce;margin:0 0 12px}
+#documented-status{font-size:11px;line-height:1.6;color:#c2dce9;margin:10px 0}
+#documented-status:empty{display:none}
+.documented-scroll-hint{display:none}
+.documented-list{display:grid;gap:8px}
+.globe-console .documented-list button{display:flex;align-items:center;gap:10px;width:100%;min-height:76px;text-align:left;padding:11px 10px;border:1px solid #5e8ca15e;border-radius:9px;background:linear-gradient(110deg,#1b3544,#14252f);transition:background .15s,border-color .15s,transform .15s}
+.documented-number{display:grid;place-items:center;flex-shrink:0;width:29px;height:32px;border:1px solid #7bd4ff50;border-radius:6px;background:#83cfff12;font:12px var(--display);color:#b9e8ff}
+.documented-card-copy{display:grid;gap:3px;flex:1;min-width:0}
+.documented-card-copy strong{font-size:13px;font-weight:600;line-height:1.35;color:#f2f8fb}
+.documented-card-copy>span{font-size:11px;color:#b7ceda;line-height:1.4}
+.documented-card-copy small{font-size:10px;color:#86c5e3;line-height:1.4}
+.documented-card-arrow{font-size:19px;color:#a6dfff}
+.globe-console .documented-list button:hover{border-color:#9cddff;background:#24495e;transform:translateX(-2px)}
+.documented-location-note{font-size:10px;line-height:1.6;color:#98b2c0;border-top:1px solid #ffffff16;padding-top:11px;margin:14px 0 0}
+#documented-detail .documented-back,#globe-selection .globe-close{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin:0 0 18px;padding:10px 12px;border:1px solid #8cd5fb;border-radius:8px;background:#bce9ff;color:#102836;font-size:12px;font-weight:650;box-shadow:0 3px 12px #0002}
+#documented-detail .documented-back{position:sticky;top:0;z-index:2}
+#documented-detail .documented-back:hover,#globe-selection .globe-close:hover{background:#e0f5ff}
+#documented-detail .globe-kicker{font-size:10px;color:#9bd5ef;letter-spacing:.06em}
+#documented-detail h3{font:500 25px/1.2 var(--display);letter-spacing:-.035em;color:#f0f7fb;margin:9px 0 7px;text-wrap:balance}
+.documented-place{font-size:12px;color:#9ec5d9;margin:0 0 12px}
+.documented-summary{font-size:13px;color:#c9d9e2;line-height:1.7;margin:14px 0 18px}
+#documented-detail h4{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#acd4e8;margin:0 0 9px}
 .documented-sources{display:grid;gap:8px}
-.documented-sources a{display:grid;gap:4px;padding:11px 12px;border:1px solid #83cfff36;border-radius:8px;background:#83cfff08;text-decoration:none;color:#cbeaff}
-.documented-sources a:hover{background:#83cfff15;border-color:#83cfff80}
-.documented-sources strong{font-size:12px;font-weight:500}
-.documented-sources span{font-size:11px;line-height:1.5;color:#bdcfd8}
-.documented-sources small{font-size:10px;color:#90acbc}
-@media(max-width:500px){#globe-documented-toggle{min-height:44px;width:100%}.documented-list button{min-height:48px}.documented-list span{font-size:11px}}
+.documented-sources a{display:grid;gap:5px;padding:12px;border:1px solid #7abde365;border-radius:9px;background:#1c394b;text-decoration:none;color:#e6f6ff}
+.documented-sources a:hover{background:#28516a;border-color:#abe2ff}
+.documented-sources strong{font-size:13px;font-weight:600}
+.documented-sources span{font-size:12px;line-height:1.5;color:#c4dce9}
+.documented-sources small{font-size:10px;color:#9fbfce}
+.documented-navigation{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:16px;margin-top:16px;border-top:1px solid #ffffff16}
+.documented-navigation>span{font-size:10px;white-space:nowrap;color:#a7c7d7}
+.globe-console .documented-navigation button{min-height:40px;font-size:11px;padding:8px;color:#d4ecfa;border-color:#83cfff55;background:#83cfff10}
+.globe-console .documented-navigation button:hover:not(:disabled){background:#83cfff28;border-color:#83cfff}
+.globe-console .documented-navigation button:disabled{opacity:.3;cursor:default}
+@media(min-width:951px){.documented-scroll-hint{display:block;margin:9px 0 0;text-align:center;font-size:10px;color:#a5d4eb}#documented-list[hidden]+.documented-scroll-hint{display:none}.globe-console{right:24px;max-height:calc(100% - 48px)}.documented-list{max-height:330px;overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:#6fabc8 #14242e}}
+@media(min-width:951px) and (max-width:1150px){.globe-console{width:280px;right:16px;padding:14px}.documented-toggle-copy strong{font-size:12px}.globe-hero .hero-copy{max-width:21vw}}
+@media(max-width:950px){.globe-console{width:auto}.documented-list{grid-template-columns:1fr 1fr}.globe-console .documented-list button{min-height:88px}}
+@media(max-width:500px){.globe-console{padding:16px}.documented-list{grid-template-columns:1fr}.globe-console .documented-list button{min-height:80px}.documented-card-copy strong{font-size:14px}.documented-navigation button{min-height:44px}}

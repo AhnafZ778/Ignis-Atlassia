@@ -120,3 +120,16 @@ Verification: all 56 existing automated tests passed. Browser checks covered
 the six-case picker, globe marker selection, external report tabs, independent
 layer visibility and mobile layout at 390×844. No JavaScript exceptions or
 horizontal overflow were observed. Desktop was checked at 1366×768.
+
+### Casebook navigation polish
+
+The documented wildfire toggle now sits at the top of the information panel.
+Numbered cards separate the event, location and date; a desktop scroll hint
+exposes the rest of the collection. Report details have a prominent sticky
+“Back to all wildfires” button and Previous/Next controls with a case counter.
+Returning restores focus to the selected card. Larger blue globe markers have
+a wider hit area. The satellite detail view also has an explicit back button.
+
+Browser checks passed for marker selection, source links, Previous/Next limits,
+back navigation, focus restoration and showing/hiding the layer. Layout checks
+at 1366, 1024, 820 and 390 px found no horizontal overflow or JavaScript errors.

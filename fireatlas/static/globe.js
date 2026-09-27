@@ -156,8 +156,9 @@
     for (const fire of state.documented && !state.revealing ? state.fires || [] : []) {
       const p = FireGlobeMath.project(fire.vector, view);
       if (!p) continue;
-      const size = view.width < 600 ? 6 : 7;
-      ctx.beginPath();ctx.arc(p.x,p.y,size+5,0,Math.PI*2);ctx.fillStyle="#08171feb";ctx.fill();
+      const size = view.width < 600 ? 9 : 10;
+      ctx.beginPath();ctx.arc(p.x,p.y,size+5,0,Math.PI*2);ctx.fillStyle="#08171ff5";ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle="#83cfff";ctx.stroke();
       ctx.beginPath();ctx.moveTo(p.x,p.y-size);ctx.lineTo(p.x+size,p.y);ctx.lineTo(p.x,p.y+size);ctx.lineTo(p.x-size,p.y);ctx.closePath();
       ctx.fillStyle = fire.id === state.selectedFire ? "#def6ff" : "#83cfff";
       ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle="#2d6f9d";ctx.stroke();
@@ -220,7 +221,7 @@
       }
       down = null;
       const target = state.visible.map(p => ({...p, d: Math.hypot(p.x - e.clientX, p.y - e.clientY)}))
-        .filter(p => p.d <= (e.pointerType === "touch" ? 13 : 8)).sort((a, b) => Number(b.kind === "documented") - Number(a.kind === "documented") || a.d - b.d)[0];
+        .filter(p => p.d <= (p.kind === "documented" ? 20 : e.pointerType === "touch" ? 13 : 8)).sort((a, b) => Number(b.kind === "documented") - Number(a.kind === "documented") || a.d - b.d)[0];
       if (target) target.kind === "documented" ? selectFire(target.id) : select(target.id);
     });
     draw(bridge.view);
@@ -245,21 +246,23 @@
     $("globe-selection").hidden = true;
     $("globe-overview").hidden = state.documented;
     $("globe-documented").hidden = !state.documented;
-    $("globe-console-title").textContent = state.documented ? "Documented wildfires" : "NASA observations";
+    $("globe-console-title").textContent = state.documented ? "Historical casebook" : "NASA observations";
     document.querySelector(".globe-console").classList.toggle("documented-view", state.documented);
-    document.querySelector(".globe-console").classList.remove("has-selection");
+    document.querySelector(".globe-console").classList.remove("has-selection", "documented-reading");
     $("globe-location").value = "";
   }
 
   async function toggleDocumented() {
     state.documented = !state.documented;
     $("globe-documented-toggle").setAttribute("aria-pressed", String(state.documented));
+    document.querySelector(".documented-toggle-state").textContent = state.documented ? "Hide" : "Show";
     clearSelection();
+    document.querySelector(".globe-console").scrollTop = 0;
     if (!state.documented) {
       state.selectedFire = null;
       $("documented-detail").hidden = true;
       $("documented-list").hidden = false;
-      if (state.fires) $("documented-status").textContent = `${state.fires.length} cases · select a diamond or a name.`;
+      if (state.fires) $("documented-status").textContent = `${state.fires.length} wildfires · choose a story to explore`;
       draw(state.bridge?.view);
       return;
     }
@@ -270,10 +273,15 @@
     try {
       const data = await state.firesLoading;
       state.fires = data.events.map(fire => ({...fire,vector:FireGlobeMath.vector(fire.lon,fire.lat)}));
-      $("documented-status").textContent = `${state.fires.length} cases · select a diamond or a name.`;
-      $("documented-list").replaceChildren(...state.fires.map(fire => {
+      $("documented-status").textContent = `${state.fires.length} wildfires · choose a story to explore`;
+      $("documented-list").replaceChildren(...state.fires.map((fire, index) => {
         const button = element("button");button.type="button";button.dataset.fireId=fire.id;
-        button.append(element("strong",fire.name),element("span",`${fire.place} · ${fire.period}`));
+        const number = element("span",String(index + 1).padStart(2,"0"),"documented-number");
+        number.setAttribute("aria-hidden","true");
+        const copy = element("span",undefined,"documented-card-copy");
+        copy.append(element("strong",fire.name),element("span",fire.place),element("small",fire.period));
+        const arrow = element("span","↗","documented-card-arrow");arrow.setAttribute("aria-hidden","true");
+        button.append(number,copy,arrow);
         button.addEventListener("click",()=>selectFire(fire.id));return button;
       }));
       syncControls();draw(state.bridge?.view);
@@ -290,14 +298,16 @@
     const fire = state.fires?.find(item => item.id === id);
     if (!fire) return;
     clearSelection();state.selectedFire=id;
+    document.querySelector(".globe-console").classList.add("documented-reading");
     focus(fire.lon,fire.lat);
     $("documented-list").hidden=true;
     $("documented-status").textContent="";
     const detail=$("documented-detail");detail.hidden=false;detail.replaceChildren();
-    const back=element("button","← All cases","documented-back");back.type="button";
+    const back=element("button","← Back to all wildfires","documented-back");back.type="button";
     back.addEventListener("click",()=>{
+      document.querySelector(".globe-console").classList.remove("documented-reading");
       state.selectedFire=null;detail.hidden=true;$("documented-list").hidden=false;
-      $("documented-status").textContent=`${state.fires.length} cases · select a diamond or a name.`;
+      $("documented-status").textContent=`${state.fires.length} wildfires · choose a story to explore`;
       document.querySelector(`[data-fire-id="${fire.id}"]`)?.focus();
     });
     detail.append(back,element("span",fire.period,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
@@ -307,7 +317,18 @@
       link.append(element("strong",`${source.publisher} ↗`),element("span",source.label),element("small",`Published ${source.published}`));
       links.append(link);
     }
-    detail.append(element("h4","Read the reports"),links);
+    const navigation=element("nav",undefined,"documented-navigation");
+    navigation.setAttribute("aria-label","Browse wildfire stories");
+    const index=state.fires.indexOf(fire);
+    const previous=element("button","← Previous");previous.type="button";
+    const next=element("button","Next wildfire →");next.type="button";
+    previous.disabled=index===0;next.disabled=index===state.fires.length-1;
+    previous.addEventListener("click",()=>selectFire(state.fires[index-1].id));
+    next.addEventListener("click",()=>selectFire(state.fires[index+1].id));
+    navigation.append(previous,element("span",`${index+1} / ${state.fires.length}`),next);
+    detail.append(element("h4","News & source reports"),links,navigation);
+    document.querySelector(".globe-console").scrollTop=0;
+    back.focus({preventScroll:true});
   }
 
   function renderObservationImprint(data, currentDay) {
@@ -494,11 +515,13 @@
     $("globe-overview").hidden = true;
     $("globe-documented").hidden = true;
     state.selectedFire=null;
+    $("documented-detail").hidden=true;$("documented-list").hidden=false;
+    if(state.fires) $("documented-status").textContent=`${state.fires.length} wildfires · choose a story to explore`;
     $("globe-console-title").textContent="NASA observations";
-    document.querySelector(".globe-console").classList.remove("documented-view");
+    document.querySelector(".globe-console").classList.remove("documented-view", "documented-reading");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
-    const close = element("button", "← Overview", "globe-close");
+    const close = element("button", state.documented ? "← Back to all wildfires" : "← Back to observations", "globe-close");
     close.type = "button";
     close.addEventListener("click", () => { clearSelection(); (state.documented ? $("globe-documented-toggle") : $("globe-location")).focus(); });
     panel.prepend(close);
