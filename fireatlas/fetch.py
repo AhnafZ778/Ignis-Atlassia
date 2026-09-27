@@ -109,8 +109,8 @@ def fetch_month(db, *, month: str, source_id: str, bbox: tuple[float, float, flo
             temporary.replace(path)
         finally:
             temporary.unlink(missing_ok=True)
-    # A source URI with a literal placeholder keeps the private key out of SQLite.
-    with db:
+    tx = db.transaction() if hasattr(db, "transaction") else db
+    with tx:
         if refresh:
             old_batches = db.execute("""
                 SELECT batch_id FROM export_windows

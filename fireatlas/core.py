@@ -51,10 +51,33 @@ REQUIRED_COLUMNS = {
 }
 
 
-def connect(path: str | Path) -> sqlite3.Connection:
+class Connection(sqlite3.Connection):
+    def __enter__(self):
+        super().__enter__()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            super().__exit__(exc_type, exc_val, exc_tb)
+        finally:
+            self.close()
+
+    def transaction(self):
+        class _Tx:
+            def __init__(self, conn):
+                self.conn = conn
+            def __enter__(self):
+                sqlite3.Connection.__enter__(self.conn)
+                return self.conn
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                return sqlite3.Connection.__exit__(self.conn, exc_type, exc_val, exc_tb)
+        return _Tx(self)
+
+
+def connect(path: str | Path) -> Connection:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    db = sqlite3.connect(path)
+    db = sqlite3.connect(path, factory=Connection)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA foreign_keys=ON")
     db.executescript("""
@@ -211,9 +234,8 @@ def ingest(
     window_key = json.dumps([complete_month, bbox])
     uri = _safe_source_uri(source_uri or csv_path.resolve().as_uri())
     retrieved = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    # Stream large public global exports inside one transaction. A bad row
-    # rolls back the entire new batch, including its excluded-row ledger.
-    with db, csv_path.open(newline="", encoding="utf-8-sig") as stream:
+    tx = db.transaction() if hasattr(db, "transaction") else db
+    with tx, csv_path.open(newline="", encoding="utf-8-sig") as stream:
         reader = csv.DictReader(stream)
         required = REQUIRED_COLUMNS - {"instrument"}
         if reader.fieldnames is None or not required.issubset(reader.fieldnames):
