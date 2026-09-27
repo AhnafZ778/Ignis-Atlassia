@@ -33,37 +33,72 @@
       <div class="hero-copy">
         <p class="eyebrow"><span class="dot"></span> NASA FIRMS / EARTH OBSERVATORY</p>
         <h1>A world<br> of <em>fire signals.</em></h1>
-        <p class="intro">Turn the planet. Follow a signal.<br>Explore where NASA satellites observed thermal activity across the world.</p>
-        <a class="hero-primary" href="#atlas-section">Explore the atlas <span aria-hidden="true">↗</span></a>
-        <span class="hero-caption">SELECT A GLOWING POINT TO INSPECT ITS EVIDENCE.</span>
+        <p class="intro">Explore NASA thermal observations. Turn on detections to inspect a signal.</p>
+        <div class="hero-actions">
+          <a class="hero-primary" href="#atlas-section">Explore the atlas <span aria-hidden="true">↗</span></a>
+          <button id="hero-start-tour" class="hero-tour-link" type="button" disabled>✦ &nbsp; Take the guided tour <span aria-hidden="true">↗</span></button>
+        </div>
+        <p class="hero-caption">Guided tour · synthetic example</p>
       </div>
       <div class="hero-art earth-hero">
         <div class="earth-fallback" aria-hidden="true"></div>
         <div id="earth-frame-host" class="earth-frame-host" aria-label="Interactive three-dimensional Earth"></div>
+        <div id="globe-reveal-status" class="globe-reveal-status" role="status" hidden></div>
         <div class="earth-controls"><span id="earth-caption">EARTH COMPOSITE · DRAG TO ROTATE</span><a href="/earth.html" target="_blank" rel="noopener noreferrer">Explore full Earth ↗</a></div>
       </div>
-      <div class="hero-coordinate">NASA FIRMS / EARTH<span id="globe-stamp">LOADING IMPORTED OBSERVATIONS</span></div>
-      <div class="globe-toolbar" aria-label="Globe navigation">
-        <div class="globe-regions" role="group" aria-label="Look at a region"><button type="button" data-globe-region="20,-5">Africa</button><button type="button" data-globe-region="-60,-12">S. America</button><button type="button" data-globe-region="-110,40">N. America</button><button type="button" data-globe-region="100,25">Asia</button><button type="button" data-globe-region="135,-25">Australia</button></div>
-        <div class="globe-tools"><button id="globe-rotate" type="button" aria-pressed="false">Pause rotation</button><button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">＋</button><button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button><label><input id="globe-markers" type="checkbox" checked> Detections</label></div>
-        <p class="globe-legend"><i></i> Earlier in snapshot <i></i> Latest observed day · size indicates detection count</p>
+      <div class="hero-coordinate">NASA FIRMS / EARTH<span id="globe-stamp">DRAG TO EXPLORE</span></div>
+      <div class="globe-flight-dock" aria-label="Globe navigation and observation profile">
+        <div class="globe-dock-main">
+          <div class="globe-regions" role="group" aria-label="Look at a region">
+            <button type="button" data-globe-region="20,-5">Africa</button>
+            <button type="button" data-globe-region="-60,-12">S. America</button>
+            <button type="button" data-globe-region="-110,40">N. America</button>
+            <button type="button" data-globe-region="100,25">Asia</button>
+            <button type="button" data-globe-region="135,-25">Australia</button>
+          </div>
+          <div class="dock-divider" aria-hidden="true"></div>
+          <div class="globe-tools">
+            <button id="globe-rotate" type="button" aria-pressed="false" title="Camera rotation (does not change observation dates)">Pause rotation</button>
+            <button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">＋</button>
+            <button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button>
+            <label class="globe-toggle-label"><input id="globe-markers" type="checkbox"> Detections</label>
+          </div>
+        </div>
+        <div class="globe-dock-sub">
+          <div class="globe-legend" role="group" aria-label="Detection legend">
+            <button type="button" data-tooltip="Amber marks groups whose last observation is before the latest day in this selection. Color shows recency, not fire intensity."><span class="legend-dot earlier" aria-hidden="true"></span> Earlier</button>
+            <button id="globe-latest-key" type="button" data-tooltip="Gold marks groups observed on the latest day in this selection. It does not mean a fire is still burning."><span class="legend-dot latest" aria-hidden="true"></span> Latest</button>
+            <button type="button" data-tooltip="Larger dots contain more satellite detections in a 1° geographic cell. Multiple detections may describe the same fire; size is not burned area or severity.">Size ⓘ</button>
+          </div>
+          <div id="globe-imprint" class="globe-imprint" aria-label="Daily observation profile">
+            <div class="imprint-meta">
+              <span class="imprint-label">Detections by day · UTC</span>
+              <button id="imprint-reset" type="button" class="imprint-reset-btn" hidden>All dates</button>
+            </div>
+            <div id="globe-imprint-bars" class="imprint-bars" role="group" aria-label="Daily detection counts"></div>
+          </div>
+        </div>
       </div>
       <aside class="globe-console" aria-labelledby="globe-console-title">
-        <div class="globe-console-head"><span class="globe-kicker">IMPORTED NASA SNAPSHOT</span><a href="/data.html" aria-label="Inspect NASA data sources">↗</a></div>
-        <h2 id="globe-console-title">The observed world.</h2>
-        <p id="globe-period" class="globe-period">Reading satellite records…</p>
-        <div class="globe-filters"><label>OBSERVATION DATE<select id="globe-date" disabled><option value="all">All imported dates</option></select></label><label>SATELLITE<select id="globe-source" disabled><option value="all">All NASA satellites</option></select></label></div>
-        <div class="globe-total"><strong id="globe-total">—</strong><span>thermal detections<br><small id="globe-cell-count">Grouping nearby records…</small></span></div>
-        <p id="globe-status" role="status">Loading the globe snapshot…</p>
+        <div class="globe-console-head"><h2 id="globe-console-title">NASA observations</h2><a href="/data.html" aria-label="Inspect data sources">↗</a></div>
+        <div id="globe-overview">
+          <div class="globe-total"><strong id="globe-total">—</strong><span>thermal detections<small id="globe-cell-count">Imported snapshot</small></span></div>
+          <p id="globe-period" class="globe-period">Preparing observations…</p>
+          <div class="globe-filters">
+            <label>Date<select id="globe-date" disabled><option value="all">All dates</option></select></label>
+            <label>Satellite<select id="globe-source" disabled><option value="all">All satellites</option></select></label>
+          </div>
+          <label class="globe-browse">Location<select id="globe-location" disabled><option value="">Browse largest groups…</option></select></label>
+        </div>
+        <p id="globe-status" role="status">Detections are hidden.</p>
         <button id="globe-retry" type="button" hidden>Retry data</button>
-        <label class="globe-browse">BROWSE DETECTION CLUSTERS<select id="globe-location"><option value="">Select a point on Earth…</option></select></label>
         <div id="globe-selection" hidden aria-live="polite"></div>
-        <p class="globe-truth">Satellite detections can include agricultural burning and other heat sources. They do not establish ignition time, burned area, or whether a fire is still active. Unmarked areas may have no observations.</p>
-        <a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">How to read NASA fire detections ↗</a>
+        <details class="globe-about"><summary>About these observations</summary><p>Imported thermal signals, including agricultural burning. Fire status, ignition time and burned area are unknown. Missing observations do not establish fire-free conditions.</p><a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">NASA detection guide ↗</a></details>
       </aside>
+      <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>
       <aside class="orbital-note" id="demo-source-note" aria-label="Observation sources"><span class="orbital-kicker">A SHARED VIEW</span><div class="orbital-diagram" aria-hidden="true"><svg viewBox="0 0 180 130"><circle cx="90" cy="65" r="30"/><ellipse cx="90" cy="65" rx="78" ry="24" transform="rotate(-30 90 65)"/><ellipse cx="90" cy="65" rx="67" ry="37" transform="rotate(40 90 65)"/><path d="M60 65h60M90 35c-20 15-20 45 0 60 20-15 20-45 0-60"/><circle class="sat-dot" cx="151" cy="32" r="4"/><circle class="sat-dot secondary" cx="45" cy="26" r="3"/></svg></div><div class="sensor-caption"><span>01</span><strong>MODIS<small>TERRA + AQUA</small></strong><i></i></div><div class="sensor-caption"><span>02</span><strong>VIIRS<small>SUOMI NPP</small></strong><i></i></div><p>Different sensors.<br>A more complete perspective.</p></aside>
       <aside class="orbital-note real-source-note" id="real-source-note" aria-label="Authentic satellite data" hidden><span class="orbital-kicker">VERIFIED ARCHIVE / NOAA</span><strong id="hero-real-count">—</strong><span class="real-source-unit">VIIRS FIRE POINTS</span><div class="real-source-rule"></div><p>Four complete July archives.<br>One Northern California window.</p><a href="/data.html">Inspect provenance ↗</a></aside>
-      <div class="hero-bottom"><a class="hero-atlas-link" href="#atlas-section"><span aria-hidden="true">↓</span> SCROLL TO DISCOVER</a><button id="hero-start-tour" class="hero-tour-link" type="button" disabled>✦ &nbsp; Start the guided tour <span aria-hidden="true">↗</span></button></div>
+      <div class="hero-bottom"><a class="hero-atlas-link" href="#atlas-section"><span aria-hidden="true">↓</span> SCROLL TO DISCOVER</a></div>
     </section>
     <div class="mission-strip"><span>FROM ORBIT TO UNDERSTANDING</span><div><strong>01</strong> Explore the planet</div><div><strong>02</strong> Follow the patterns</div><div><strong>03</strong> Inspect the evidence</div><a href="/research.html">Go deeper ↗</a></div>
     <div class="shell">

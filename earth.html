@@ -77,11 +77,25 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    drift:0,cinema:false,dragging:false,lastInteraction:0};
  let gl, program, uniform, frameId=0, previous=0, elapsed=0, toastTimer, hasStarted=false;
  let scale=Math.min(devicePixelRatio||1,embedded?1.3:1.7), slowFrames=0, frameCounter=0;
- let focusTarget=null,renderVisible=true;
+ let focusTarget=null,renderVisible=true,revealOrbit=null;
+ // A complete, bounded turn for the landing page; restore the captured pose exactly.
+ function finishRevealOrbit(completed){
+   if(!revealOrbit)return;
+   const orbit=revealOrbit;revealOrbit=null;
+   Object.assign(state,orbit.pose,{playing:false});focusTarget=null;playUI();
+   orbit.resolve(completed);
+ }
  const bridge=window.fireAtlasEarth={view:null,onFrame:null,
    setVisible(value){renderVisible=Boolean(value);if(renderVisible&&hasStarted)startLoop();},
    focus(lon,lat){if(!Number.isFinite(lon)||!Number.isFinite(lat))return;const target=lon*Math.PI/180;focusTarget={yaw:state.yaw+Math.atan2(Math.sin(target-state.yaw),Math.cos(target-state.yaw)),pitch:Math.max(-1.45,Math.min(1.45,lat*Math.PI/180))};state.playing=false;playUI();},
    setPlaying(value){state.playing=Boolean(value);focusTarget=null;playUI();},
+   rotateOnce({duration=8000}={}){
+     finishRevealOrbit(false);focusTarget=null;state.playing=false;playUI();
+     if(matchMedia('(prefers-reduced-motion: reduce)').matches)return Promise.resolve(true);
+     const pose={yaw:state.yaw,pitch:state.pitch,distance:state.distance,targetDistance:state.distance,angle:state.angle,targetAngle:state.angle,drift:state.drift};
+     return new Promise(resolve=>{revealOrbit={pose,duration:Math.max(1000,duration),elapsed:0,resolve};});
+   },
+   cancelOrbit(){finishRevealOrbit(false);},
    zoom(delta){zoom(delta);},reset(){focusTarget=null;reset();}
  };
  const textures=[];
@@ -269,7 +283,12 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
  function draw(now){
    frameId=0;if(document.hidden||!renderVisible)return;
    const rawDt=previous?(now-previous)/1000:1/60;const dt=Math.min(rawDt,.05);previous=now;elapsed+=dt;
-   if(!state.dragging&&state.playing&&now-state.lastInteraction>850){state.yaw+=dt*.027*state.speed;}
+   if(revealOrbit){
+     const orbit=revealOrbit;orbit.elapsed+=rawDt*1000;
+     const t=Math.min(1,orbit.elapsed/orbit.duration),ease=t*t*(3-2*t);
+     Object.assign(state,orbit.pose);state.yaw=orbit.pose.yaw+Math.PI*2*ease;
+     if(t===1)finishRevealOrbit(true);
+   }else if(!state.dragging&&state.playing&&now-state.lastInteraction>850){state.yaw+=dt*.027*state.speed;}
    if(state.playing&&!state.dragging)state.drift+=dt*.00020*state.speed;
    const ease=1.-Math.exp(-dt*7.);if(focusTarget){state.yaw+=(focusTarget.yaw-state.yaw)*ease;state.pitch+=(focusTarget.pitch-state.pitch)*ease;}state.distance+=(state.targetDistance-state.distance)*ease;state.angle+=(state.targetAngle-state.angle)*ease;
    resize();gl.useProgram(program);
@@ -280,7 +299,7 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    const view={width:innerWidth,height:innerHeight,rotation:rotation(state.yaw,state.pitch),
      distance:embedded&&innerWidth>950?Math.max(1.65,landingDistance+state.distance-initialDistance):state.distance+(embedded&&innerWidth>650&&innerWidth<=950?.5:0.),
      framing:embedded?0.:innerWidth>850?.32:0.,vertical:embedded?(innerWidth<=760?-.17:innerWidth<=950?-.32:.03):innerWidth<701?-.03:.035,
-     playing:state.playing};
+     playing:state.playing,revealing:Boolean(revealOrbit)};
    gl.uniform1f(uniform.uDistance,view.distance);
    gl.uniform1f(uniform.uFraming,view.framing);
    gl.uniform1f(uniform.uVertical,view.vertical);

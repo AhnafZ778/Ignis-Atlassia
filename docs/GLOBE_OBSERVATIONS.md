@@ -71,3 +71,33 @@ The 1° cells are a visual grouping chosen for the global view. Use the linked
 atlas and original source records for closer inspection. Regional fire status,
 fire boundaries, ignition attribution and operational response information
 require additional data and are not derived by this feature.
+
+## Landing-page polish and detection reveal — 27 September 2026
+
+The globe starts with detections off. Observation data is fetched during idle
+time after the Earth becomes ready (or on an explicit detection request).
+Turning on detections performs an eased full turn, then restores the captured
+orientation and pauses before revealing the overlay. If data remains pending,
+“Loading data…” stays visible at that original pose. Unchecking cancels the turn
+and restores the pose without showing detections. Reduced-motion mode skips the
+turn. Failed data requests leave detections off and expose Retry.
+
+The compact right panel switches between the overview and selected group;
+source records, atlas links and interpretation expand on demand. Legend buttons
+and daily-count bars show explanatory tooltips on hover, keyboard focus or tap.
+The daily chart retains the full date window for the selected satellite even
+when the globe displays one date. Missing records are labelled coverage unknown.
+
+Verification: 56 automated tests passed. Browser checks covered default-hidden
+markers, background loading, exact rotation-matrix equality after a full turn,
+cancellation, delayed data, reduced motion, request errors, tooltips and group
+inspection. Desktop 1440×900, laptop 1366×768 and mobile-width 390×844 were checked;
+no horizontal overflow or JavaScript exceptions were observed. The application
+uses the existing Earth textures and shaders; the renderer bridge now exposes a
+bounded turn and cancellation to support this interaction.
+
+Repeat the delayed-data and pose checks against a populated server:
+
+```bash
+uv run --with playwright python scripts/verify_globe_reveal.py
+```
