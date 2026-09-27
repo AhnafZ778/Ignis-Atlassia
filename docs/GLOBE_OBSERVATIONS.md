@@ -76,8 +76,10 @@ require additional data and are not derived by this feature.
 
 The globe starts with detections off. Observation data is fetched during idle
 time after the Earth becomes ready (or on an explicit detection request).
-Turning on detections performs an eased full turn, then restores the captured
-orientation and pauses before revealing the overlay. If data remains pending,
+Turning on detections shows the overlay immediately if its data is already
+loaded, without a forced turn or change to the current rotation setting. When
+data is still needed, the globe performs an eased full turn, then restores the
+captured orientation and pauses before revealing the overlay. If data remains pending,
 “Loading data…” stays visible at that original pose. Unchecking cancels the turn
 and restores the pose without showing detections. Reduced-motion mode skips the
 turn. Failed data requests leave detections off and expose Retry.

@@ -79,13 +79,14 @@
       $("globe-status").textContent = "Detections hidden.";
       return;
     }
-    state.revealing = true;
-    revealStatus(state.data ? "Preparing detections…" : "Loading data…");
+    const needsData = !state.data || Boolean(state.loading);
+    state.revealing = needsData;
+    revealStatus(needsData ? "Loading data…" : "");
     syncControls();
     const dataReady = state.loading || (state.data ? Promise.resolve(true) : load());
     // The checkbox can be used before WebGL finishes initializing.
-    if (!state.bridge && !state.failedEarth) return;
-    const turn = state.bridge ? state.bridge.rotateOnce() : Promise.resolve(true);
+    if (needsData && !state.bridge && !state.failedEarth) return;
+    const turn = needsData && state.bridge ? state.bridge.rotateOnce() : Promise.resolve(true);
     const [loaded, completed] = await Promise.all([dataReady, turn]);
     if (request !== state.revealRequest || !$("globe-markers").checked) return;
     state.revealing = false;
