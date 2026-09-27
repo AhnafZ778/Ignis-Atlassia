@@ -8,7 +8,16 @@
     }
     try {
       const registration = await navigator.serviceWorker.register("/training-sw.js", {scope:"/training.html", updateViaCache:"none"});
-      const ready = await Promise.race([navigator.serviceWorker.ready,
+      // Wait for this training registration, not a broader app worker.
+      const activation = registration.active ? Promise.resolve(registration) : new Promise((resolve, reject) => {
+        const worker = registration.installing || registration.waiting;
+        if (!worker) { reject(new Error("no worker")); return; }
+        worker.addEventListener("statechange", () => {
+          if (worker.state === "activated") resolve(registration);
+          if (worker.state === "redundant") reject(new Error("installation failed"));
+        });
+      });
+      const ready = await Promise.race([activation,
         new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 15000))]);
       if (!ready.active) throw new Error("not active");
       status().textContent = "Offline page ready · this tab can reload without a connection.";

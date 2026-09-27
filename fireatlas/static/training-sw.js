@@ -1,9 +1,10 @@
 /* Bump this version whenever a file in this offline pack changes. */
-const CACHE = "fireatlas-training-shell-v2";
+const CACHE = "fireatlas-training-shell-v3";
 const ASSETS = ["/training.html", "/styles.css", "/training.css", "/design.css", "/ui.js",
   "/training.js", "/training-state.js", "/training-store.js", "/training-offline.js",
   "/vendor/leaflet.js", "/vendor/leaflet.css", "/favicon.svg",
-  "/fonts/dm-sans.ttf", "/fonts/space-grotesk.ttf"];
+  "/fonts/dm-sans.ttf", "/fonts/space-grotesk.ttf", "/manifest.webmanifest",
+  "/app-icon-192.png", "/app-icon-512.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS.map(path => new Request(path, {cache:"reload"})))));
 });

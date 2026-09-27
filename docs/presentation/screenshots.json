@@ -1,0 +1,146 @@
+[
+  {
+    "file": "01-globe.png",
+    "url": "http://127.0.0.1:8000/?year=2024&month=7&series=hms-viirs&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=0",
+    "selector": null,
+    "caption": "Landing globe; authentic September 2026 NASA snapshot."
+  },
+  {
+    "file": "02-globe-evidence.png",
+    "url": "http://127.0.0.1:8000/?year=2024&month=7&series=hms-viirs&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=0",
+    "selector": "#globe-selection",
+    "caption": "Selected authentic cluster; exact satellite records are expandable."
+  },
+  {
+    "file": "03-calendar.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=1#calendar-section",
+    "selector": "#calendar-section",
+    "caption": "Synthetic September 2026 scenario; all twelve months and baselines are populated."
+  },
+  {
+    "file": "04-sensors.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=1#calendar-section",
+    "selector": "#firms-source-compare",
+    "caption": "Synthetic raw-pixel comparison against deduplicated common cell-days."
+  },
+  {
+    "file": "05-replay.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=1#calendar-section",
+    "selector": "#atlas-section",
+    "caption": "Synthetic observation-date replay at September 8."
+  },
+  {
+    "file": "06-context.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=ndvi&demo=1#calendar-section",
+    "selector": "#atlas-section",
+    "caption": "Illustrative vegetation layer; generated context, not measured NDVI."
+  },
+  {
+    "file": "07-evidence.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=2026-09-01&layer=ndvi&demo=1#calendar-section",
+    "selector": "#evidence-section",
+    "caption": "Original-row inspection for the explicitly synthetic demonstration."
+  },
+  {
+    "file": "08-study.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=2026-09-01&layer=ndvi&demo=1#calendar-section",
+    "selector": ".study-tools",
+    "caption": "Saved views, shareable selections and independently verifiable ZIP downloads."
+  },
+  {
+    "file": "09-tour.png",
+    "url": "http://127.0.0.1:8000/?year=2015&month=7&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=ndvi&demo=1#calendar-section",
+    "selector": null,
+    "caption": "The guided tour operates real website controls using its small legacy synthetic example."
+  },
+  {
+    "file": "10-overlap.png",
+    "url": "http://127.0.0.1:8000/research.html?demo=1&year=2026&month=9&exposure=synthetic",
+    "selector": ".overlap-panel",
+    "caption": "Synthetic sensor overlap and exploratory paired-day ratio band."
+  },
+  {
+    "file": "11-candidates.png",
+    "url": "http://127.0.0.1:8000/research.html?demo=1&year=2026&month=9&exposure=synthetic",
+    "selector": "section[aria-labelledby=candidates-title]",
+    "caption": "Three synthetic candidate groups; these are not confirmed incidents."
+  },
+  {
+    "file": "12-exposure.png",
+    "url": "http://127.0.0.1:8000/research.html?demo=1&year=2026&month=9&exposure=synthetic",
+    "selector": "section[aria-labelledby=coverage-title]",
+    "caption": "Rates calculated using the explicitly fabricated example mask."
+  },
+  {
+    "file": "13-command.png",
+    "url": "http://127.0.0.1:8000/training.html",
+    "selector": ".exercise-grid",
+    "caption": "Fictional Alder Creek commander exercise at 12:20 UTC."
+  },
+  {
+    "file": "14-alerts.png",
+    "url": "http://127.0.0.1:8000/training.html",
+    "selector": ".review-grid",
+    "caption": "Exercise alert acknowledgments and evidence timeline."
+  },
+  {
+    "file": "15-data.png",
+    "url": "http://127.0.0.1:8000/data.html",
+    "selector": "#recent-imports",
+    "caption": "Authentic NASA imports; one excluded polar row is recorded separately."
+  },
+  {
+    "file": "16-data-showcase.png",
+    "url": "http://127.0.0.1:8000/data.html",
+    "selector": ".presentation-data",
+    "caption": "Separate generated presentation dataset and its transparent limitations."
+  },
+  {
+    "file": "17-events.png",
+    "url": "http://127.0.0.1:8000/#live-events",
+    "selector": "#live-events",
+    "caption": "NASA EONET reported-event feed/cache, separate from FIRMS satellite detections."
+  },
+  {
+    "file": "18-mobile-globe.png",
+    "url": "http://127.0.0.1:8000/?year=2024&month=7&series=hms-viirs&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=0",
+    "selector": null,
+    "caption": "390-pixel mobile browser emulation; current responsive globe."
+  },
+  {
+    "file": "19-mobile-crew.png",
+    "url": "http://127.0.0.1:8000/training.html",
+    "selector": ".command-panel",
+    "caption": "Mobile Crew Device view for fictional Crew Bravo."
+  },
+  {
+    "file": "20-mobile-offline.png",
+    "url": "http://127.0.0.1:8000/training.html",
+    "selector": ".exercise-recovery",
+    "caption": "Actual browser offline reload from the prepared Training Lab tab."
+  },
+  {
+    "file": "23-calendar-detail.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=1#calendar-section",
+    "selector": ".content-grid",
+    "caption": "Synthetic September 2026 showcase; current application."
+  },
+  {
+    "file": "24-calendar-stats.png",
+    "url": "http://127.0.0.1:8000/?year=2026&month=9&series=joint&bbox=-122%2C39%2C-120%2C41&day=&layer=none&demo=1#calendar-section",
+    "selector": ".stats",
+    "caption": "Synthetic September 2026 showcase; current application."
+  },
+  {
+    "file": "21-mobile-install.png",
+    "url": "http://127.0.0.1:8000/install.html",
+    "selector": null,
+    "caption": "Mobile installation instructions."
+  },
+  {
+    "file": "22-mobile-offline-launch.png",
+    "url": "http://127.0.0.1:8000/?launch=app",
+    "selector": null,
+    "caption": "Actual offline reconnect screen; no stale observations presented."
+  }
+]

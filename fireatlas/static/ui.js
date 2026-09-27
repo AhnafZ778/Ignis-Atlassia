@@ -1,5 +1,8 @@
 // Shared navigation behavior; data tools retain their own state and controls.
 document.addEventListener("DOMContentLoaded", () => {
+  if ("serviceWorker" in navigator && window.isSecureContext && location.pathname !== "/training.html") {
+    navigator.serviceWorker.register("/app-sw.js", {scope:"/",updateViaCache:"none"}).catch(() => {});
+  }
   const toggle = document.querySelector(".nav-toggle");
   const navigation = document.querySelector("#site-navigation");
   if (toggle && navigation) {

@@ -1,5 +1,11 @@
 # FireAtlas — atlas, training and research labs
 
+## Presentation guide and mobile app
+
+[Download the 22-page feature polish guide](docs/presentation/FireAtlas_Feature_Polish_Guide.pdf) for 16 prioritized features, exact pages, actual screenshots and presentation checks.
+
+FireAtlas now includes an installable mobile web app. Open `/install.html` for installation instructions; see [mobile setup and verification](docs/MOBILE_APP.md). The prepared Training Lab works offline. There is no native APK/iOS build, and the globe and analysis tools still require the server. A physical-phone rehearsal and reachable HTTPS host remain necessary.
+
 The [PRD](PRD.md) defines the full NASA Space Apps project. The local web MVP runs on the Phase 1 data pipeline: NASA FIRMS CSV import, original-row provenance, 1 km common-cell assignment, and a UTC burning activity calendar with comparable prior-year monthly baselines.
 
 ## Launch the website
