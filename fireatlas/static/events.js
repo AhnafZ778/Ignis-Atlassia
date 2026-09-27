@@ -14,7 +14,7 @@
   const coordinate = p => `${Math.abs(p.lat).toFixed(2)}°${p.lat<0?"S":"N"} / ${Math.abs(p.lon).toFixed(2)}°${p.lon<0?"W":"E"}`;
   const date = stamp => new Intl.DateTimeFormat("en",{timeZone:"UTC",month:"short",day:"numeric",year:"numeric"}).format(new Date(stamp));
   const el = (tag,text) => {const node=document.createElement(tag);node.textContent=text;return node;};
-  let map,points,layer="thermal",records=[],request=0,shown=30;
+  let map,points,layer="documented",records=[],request=0,shown=30;
   const cache={},markers=new Map();
   function regionalRecords() {
     const key=$("event-region").value;
@@ -85,20 +85,20 @@
     $("event-map").dataset.layer=layer;$("event-map").dataset.points=records.length;
     $("event-count").textContent=number(layer==="thermal"?data.total:records.length);
     const thermal=layer==="thermal",documented=layer==="documented";
-    $("event-count-label").textContent=thermal?"SATELLITE DETECTIONS · WORLDWIDE":documented?"SOURCED CASE FILES · SELECTED":"REPORTED EVENTS · SAMPLE";
-    $("event-updated").textContent=thermal?`${data.window_start||"No imported data"} → ${data.window_end||"—"} · imported snapshot`:documented?`${data.period_start.slice(0,4)}–${data.period_end.slice(0,4)} · curated, not exhaustive`: `Fetched ${date(data.fetched_utc)} · ${data.stale?"cached copy":"NASA EONET"}`;
-    $("event-legend").textContent=thermal?"● THERMAL DETECTION GROUPS":documented?"◆ SELECTED WILDFIRE CASES":"● REPORTED EVENTS · SAMPLE";
+    $("event-count-label").textContent=thermal?"SATELLITE DETECTIONS · WORLDWIDE":documented?"SOURCED CASE FILES · SELECTED":"NASA EONET · CURATED SAMPLE";
+    $("event-updated").textContent=thermal?`${data.window_start||"No imported data"} → ${data.window_end||"—"} · imported snapshot`:documented?`${data.period_start.slice(0,4)}–${data.period_end.slice(0,4)} · curated, not exhaustive`: `Fetched ${date(data.fetched_utc)} · ${data.stale?"cached copy":"NASA EONET feed"}`;
+    $("event-legend").textContent=thermal?"● THERMAL DETECTION GROUPS":documented?"◆ SELECTED WILDFIRE CASES":"● NASA EONET REPORTS · SAMPLE";
     $("event-legend").dataset.layer=layer;
-    $("event-list-heading").textContent=thermal?"LARGEST DETECTION GROUPS":documented?"GLOBAL FIRE CASEBOOK":"REPORTED LOCATIONS";
-    $("event-layer-note").textContent=thermal?"Same global FIRMS snapshot as the 3D Earth. Points group satellite detections in 1° cells; they are not fire boundaries or a count of wildfires. Thermal signals include agricultural burning. Current fire status is unknown.":documented?`${data.scope_note} ${data.death_method_note} Markers show approximate affected areas. Open a case for its death toll, responder count, and source links.`:`${data.stale?"NASA could not be reached; showing a cached sample. ":""}EONET is a curated event feed, not global satellite coverage. This sample is limited to ${data.sample_limit||data.count} events and may be dominated by US sources; its wildfire category includes prescribed fires. Use Satellite detections for worldwide observations.`;
+    $("event-list-heading").textContent=thermal?"LARGEST DETECTION GROUPS":documented?"GLOBAL FIRE CASEBOOK":"EONET REPORT SAMPLE";
+    $("event-layer-note").textContent=thermal?"Same global FIRMS snapshot as the 3D Earth. Points group satellite detections in 1° cells; they are not fire boundaries or a count of wildfires. Thermal signals include agricultural burning. Current fire status is unknown.":documented?`${data.scope_note} ${data.death_method_note} Markers show approximate affected areas. Open a case for its death toll, responder count, and source links.`:`${data.stale?"NASA could not be reached; showing a cached sample. ":""}EONET is a curated report feed, not a complete global fire map. This visible sample is limited to ${data.sample_limit||data.count} records, may be US-heavy, and can include prescribed fires. Choose Global fire casebook for the selected worldwide historical cases, or Satellite signals for NASA thermal detections.`;
     const source=$("event-source-link");source.href=thermal?"https://firms.modaps.eosdis.nasa.gov/active_fire/":documented?"/documented-fires.json":"https://eonet.gsfc.nasa.gov/docs/v3";
     source.textContent=thermal?"About NASA FIRMS ↗":documented?"Open casebook data & sources ↗":"About NASA EONET ↗";
     markers.clear();points?.clearLayers();
     for(const record of records){
       if(!map)break;
-      const color=thermal?(record.last.slice(0,10)===data.window_end?"#ffc676":"#dc6931"):documented?"#83cfff":"#8bc5bc";
-      const baseRadius=thermal?Math.min(4,1.3+Math.log10(record.count+1)*.7):7;
-      const marker=L.circleMarker([record.lat,record.lon],{baseRadius,radius:thermal?baseRadius*Math.min(1.2,Math.max(.4,map.getZoom()/4)):7,color,weight:thermal?0:2,fillColor:color,fillOpacity:thermal?.8:.9}).addTo(points);
+      const color=thermal?(record.last.slice(0,10)===data.window_end?"#ffc676":"#dc6931"):documented?"#83d2ff":"#8bc5bc";
+      const baseRadius=thermal?Math.min(4,1.3+Math.log10(record.count+1)*.7):documented?8:7;
+      const marker=L.circleMarker([record.lat,record.lon],{baseRadius,radius:thermal?baseRadius*Math.min(1.2,Math.max(.4,map.getZoom()/4)):baseRadius,color,weight:thermal?0:documented?2.5:2,fillColor:color,fillOpacity:thermal?.8:1}).addTo(points);
       marker.bindPopup(()=>popup(record),{minWidth:170,maxWidth:250});marker.on("click",()=>select(record,false));markers.set(record.id,marker);
     }
     renderList();if(map){map.invalidateSize();resetView();}
