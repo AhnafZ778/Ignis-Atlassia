@@ -305,6 +305,15 @@ def calendar(db: sqlite3.Connection, *, bbox: tuple[float, float, float, float],
     sources = SERIES[series]
     marks, raw_counts = _counts(db, year, sources, bbox)
     previous_counts = {}
+    # Synthetic exercises sharing a sensor schema are still different scenarios.
+    # Match the scenario URI directory before treating older months as baselines.
+    cohorts = defaultdict(set)
+    source_sql = ",".join("?" for _ in sources)
+    for row in db.execute(f"""SELECT w.month,b.source_id,b.demo,b.source_uri
+        FROM export_windows w JOIN batches b ON b.id=w.batch_id
+        WHERE w.source_id IN ({source_sql}) AND w.west<=? AND w.south<=? AND w.east>=? AND w.north>=?""",
+        (*sources, *bbox)):
+        cohorts[row["month"]].add((row["source_id"], row["source_uri"].rsplit("/", 1)[0] if row["demo"] else "authentic"))
     monthly = []
     for month_number in range(1, 13):
         month = f"{year}-{month_number:02d}"
@@ -313,7 +322,8 @@ def calendar(db: sqlite3.Connection, *, bbox: tuple[float, float, float, float],
         previous = []
         for previous_year in range(2000, year):
             old_month = f"{previous_year}-{month_number:02d}"
-            if _complete_month(db, old_month, sources, bbox):
+            comparable = not cohorts[month] or cohorts[month] == cohorts[old_month]
+            if comparable and _complete_month(db, old_month, sources, bbox):
                 if previous_year not in previous_counts:
                     previous_counts[previous_year], _ = _counts(db, previous_year, sources, bbox)
                 old_marks = previous_counts[previous_year]

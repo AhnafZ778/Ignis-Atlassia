@@ -264,6 +264,9 @@ def report(db, *, year=2015, month=7, bbox=(-122, 39, -120, 41), as_of=None, dis
               "gates": {"calibration": "Requires matched overpasses, observation masks, reference labels and independent holdout validation.",
                         "radar": "Requires co-registered SAR before/after scenes, quality masks and a dated optical cross-check.",
                         "spread": "Requires a validated regional fuel/terrain model, weather ensemble and held-out arrival observations."}}
+    from .presentation import PREFIX, provenance as presentation_provenance
+    if result["demo_data"] and any(p["source_uri"].startswith(PREFIX) for p in result["provenance"]):
+        result["presentation"] = presentation_provenance()
     result["report_id"] = digest(result)
     return result
 

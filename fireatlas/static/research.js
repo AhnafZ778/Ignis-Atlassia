@@ -230,6 +230,11 @@
       if (Number(params.get("month")) >= 1 && Number(params.get("month")) <= 12) $("research-month").value = params.get("month");
       if (params.has("bbox")) $("research-bbox").value = params.get("bbox");
       dateRange(); initMap(); await run();
+      // Populate the optional exposure demonstration only on an explicit showcase link.
+      if (demo && params.get("exposure") === "synthetic" && state.report?.raw_pixels) {
+        const mask = await json(`/api/research/coverage-example?${query(config())}`);
+        await run(mask, true);
+      }
     } catch (error) { showError(error.message); $("study-results").hidden = true; }
   });
 })();

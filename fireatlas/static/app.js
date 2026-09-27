@@ -1,5 +1,5 @@
 const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null, demo: true };
-let map, markers, aoiOutline, contextLayer, contextChoice = "none", mapRequest = 0;
+let map, markers, aoiOutline, contextLayer, contextChoice = "none", mapRequest = 0, contextRequest = 0;
 let mapDay = null, mapPlayback = null, mapInputTimer = null, focusMapOnDay = false;
 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const shortMonths = monthNames.map(name => name.slice(0, 3).toUpperCase());
@@ -55,7 +55,7 @@ async function loadMeta() {
   document.querySelectorAll('[data-series="joint"],[data-series="modis"],[data-series="viirs-snpp"]').forEach(button => { button.hidden = !hasFirms; });
   $(".series-row p").textContent = state.demo || hasFirms ? "Separate series preserve the sensor transition." : "A verified NOAA VIIRS cohort from the historical daily archive.";
   $("#mode-description").textContent = state.demo
-    ? "Explore generated observations that demonstrate the complete workflow. Every example is marked synthetic."
+    ? "Explore 2023–2026 seasonal examples, sensor comparisons and local context layers. Generated from CSV attribute samples; all dates and locations are synthetic."
     : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Browse real NOAA HMS VIIRS fire points from complete historical daily archives. NASA EONET reports remain a separate layer."
     : meta.years.length ? "Browsing imported source records. Check the source ledger for retrieval and coverage details."
       : "NASA imports have not arrived on this server. Try the guided demo while the connection is restored.";
@@ -286,9 +286,30 @@ function compositeDate() {
   return new Date(first + Math.floor(elapsed / 16) * 16 * 86400000).toISOString().slice(0, 10);
 }
 
-function updateContextLayer() {
+async function updateContextLayer() {
+  const request = ++contextRequest;
   if (!map) return;
   if (contextLayer) { map.removeLayer(contextLayer); contextLayer = null; }
+  if (state.demo && contextChoice !== "none") {
+    $("#layer-status").textContent = "Loading synthetic context…";
+    try {
+      const fixture = await getJson(`/api/context?${new URLSearchParams({demo:1,year:state.year,month:state.month+1,bbox:state.bbox,layer:contextChoice})}`);
+      if (request !== contextRequest) return;
+      contextLayer = L.geoJSON(fixture, {
+        style: feature => ({color:feature.properties.color,weight:.5,fillColor:feature.properties.color,fillOpacity:.4}),
+        onEachFeature: (feature, layer) => {
+          const label = document.createElement("span");
+          label.textContent = `SYNTHETIC · ${feature.properties.label} · ${fixture.year}-${String(fixture.month).padStart(2,"0")} monthly illustration`;
+          layer.bindTooltip(label);
+        }
+      }).addTo(map);
+      contextLayer.bringToBack();
+      $("#layer-status").textContent = fixture.features.length ? fixture.note : "No synthetic context outside the Northern California showcase AOI.";
+    } catch (error) {
+      if (request === contextRequest) $("#layer-status").textContent = `Context unavailable: ${error.message}`;
+    }
+    return;
+  }
   if (contextChoice === "ndvi" || contextChoice === "landcover") {
     const ndvi = contextChoice === "ndvi";
     const time = ndvi ? compositeDate() : `${Math.min(state.year, 2024)}-01-01`;
@@ -424,7 +445,7 @@ function render() {
   const research = $("#open-research-study");
   const researchUsesDemo = !["joint", "modis", "viirs-snpp"].includes(state.series);
   const researchContext = researchUsesDemo
-    ? {year: 2015, month: 7, bbox: "-122,39,-120,41", demo: 1}
+    ? {year: 2026, month: 9, bbox: "-122,39,-120,41", demo: 1}
     : {year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0};
   const researchUrl = `/research.html?${new URLSearchParams(researchContext)}`;
   if (research) research.href = researchUrl;

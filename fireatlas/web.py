@@ -28,6 +28,7 @@ from .study import build_bundle
 from .pilots import PilotSync, PILOTS
 from .events import latest as latest_events
 from .bootstrap import populate_showcase
+from .presentation import ensure_presentation, provenance as presentation_provenance, context_fixture, DEFAULT_VIEW
 
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
@@ -107,6 +108,7 @@ def handler_factory(database: Path):
     database = Path(database)
     demo_database = database.with_name("demo.sqlite3")
     demo_lock = threading.Lock()
+    demo_ready = False
     event_lock = threading.Lock()
     event_cache = database.with_suffix(".events.json")
     pilot_sync = PilotSync(database)
@@ -120,15 +122,19 @@ def handler_factory(database: Path):
                     and self.headers.get("Content-Type") == content_type)
 
         def _database_for(self, params):
+            nonlocal demo_ready
             choice = params.get("demo", ["0"])[0]
             if choice not in ("0", "1"):
                 raise ValueError("demo must be 0 or 1")
             if choice == "0":
                 return database
             with demo_lock:
-                if not demo_database.exists():
+                if not demo_ready:
                     with contextlib.redirect_stdout(io.StringIO()):
+                        # Legacy tour and richer seasonal fixtures coexist in separate years.
+                        ensure_presentation(demo_database.parent / "presentation", demo_database)
                         make_demo(demo_database.parent / "demo", demo_database)
+                    demo_ready = True
             return demo_database
 
         def _respond(self, content: bytes, content_type: str, status: HTTPStatus = HTTPStatus.OK, filename=None):
@@ -249,7 +255,14 @@ def handler_factory(database: Path):
                     self._json(snapshot(int(params.get("elapsed", ["0"])[0])))
                     return
                 with connect(self._database_for(params)) as db:
-                    if url.path == "/api/research":
+                    if url.path == "/api/presentation":
+                        self._json(presentation_provenance())
+                    elif url.path == "/api/context":
+                        if params.get("demo", ["0"])[0] != "1":
+                            raise ValueError("Synthetic context requires explicit demo=1; authentic data are never filled with synthetic values")
+                        year, month, _, bbox = _request_context(params)
+                        self._json(context_fixture(year=year, month=month, bbox=bbox, layer=params.get("layer", ["none"])[0]))
+                    elif url.path == "/api/research":
                         self._json(research_report(db, **_research_context(params)))
                     elif url.path == "/api/research/coverage-example":
                         self._json(coverage_example(db, **_research_context(params)))
@@ -266,6 +279,9 @@ def handler_factory(database: Path):
                                         "bbox": [latest[k] for k in ("west", "south", "east", "north")] if latest else PILOTS[0]["bbox"]}
                         default_series = next((name for name, sources in SERIES.items()
                                                if latest and sources == (latest["source_id"],)), "joint")
+                        if params.get("demo", ["0"])[0] == "1":
+                            default_view = DEFAULT_VIEW
+                            default_series = "joint"
                         self._json({"years": [row["year"] for row in rows], "series": list(SERIES),
                                     "default_view": default_view, "pilots": PILOTS,
                                     "default_series": default_series,

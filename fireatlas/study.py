@@ -69,6 +69,11 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
         "export-windows.json": windows,
         "batches.json": batches,
     }
+    from .presentation import PREFIX, YEARS, provenance, context_fixture
+    if data_class == "synthetic" and any(b["source_uri"].startswith(PREFIX) for b in batches):
+        payloads["presentation-provenance.json"] = provenance()
+        if layer != "none" and year in YEARS:
+            payloads["synthetic-context.geojson"] = context_fixture(year=year, month=month, bbox=bbox, layer=layer)
     files = {name: json.dumps(value, sort_keys=True, indent=2, allow_nan=False).encode() for name, value in payloads.items()}
     files["README.txt"] = (
         "FireAtlas study bundle v1\n\n"
@@ -83,6 +88,7 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
         "  uv run python -m fireatlas.study path/to/study.zip\n\n"
         "SHA-256 checks detect changes; they are not signatures or proof of source authenticity.\n"
         "Source file hashes identify original imports; those entire files are not embedded.\n"
+        "Synthetic presentation studies include seed provenance and, when selected, synthetic context GeoJSON.\n"
         "Map tiles, satellite context images, coverage masks and research outputs are not included.\n"
         "Cell-days are a sampling proxy, not fire counts or burned area. Observation coverage is\n"
         "unknown. Synthetic or mixed data are not regional scientific validation. Shared URLs\n"
@@ -111,8 +117,12 @@ def verify_bundle(path):
             raise ValueError("duplicate bundle entries")
         manifest = json.loads(archive.read("manifest.json"))
         required = {"selection.json", "calendar.json", "observations.json", "export-windows.json", "batches.json", "README.txt"}
-        if manifest.get("schema") != SCHEMA or set(manifest.get("files", {})) != required:
+        optional = {"presentation-provenance.json", "synthetic-context.geojson"}
+        included = set(manifest.get("files", {}))
+        if manifest.get("schema") != SCHEMA or not required <= included or included - required - optional:
             raise ValueError("unsupported or incomplete study bundle")
+        if included & optional and manifest.get("data_class") != "synthetic":
+            raise ValueError("synthetic presentation inputs require a synthetic study")
         for name, checksum in manifest["files"].items():
             if hashlib.sha256(archive.read(name)).hexdigest() != checksum:
                 raise ValueError(f"checksum mismatch: {name}")
