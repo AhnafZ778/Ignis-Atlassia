@@ -92,8 +92,14 @@ def connect(path: str | Path) -> sqlite3.Connection:
             grid_y INTEGER NOT NULL,
             raw_json TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS excluded_rows (
+            batch_id INTEGER NOT NULL REFERENCES batches(id),
+            line_number INTEGER NOT NULL, reason TEXT NOT NULL, raw_json TEXT NOT NULL,
+            PRIMARY KEY(batch_id,line_number)
+        );
         CREATE INDEX IF NOT EXISTS observations_lookup
             ON observations(source_id, acquisition_utc, lon, lat);
+        CREATE INDEX IF NOT EXISTS observations_batch ON observations(batch_id);
         CREATE TABLE IF NOT EXISTS export_windows (
             batch_id INTEGER PRIMARY KEY REFERENCES batches(id),
             source_id TEXT NOT NULL,
@@ -125,7 +131,7 @@ def _normalized_row(row: dict[str, str], source_id: str, retrieved: str, uri: st
     lon, lat = float(row["longitude"]), float(row["latitude"])
     if not (-180 <= lon <= 180 and -86 <= lat <= 86):
         raise ValueError("coordinates outside supported EPSG:6933 region")
-    if row["instrument"].strip().upper() != sensor:
+    if row.get("instrument", sensor).strip().upper() != sensor:
         raise ValueError(f"instrument does not match {source_id}")
     if source_id != "NOAA_HMS_VIIRS":
         platforms = {"MODIS": {"T", "A", "TERRA", "AQUA"}, "SNPP": {"N", "SNPP", "SUOMI NPP", "S-NPP"},
@@ -185,63 +191,79 @@ def ingest(
     complete_month: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     demo: bool = False,
+    exclude_outside_grid: bool = False,
 ) -> dict:
     if source_id not in SOURCES:
         raise ValueError(f"unsupported source: {source_id}")
     if (complete_month is None) != (bbox is None):
         raise ValueError("complete_month and bbox must be provided together")
+    if exclude_outside_grid and complete_month:
+        raise ValueError("Excluded rows cannot establish a complete monthly export")
     if bbox:
         validate_bbox(bbox)
         date.fromisoformat(complete_month + "-01")
     csv_path = Path(csv_path)
-    raw_bytes = csv_path.read_bytes()
-    file_hash = hashlib.sha256(raw_bytes).hexdigest()
+    with csv_path.open("rb") as binary:
+        digest = hashlib.sha256()
+        for chunk in iter(lambda: binary.read(1024 * 1024), b""):
+            digest.update(chunk)
+        file_hash = digest.hexdigest()
     window_key = json.dumps([complete_month, bbox])
     uri = _safe_source_uri(source_uri or csv_path.resolve().as_uri())
     retrieved = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    with csv_path.open(newline="", encoding="utf-8-sig") as stream:
+    # Stream large public global exports inside one transaction. A bad row
+    # rolls back the entire new batch, including its excluded-row ledger.
+    with db, csv_path.open(newline="", encoding="utf-8-sig") as stream:
         reader = csv.DictReader(stream)
-        if reader.fieldnames is None or not REQUIRED_COLUMNS.issubset(reader.fieldnames):
-            raise ValueError(f"FIRMS CSV missing columns: {sorted(REQUIRED_COLUMNS - set(reader.fieldnames or []))}")
-        rows = []
-        for line_number, row in enumerate(reader, 2):
-            try:
-                normalized = _normalized_row(row, source_id, retrieved, uri)
-                if complete_month:
-                    w, s, e, n = bbox
-                    if normalized["acquisition_utc"][:7] != complete_month or not (
-                        w <= normalized["lon"] <= e and s <= normalized["lat"] <= n
-                    ):
-                        raise ValueError("row outside declared complete export window")
-                rows.append(normalized)
-            except (ValueError, KeyError) as exc:
-                raise ValueError(f"CSV line {line_number}: {exc}") from exc
-    with db:
+        required = REQUIRED_COLUMNS - {"instrument"}
+        if reader.fieldnames is None or not required.issubset(reader.fieldnames):
+            raise ValueError(f"FIRMS CSV missing columns: {sorted(required - set(reader.fieldnames or []))}")
         existing = db.execute(
             "SELECT id, row_count FROM batches WHERE source_id=? AND file_sha256=? AND window_key=?",
             (source_id, file_hash, window_key),
         ).fetchone()
         if existing:
-            return {"batch_id": existing["id"], "rows_read": existing["row_count"], "rows_inserted": 0, "already_imported": True}
+            excluded = db.execute("SELECT count(*) FROM excluded_rows WHERE batch_id=?", (existing["id"],)).fetchone()[0]
+            return {"batch_id": existing["id"], "rows_read": existing["row_count"], "rows_inserted": 0,
+                    "rows_excluded": excluded, "already_imported": True}
         cursor = db.execute(
             "INSERT INTO batches(source_id,source_uri,file_sha256,retrieved_utc,demo,row_count,window_key) VALUES (?,?,?,?,?,?,?)",
-            (source_id, uri, file_hash, retrieved, int(demo), len(rows), window_key),
+            (source_id, uri, file_hash, retrieved, int(demo), 0, window_key),
         )
         batch_id = cursor.lastrowid
-        before = db.total_changes
-        keys = list(rows[0]) if rows else []
-        for row in rows:
-            db.execute(
-                f"INSERT OR IGNORE INTO observations(batch_id,{','.join(keys)}) VALUES (?{',?' * len(keys)})",
-                (batch_id, *(row[key] for key in keys)),
-            )
-        inserted = db.total_changes - before
+        count = inserted = excluded = 0
+        for line_number, row in enumerate(reader, 2):
+            count += 1
+            try:
+                latitude, longitude = float(row["latitude"]), float(row["longitude"])
+                if exclude_outside_grid and -90 <= latitude <= 90 and -180 <= longitude <= 180 and abs(latitude) > 86:
+                    db.execute("INSERT INTO excluded_rows VALUES (?,?,?,?)",
+                               (batch_id, line_number, "Outside EPSG:6933 supported latitude [-86,86]", json.dumps(row, sort_keys=True)))
+                    excluded += 1
+                    continue
+                normalized = _normalized_row(row, source_id, retrieved, uri)
+                if complete_month:
+                    w, south, e, n = bbox
+                    if normalized["acquisition_utc"][:7] != complete_month or not (
+                        w <= normalized["lon"] <= e and south <= normalized["lat"] <= n
+                    ):
+                        raise ValueError("row outside declared complete export window")
+                keys = list(normalized)
+                cursor = db.execute(
+                    f"INSERT OR IGNORE INTO observations(batch_id,{','.join(keys)}) VALUES (?{',?' * len(keys)})",
+                    (batch_id, *(normalized[key] for key in keys)),
+                )
+                inserted += cursor.rowcount
+            except (ValueError, KeyError, TypeError) as exc:
+                raise ValueError(f"CSV line {line_number}: {exc}") from exc
+        db.execute("UPDATE batches SET row_count=? WHERE id=?", (count, batch_id))
         if complete_month:
             db.execute(
                 "INSERT INTO export_windows(batch_id,source_id,month,west,south,east,north) VALUES (?,?,?,?,?,?,?)",
                 (batch_id, source_id, complete_month, *bbox),
             )
-    return {"batch_id": batch_id, "rows_read": len(rows), "rows_inserted": inserted, "already_imported": False}
+    return {"batch_id": batch_id, "rows_read": count, "rows_inserted": inserted,
+            "rows_excluded": excluded, "already_imported": False}
 
 
 def _complete_month(db: sqlite3.Connection, month: str, sources: tuple[str, ...], bbox: tuple[float, ...]) -> bool:

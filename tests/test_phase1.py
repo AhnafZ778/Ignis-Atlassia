@@ -133,3 +133,27 @@ class Phase1Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class PublicCsvTests(unittest.TestCase):
+    def test_public_header_preserved_and_polar_row_accounted_for(self):
+        import json
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / 'public.csv'
+            values = [row(instrument='VIIRS', satellite='N21', version='2.0NRT'),
+                      row(instrument='VIIRS', satellite='N21', version='2.0NRT', latitude='-86.2141')]
+            for item in values: item.pop('instrument')
+            with path.open('w') as stream:
+                writer = csv.DictWriter(stream, fieldnames=list(values[0]));writer.writeheader();writer.writerows(values)
+            with connect(root / 'test.sqlite3') as db:
+                with self.assertRaisesRegex(ValueError, 'coordinates outside'):
+                    ingest(db, path, 'VIIRS_NOAA21_NRT')
+                self.assertEqual(db.execute('SELECT count(*) FROM batches').fetchone()[0], 0)
+                result = ingest(db, path, 'VIIRS_NOAA21_NRT', exclude_outside_grid=True)
+                self.assertEqual((result['rows_read'],result['rows_inserted'],result['rows_excluded']), (2,1,1))
+                raw = json.loads(db.execute('SELECT raw_json FROM observations').fetchone()[0])
+                self.assertNotIn('instrument', raw)
+                self.assertEqual(db.execute('SELECT sensor FROM observations').fetchone()[0], 'VIIRS')
+                self.assertEqual(db.execute('SELECT line_number FROM excluded_rows').fetchone()[0], 3)
+                self.assertEqual(ingest(db,path,'VIIRS_NOAA21_NRT',exclude_outside_grid=True)['rows_inserted'], 0)
+                self.assertEqual(db.execute('SELECT count(*) FROM export_windows').fetchone()[0], 0)

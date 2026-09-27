@@ -32,6 +32,7 @@ def main() -> None:
     import_parser.add_argument("csv", type=Path)
     import_parser.add_argument("--source", choices=sorted(SOURCES), required=True)
     import_parser.add_argument("--source-uri", help="non-secret source identifier (do not include API keys)")
+    import_parser.add_argument("--exclude-outside-grid", action="store_true", help="preserve polar rows outside +/-86 degrees in the exclusion ledger; partial exports only")
     import_parser.add_argument("--complete-month", help="YYYY-MM; assert the CSV is a complete AOI export")
     import_parser.add_argument("--bbox", nargs=4, type=float, metavar=("W", "S", "E", "N"))
     view_parser = commands.add_parser("calendar", help="export a sensor-aware UTC calendar")
@@ -75,6 +76,7 @@ def main() -> None:
             db, args.csv, args.source, source_uri=args.source_uri,
             complete_month=args.complete_month,
             bbox=tuple(args.bbox) if args.bbox else None,
+            exclude_outside_grid=args.exclude_outside_grid,
         )
     elif args.command == "fetch-month":
         result = fetch_month(

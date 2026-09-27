@@ -70,6 +70,22 @@ Everything in `data/demo/` is **synthetic** and labelled as such in JSON output.
 
 Request a free [FIRMS MAP_KEY](https://firms.modaps.eosdis.nasa.gov/api/map_key). Keep it in your shell environment or in `~/.config/fireatlas/firms.key` with owner-only permissions (`chmod 600`). `FIRMS_MAP_KEY` overrides the key file; `FIRMS_KEY_FILE` can select a different file. Do not commit credentials. The key is never returned by the website or included in downloaded studies. Select a modest AOI and a month offered by the chosen standard-processing source; verify availability with [NASA's availability endpoint](https://firms.modaps.eosdis.nasa.gov/api/data_availability/).
 
+### Imported NASA snapshot: September 20–27, 2026
+
+The three CSVs supplied in `NASA_data/` contain 866,957 rows. The local authentic database now holds 866,956 of these detections: MODIS NRT **72,776**, NOAA-20 VIIRS NRT **394,527**, and NOAA-21 VIIRS NRT **399,653**. One NOAA-21 row at latitude -86.2141 is outside the supported EPSG:6933 region; its original row, CSV line number and reason are retained in `excluded_rows`. Original files are unchanged and ignored by Git; their exact hashes and official download URLs are recorded in the database. These downloads are local and are not included in the bundled NOAA showcase or repository.
+
+Open `/data.html` and use the NASA snapshot links to view each source globally, then select an acquisition day or zoom in. Low-zoom bins count all imported points in the viewport. High-zoom display samples at most 1,000 points across the entire selected period, with the full imported count reported. Sampling does not affect calendar counts or evidence. The files are rolling seven-day near-real-time snapshots touching eight UTC dates; they do not establish complete September exports or replace the historical 2021–2024 standard-product comparison.
+
+The importer accepts NASA public CSVs without an `instrument` column, deriving the normalized sensor from the selected source and validating its satellite identifier. Original row JSON stays unchanged. Large CSVs stream through one transaction instead of being held in memory. To repeat an import (duplicates are ignored):
+
+```bash
+uv run python -m fireatlas.cli ingest NASA_data/J2_VIIRS_C2_Global_7d.csv \
+  --source VIIRS_NOAA21_NRT --exclude-outside-grid \
+  --source-uri https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_Global_7d.csv
+```
+
+The `--exclude-outside-grid` option preserves polar rows separately and is restricted to partial imports. Invalid records within the grid still roll back the new batch. Use the CLI for files above the browser upload limit of 25 MB. NASA's original recent files remain snapshots, not a continuously updating feed.
+
 ### September 2026 data continuity and manual downloads
 
 The Data Sources page includes the FIRMS2 maintenance advisory captured on September 27 (disruption may extend through September 30), and NASA's planned November 1 Suomi NPP delivery cessation. The maintenance panel switches to historical wording after that window; it never declares recovery automatically. The S-NPP historical study remains separate from future NOAA-20/21 imports.
@@ -105,7 +121,7 @@ uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 sync-pilots
 
 The sync exits nonzero on failure. Status is retained in `data/fireatlas.sync.json`, and successful checks in `data/fireatlas.validation.json`. CSV downloads are cached under `data/downloads/`. Completed imports are retained and reused; incomplete monthly requests never receive a complete-export marker. A demo database is rejected before authentic imports can begin.
 
-**Development environment note (27 September 2026):** FIRMS connections timed out during local checks, including a check against NASA's documented secondary host. A key's presence does not verify its validity or source availability. No authentic **FIRMS** pilot observations or scientific calibration results are claimed; the independent NOAA HMS pilot above is real satellite data. Retry FIRMS from the Data sources page when connectivity is restored. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
+**Development environment note (27 September 2026):** FIRMS connections timed out during local checks, including a check against NASA's documented secondary host. A key's presence does not verify its validity or source availability. The recent user-downloaded FIRMS snapshots are imported, but the complete historical FIRMS pilot and scientific calibration remain pending; the independent NOAA HMS pilot above is also real satellite data. Retry FIRMS from the Data sources page when connectivity is restored. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
 
 ### Reachable NASA event-feed workaround
 

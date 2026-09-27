@@ -262,13 +262,12 @@ function initMap() {
     $("#map-status").textContent = "Map library unavailable. The calendar remains available.";
     return;
   }
-  map = L.map("map", {scrollWheelZoom: false, worldCopyJump: true, minZoom: 2}).setView([39.8, -121.1], 8);
+  map = L.map("map", {scrollWheelZoom: false, worldCopyJump: true, preferCanvas: true, minZoom: 0, zoomSnap: 0.25}).setView([39.8, -121.1], 8);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors", maxZoom: 18, className: "atlas-basemap",
   }).addTo(map);
   markers = L.layerGroup().addTo(map);
   map.on("moveend", () => { if (state.data) updateMap(); });
-  map.on("zoomend", () => { if (state.data) updateMap(); });
   drawAoi(false);
 }
 
@@ -335,8 +334,10 @@ function renderTimeline() {
   counts.forEach((count, index) => {
     const button = document.createElement("button"); button.type = "button";
     button.className = "map-timeline-bar" + (mapDay === index + 1 ? " active" : "");
-    button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${count} detected cell-days`);
-    button.title = `${monthNames[state.month]} ${index + 1} · ${count} cell-days`;
+    const partial = !entries[index]?.export_window_complete;
+    const label = partial ? (count ? `${count} imported cell-days · partial export` : "No imported detections · coverage unknown") : `${count} detected cell-days`;
+    button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${label}`);
+    button.title = `${monthNames[state.month]} ${index + 1} · ${label}`;
     const fill = document.createElement("span"); fill.style.height = `${Math.max(5, count / max * 100)}%`;
     button.append(fill); button.addEventListener("click", () => { stopMapPlayback(); setMapDay(index + 1, true); });
     bars.append(button);
@@ -382,11 +383,11 @@ async function updateMap() {
     markers.clearLayers();
     for (const feature of result.features) {
       if (result.mode === "aggregates") {
-        const radius = Math.max(8, Math.min(30, 8 + Math.log2(feature.count + 1) * 3));
-        const marker = L.circleMarker([feature.lat, feature.lon], {radius, color: "#ffe0b5", weight: 2, fillColor: "#e9905a", fillOpacity: .85});
+        const radius = Math.max(1.5, Math.min(map.getZoom() < 3 ? 5 : 11, 1 + Math.log2(feature.count + 1) * (map.getZoom() < 3 ? .35 : .65)));
+        const marker = L.circleMarker([feature.lat, feature.lon], {radius, color: "#ffc28c", weight: .5, fillColor: "#ff944e", fillOpacity: .72});
         const body = document.createElement("div");
         const title = document.createElement("strong"); title.textContent = `${feature.count} imported pixels`;
-        const note = document.createElement("p"); note.textContent = `Grouped map sample · ${feature.sensors.join(" + ")}. Zoom in to inspect detections.`;
+        const note = document.createElement("p"); note.textContent = `All imported points in this grid bin · ${feature.sensors.join(" + ")}. Zoom in to inspect detections.`;
         body.append(title, note); marker.bindPopup(body); markers.addLayer(marker);
       } else {
         const marker = L.circleMarker([feature.lat, feature.lon], {radius: 6, color: "#ffe1c2", weight: 1.5, fillColor: feature.sensor === "MODIS" ? "#ef8055" : "#edbd64", fillOpacity: .9});
@@ -405,15 +406,15 @@ async function updateMap() {
     }
     const scope = result.scope_date || result.month;
     $("#map-status").textContent = result.mode === "aggregates"
-      ? `${result.features.length} map groups from ${result.records_in_sample.toLocaleString()} imported ${scope} points${result.truncated ? "+" : ""}`
-      : `${result.features.length.toLocaleString()} displayed across ${result.records_in_sample.toLocaleString()} imported ${scope} points${result.truncated ? "+" : ""} · ${state.series}`;
+      ? `${result.features.length} map groups from ${result.records_in_sample.toLocaleString()} imported ${scope} points`
+      : `${result.features.length.toLocaleString()} displayed across ${result.records_in_sample.toLocaleString()} imported ${scope} points · ${state.series}`;
     if (focusMapOnDay && mapDay !== null && result.features.length) {
       focusMapOnDay = false;
       const [west, south, east, north] = result.point_bounds;
       const bounds = L.latLngBounds([[south, west], [north, east]]);
       map.fitBounds(bounds.pad(.25), {padding: [45, 45], maxZoom: 11});
     }
-    if (result.truncated) toast("Map sample capped. Zoom in for a smaller area.");
+    if (result.truncated) $("#map-status").textContent += " · sampled across all imported dates";
   } catch (error) { if (request === mapRequest) $("#map-status").textContent = error.message; }
 }
 

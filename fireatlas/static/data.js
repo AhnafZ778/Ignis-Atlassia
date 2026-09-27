@@ -30,6 +30,21 @@
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not read source status.");
       $("data-error").hidden = true;
+      const recent = data.sources.filter(source => !source.demo && source.source_id.endsWith("_NRT") && source.observations);
+      $("recent-imports").hidden = !recent.length;
+      if (recent.length) {
+        $("recent-count").textContent = recent.reduce((sum,source) => sum + source.observations, 0).toLocaleString();
+        const first = recent.map(s => s.first_observation).sort()[0];
+        const last = recent.map(s => s.last_observation).sort().at(-1);
+        $("recent-dates").textContent = `${first.slice(0,10)} → ${last.slice(0,10)} · UTC acquisition dates`;
+        $("recent-links").replaceChildren(...recent.map(source => {
+          const link = node("a", source.source_id.replace("VIIRS_", "VIIRS ").replace("_NRT", "") + " ↗");
+          link.href = `/?${new URLSearchParams({demo:0,series:source.series,year:source.last_observation.slice(0,4),month:Number(source.last_observation.slice(5,7)),bbox:"-180,-86,180,86"})}#atlas-section`;
+          return link;
+        }));
+        const excluded = recent.reduce((sum,source) => sum + (source.excluded_rows || 0), 0);
+        $("recent-exclusions").textContent = excluded ? `${excluded} polar source row retained in the exclusion ledger outside the ±86° atlas grid.` : "Original CSV rows and file hashes preserved.";
+      }
       const noaa = data.sources.find(source => source.source_id === "NOAA_HMS_VIIRS");
       $("noaa-count").textContent = noaa ? noaa.observations.toLocaleString() : "0";
       $("noaa-state").textContent = noaa ? "AUTHENTIC ARCHIVE LOADED" : "ARCHIVE READY TO IMPORT";
@@ -78,6 +93,7 @@
         card.append(node("p", source.demo ? "SYNTHETIC" : "IMPORTED", "eyebrow"), node("h3", source.source_id === "NOAA_HMS_VIIRS" ? "NOAA HMS · VIIRS" : source.source_id),
           node("strong", source.observations.toLocaleString()), node("p", `${source.imports} imports · ${source.observations.toLocaleString()} observations`),
           node("small", `Latest retrieval ${new Date(source.retrieved_utc).toLocaleString()}`));
+        if (source.excluded_rows) card.append(node("p", `${source.excluded_rows} source row outside the atlas grid, preserved separately.`));
         if (source.first_observation) {
           card.append(node("p", `Observed ${source.first_observation.slice(0,10)} – ${source.last_observation.slice(0,10)}`));
           if (source.series) {

@@ -309,34 +309,47 @@ def handler_factory(database: Path):
                             selected = date(year, month, int(selected_day))
                             start = selected.isoformat()
                             end = (selected + timedelta(days=1)).isoformat()
-                        raw = _records(db, SERIES[series], bbox, start, end, 60001)
-                        truncated = len(raw) > 60000
-                        raw = raw[:60000]
-                        point_bounds = ([min(row["lon"] for row in raw), min(row["lat"] for row in raw),
-                                         max(row["lon"] for row in raw), max(row["lat"] for row in raw)] if raw else None)
+                        sources = SERIES[series]
+                        source_sql = ",".join("?" for _ in sources)
+                        where = f"source_id IN ({source_sql}) AND acquisition_utc>=? AND acquisition_utc<? AND lon>=? AND lon<=? AND lat>=? AND lat<=?"
+                        scope = (*sources, start, end, bbox[0], bbox[2], bbox[1], bbox[3])
+                        totals = db.execute(f"SELECT count(*) AS total,min(lon) AS west,min(lat) AS south,max(lon) AS east,max(lat) AS north FROM observations WHERE {where}", scope).fetchone()
+                        total = totals["total"]
+                        point_bounds = [totals[k] for k in ("west", "south", "east", "north")] if total else None
                         if zoom < 6:
                             step = 4 if zoom < 4 else 1
-                            bins = defaultdict(lambda: {"count": 0, "sensors": set()})
-                            for row in raw:
-                                cell = (math.floor(row["lat"] / step), math.floor(row["lon"] / step))
-                                bins[cell]["count"] += 1
-                                bins[cell]["sensors"].add(row["sensor"])
-                            features = [{"lat": (lat + .5) * step, "lon": (lon + .5) * step,
-                                         "count": info["count"], "sensors": sorted(info["sensors"])}
-                                        for (lat, lon), info in bins.items()]
+                            bins = db.execute(f"""
+                                SELECT CAST((lat+90)/? AS INTEGER) AS y,CAST((lon+180)/? AS INTEGER) AS x,
+                                       count(*) AS count,group_concat(DISTINCT sensor) AS sensors
+                                FROM observations WHERE {where} GROUP BY y,x
+                            """, (step, step, *scope))
+                            features = [{"lat": (row["y"] + .5) * step - 90, "lon": (row["x"] + .5) * step - 180,
+                                         "count": row["count"], "sensors": row["sensors"].split(",")} for row in bins]
                             mode = "aggregates"
+                            displayed = total
                         else:
-                            stride = max(1, math.ceil(len(raw) / 1000))
+                            stride = max(1, math.ceil(total / 1000))
+                            raw = db.execute(f"""
+                                WITH ranked AS (
+                                    SELECT detection_id,row_number() OVER (ORDER BY acquisition_utc,detection_id) AS position
+                                    FROM observations WHERE {where}
+                                )
+                                SELECT o.*,b.demo FROM ranked r JOIN observations o ON o.detection_id=r.detection_id
+                                JOIN batches b ON b.id=o.batch_id WHERE (r.position-1) % ? = 0
+                                ORDER BY r.position LIMIT 1000
+                            """, (*scope, stride)).fetchall()
                             features = [{"lat": row["lat"], "lon": row["lon"],
                                          "sensor": row["sensor"], "platform": row["platform"],
                                          "acquisition_utc": row["acquisition_utc"],
                                          "confidence_raw": row["confidence_raw"],
                                          "product_version": row["product_version"],
-                                         "demo": bool(row["demo"])} for row in raw[::stride]][:1000]
+                                         "demo": bool(row["demo"])} for row in raw]
                             mode = "points"
-                        self._json({"mode": mode, "features": features, "truncated": truncated,
-                                    "records_in_sample": len(raw), "point_bounds": point_bounds,
-                                    "month": start[:7], "scope_date": start if selected_day is not None else None,
+                            displayed = len(raw)
+                        self._json({"mode": mode, "features": features, "truncated": mode == "points" and total > displayed,
+                                    "records_in_sample": total, "total_records": total, "displayed_points": displayed,
+                                    "point_bounds": point_bounds, "month": start[:7],
+                                    "scope_date": start if selected_day is not None else None,
                                     "record_scope": "imported records only"})
                     elif url.path == "/api/export":
                         year, month, series, bbox = _request_context(params)

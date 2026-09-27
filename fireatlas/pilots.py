@@ -92,6 +92,7 @@ class PilotSync:
             """)]
             for source in sources:
                 source["series"] = next((name for name, ids in SERIES.items() if ids == (source["source_id"],)), None)
+                source["excluded_rows"] = db.execute("SELECT count(*) FROM excluded_rows e JOIN batches b ON b.id=e.batch_id WHERE b.source_id=? AND b.demo=?", (source["source_id"], source["demo"])).fetchone()[0]
                 window = db.execute("SELECT month,west,south,east,north FROM export_windows WHERE source_id=? ORDER BY month DESC LIMIT 1", (source["source_id"],)).fetchone()
                 source["latest_window"] = dict(window) if window else None
             pilots = []
