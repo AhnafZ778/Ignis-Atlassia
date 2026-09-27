@@ -70,6 +70,26 @@ Everything in `data/demo/` is **synthetic** and labelled as such in JSON output.
 
 Request a free [FIRMS MAP_KEY](https://firms.modaps.eosdis.nasa.gov/api/map_key). Keep it in your shell environment or in `~/.config/fireatlas/firms.key` with owner-only permissions (`chmod 600`). `FIRMS_MAP_KEY` overrides the key file; `FIRMS_KEY_FILE` can select a different file. Do not commit credentials. The key is never returned by the website or included in downloaded studies. Select a modest AOI and a month offered by the chosen standard-processing source; verify availability with [NASA's availability endpoint](https://firms.modaps.eosdis.nasa.gov/api/data_availability/).
 
+### September 2026 data continuity and manual downloads
+
+The Data Sources page includes the FIRMS2 maintenance advisory captured on September 27 (disruption may extend through September 30), and NASA's planned November 1 Suomi NPP delivery cessation. The maintenance panel switches to historical wording after that window; it never declares recovery automatically. The S-NPP historical study remains separate from future NOAA-20/21 imports.
+
+FIRMS downloads try the primary host, then the official secondary host for connection failures and HTTP 5xx responses. Authentication errors, malformed responses and rate limits are reported without trying to bypass them. Availability checks still gate full-month downloads. Neither host nor the nrt3/nrt4 daily archive could be reached from this machine during the September 27 checks; a configured key is not a verified key.
+
+**Nothing must be downloaded to explore the bundled NOAA showcase.** To finish the real FIRMS historical comparison while the API is unreachable, request eight CSV exports from [NASA Archive Download](https://firms2.modaps.eosdis.nasa.gov/download/):
+
+- Products: **MODIS Collection 6.1 standard** and **VIIRS Suomi NPP 375 m standard**.
+- Dates: **July 1–31 in 2021, 2022, 2023 and 2024**, one file per product and month.
+- Bounding box: **west -122.2, south 38.8, east -120, north 41**, covering both pilot areas.
+
+On `/data.html`, select the downloaded CSV and exact product. Assert a complete month only for a verified full export and enter its month and exact bounding box. Eight full exports over this enclosing area satisfy the 16 individual pilot windows. The importer checks row dates, coordinates, instrument and satellite, preserves row provenance and file hashes, rejects NRT-labelled records under a standard product, and prevents duplicate detections. The full-export declaration comes from the user: CSV rows alone cannot prove missing days were observed. Partial files never establish complete export windows.
+
+Recent 24-hour/48-hour/7-day CSVs can also be imported with the full-month checkbox unchecked. The source ledger links to their atlas view. NOAA-20 standard and NOAA-20/21 NRT, S-NPP NRT and MODIS NRT have separate series; they do not silently replace the historical MODIS/S-NPP comparison. The current CLI can fetch complete months for these sources when the availability API offers them; it does not yet harvest rolling recent windows automatically.
+
+The daily HTTPS text archive in NASA's Active Fire page requires **Earthdata Login**, separate from MAP_KEY. That authenticated file route is **not automated** here. Archive Download may use an email verification code. WMS/KML/shapefiles and Landsat are not required for this pilot; the CSV importer supports MODIS and VIIRS, not Landsat. GIBS imagery is visual context and does not provide the observation masks or weather datasets needed for calibrated research.
+
+Browser imports are limited to 25 MB, same-origin requests and the local app. Larger files can use the existing CLI. Run sync again after manual imports to reproduce all completed pilot totals; no NASA request is needed if every pilot window is already present.
+
 ### Authentic-data pilot workflow
 
 The **Data sources** page shows credential configuration separately from successful NASA verification, import progress, a per-source/year completeness matrix, and reproducibility results. **Sync pilot data** runs a background import; **Retry pilot sync** resumes completed source-months after a failure. The action is limited to same-origin requests on the local app. Remote/public deployment needs a separately authenticated administrative workflow.

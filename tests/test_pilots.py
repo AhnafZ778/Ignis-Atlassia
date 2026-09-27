@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 
 from fireatlas.core import REQUIRED_COLUMNS, connect
 from fireatlas.fetch import availability, fetch_month
@@ -52,11 +52,21 @@ class PilotTests(unittest.TestCase):
     def test_failed_month_has_no_complete_export_or_partial_cache(self):
         headers = ",".join(sorted(REQUIRED_COLUMNS)) + "\n"
         available = [{"data_id":"MODIS_SP", "min_date":"2000-01-01", "max_date":"2024-12-31"}]
-        with connect(self.database) as db, patch("fireatlas.fetch.urlopen", side_effect=[Response(headers), URLError("test-secret")]):
+        with connect(self.database) as db, patch("fireatlas.fetch.urlopen", side_effect=[Response(headers), URLError("test-secret"), URLError("test-secret")]):
             with self.assertRaises(ValueError):
                 fetch_month(db, month="2024-07", source_id="MODIS_SP", bbox=tuple(PILOTS[0]["bbox"]), directory=self.root / "downloads", available_sources=available)
             self.assertEqual(db.execute("SELECT count(*) FROM export_windows").fetchone()[0], 0)
         self.assertEqual(list((self.root / "downloads").glob("*.csv")), [])
+
+    def test_secondary_recovers_transport_failure_but_not_rate_limit(self):
+        body = "data_id,min_date,max_date\nVIIRS_NOAA20_NRT,2026-09-01,2026-09-27\n"
+        with patch("fireatlas.fetch.urlopen", side_effect=[URLError("offline"), Response(body)]) as download:
+            self.assertEqual(availability()[0]["data_id"], "VIIRS_NOAA20_NRT")
+            self.assertIn("firms2.modaps", download.call_args.args[0])
+        with patch("fireatlas.fetch.urlopen", side_effect=HTTPError("secret", 429, "limit", {}, None)) as download:
+            with self.assertRaisesRegex(ValueError, "HTTP 429"):
+                availability()
+            self.assertEqual(download.call_count, 1)
 
     def test_full_empty_pilots_reproduce_and_second_run_skips_completed_downloads(self):
         def fake_open(url, timeout):
@@ -74,7 +84,7 @@ class PilotTests(unittest.TestCase):
             self.assertNotIn("test-secret", json.dumps(first))
             download.reset_mock()
             sync.run()
-            self.assertEqual(download.call_count, 1)
+            self.assertEqual(download.call_count, 0)
         with connect(self.database) as db:
             self.assertEqual(db.execute("SELECT count(*) FROM batches").fetchone()[0], 16)
 

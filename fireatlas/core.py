@@ -39,6 +39,11 @@ SERIES = {
     "viirs-snpp": ("VIIRS_SNPP_SP",),
     "joint": ("MODIS_SP", "VIIRS_SNPP_SP"),
     "hms-viirs": ("NOAA_HMS_VIIRS",),
+    "viirs-noaa20": ("VIIRS_NOAA20_SP",),
+    "viirs-noaa20-nrt": ("VIIRS_NOAA20_NRT",),
+    "viirs-noaa21-nrt": ("VIIRS_NOAA21_NRT",),
+    "viirs-snpp-nrt": ("VIIRS_SNPP_NRT",),
+    "modis-nrt": ("MODIS_NRT",),
 }
 REQUIRED_COLUMNS = {
     "latitude", "longitude", "acq_date", "acq_time", "satellite",
@@ -122,6 +127,15 @@ def _normalized_row(row: dict[str, str], source_id: str, retrieved: str, uri: st
         raise ValueError("coordinates outside supported EPSG:6933 region")
     if row["instrument"].strip().upper() != sensor:
         raise ValueError(f"instrument does not match {source_id}")
+    if source_id != "NOAA_HMS_VIIRS":
+        platforms = {"MODIS": {"T", "A", "TERRA", "AQUA"}, "SNPP": {"N", "SNPP", "SUOMI NPP", "S-NPP"},
+                     "NOAA20": {"1", "N20", "NOAA-20", "NOAA20"}, "NOAA21": {"2", "N21", "NOAA-21", "NOAA21"}}
+        platform_key = "MODIS" if sensor == "MODIS" else source_id.split("_")[1]
+        if row["satellite"].strip().upper() not in platforms[platform_key]:
+            raise ValueError(f"satellite does not match {source_id}")
+        version = row["version"].strip().upper()
+        if ("NRT" in version or "URT" in version or version.endswith("RT")) and level == "SP":
+            raise ValueError("near real-time rows cannot be imported as standard processing")
     hhmm = row["acq_time"].strip().zfill(4)
     if len(hhmm) != 4 or not hhmm.isdigit():
         raise ValueError("invalid FIRMS acq_time")

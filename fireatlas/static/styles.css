@@ -58,3 +58,4 @@
 @media(max-width:650px){.topbar nav .training-nav{display:block}.topbar nav a[href="#calendar-section"]{display:none}.training-entry{flex-direction:column;align-items:flex-start;padding:22px}.training-entry h2{font-size:23px}}
 @media(max-width:650px){.topbar nav .research-nav{display:block}.topbar nav a[href="#top"]{display:none}.topbar nav{gap:10px}}
 @media(max-width:360px){.topbar{gap:10px}.topbar nav{gap:8px;font-size:10px}.brand{font-size:11px;letter-spacing:.1em}.brand-mark{margin-right:2px}}
+#additional-source-label{font-size:11px;color:var(--muted)}#additional-source{max-width:100%;padding:9px;border:1px solid var(--line-strong);border-radius:5px;background:var(--surface);color:var(--text);font:inherit}

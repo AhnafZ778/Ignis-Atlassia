@@ -44,6 +44,13 @@ async function loadMeta() {
     button.setAttribute("aria-pressed", String(active));
   });
   document.querySelectorAll('[data-series="hms-viirs"]').forEach(button => { button.hidden = state.demo || !meta.available_sources?.includes("NOAA_HMS_VIIRS"); });
+  const extraSources = {"viirs-noaa20": ["VIIRS_NOAA20_SP", "VIIRS NOAA-20 · standard"], "viirs-noaa20-nrt": ["VIIRS_NOAA20_NRT", "VIIRS NOAA-20 · near real time"], "viirs-noaa21-nrt": ["VIIRS_NOAA21_NRT", "VIIRS NOAA-21 · near real time"], "viirs-snpp-nrt": ["VIIRS_SNPP_NRT", "VIIRS S-NPP · near real time"], "modis-nrt": ["MODIS_NRT", "MODIS · near real time"]};
+  const extraSelect = $("#additional-source");
+  extraSelect.replaceChildren(new Option("Choose product…", ""));
+  for (const [series, [source, label]] of Object.entries(extraSources)) {
+    if (meta.available_sources?.includes(source)) extraSelect.add(new Option(label, series));
+  }
+  $("#additional-source-label").hidden = extraSelect.options.length === 1;
   const hasFirms = state.demo || meta.available_sources?.some(source => source !== "NOAA_HMS_VIIRS");
   document.querySelectorAll('[data-series="joint"],[data-series="modis"],[data-series="viirs-snpp"]').forEach(button => { button.hidden = !hasFirms; });
   $(".series-row p").textContent = state.demo || hasFirms ? "Separate series preserve the sensor transition." : "A verified NOAA VIIRS cohort from the historical daily archive.";
@@ -82,7 +89,7 @@ async function loadCalendar(next = {}) {
   const params = new URLSearchParams({ year: config.year, series: config.series, bbox: config.bbox, demo: config.demo ? 1 : 0 });
   const data = await getJson(`/api/calendar?${params}`);
   const key = `${Number(config.demo)}:${config.year}:${config.bbox}`;
-  let comparison = config.series === "hms-viirs" ? data : jointCache.get(key);
+  let comparison = !["joint", "modis", "viirs-snpp"].includes(config.series) ? data : jointCache.get(key);
   if (!comparison && config.series !== "hms-viirs") {
     comparison = config.series === "joint" ? data : await getJson(`/api/calendar?${new URLSearchParams({year:config.year,series:"joint",bbox:config.bbox,demo:config.demo ? 1 : 0})}`);
     jointCache.set(key, comparison);
@@ -116,17 +123,24 @@ function renderStats() {
 }
 
 function renderSourceComparison() {
-  const isHms = state.series === "hms-viirs";
+  const isHms = !["joint", "modis", "viirs-snpp"].includes(state.series);
+  $("#additional-source").value = state.series;
+  const archive = state.series === "hms-viirs";
+  const summary = $("#hms-source-compare");
+  summary.querySelector("div > span").textContent = archive ? "NOAA HISTORICAL FIRE ARCHIVE" : "NASA FIRMS · IMPORTED PRODUCT";
+  summary.querySelector("h3").textContent = archive ? "Real VIIRS detections. A visible fire season." : state.series.toUpperCase().replaceAll("-", " ");
+  summary.querySelector("p").textContent = archive ? "NOAA HMS points from Suomi NPP, NOAA-20 and NOAA-21. Every day in a complete month is checked before the calendar is marked loaded." : "This product is displayed separately from the historical MODIS / Suomi NPP comparison. Imported detections remain visible when a month's export is partial.";
+  $("#hms-raw").nextElementSibling.textContent = "IMPORTED DETECTIONS";
   $("#hms-source-compare").hidden = !isHms;
   $("#firms-source-compare").hidden = isHms;
   $("#source-compare-note").hidden = isHms;
   if (isHms) {
     const month = state.data.monthly[state.month];
     const records = state.data.daily.filter(day => Number(day.date_utc.slice(5,7)) === state.month + 1);
-    const pixels = records.reduce((sum, day) => sum + (day.raw_pixels_by_sensor.VIIRS || 0), 0);
-    $("#hms-raw").textContent = month.export_window_complete ? pixels.toLocaleString() : "—";
+    const pixels = records.reduce((sum, day) => sum + (Object.values(day.raw_pixels_by_sensor).reduce((a,b) => a+b, 0)), 0);
+    $("#hms-raw").textContent = pixels.toLocaleString();
     $("#hms-cells").textContent = month.detected_cell_days === null ? "—" : month.detected_cell_days.toLocaleString();
-    $("#hms-period").textContent = `${monthNames[state.month]} ${state.year} · ${month.export_window_complete ? "complete daily archive" : "archive not loaded"}`;
+    $("#hms-period").textContent = `${monthNames[state.month]} ${state.year} · ${month.export_window_complete ? "complete export" : "partial / no complete export"}`;
     return;
   }
   const month = state.comparison.monthly[state.month];
@@ -407,14 +421,14 @@ function render() {
   syncView(); renderStudySources();
   renderStats(); renderSourceComparison(); renderMonths(); renderDays(); renderTimeline(); renderProvenance(); drawAoi(false); updateContextLayer(); updateMap();
   const research = $("#open-research-study");
-  const researchUsesDemo = state.series === "hms-viirs";
+  const researchUsesDemo = !["joint", "modis", "viirs-snpp"].includes(state.series);
   const researchContext = researchUsesDemo
     ? {year: 2015, month: 7, bbox: "-122,39,-120,41", demo: 1}
     : {year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0};
   const researchUrl = `/research.html?${new URLSearchParams(researchContext)}`;
   if (research) research.href = researchUrl;
   $("#research-entry-copy").textContent = researchUsesDemo
-    ? "Explore source overlap and candidate groups in a clearly labelled synthetic MODIS/VIIRS example. The NOAA archive stays in the atlas."
+    ? "Explore source overlap and candidate groups in a clearly labelled synthetic MODIS/VIIRS example. Your selected satellite product stays in the atlas."
     : "Compare source overlap, test candidate groups, and inspect observation-mask denominators.";
   document.querySelectorAll('a[href^="/research.html"]:not(#open-research-study)').forEach(link => { link.href = researchUrl; });
 }
@@ -422,6 +436,10 @@ function render() {
 document.addEventListener("DOMContentLoaded", async () => {
   initMap();
   initStudyTools();
+  $("#additional-source").addEventListener("change", async event => {
+    if (!event.target.value) return;
+    try { await loadCalendar({series:event.target.value, day:null}); } catch (error) { toast(error.message); }
+  });
   $("#map-play").addEventListener("click", playMapMonth);
   $("#map-all").addEventListener("click", () => { stopMapPlayback(); setMapDay(null); });
   $("#map-day").addEventListener("input", event => {

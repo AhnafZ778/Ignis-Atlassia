@@ -169,3 +169,47 @@ class WebMvpTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class CsvImportTests(unittest.TestCase):
+    def test_local_import_is_atomic_idempotent_and_preserves_partial_state(self):
+        from test_phase1 import row, write_csv
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            database = root / 'real.sqlite3'
+            server = ThreadingHTTPServer(('127.0.0.1', 0), handler_factory(database))
+            threading.Thread(target=server.serve_forever, daemon=True).start()
+            base = f'http://127.0.0.1:{server.server_port}'
+            file = root / 'input.csv'
+            try:
+                def upload(source='VIIRS_NOAA20_NRT', suffix='', origin=base):
+                    request = Request(base + '/api/data/import?source=' + source + suffix, data=file.read_bytes(),
+                                      headers={'Content-Type':'text/csv', 'Origin':origin})
+                    with urlopen(request) as response:
+                        return json.load(response)
+                write_csv(file, [row(instrument='VIIRS', satellite='N20', version='2.0NRT')])
+                self.assertEqual(upload()['import']['rows_inserted'], 1)
+                self.assertTrue(upload()['import']['already_imported'])
+                with urlopen(base + '/api/calendar?year=2024&series=viirs-noaa20-nrt&bbox=-122,39,-120,41') as response:
+                    self.assertIsNone(json.load(response)['monthly'][6]['detected_cell_days'])
+                for source in ('VIIRS_SNPP_NRT', 'VIIRS_NOAA20_SP'):
+                    with self.assertRaises(HTTPError) as caught:
+                        upload(source)
+                    self.assertEqual(caught.exception.code, 400)
+                with self.assertRaises(HTTPError) as caught:
+                    upload(origin='https://other.example')
+                self.assertEqual(caught.exception.code, 403)
+                write_csv(file, [row(instrument='VIIRS', satellite='N20', version='2.0NRT'), row(instrument='VIIRS', satellite='N20', acq_date='2024-08-01')])
+                with self.assertRaises(HTTPError):
+                    upload(suffix='&complete_month=2024-07&bbox=-122,39,-120,41')
+                with connect(database) as db:
+                    self.assertEqual(db.execute('SELECT count(*) FROM observations').fetchone()[0], 1)
+                    self.assertEqual(db.execute('SELECT count(*) FROM export_windows').fetchone()[0], 0)
+                write_csv(file, [row()])
+                upload('MODIS_SP', '&complete_month=2024-07&bbox=-122,39,-120,41')
+                with urlopen(base + '/api/data/status') as response:
+                    status = json.load(response)
+                self.assertEqual(status['sync']['completed'], 1)
+                self.assertEqual(status['sources'][0]['latest_window']['month'], '2024-07')
+            finally:
+                server.shutdown()
+                server.server_close()

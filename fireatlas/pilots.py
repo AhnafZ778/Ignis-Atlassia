@@ -84,16 +84,23 @@ class PilotSync:
         with connect(self.database) as db:
             sources = [dict(row) for row in db.execute("""
                 SELECT b.source_id,b.demo,count(DISTINCT b.id) AS imports,
-                       count(o.detection_id) AS observations,max(b.retrieved_utc) AS retrieved_utc
+                       count(o.detection_id) AS observations,max(b.retrieved_utc) AS retrieved_utc,
+                       min(o.acquisition_utc) AS first_observation,max(o.acquisition_utc) AS last_observation,
+                       min(o.lon) AS west,min(o.lat) AS south,max(o.lon) AS east,max(o.lat) AS north
                 FROM batches b LEFT JOIN observations o ON o.batch_id=b.id GROUP BY b.source_id,b.demo
                 ORDER BY b.source_id,b.demo
             """)]
+            for source in sources:
+                source["series"] = next((name for name, ids in SERIES.items() if ids == (source["source_id"],)), None)
+                window = db.execute("SELECT month,west,south,east,north FROM export_windows WHERE source_id=? ORDER BY month DESC LIMIT 1", (source["source_id"],)).fetchone()
+                source["latest_window"] = dict(window) if window else None
             pilots = []
             for pilot in PILOTS:
                 windows = [{"year": year, "source": source,
                             "complete": _complete_month(db, f"{year}-07", (source,), tuple(pilot["bbox"]))}
                            for year in YEARS for source in SERIES["joint"]]
                 pilots.append({**pilot, "windows": windows})
+            state["completed"] = sum(window["complete"] for pilot in pilots for window in pilot["windows"])
             hms_windows = [{"year": year, "complete": _complete_month(db, f"{year}-07", ("NOAA_HMS_VIIRS",), tuple(PILOTS[0]["bbox"]))}
                            for year in YEARS]
             hms_batch = db.execute("SELECT MAX(id) FROM batches WHERE source_id='NOAA_HMS_VIIRS'").fetchone()[0]
@@ -124,11 +131,32 @@ class PilotSync:
         Thread(target=self.run, daemon=True).start()
         return True
 
+    def reconcile_imports(self):
+        """Update the pilot matrix after a user-supplied CSV without contacting FIRMS."""
+        with connect(self.database) as db:
+            completed = sum(
+                _complete_month(db, f"{year}-07", (source,), tuple(pilot["bbox"]))
+                for pilot in PILOTS for year in YEARS for source in SERIES["joint"]
+            )
+            if completed == 16:
+                validation = validate_pilots(db)
+                write_json(self.database.with_suffix(".validation.json"), validation)
+                self.update(status="complete", completed=completed, total=16, validation=validation,
+                            message="All pilot exports imported. Calendar totals and baselines reproduced.")
+            else:
+                self.update(status="partial", completed=completed, total=16, validation=None,
+                            message=f"{completed} of 16 complete pilot exports imported. Partial CSVs remain visible without a completeness claim.")
+        return self.status()
+
     def run(self):
         try:
             with connect(self.database) as db:
                 if db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone():
                     raise ValueError("This server uses synthetic data. Start it with a separate authentic-data database before syncing.")
+                if all(_complete_month(db, f"{year}-07", (source,), tuple(pilot["bbox"]))
+                       for pilot in PILOTS for year in YEARS for source in SERIES["joint"]):
+                    self.reconcile_imports()
+                    return
                 self.update(status="checking", message="Checking NASA source availability…", completed=0, validation=None)
                 available = availability()
                 for source in SERIES["joint"]:

@@ -15,19 +15,31 @@ from urllib.request import urlopen
 from .core import REQUIRED_COLUMNS, SOURCES, ingest, validate_bbox
 from .settings import firms_key
 
-BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
-AVAILABILITY_URL = "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv"
+API_HOSTS = (
+    "https://firms.modaps.eosdis.nasa.gov",
+    "https://firms2.modaps.eosdis.nasa.gov",
+)
+BASE_URL = API_HOSTS[0] + "/api/area/csv"
+AVAILABILITY_URL = API_HOSTS[0] + "/api/data_availability/csv"
 FIRMS_SOURCES = {source for source in SOURCES if source != "NOAA_HMS_VIIRS"}
 
 
 def _download(url: str, label: str) -> str:
-    try:
-        with urlopen(url, timeout=15) as response:
-            return response.read().decode("utf-8-sig")
-    except HTTPError as exc:
-        raise ValueError(f"FIRMS request failed for {label}: HTTP {exc.code}") from None
-    except (URLError, TimeoutError):
-        raise ValueError(f"FIRMS request failed for {label}: network error") from None
+    """Try NASA's documented secondary server for transport and server failures."""
+    for index, host in enumerate(API_HOSTS):
+        candidate = url.replace(API_HOSTS[0], host, 1)
+        try:
+            with urlopen(candidate, timeout=15) as response:
+                return response.read().decode("utf-8-sig")
+        except HTTPError as exc:
+            # A rejected key, bad request or rate limit will not improve by
+            # repeating the same request on another server.
+            if exc.code < 500 or index == len(API_HOSTS) - 1:
+                raise ValueError(f"FIRMS request failed for {label}: HTTP {exc.code}") from None
+        except (URLError, TimeoutError, OSError):
+            if index == len(API_HOSTS) - 1:
+                raise ValueError(f"FIRMS request failed for {label}: primary and secondary servers unreachable") from None
+    raise ValueError(f"FIRMS request failed for {label}: primary and secondary servers unavailable")
 
 
 def availability(source_id="ALL"):

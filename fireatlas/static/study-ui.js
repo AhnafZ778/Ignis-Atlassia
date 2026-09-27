@@ -7,7 +7,7 @@ function validateView(input) {
   const bbox = String(input.bbox).split(",").map(value => value.trim() === "" ? NaN : Number(value));
   const [w, s, e, n] = bbox;
   if (!Number.isInteger(year) || year < 2000 || year > 2100 || !Number.isInteger(month) || month < 1 || month > 12 ||
-      !["joint", "modis", "viirs-snpp", "hms-viirs"].includes(input.series) || bbox.length !== 4 || bbox.some(v => !Number.isFinite(v)) ||
+      !["joint", "modis", "viirs-snpp", "hms-viirs", "viirs-noaa20", "viirs-noaa20-nrt", "viirs-noaa21-nrt", "viirs-snpp-nrt", "modis-nrt"].includes(input.series) || bbox.length !== 4 || bbox.some(v => !Number.isFinite(v)) ||
       !(w >= -180 && w < e && e <= 180 && s >= -90 && s < n && n <= 90)) throw new Error("This view has an invalid year, month, sensor series or area.");
   const day = input.day || null, layer = input.layer || "none";
   if (!["none", "ndvi", "landcover", "fwi"].includes(layer)) throw new Error("Unknown context layer in this view.");

@@ -11,6 +11,7 @@ import ipaddress
 import sqlite3
 import threading
 import contextlib
+import tempfile
 from collections import defaultdict
 from datetime import date, timedelta
 from http import HTTPStatus
@@ -18,7 +19,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from .core import SERIES, calendar, connect, validate_bbox
+from .core import SERIES, calendar, connect, ingest, validate_bbox
+from .fetch import FIRMS_SOURCES
 from .demo import make_demo
 from .training import public_scenario, snapshot
 from .research import report as research_report, coverage_example
@@ -109,6 +111,14 @@ def handler_factory(database: Path):
     event_cache = database.with_suffix(".events.json")
     pilot_sync = PilotSync(database)
     class Handler(BaseHTTPRequestHandler):
+        def _local_data_action(self, content_type):
+            host = self.headers.get("Host", "")
+            hostname = urlsplit("//" + host).hostname
+            return (ipaddress.ip_address(self.client_address[0]).is_loopback
+                    and hostname in ("localhost", "127.0.0.1", "::1")
+                    and self.headers.get("Origin") == f"http://{host}"
+                    and self.headers.get("Content-Type") == content_type)
+
         def _database_for(self, params):
             choice = params.get("demo", ["0"])[0]
             if choice not in ("0", "1"):
@@ -136,14 +146,10 @@ def handler_factory(database: Path):
             self._respond(json.dumps(value).encode(), "application/json; charset=utf-8", status)
 
         def do_POST(self):
-            if urlsplit(self.path).path == "/api/data/sync":
+            path = urlsplit(self.path).path
+            if path == "/api/data/sync":
                 # A browser can start ingestion only through the local app, never cross-site.
-                host = self.headers.get("Host", "")
-                hostname = urlsplit("//" + host).hostname
-                if (not ipaddress.ip_address(self.client_address[0]).is_loopback
-                        or hostname not in ("localhost", "127.0.0.1", "::1")
-                        or self.headers.get("Origin") != f"http://{host}"
-                        or self.headers.get("Content-Type") != "application/json"):
+                if not self._local_data_action("application/json"):
                     self._json({"error": "Pilot sync is available only from this local application's Data page."}, HTTPStatus.FORBIDDEN)
                     return
                 if not pilot_sync.start():
@@ -151,7 +157,43 @@ def handler_factory(database: Path):
                 else:
                     self._json({"started": True}, HTTPStatus.ACCEPTED)
                 return
-            if urlsplit(self.path).path != "/api/research":
+            if path == "/api/data/import":
+                if not self._local_data_action("text/csv"):
+                    self._json({"error": "CSV import is available only from this local application's Data page."}, HTTPStatus.FORBIDDEN)
+                    return
+                if pilot_sync.running:
+                    self._json({"error": "Wait for the current pilot sync before importing a file."}, HTTPStatus.CONFLICT)
+                    return
+                try:
+                    length = int(self.headers.get("Content-Length", "0"))
+                    if not 0 < length <= 25_000_000:
+                        self._json({"error": "CSV must contain 1–25,000,000 bytes."}, HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+                        return
+                    params = parse_qs(urlsplit(self.path).query)
+                    source = params.get("source", [""])[0]
+                    if source not in FIRMS_SOURCES:
+                        raise ValueError("Choose a supported NASA FIRMS source.")
+                    month = params.get("complete_month", [None])[0]
+                    if month and "bbox" not in params:
+                        raise ValueError("A complete month requires its exact export bounding box.")
+                    bbox = _bbox(params) if month else None
+                    with connect(database) as db:
+                        if db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone():
+                            raise ValueError("Synthetic data cannot be mixed with an authentic NASA import.")
+                        with tempfile.TemporaryDirectory() as temporary:
+                            uploaded = Path(temporary) / "uploaded.csv"
+                            uploaded.write_bytes(self.rfile.read(length))
+                            result = ingest(db, uploaded, source, source_uri="user-supplied:FIRMS CSV",
+                                            complete_month=month, bbox=bbox)
+                    pilot_sync.reconcile_imports()
+                    self._json({"import": result, "source": source, "complete_month": month,
+                                "message": "CSV imported. View the source ledger and pilot matrix below."})
+                except (ValueError, UnicodeError, TypeError) as exc:
+                    self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+                except (OSError, sqlite3.Error):
+                    self._json({"error": "CSV import could not finish; no unverified completion was recorded."}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                return
+            if path != "/api/research":
                 self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
                 return
             try:
@@ -222,9 +264,11 @@ def handler_factory(database: Path):
                         default_view = {"year": int(latest["month"][:4]) if latest else 2024,
                                         "month": int(latest["month"][5:]) if latest else 7,
                                         "bbox": [latest[k] for k in ("west", "south", "east", "north")] if latest else PILOTS[0]["bbox"]}
+                        default_series = next((name for name, sources in SERIES.items()
+                                               if latest and sources == (latest["source_id"],)), "joint")
                         self._json({"years": [row["year"] for row in rows], "series": list(SERIES),
                                     "default_view": default_view, "pilots": PILOTS,
-                                    "default_series": "hms-viirs" if latest and latest["source_id"] == "NOAA_HMS_VIIRS" else "joint",
+                                    "default_series": default_series,
                                     "available_sources": [row[0] for row in db.execute("SELECT DISTINCT source_id FROM batches ORDER BY source_id")],
                                     "source_counts": {row[0]: row[1] for row in db.execute("SELECT source_id,COUNT(*) FROM observations GROUP BY source_id")},
                                     "synthetic": bool(db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone())})

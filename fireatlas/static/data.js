@@ -1,6 +1,10 @@
 (() => {
   const $ = id => document.getElementById(id);
   let timer, busy = false;
+  if (new Date() >= new Date("2026-10-01T04:00:00Z")) {
+    $("maintenance-title").textContent = "September maintenance window has passed";
+    $("maintenance-copy").textContent = "The September 25–30 FIRMS2 advisory is historical. It does not confirm a current outage or recovery. Use the connection status below and NASA’s latest notice to check service availability.";
+  }
   function node(tag, text, className) {
     const el = document.createElement(tag); el.textContent = text;
     if (className) el.className = className;
@@ -41,6 +45,7 @@
         ? `Last accepted NASA availability request: ${new Date(sync.connection_verified_utc).toLocaleString()}. ${sync.updated_utc ? "Status updated " + new Date(sync.updated_utc).toLocaleString() + "." : ""}`
         : "Server connection pending. No successful FIRMS availability response has been recorded yet.";
       $("sync-progress").value = sync.completed || 0;
+      $("sync-progress").max = sync.total || 16;
       $("sync-count").textContent = `${sync.completed || 0} / ${sync.total || 16} source-months`;
       $("sync-pilots").disabled = running || !data.credential_configured || data.synthetic;
       $("sync-pilots").textContent = running ? "Sync in progress…" : sync.status === "failed" || sync.status === "interrupted" ? "Retry pilot sync ↗" : "Sync pilot data ↗";
@@ -48,6 +53,8 @@
         $("data-error").hidden = false;
         $("data-error").textContent = "This server is using synthetic data. Start the app with a separate authentic-data database to enable NASA imports.";
       }
+      $("csv-import").querySelectorAll("input, select, button").forEach(control => { control.disabled = data.synthetic; });
+      if (data.synthetic) $("import-result").textContent = "Import needs an authentic-data database.";
       $("pilot-list").replaceChildren();
       for (const pilot of data.pilots) {
         const card = node("article", "", "pilot-card");
@@ -71,6 +78,17 @@
         card.append(node("p", source.demo ? "SYNTHETIC" : "IMPORTED", "eyebrow"), node("h3", source.source_id === "NOAA_HMS_VIIRS" ? "NOAA HMS · VIIRS" : source.source_id),
           node("strong", source.observations.toLocaleString()), node("p", `${source.imports} imports · ${source.observations.toLocaleString()} observations`),
           node("small", `Latest retrieval ${new Date(source.retrieved_utc).toLocaleString()}`));
+        if (source.first_observation) {
+          card.append(node("p", `Observed ${source.first_observation.slice(0,10)} – ${source.last_observation.slice(0,10)}`));
+          if (source.series) {
+            const link = node("a", "Explore these detections ↗");
+            const window = source.latest_window;
+            const bbox = window ? [window.west,window.south,window.east,window.north] : [Math.max(-180,source.west-.05),Math.max(-86,source.south-.05),Math.min(180,source.east+.05),Math.min(86,source.north+.05)];
+            const date = window?.month || source.last_observation;
+            link.href = `/?${new URLSearchParams({demo:source.demo ? 1 : 0, series:source.series, year:date.slice(0,4), month:Number(date.slice(5,7)), bbox:bbox.join(",")})}#atlas-section`;
+            card.append(link);
+          }
+        }
         $("source-list").append(card);
       }
       $("pilot-validation").replaceChildren();
@@ -95,6 +113,38 @@
     } finally { busy = false; }
   }
   $("refresh-data").addEventListener("click", refresh);
+  $("import-complete").addEventListener("change", () => {
+    $("import-window").hidden = !$("import-complete").checked;
+    $("import-month").required = $("import-complete").checked;
+    $("import-bbox").required = $("import-complete").checked;
+  });
+  $("csv-import").addEventListener("submit", async event => {
+    event.preventDefault();
+    const file = $("import-file").files[0];
+    if (!file) return;
+    if (file.size > 25_000_000) { $("import-result").textContent = "Choose a CSV smaller than 25 MB."; return; }
+    const params = new URLSearchParams({source: $("import-source").value});
+    if ($("import-complete").checked) {
+      params.set("complete_month", $("import-month").value);
+      params.set("bbox", $("import-bbox").value.trim());
+    }
+    $("import-submit").disabled = true;
+    $("import-result").textContent = `Importing ${file.name}…`;
+    try {
+      const response = await fetch(`/api/data/import?${params}`, {method:"POST", headers:{"Content-Type":"text/csv"}, body:file});
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Import failed.");
+      $("import-result").textContent = result.import.already_imported
+        ? "This exact source file was already imported."
+        : `${result.import.rows_inserted.toLocaleString()} detections added · ${result.complete_month ? "complete month recorded" : "partial file"}.`;
+      $("csv-import").reset();
+      $("import-window").hidden = true;
+      $("import-month").required = false;
+      $("import-bbox").required = false;
+      await refresh();
+    } catch (error) { $("import-result").textContent = error.message; }
+    finally { $("import-submit").disabled = false; }
+  });
   $("sync-pilots").addEventListener("click", async () => {
     $("sync-pilots").disabled = true;
     try {
