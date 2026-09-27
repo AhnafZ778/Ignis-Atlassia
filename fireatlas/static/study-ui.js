@@ -9,7 +9,7 @@ function validateView(input) {
   if (!Number.isInteger(year) || year < 2000 || year > 2100 || !Number.isInteger(month) || month < 1 || month > 12 ||
       !["joint", "modis", "viirs-snpp", "hms-viirs", "viirs-noaa20", "viirs-noaa20-nrt", "viirs-noaa21-nrt", "viirs-snpp-nrt", "modis-nrt"].includes(input.series) || bbox.length !== 4 || bbox.some(v => !Number.isFinite(v)) ||
       !(w >= -180 && w < e && e <= 180 && s >= -90 && s < n && n <= 90)) throw new Error("This view has an invalid year, month, sensor series or area.");
-  const day = input.day || null, layer = input.layer || "none";
+  const day = input.day || null, layer = input.layer || "ndvi";
   if (!["none", "ndvi", "landcover", "fwi"].includes(layer)) throw new Error("Unknown context layer in this view.");
   if (day && (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number(day.slice(0,4)) !== year || Number(day.slice(5,7)) !== month ||
       Number(day.slice(8)) < 1 || Number(day.slice(8)) > new Date(Date.UTC(year,month,0)).getUTCDate())) throw new Error("The selected day does not belong to this month.");

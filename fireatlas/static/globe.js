@@ -260,7 +260,7 @@
     $("globe-selection").hidden = true;
     $("globe-overview").hidden = state.documented;
     $("globe-documented").hidden = !state.documented;
-    $("globe-console-title").textContent = state.documented ? "Historical casebook" : "NASA observations";
+    $("globe-console-title").textContent = state.documented ? "Historical casebook" : "Observation snapshot";
     document.querySelector(".globe-console").classList.toggle("documented-view", state.documented);
     document.querySelector(".globe-console").classList.remove("has-selection", "documented-reading");
     $("globe-location").value = "";
@@ -531,7 +531,7 @@
     state.selectedFire=null;
     $("documented-detail").hidden=true;$("documented-list").hidden=false;
     if(state.fires) $("documented-status").textContent=`${state.fires.length} wildfires · choose a story to explore`;
-    $("globe-console-title").textContent="NASA observations";
+    $("globe-console-title").textContent="Observation snapshot";
     document.querySelector(".globe-console").classList.remove("documented-view", "documented-reading");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
@@ -635,7 +635,7 @@
     });
     tip.addEventListener("pointerenter", () => clearTimeout(timer));
     tip.addEventListener("pointerleave", hide);
-    document.addEventListener("focusin", e => { if (e.target.matches("[data-tooltip]")) show(e.target); });
+    document.addEventListener("focusin", e => { const target=e.target.closest("[data-tooltip]");if(target)show(target); });
     document.addEventListener("focusout", e => { if (e.target.matches("[data-tooltip]")) hide(); });
     document.addEventListener("click", e => { const target=e.target.closest("[data-tooltip]");if(target)show(target);else if(!tip.contains(e.target))hide(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") hide(); });

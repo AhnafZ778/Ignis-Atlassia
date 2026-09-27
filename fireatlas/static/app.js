@@ -1,5 +1,5 @@
 const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null, demo: true };
-let map, markers, aoiOutline, contextLayer, contextChoice = "none", mapRequest = 0, contextRequest = 0;
+let map, markers, aoiOutline, contextLayer, contextChoice = "ndvi", mapRequest = 0, contextRequest = 0;
 let mapDay = null, mapPlayback = null, mapInputTimer = null, focusMapOnDay = false;
 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const shortMonths = monthNames.map(name => name.slice(0, 3).toUpperCase());
@@ -51,12 +51,22 @@ async function loadMeta() {
     if (meta.available_sources?.includes(source)) extraSelect.add(new Option(label, series));
   }
   $("#additional-source-label").hidden = extraSelect.options.length === 1;
-  const hasFirms = state.demo || meta.available_sources?.some(source => source !== "NOAA_HMS_VIIRS");
-  document.querySelectorAll('[data-series="joint"],[data-series="modis"],[data-series="viirs-snpp"]').forEach(button => { button.hidden = !hasFirms; });
-  $(".series-row p").textContent = state.demo || hasFirms ? "Separate series preserve the sensor transition." : "A verified NOAA VIIRS cohort from the historical daily archive.";
+  const historicalSources = {modis: ["MODIS_SP"], "viirs-snpp": ["VIIRS_SNPP_SP"], joint: ["MODIS_SP", "VIIRS_SNPP_SP"]};
+  for (const [series, sources] of Object.entries(historicalSources)) {
+    const available = sources.every(source => meta.available_sources?.includes(source));
+    document.querySelectorAll(`[data-series="${series}"]`).forEach(button => { button.hidden = !available; });
+    document.querySelectorAll(`[data-source-target="${series}"]`).forEach(button => { button.disabled = !available; });
+  }
+  $(".series-row p").textContent = state.demo ? "Separate series preserve the sensor transition." : "Select an imported product to inspect its observations.";
+  const weatherButton = $('[data-layer="fwi"]');
+  weatherButton.setAttribute("aria-disabled", String(!state.demo));
+  weatherButton.textContent = state.demo ? "Fire weather" : "Fire weather · unavailable";
+  weatherButton.dataset.tooltip = state.demo
+    ? "Synthetic weather illustration for the example study; not measured weather or a forecast."
+    : "Measured fire-weather data have not been imported. A synthetic illustration is available in example mode.";
   $("#mode-description").textContent = state.demo
-    ? "Explore 2023–2026 seasonal examples, sensor comparisons and local context layers. Generated from CSV attribute samples; all dates and locations are synthetic."
-    : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Browse real NOAA HMS VIIRS fire points from complete historical daily archives. NASA EONET reports remain a separate layer."
+    ? "Generated seasonal examples and context layers. Dates and locations are synthetic; these controls apply to the study tools below."
+    : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Study imported satellite archives by year, product and region. This selection applies to the atlas, calendar and evidence below."
     : meta.years.length ? "Browsing imported source records. Check the source ledger for retrieval and coverage details."
       : "NASA imports have not arrived on this server. Try the guided demo while the connection is restored.";
 }
@@ -70,7 +80,7 @@ async function selectDataset(demo) {
   state.comparison = null;
   try {
     await loadMeta();
-    state.day = null; contextChoice = "none";
+    state.day = null; contextChoice = "ndvi";
     await loadCalendar();
     drawAoi(true);
   } catch (error) {
@@ -234,7 +244,9 @@ async function loadDay(stamp) {
       const summary = document.createElement("summary");
       const name = document.createElement("strong"); name.textContent = `${item.sensor} · ${item.platform}`;
       const time = document.createElement("span"); time.textContent = item.acquisition_utc.slice(11,16) + " UTC";
-      const meta = document.createElement("span"); meta.textContent = `confidence ${item.confidence_raw} · FRP ${item.frp_raw || "—"}`;
+      const frp = item.frp_raw ?? null;
+      const meta = document.createElement("span"); meta.textContent = `confidence ${item.confidence_raw} · FRP ${frp === null || frp === "" ? "unknown" : `${frp} MW`}`;
+      summary.dataset.tooltip = "Confidence uses the source product's native scale. FRP is observed fire radiative power in megawatts, not burned area or fire severity.";
       summary.append(name, time, meta);
       const pre = document.createElement("pre"); pre.textContent = JSON.stringify(item.raw, null, 2);
       details.append(summary, pre); container.append(details);
@@ -481,6 +493,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#analyze").click();
   });
   document.querySelectorAll("[data-layer]").forEach(button => button.addEventListener("click", () => {
+    if (button.getAttribute("aria-disabled") === "true") return toast("Measured fire-weather data have not been imported. Select the synthetic example to explore an illustration.");
     contextChoice = button.dataset.layer;
     document.querySelectorAll("[data-layer]").forEach(other => other.classList.toggle("selected", other === button));
     updateContextLayer(); syncView();
