@@ -48,6 +48,11 @@
       </div>
       <div class="hero-coordinate">NASA FIRMS / EARTH<span id="globe-stamp">DRAG TO EXPLORE</span></div>
       <div class="globe-flight-dock" aria-label="Globe navigation and observation profile">
+        <label class="globe-toggle-label" for="globe-markers">
+          <span class="thermal-toggle-icon" aria-hidden="true">◉</span>
+          <span class="thermal-toggle-copy"><strong>Thermal detections</strong><small>NASA satellite observations</small></span>
+          <input id="globe-markers" type="checkbox" aria-label="Thermal detections">
+        </label>
         <div class="globe-dock-main">
           <div class="globe-regions" role="group" aria-label="Look at a region">
             <button type="button" data-globe-region="20,-5">Africa</button>
@@ -61,7 +66,6 @@
             <button id="globe-rotate" type="button" aria-pressed="false" title="Camera rotation (does not change observation dates)">Pause rotation</button>
             <button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">＋</button>
             <button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button>
-            <label class="globe-toggle-label"><input id="globe-markers" type="checkbox"> Detections</label>
           </div>
         </div>
         <div class="globe-dock-sub">
@@ -80,7 +84,7 @@
         </div>
       </div>
       <aside class="globe-console" aria-labelledby="globe-console-title">
-        <button id="globe-documented-toggle" type="button" aria-pressed="false" aria-controls="globe-documented"><span class="documented-toggle-icon" aria-hidden="true">◇</span><span class="documented-toggle-copy"><strong>Documented wildfires</strong><small>Explore the stories behind the fires</small></span><span class="documented-toggle-state">Show</span></button>
+        <button id="globe-documented-toggle" type="button" aria-pressed="false" aria-controls="globe-documented"><svg class="documented-toggle-icon" aria-hidden="true" viewBox="0 0 32 32"><path class="documented-diamond" d="M16 2 30 16 16 30 2 16Z"/><path class="documented-check" d="m10 16 4 4 8-8"/></svg><span class="documented-toggle-copy"><strong>Documented wildfires</strong><small>Explore the stories behind the fires</small></span><span class="documented-toggle-state">Show</span></button>
         <div class="globe-console-head"><h2 id="globe-console-title">NASA observations</h2><a href="/data.html" aria-label="Inspect data sources">↗</a></div>
         <div id="globe-overview">
           <div class="globe-total"><strong id="globe-total">—</strong><span>thermal detections<small id="globe-cell-count">Imported snapshot</small></span></div>

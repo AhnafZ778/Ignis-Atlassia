@@ -839,7 +839,11 @@
 .globe-console{width:316px;padding:16px}
 #globe-documented-toggle{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;margin:0 0 18px;padding:12px;text-align:left;border:1px solid #70c5ed8c;border-radius:10px;background:linear-gradient(120deg,#183b50,#142733);color:#effaff;cursor:pointer;box-shadow:0 4px 20px #0003}
 #globe-documented-toggle:hover{background:linear-gradient(120deg,#21516b,#193548);border-color:#a8e1ff}
-.documented-toggle-icon{font-size:29px;color:#9adeff;line-height:1}
+.documented-toggle-icon{width:30px;height:30px;flex-shrink:0;overflow:visible}
+.documented-diamond{fill:transparent;stroke:#9adeff;stroke-width:1.7;stroke-linejoin:round}
+.documented-check{fill:none;stroke:#102c3d;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+#globe-documented-toggle[aria-pressed=true] .documented-diamond{fill:#bce9ff;stroke:#d7f2ff}
+#globe-documented-toggle[aria-pressed=true] .documented-check{opacity:1}
 .documented-toggle-copy{display:grid;gap:5px;flex:1;min-width:0}
 .documented-toggle-copy strong{font-size:13px;font-weight:600;letter-spacing:-.01em}
 .documented-toggle-copy small{font-size:10px;line-height:1.4;color:#b4d4e5}
@@ -888,3 +892,17 @@
 @media(min-width:951px) and (max-width:1150px){.globe-console{width:280px;right:16px;padding:14px}.documented-toggle-copy strong{font-size:12px}.globe-hero .hero-copy{max-width:21vw}}
 @media(max-width:950px){.globe-console{width:auto}.documented-list{grid-template-columns:1fr 1fr}.globe-console .documented-list button{min-height:88px}}
 @media(max-width:500px){.globe-console{padding:16px}.documented-list{grid-template-columns:1fr}.globe-console .documented-list button{min-height:80px}.documented-card-copy strong{font-size:14px}.documented-navigation button{min-height:44px}}
+
+/* Make the primary satellite layer easy to discover and toggle. */
+.globe-flight-dock>.globe-toggle-label{display:flex;align-items:center;gap:11px;width:100%;min-height:52px;margin:0 0 3px;padding:9px 13px;border:1px solid #ee985c99;border-radius:9px;background:linear-gradient(110deg,#462a1f,#241d1a);color:#fff0df;cursor:pointer;box-sizing:border-box}
+.globe-flight-dock>.globe-toggle-label:hover{border-color:#ffc28b;background:linear-gradient(110deg,#583223,#30231c)}
+.thermal-toggle-icon{font-size:26px;line-height:1;color:#ffa865}
+.thermal-toggle-copy{display:flex;align-items:baseline;gap:10px;flex:1;flex-wrap:wrap}
+.thermal-toggle-copy strong{font-size:13px;font-weight:650}
+.thermal-toggle-copy small{font-size:10px;color:#d3b6a2}
+.globe-flight-dock #globe-markers{appearance:none;flex-shrink:0;position:relative;width:38px;height:22px;margin:0;border:1px solid #cb9973;border-radius:20px;background:#171b1f;cursor:pointer}
+.globe-flight-dock #globe-markers::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#d7bca8}
+.globe-flight-dock #globe-markers:checked{background:#f79656;border-color:#ffc897}
+.globe-flight-dock #globe-markers:checked::after{left:19px;background:#29180f}
+.globe-flight-dock>.globe-toggle-label:has(:checked){border-color:#ffb57e;background:linear-gradient(110deg,#583021,#342319)}
+@media(max-width:500px){.thermal-toggle-copy{display:grid;gap:3px}.globe-flight-dock>.globe-toggle-label{min-height:58px}}
