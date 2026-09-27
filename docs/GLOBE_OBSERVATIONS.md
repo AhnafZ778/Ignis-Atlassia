@@ -135,3 +135,32 @@ a wider hit area. The satellite detail view also has an explicit back button.
 Browser checks passed for marker selection, source links, Previous/Next limits,
 back navigation, focus restoration and showing/hiding the layer. Layout checks
 at 1366, 1024, 820 and 390 px found no horizontal overflow or JavaScript errors.
+
+## Worldwide 2D and 3D browsing — 28 September 2026
+
+The former EONET-only map now defaults to `/api/globe?source=all&date=all`,
+using the same authentic global FIRMS snapshot as Earth: 866,956 imported
+observations in 7,307 one-degree groups, dated September 20–27, 2026. The
+existing data already included worldwide locations; no synthetic observations
+or new claims of live activity were added. The previous 200-event EONET sample
+contained only IRWIN reports and was unsuitable as a global coverage map.
+
+The 2D layer selector separates satellite groups, six documented historical
+cases, and the existing EONET report sample. Every layer exposes its provenance
+and date limitations. Regional navigation and worldwide reset cover Africa,
+Asia, Europe, North America, South America and Oceania. These regional views
+use broad rectangular geographic windows, not administrative boundaries.
+All groups are drawn; the list pages through 30 at a time. At global zoom,
+marker sizes shrink to preserve geographic readability. Orange/gold satellite
+colors follow the globe's earlier/latest observation-day convention.
+
+Satellite and historical popups link to the matching 3D selection. A satellite
+handoff restores the full snapshot's date and source selection so its evidence
+matches the 2D point. The globe now has World/Europe controls and a location
+picker scoped to the chosen regional window. The 2D map loads as it approaches
+the viewport, retaining lazy loading on the landing page.
+
+Browser verification passed: exact global totals/group counts; nonempty data
+in all six regional windows; satellite and historical handoff to 3D; historical
+source links; EONET sample labelling; pagination; worldwide reset; and layouts
+at 1440, 1024, 820 and 390 px without horizontal overflow or JavaScript errors.

@@ -29,6 +29,7 @@
     documented: false,
     fires: null,
     firesLoading: null,
+    region: "world",
     selectedFire: null
   };
 
@@ -96,6 +97,17 @@
     else $("globe-status").textContent = state.data.total ? (state.failedEarth ? "3D unavailable · browse locations below." : "Select a point to inspect.") : "No imported detections · coverage unknown.";
     syncControls();
     draw(state.bridge?.view);
+  }
+
+  function updateLocations() {
+    const region = window.FireAtlasRegions?.[state.region];
+    let points = state.data?.clusters || [];
+    if(region && state.region !== "world") {
+      const [[south,west],[north,east]] = region.bounds;
+      points = points.filter(p => p.lat>=south && p.lat<=north && p.lon>=west && p.lon<=east);
+    }
+    $("globe-location").replaceChildren(new Option(`${region?.name || "Worldwide"} · ${points.length ? "largest groups…" : "no observations"}`, ""), ...points.slice(0,40).map(c => new Option(`${coords(c.lon,c.lat)} · ${format(c.count)}`, c.id)));
+    document.querySelectorAll("[data-region-key]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.regionKey===state.region)));
   }
 
   function focus(lon, lat) {
@@ -228,6 +240,7 @@
     draw(bridge.view);
     const selectedFire = state.documented && state.fires?.find(fire => fire.id === state.selectedFire);
     if (selectedFire) focus(selectedFire.lon, selectedFire.lat);
+    else if(state.selected){const selected=state.points.find(p=>p.id===state.selected);if(selected)focus(selected.lon,selected.lat);}
     if ($("globe-markers").checked) revealDetections();
     else scheduleLoad();
   }
@@ -473,7 +486,7 @@
       $("globe-date").replaceChildren(...dates);
       $("globe-date").value = day;
       renderObservationImprint(data, day);
-      $("globe-location").replaceChildren(new Option("Browse 40 largest groups…", ""), ...data.clusters.slice(0, 40).map(c => new Option(`${coords(c.lon, c.lat)} · ${format(c.count)}`, c.id)));
+      updateLocations();
       $("globe-status").textContent = data.total ? (state.revealed ? "Select a point to inspect." : "Ready · turn on detections to explore.") : "No imported detections · coverage unknown.";
       const latest = data.daily.at(-1)?.date;
       $("globe-latest-key").dataset.tooltip = `${latest ? latest + " UTC\n" : ""}Gold marks groups observed on the latest day in this selection. It does not establish whether a fire is still burning.`;
@@ -577,6 +590,27 @@
     syncControls();
   });
 
+  window.addEventListener("fireatlas-map-selection", async event => {
+    const {layer,id} = event.detail || {};
+    if(!["thermal","documented"].includes(layer))return;
+    if(state.revealing){cancelReveal();$("globe-markers").checked=false;}
+    if(layer === "documented") {
+      if(!state.documented) await toggleDocumented();
+      else if(state.firesLoading) await state.firesLoading.catch(()=>{});
+      selectFire(id);
+      return;
+    }
+    if(state.loading) await state.loading;
+    if(!state.data || state.data.source!=="all" || state.data.date!=="all") {
+      $("globe-source").value="all";$("globe-date").value="all";
+      if(!await load())return;
+    }
+    state.region="world";updateLocations();
+    $("globe-markers").checked=true;
+    await revealDetections();
+    select(id);
+  });
+
   function setupTooltips() {
     const tip = $("globe-tooltip");
     let owner = null, timer;
@@ -625,9 +659,11 @@
     $("globe-zoom-out").addEventListener("click", () => state.bridge?.zoom(0.3));
     document.querySelectorAll("[data-globe-region]").forEach(button => button.addEventListener("click", () => {
       clearSelection();
+      state.region=button.dataset.regionKey;updateLocations();
       focus(...button.dataset.globeRegion.split(",").map(Number));
     }));
     // Fetch after the Earth becomes visible, or immediately on an explicit request.
+    updateLocations();
     syncControls();
   });
 })();

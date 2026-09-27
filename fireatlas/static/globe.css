@@ -906,3 +906,5 @@
 .globe-flight-dock #globe-markers:checked::after{left:19px;background:#29180f}
 .globe-flight-dock>.globe-toggle-label:has(:checked){border-color:#ffb57e;background:linear-gradient(110deg,#583021,#342319)}
 @media(max-width:500px){.thermal-toggle-copy{display:grid;gap:3px}.globe-flight-dock>.globe-toggle-label{min-height:58px}}
+.globe-regions{flex-wrap:wrap;justify-content:center}
+.globe-regions button[aria-pressed=true]{border-color:#a8d8e7;background:#234351;color:#effaff}
