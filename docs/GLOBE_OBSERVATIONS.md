@@ -101,3 +101,22 @@ Repeat the delayed-data and pose checks against a populated server:
 ```bash
 uv run --with playwright python scripts/verify_globe_reveal.py
 ```
+
+## Documented wildfire layer — 27 September 2026
+
+The “Documented wildfires” toggle loads six curated historical cases from
+`/documented-fires.json`: Jasper, Valparaíso, Evros, Lahaina, Mallacoota and the
+Camp Fire. Blue diamond markers and a case picker open a dated summary with
+direct news reports in new tabs. Camp Fire also links to NASA imagery.
+
+This layer works independently of the thermal-detection toggle and NASA API
+availability. These are selected historical examples, not a current incident
+feed. Coordinates represent approximate affected communities, not ignition
+points or fire boundaries. Cases are not inferred from or matched to the
+current satellite snapshot; satellite date and source filters do not filter
+the historical collection. Source publication dates appear beside each link.
+
+Verification: all 56 existing automated tests passed. Browser checks covered
+the six-case picker, globe marker selection, external report tabs, independent
+layer visibility and mobile layout at 390×844. No JavaScript exceptions or
+horizontal overflow were observed. Desktop was checked at 1366×768.

@@ -834,3 +834,31 @@
 @media(prefers-reduced-motion:reduce){
  .globe-hero *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* Historical reporting is a separate, explicitly dated layer. */
+#globe-documented-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;min-height:34px;padding:7px 10px;border:1px solid #83cfff36;border-radius:7px;background:#83cfff08;color:#b5cbd7;font:11px var(--sans);cursor:pointer;white-space:nowrap}
+#globe-documented-toggle>span{font-size:18px;color:#83cfff;line-height:1}
+#globe-documented-toggle[aria-pressed=true]{background:#83cfff1a;color:#e5f5ff;border-color:#83cfff85}
+.globe-dock-sub{flex-wrap:wrap;gap:8px}
+.globe-console.documented-view>#globe-status,.globe-console.documented-view>#globe-retry,.globe-console.documented-view>.globe-about{display:none}
+#globe-documented{padding-top:10px}
+.documented-note{font-size:11px;line-height:1.6;color:#b4cbd6;margin:0 0 12px}
+#documented-status{font-size:11px;line-height:1.6;color:#8cb0c5;margin:8px 0}
+.documented-list{display:grid;gap:5px}
+.documented-list button{display:grid;gap:4px;width:100%;text-align:left;padding:9px 10px;border-color:#83cfff1c;background:#83cfff05}
+.documented-list strong{font-size:12px;font-weight:500;color:#e0edf3}
+.documented-list span{font-size:10px;color:#91aebb;line-height:1.5}
+.documented-list button:hover{border-color:#83cfff80;background:#83cfff10}
+.documented-location-note{font-size:10px;line-height:1.6;color:#91a7b4;border-top:1px solid #ffffff12;padding-top:11px;margin:14px 0 0}
+#documented-detail .documented-back{border:0;background:none;padding:2px 0 13px;color:#a9c9db;font-size:11px}
+#documented-detail h3{font:400 24px/1.25 var(--display);letter-spacing:-.04em;color:#e2f1f7;margin:8px 0 5px}
+.documented-place{font-size:12px;color:#94b6c8;margin:0 0 12px}
+.documented-summary{font-size:12px;color:#bfced5;line-height:1.75;margin:12px 0 16px}
+#documented-detail h4{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#89b5ca;margin:0 0 8px}
+.documented-sources{display:grid;gap:8px}
+.documented-sources a{display:grid;gap:4px;padding:11px 12px;border:1px solid #83cfff36;border-radius:8px;background:#83cfff08;text-decoration:none;color:#cbeaff}
+.documented-sources a:hover{background:#83cfff15;border-color:#83cfff80}
+.documented-sources strong{font-size:12px;font-weight:500}
+.documented-sources span{font-size:11px;line-height:1.5;color:#bdcfd8}
+.documented-sources small{font-size:10px;color:#90acbc}
+@media(max-width:500px){#globe-documented-toggle{min-height:44px;width:100%}.documented-list button{min-height:48px}.documented-list span{font-size:11px}}

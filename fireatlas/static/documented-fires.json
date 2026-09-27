@@ -1,0 +1,64 @@
+{
+  "kind": "documented-historical-wildfires",
+  "reviewed_on": "2026-09-27",
+  "location_note": "Approximate affected-community locations, not ignition points or fire boundaries.",
+  "events": [
+    {
+      "id": "jasper-2024",
+      "name": "Jasper wildfire",
+      "place": "Alberta, Canada",
+      "period": "July 2024",
+      "lat": 52.87, "lon": -118.08,
+      "summary": "A wildfire reached Jasper after residents and visitors evacuated. Reporting describes damage to the town and the firefighting response in Jasper National Park.",
+      "sources": [{"publisher": "AP / MPR News", "published": "2024-07-25", "label": "Town damage and evacuation report", "url": "https://www.mprnews.org/story/2024/07/25/fast-moving-wildfire-in-the-canadian-rockies-largest-national-park-ravages-the-town-of-jasper"}]
+    },
+    {
+      "id": "valparaiso-2024",
+      "name": "Valparaíso region fires",
+      "place": "Viña del Mar, Chile",
+      "period": "February 2024",
+      "lat": -33.02, "lon": -71.55,
+      "summary": "Forest fires spread into populated areas in central Chile. The report describes affected neighborhoods, the emergency response and curfews around Viña del Mar.",
+      "sources": [{"publisher": "Associated Press", "published": "2024-02-04", "label": "Central Chile wildfire report", "url": "https://apnews.com/article/4f85c0671d70cfcb0a677d410a0b3961"}]
+    },
+    {
+      "id": "evros-2023",
+      "name": "Alexandroupolis–Evros fire",
+      "place": "Northeastern Greece",
+      "period": "August 2023",
+      "lat": 40.85, "lon": 25.88,
+      "summary": "The fire began on August 19 and continued for days across northeastern Greece. Reporting covers the response by Greek crews and other European firefighting teams.",
+      "sources": [{"publisher": "Associated Press", "published": "2023-08-29", "label": "Evros fire and European response", "url": "https://apnews.com/article/6d3beee5f237dc3a71cdf3acb7444955"}]
+    },
+    {
+      "id": "lahaina-2023",
+      "name": "Lahaina wildfire",
+      "place": "Maui, Hawaiʻi, USA",
+      "period": "August 2023",
+      "lat": 20.88, "lon": -156.68,
+      "summary": "A wildfire swept through Lahaina on August 8. This report examines the warnings, communication failures and evacuation difficulties as the fire spread through the town.",
+      "sources": [{"publisher": "Associated Press", "published": "2023-08-12", "label": "Warnings and evacuation timeline", "url": "https://apnews.com/article/f4bb9bb77c093ac8ff16440b54ade4a6"}]
+    },
+    {
+      "id": "mallacoota-2019",
+      "name": "Mallacoota bushfire",
+      "place": "Victoria, Australia",
+      "period": "December 2019 – January 2020",
+      "lat": -37.56, "lon": 149.75,
+      "summary": "Residents and holidaymakers sheltered on the foreshore as fire approached on New Year’s Eve. With roads cut off, naval vessels began evacuating people on January 3.",
+      "sources": [{"publisher": "ABC News Australia", "published": "2020-01-03", "label": "Naval evacuation from Mallacoota", "url": "https://www.abc.net.au/news/2020-01-03/navy-starts-bushfires-evacuations--in-mallacoota/11838424"}]
+    },
+    {
+      "id": "camp-2018",
+      "name": "Camp Fire",
+      "place": "Paradise, California, USA",
+      "period": "November 2018",
+      "lat": 39.76, "lon": -121.62,
+      "summary": "The Camp Fire began on November 8 and spread into Paradise. NASA documented the smoke plume and fire with satellite imagery; news photographs show damage in the community.",
+      "sources": [
+        {"publisher": "Axios", "published": "2018-11-20", "label": "Before-and-after news photographs", "url": "https://www.axios.com/2018/11/20/camp-fire-california-wildfire-before-after-photos"},
+        {"publisher": "NASA Earth Observatory", "published": "2018-11-09", "label": "Satellite view of the Camp Fire", "url": "https://science.nasa.gov/earth/earth-observatory/camp-fire-rages-in-california-144225/"}
+      ]
+    }
+  ]
+}

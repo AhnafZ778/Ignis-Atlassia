@@ -65,6 +65,7 @@
           </div>
         </div>
         <div class="globe-dock-sub">
+          <button id="globe-documented-toggle" type="button" aria-pressed="false" aria-controls="globe-documented"><span aria-hidden="true">◇</span> Documented wildfires</button>
           <div class="globe-legend" role="group" aria-label="Detection legend">
             <button type="button" data-tooltip="Amber marks groups whose last observation is before the latest day in this selection. Color shows recency, not fire intensity."><span class="legend-dot earlier" aria-hidden="true"></span> Earlier</button>
             <button id="globe-latest-key" type="button" data-tooltip="Gold marks groups observed on the latest day in this selection. It does not mean a fire is still burning."><span class="legend-dot latest" aria-hidden="true"></span> Latest</button>
@@ -93,6 +94,13 @@
         <p id="globe-status" role="status">Detections are hidden.</p>
         <button id="globe-retry" type="button" hidden>Retry data</button>
         <div id="globe-selection" hidden aria-live="polite"></div>
+        <section id="globe-documented" hidden aria-label="Documented historical wildfires">
+          <p class="documented-note">Selected historical cases · not current fire activity.</p>
+          <p id="documented-status" role="status"></p>
+          <div id="documented-list" class="documented-list"></div>
+          <div id="documented-detail" hidden></div>
+          <p class="documented-location-note">Blue diamonds mark approximate affected communities, not ignition points or boundaries.</p>
+        </section>
         <details class="globe-about"><summary>About these observations</summary><p>Imported thermal signals, including agricultural burning. Fire status, ignition time and burned area are unknown. Missing observations do not establish fire-free conditions.</p><a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">NASA detection guide ↗</a></details>
       </aside>
       <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>
