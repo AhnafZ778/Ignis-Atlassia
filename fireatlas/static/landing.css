@@ -127,3 +127,5 @@
 .landing-overhaul .day.detected:hover{background:#684831;border-color:#d9a06e}
 .landing-overhaul .day.chosen{border-color:#ffc18d;box-shadow:0 0 0 1px #ffc18d inset}
 .landing-overhaul .legend{color:#a1bdce}.landing-overhaul .legend-swatch.none{background:#101b24;border-color:#476070}.landing-overhaul .legend-swatch.zero{background:#244453}.landing-overhaul .legend-swatch.active{background:#ba8158}
+.landing-overhaul .event-card .event-case-count{display:block;margin-bottom:5px;color:#ffc29e;font-size:10px;font-weight:650;letter-spacing:.02em;text-transform:none}
+.landing-overhaul .event-card .event-case-place{display:block;margin-top:4px;color:#a8c0ce;font-size:10px;line-height:1.5}

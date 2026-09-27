@@ -866,6 +866,8 @@
 .documented-card-copy strong{font-size:13px;font-weight:600;line-height:1.35;color:#f2f8fb}
 .documented-card-copy>span{font-size:11px;color:#b7ceda;line-height:1.4}
 .documented-card-copy small{font-size:10px;color:#86c5e3;line-height:1.4}
+.documented-card-copy small{display:block;overflow-wrap:anywhere}
+.documented-card-copy .documented-case-toll{width:max-content;max-width:100%;padding:3px 6px;border-left:2px solid #ff9a65;border-radius:2px;background:#ff89551a;color:#ffc29e;font-weight:650}
 .documented-card-arrow{font-size:19px;color:#a6dfff}
 .globe-console .documented-list button:hover{border-color:#9cddff;background:#24495e;transform:translateX(-2px)}
 .documented-location-note{font-size:10px;line-height:1.6;color:#98b2c0;border-top:1px solid #ffffff16;padding-top:11px;margin:14px 0 0}
@@ -876,6 +878,12 @@
 #documented-detail h3{font:500 25px/1.2 var(--display);letter-spacing:-.035em;color:#f0f7fb;margin:9px 0 7px;text-wrap:balance}
 .documented-place{font-size:12px;color:#9ec5d9;margin:0 0 12px}
 .documented-summary{font-size:13px;color:#c9d9e2;line-height:1.7;margin:14px 0 18px}
+.documented-fatalities{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:14px 0 9px}
+.documented-fatality{display:grid;align-content:start;gap:5px;min-width:0;padding:10px;border:1px solid #35505d;border-radius:8px;background:linear-gradient(145deg,#142630,#101a20)}
+.documented-fatality>span{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#9cb6c3}
+.documented-fatality>strong{font:500 18px/1.2 var(--display);letter-spacing:-.03em;color:#ffb184;overflow-wrap:anywhere}
+.documented-fatality>small{font-size:10px;line-height:1.5;color:#bacbd3}
+.documented-death-note{margin:8px 0 16px;color:#8ea7b3;font-size:10px;line-height:1.6}
 #documented-detail h4{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#acd4e8;margin:0 0 9px}
 .documented-sources{display:grid;gap:8px}
 .documented-sources a{display:grid;gap:5px;padding:12px;border:1px solid #7abde365;border-radius:9px;background:#1c394b;text-decoration:none;color:#e6f6ff}
@@ -883,6 +891,7 @@
 .documented-sources strong{font-size:13px;font-weight:600}
 .documented-sources span{font-size:12px;line-height:1.5;color:#c4dce9}
 .documented-sources small{font-size:10px;color:#9fbfce}
+.documented-sources a[data-kind="research"],.documented-sources a[data-kind="official"]{background:#152a35;border-color:#4c6b7b66}
 .documented-navigation{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:16px;margin-top:16px;border-top:1px solid #ffffff16}
 .documented-navigation>span{font-size:10px;white-space:nowrap;color:#a7c7d7}
 .globe-console .documented-navigation button{min-height:40px;font-size:11px;padding:8px;color:#d4ecfa;border-color:#83cfff55;background:#83cfff10}
@@ -892,6 +901,8 @@
 @media(min-width:951px) and (max-width:1150px){.globe-console{width:280px;right:16px;padding:14px}.documented-toggle-copy strong{font-size:12px}.globe-hero .hero-copy{max-width:21vw}}
 @media(max-width:950px){.globe-console{width:auto}.documented-list{grid-template-columns:1fr 1fr}.globe-console .documented-list button{min-height:88px}}
 @media(max-width:500px){.globe-console{padding:16px}.documented-list{grid-template-columns:1fr}.globe-console .documented-list button{min-height:80px}.documented-card-copy strong{font-size:14px}.documented-navigation button{min-height:44px}}
+
+@media(max-width:390px){.documented-fatality{padding:8px}.documented-fatality>strong{font-size:16px}.documented-fatality>small{font-size:9px}}
 
 /* Make the primary satellite layer easy to discover and toggle. */
 .globe-flight-dock>.globe-toggle-label{display:flex;align-items:center;gap:11px;width:100%;min-height:52px;margin:0 0 3px;padding:9px 13px;border:1px solid #ee985c99;border-radius:9px;background:linear-gradient(110deg,#462a1f,#241d1a);color:#fff0df;cursor:pointer;box-sizing:border-box}

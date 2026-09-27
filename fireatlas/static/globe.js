@@ -276,24 +276,25 @@
       state.selectedFire = null;
       $("documented-detail").hidden = true;
       $("documented-list").hidden = false;
-      if (state.fires) $("documented-status").textContent = `${state.fires.length} wildfires · choose a story to explore`;
+      if (state.fires) $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
       draw(state.bridge?.view);
       return;
     }
     if (state.fires) { draw(state.bridge?.view);return; }
     if (state.firesLoading) return;
-    $("documented-status").textContent = "Loading documented cases…";
+    $("documented-status").textContent = "Loading sourced case files…";
     state.firesLoading = json("/documented-fires.json", AbortSignal.timeout(15000));
     try {
       const data = await state.firesLoading;
       state.fires = data.events.map(fire => ({...fire,vector:FireGlobeMath.vector(fire.lon,fire.lat)}));
-      $("documented-status").textContent = `${state.fires.length} wildfires · choose a story to explore`;
+      $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
       $("documented-list").replaceChildren(...state.fires.map((fire, index) => {
         const button = element("button");button.type="button";button.dataset.fireId=fire.id;
         const number = element("span",String(index + 1).padStart(2,"0"),"documented-number");
         number.setAttribute("aria-hidden","true");
         const copy = element("span",undefined,"documented-card-copy");
-        copy.append(element("strong",fire.name),element("span",fire.place),element("small",fire.period));
+        const toll=element("small",`${fire.period} · ${fire.deaths?.direct?.label||"Fatality count unavailable"}`,"documented-case-toll");
+        copy.append(element("strong",fire.name),element("span",fire.place),toll);
         const arrow = element("span","↗","documented-card-arrow");arrow.setAttribute("aria-hidden","true");
         button.append(number,copy,arrow);
         button.addEventListener("click",()=>selectFire(fire.id));return button;
@@ -317,17 +318,33 @@
     $("documented-list").hidden=true;
     $("documented-status").textContent="";
     const detail=$("documented-detail");detail.hidden=false;detail.replaceChildren();
-    const back=element("button","← Back to all wildfires","documented-back");back.type="button";
+    const back=element("button","← Back to casebook","documented-back");back.type="button";
     back.addEventListener("click",()=>{
       document.querySelector(".globe-console").classList.remove("documented-reading");
       state.selectedFire=null;detail.hidden=true;$("documented-list").hidden=false;
-      $("documented-status").textContent=`${state.fires.length} wildfires · choose a story to explore`;
+      $("documented-status").textContent=`${state.fires.length} sourced case files · select one to explore`;
       document.querySelector(`[data-fire-id="${fire.id}"]`)?.focus();
     });
-    detail.append(back,element("span",fire.period,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
+    detail.append(back,element("span",`${fire.period} · ${fire.unit||"Wildfire"}`,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
+    const fatalityGrid=element("div",undefined,"documented-fatalities");
+    const deathRows=[
+      ["Direct deaths",fire.deaths?.direct],
+      ["First responders",fire.deaths?.responders],
+      ["Smoke-related estimate",fire.deaths?.smoke]
+    ];
+    for(const [label,death] of deathRows){
+      if(!death)continue;
+      const card=element("section",undefined,"documented-fatality");
+      card.append(element("span",label),element("strong",death.label),element("small",death.detail));
+      fatalityGrid.append(card);
+    }
+    detail.append(fatalityGrid);
+    const scope=element("p","Counts follow the linked source and may use different definitions. ‘Not separately reported’ does not mean zero. Smoke estimates are modeled indirect impacts, separate from direct deaths.","documented-death-note");
+    detail.append(scope);
     const links=element("div",undefined,"documented-sources");
     for(const source of fire.sources){
       const link=element("a");link.href=source.url;link.target="_blank";link.rel="noopener noreferrer";
+      link.dataset.kind=source.kind||"news";
       link.append(element("strong",`${source.publisher} ↗`),element("span",source.label),element("small",`Published ${source.published}`));
       links.append(link);
     }
@@ -335,12 +352,12 @@
     navigation.setAttribute("aria-label","Browse wildfire stories");
     const index=state.fires.indexOf(fire);
     const previous=element("button","← Previous");previous.type="button";
-    const next=element("button","Next wildfire →");next.type="button";
+    const next=element("button","Next case →");next.type="button";
     previous.disabled=index===0;next.disabled=index===state.fires.length-1;
     previous.addEventListener("click",()=>selectFire(state.fires[index-1].id));
     next.addEventListener("click",()=>selectFire(state.fires[index+1].id));
     navigation.append(previous,element("span",`${index+1} / ${state.fires.length}`),next);
-    detail.append(element("h4","News & source reports"),links,navigation);
+    detail.append(element("h4","News coverage & supporting sources"),links,navigation);
     document.querySelector(".globe-console").scrollTop=0;
     back.focus({preventScroll:true});
   }
@@ -530,12 +547,12 @@
     $("globe-documented").hidden = true;
     state.selectedFire=null;
     $("documented-detail").hidden=true;$("documented-list").hidden=false;
-    if(state.fires) $("documented-status").textContent=`${state.fires.length} wildfires · choose a story to explore`;
+    if(state.fires) $("documented-status").textContent=`${state.fires.length} sourced case files · select one to explore`;
     $("globe-console-title").textContent="Observation snapshot";
     document.querySelector(".globe-console").classList.remove("documented-view", "documented-reading");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
-    const close = element("button", state.documented ? "← Back to all wildfires" : "← Back to observations", "globe-close");
+    const close = element("button", state.documented ? "← Back to fire casebook" : "← Back to observations", "globe-close");
     close.type = "button";
     close.addEventListener("click", () => { clearSelection(); (state.documented ? $("globe-documented-toggle") : $("globe-location")).focus(); });
     panel.prepend(close);
