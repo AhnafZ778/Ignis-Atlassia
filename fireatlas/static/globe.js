@@ -140,17 +140,40 @@
       ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = recent ? "rgba(255,198,118,.90)" : "rgba(220,105,49,.72)";
       ctx.fill();
-      if (item.count > 300 && view.width > 700) {
+      // Outer glow halo for large clusters — premium visual
+      if (item.count > 150 && view.width > 500) {
+        const glowRadius = radius + (item.count > 500 ? 5 : 3);
+        const glowAlpha = item.count > 500 ? 0.15 : 0.08;
         ctx.beginPath();
-        ctx.arc(point.x, point.y, radius + 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,112,47,.10)";
+        ctx.arc(point.x, point.y, glowRadius, 0, Math.PI * 2);
+        ctx.fillStyle = recent ? `rgba(255,198,118,${glowAlpha})` : `rgba(255,112,47,${glowAlpha})`;
         ctx.fill();
       }
+      // Place label on large clusters when view is wide enough
+      if (item.count > 400 && view.width > 900) {
+        ctx.save();
+        ctx.font = `500 ${9 * markerScale}px Inter, system-ui, sans-serif`;
+        ctx.fillStyle = "rgba(220, 232, 236, 0.65)";
+        ctx.textAlign = "center";
+        const labelY = point.y + radius + 11 * markerScale;
+        const label = `${Math.abs(item.lat).toFixed(0)}°${item.lat < 0 ? "S" : "N"} ${Math.abs(item.lon).toFixed(0)}°${item.lon < 0 ? "W" : "E"}`;
+        ctx.fillText(label, point.x, labelY);
+        ctx.restore();
+      }
       if (item.id === state.selected) {
+        // Animated pulsing selection ring
+        const pulseT = (Date.now() % 2000) / 2000;
+        const pulseR = 9 + Math.sin(pulseT * Math.PI * 2) * 2;
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 9, 0, Math.PI * 2);
+        ctx.arc(point.x, point.y, pulseR, 0, Math.PI * 2);
         ctx.strokeStyle = "#fff0d6";
         ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // Outer soft ring
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, pulseR + 4, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,240,214,0.25)";
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
       state.visible.push({x: point.x, y: point.y, radius, id: item.id});

@@ -4,10 +4,13 @@ from datetime import date, timedelta
 import math
 
 SOURCES = {
-    "MODIS_NRT": "MODIS · Terra / Aqua",
-    "VIIRS_NOAA20_NRT": "VIIRS · NOAA-20",
-    "VIIRS_NOAA21_NRT": "VIIRS · NOAA-21",
-    "VIIRS_SNPP_NRT": "VIIRS · Suomi NPP",
+    "MODIS_NRT": "MODIS NRT · Terra / Aqua",
+    "VIIRS_NOAA20_NRT": "VIIRS NRT · NOAA-20",
+    "VIIRS_NOAA21_NRT": "VIIRS NRT · NOAA-21",
+    "VIIRS_SNPP_NRT": "VIIRS NRT · Suomi NPP",
+    "MODIS_SP": "MODIS SP · Terra / Aqua",
+    "VIIRS_SNPP_SP": "VIIRS SP · Suomi NPP",
+    "NOAA_HMS_VIIRS": "NOAA HMS VIIRS",
 }
 BIN_X = "MIN(359,CAST(o.lon+180 AS INTEGER))"
 BIN_Y = "MIN(179,CAST(o.lat+90 AS INTEGER))"

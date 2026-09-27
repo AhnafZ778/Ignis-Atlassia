@@ -83,3 +83,27 @@ footer,.training-page footer,.research-page footer{padding:28px 0 40px;border-to
 @media(max-width:760px){.event-map-toolbar{padding:14px;gap:12px}.event-layer-tabs{width:100%}.event-layer-tabs button{flex:1;font-size:11px;padding:10px 8px}.event-map-toolbar label{width:100%;justify-content:space-between}#event-region{flex:1;max-width:220px}}
 
 @media(min-width:761px){.event-map-wrap #event-map{height:100%;min-height:430px}}
+
+/* Priority 2 & 4: Peak highlighting for calendar months, days, and replay bars */
+.month-row.peak .month-fill{background:linear-gradient(0deg,#e85a2a,#ffb76e)!important;box-shadow:0 0 12px #ff865c30}
+.month-row.peak .month-label{color:#ffb76e!important;font-weight:600}
+.month-row.peak .month-count{color:#ffb76e!important}
+.day.day-peak{border-color:#ffb76e!important;box-shadow:0 0 0 1px #ffb76e40 inset,0 2px 12px #ff865c18}
+.day.day-peak span{color:#ffcb8e}
+.day.day-peak small{color:#ffd4a8!important}
+.day.detected{transition:background .2s,border-color .2s,box-shadow .2s}
+.map-timeline-bar.peak span{background:linear-gradient(0deg,#e85a2a,#ffcb8e)!important;opacity:1!important;box-shadow:0 -2px 8px #ff865c30}
+.map-timeline-bar.peak{border-bottom-color:#ffcb8e}
+
+/* Sensor comparison card hover improvement */
+.source-signal{transition:border-color .2s,background .2s,transform .15s}
+.source-signal:hover{transform:translateY(-2px)}
+.source-signal.active{box-shadow:0 4px 20px #ff865c12}
+
+/* Reading guide cards entrance animation */
+@media(prefers-reduced-motion:no-preference){
+  .reading-guide article{animation:card-entrance .5s ease both}
+  .reading-guide article:nth-child(2){animation-delay:.1s}
+  .reading-guide article:nth-child(3){animation-delay:.2s}
+  @keyframes card-entrance{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+}

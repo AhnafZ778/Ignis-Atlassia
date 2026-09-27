@@ -164,23 +164,37 @@ function renderSourceComparison() {
     $(`#compare-${name}`).textContent = known ? counts[name].toLocaleString() : "—";
     $(`#compare-${name}-bar`).style.width = known ? `${Math.max(6, counts[name] / scale * 100)}%` : "12%";
   }
+  const sensorTips = {
+    modis: `MODIS (Terra & Aqua) · 1 km thermal pixels. ${known ? modis.toLocaleString() + " raw pixels this month." : "Complete export needed."} Click to view MODIS only.`,
+    "viirs-snpp": `VIIRS (Suomi NPP) · 375 m pixels, detects smaller hotspots. ${known ? viirs.toLocaleString() + " raw pixels this month." : "Complete export needed."} Click to view VIIRS only.`,
+    joint: `Joint view · Both sensors on a shared 1 km grid. Each cell counted once per UTC day. ${known ? (month.detected_cell_days || 0).toLocaleString() + " cell-days." : "Complete export needed."} Not a sensitivity ranking.`
+  };
   $("#source-compare-note").textContent = known
     ? `${monthNames[state.month]} ${state.year} · Raw pixels retain each sensor’s detections; joint cell-days count each shared grid cell once per UTC day. These are different measures, not a sensitivity ranking.`
     : `${monthNames[state.month]} ${state.year} · A complete export for both sources is needed before comparing the raw pixels with joint cell-days.`;
   document.querySelectorAll("[data-source-target]").forEach(button => {
-    button.classList.toggle("active", button.dataset.sourceTarget === state.series);
-    button.setAttribute("aria-pressed", String(button.dataset.sourceTarget === state.series));
+    const key = button.dataset.sourceTarget;
+    if (sensorTips[key]) button.title = sensorTips[key];
+    button.classList.toggle("active", key === state.series);
+    button.setAttribute("aria-pressed", String(key === state.series));
   });
 }
 
 function renderMonths() {
   const container = $("#monthly-bars"); container.replaceChildren();
   const max = Math.max(1, ...state.data.monthly.map(item => item.detected_cell_days || 0));
+  const peakIndex = state.data.monthly.reduce((best, item, i) => (item.detected_cell_days || 0) > (state.data.monthly[best]?.detected_cell_days || 0) ? i : best, 0);
   state.data.monthly.forEach((item, index) => {
     const button = document.createElement("button");
-    button.type = "button"; button.className = "month-row" + (index === state.month ? " chosen" : "");
-    button.setAttribute("aria-label", `${monthNames[index]}: ${item.detected_cell_days === null ? "not loaded" : item.detected_cell_days + " detected cell-days"}`);
-    const label = document.createElement("span"); label.className = "month-label"; label.textContent = shortMonths[index];
+    const isPeak = item.detected_cell_days !== null && item.detected_cell_days > 0 && index === peakIndex;
+    button.type = "button"; button.className = "month-row" + (index === state.month ? " chosen" : "") + (isPeak ? " peak" : "");
+    const tooltipText = item.detected_cell_days === null
+      ? `${monthNames[index]} ${state.year}: Source export not loaded. This does not mean zero burning — the data may be missing or incomplete.`
+      : `${monthNames[index]} ${state.year}: ${item.detected_cell_days} detected cell-days${isPeak ? " · PEAK MONTH for this year and area" : ""}. Click to view the daily calendar.`;
+    button.setAttribute("aria-label", tooltipText);
+    button.title = tooltipText;
+    const label = document.createElement("span"); label.className = "month-label";
+    label.textContent = isPeak ? `${shortMonths[index]} ●` : shortMonths[index];
     const track = document.createElement("span"); track.className = "month-track";
     const fill = document.createElement("span"); fill.className = "month-fill" + (item.detected_cell_days === null ? " missing" : "");
     fill.style.width = item.detected_cell_days === null ? "100%" : `${Math.max(4, item.detected_cell_days / max * 100)}%`;
@@ -202,12 +216,20 @@ function renderDays() {
     const blank = document.createElement("span"); blank.className = "day blank"; grid.append(blank);
   }
   const days = new Date(Date.UTC(state.year, state.month + 1, 0)).getUTCDate();
+  const dayMax = Math.max(1, ...state.data.daily.filter(d => Number(d.date_utc.slice(5,7)) === state.month + 1).map(d => d.detected_cell_days || 0));
   for (let dayNumber = 1; dayNumber <= days; dayNumber++) {
     const stamp = `${state.year}-${String(state.month + 1).padStart(2,"0")}-${String(dayNumber).padStart(2,"0")}`;
     const item = state.data.daily.find(entry => entry.date_utc === stamp);
     const button = document.createElement("button"); button.type = "button";
-    button.className = `day ${item.detected_cell_days === null ? "unloaded" : item.detected_cell_days > 0 ? "detected" : "clear-export"}` + (stamp === state.day ? " chosen" : "");
-    button.setAttribute("aria-label", `${stamp}: ${item.detected_cell_days === null ? "export not loaded" : item.detected_cell_days + " detected cell-days"}`);
+    const isDayPeak = item.detected_cell_days !== null && item.detected_cell_days === dayMax && dayMax > 0;
+    button.className = `day ${item.detected_cell_days === null ? "unloaded" : item.detected_cell_days > 0 ? "detected" : "clear-export"}` + (stamp === state.day ? " chosen" : "") + (isDayPeak ? " day-peak" : "");
+    const dayTooltip = item.detected_cell_days === null
+      ? `${stamp} UTC · Source export not loaded. Missing data does not mean no burning.`
+      : item.detected_cell_days > 0
+        ? `${stamp} UTC · ${item.detected_cell_days} detected cell-days${isDayPeak ? " · HIGHEST this month" : ""}. Click to inspect source observations.`
+        : `${stamp} UTC · No thermal detections in this export. Cloud cover and satellite pass gaps remain unknown.`;
+    button.setAttribute("aria-label", dayTooltip);
+    button.title = dayTooltip;
     const number = document.createElement("span"); number.textContent = dayNumber;
     const count = document.createElement("small"); count.textContent = item.detected_cell_days === null ? "·" : item.detected_cell_days > 0 ? `${item.detected_cell_days} cell` : "0";
     button.append(number, count);
@@ -363,19 +385,21 @@ function renderTimeline() {
   const entries = state.data.daily.filter(item => Number(item.date_utc.slice(5, 7)) === month);
   const counts = entries.map(item => item.detected_cell_days ?? item.partial_import_detected_cell_days ?? 0);
   const max = Math.max(1, ...counts);
+  const peakDay = counts.reduce((best, c, i) => c > (counts[best] || 0) ? i : best, 0);
   const bars = $("#map-timeline-bars"); bars.replaceChildren();
   counts.forEach((count, index) => {
     const button = document.createElement("button"); button.type = "button";
-    button.className = "map-timeline-bar" + (mapDay === index + 1 ? " active" : "");
+    const isPeak = count > 0 && index === peakDay;
+    button.className = "map-timeline-bar" + (mapDay === index + 1 ? " active" : "") + (isPeak ? " peak" : "");
     const partial = !entries[index]?.export_window_complete;
     const label = partial ? (count ? `${count} imported cell-days · partial export` : "No imported detections · coverage unknown") : `${count} detected cell-days`;
-    button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${label}`);
-    button.title = `${monthNames[state.month]} ${index + 1} · ${label}`;
+    button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${label}${isPeak ? " · PEAK DAY" : ""}`);
+    button.title = `Day ${index + 1} · ${label}${isPeak ? " · Peak" : ""}`;
     const fill = document.createElement("span"); fill.style.height = `${Math.max(5, count / max * 100)}%`;
     button.append(fill); button.addEventListener("click", () => { stopMapPlayback(); setMapDay(index + 1, true); });
     bars.append(button);
   });
-  const dateText = mapDay ? `${monthNames[state.month]} ${mapDay}, ${state.year} · observed pixels` : `${monthNames[state.month]} ${state.year} · all dates`;
+  const dateText = mapDay ? `Day ${mapDay} of ${days} · ${monthNames[state.month]} ${mapDay}, ${state.year}` : `${monthNames[state.month]} ${state.year} · all ${days} days`;
   $("#map-timeline-title").textContent = dateText;
   $("#map-day").max = String(days); $("#map-day").value = String(mapDay || 1);
   $("#map-all").disabled = mapDay === null;
@@ -391,11 +415,13 @@ function setMapDay(day, focus = false) {
 function playMapMonth() {
   if (mapPlayback) { stopMapPlayback(); return; }
   if (mapDay === null || mapDay >= Number($("#map-day").max)) mapDay = 0;
-  $("#map-play").textContent = "Ⅱ Pause replay";
+  const totalDays = Number($("#map-day").max);
+  $("#map-play").textContent = `⏸ Pause (${mapDay}/${totalDays})`;
   const step = () => {
     mapDay += 1;
+    $("#map-play").textContent = `⏸ Pause (${mapDay}/${totalDays})`;
     renderTimeline(); updateMap();
-    if (mapDay >= Number($("#map-day").max)) { stopMapPlayback(); return; }
+    if (mapDay >= totalDays) { stopMapPlayback(); return; }
     mapPlayback = setTimeout(step, 950);
   };
   step();
