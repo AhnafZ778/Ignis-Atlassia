@@ -34,6 +34,7 @@ from .globe import snapshot as globe_snapshot, detail as globe_detail
 
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
+FEATURE_LOOKBOOK = Path(__file__).resolve().parent.parent / "docs" / "FireWatch_Feature_Gap_Lookbook.html"
 ASSETS = {
     "/manifest.webmanifest": ("manifest.webmanifest", "application/manifest+json"),
     "/app-sw.js": ("app-sw.js", "text/javascript; charset=utf-8"),
@@ -245,6 +246,12 @@ def handler_factory(database: Path):
 
         def do_GET(self):
             url = urlsplit(self.path)
+            if url.path == "/feature-lookbook.html":
+                if FEATURE_LOOKBOOK.is_file():
+                    self._respond(FEATURE_LOOKBOOK.read_bytes(), "text/html; charset=utf-8")
+                else:
+                    self._json({"error": "Feature lookbook not found"}, HTTPStatus.NOT_FOUND)
+                return
             if url.path == "/earth.html":
                 if EARTH_MODEL.is_file():
                     self._respond(EARTH_MODEL.read_bytes(), "text/html; charset=utf-8")

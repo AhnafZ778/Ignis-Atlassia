@@ -1,0 +1,365 @@
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                                            VISION
+
+SATELLITE EVIDENCE > CLEARER DECISIONS                                                  EARTH
+
+FIREWATCH                                                                     MODIS / VIIRS / HUMAN REVIEW
+                                                                                                                                                                              01 / 13
+Eight standout features to design and
+present, one at a time.
+
+A team lookbook for the NASA Space Apps 2026 MODIS and VIIRS hot spots
+challenge. The core is a harmonized burning-activity calendar; the signature
+extension makes observation gaps and verification decisions visible.
+
+CALENDAR   UNCERTAINTY  DRONE HANDOFF
+
+PLANNING DOCUMENT | FEATURES ARE PROPOSED, NOT YET CLAIMED AS BUILT
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                               BUILD ORDER
+
+THE STORY TO BUILD
+
+Each step earns a distinct screen and a single demo moment. The first four answer the official challenge; the next four turn that evidence into a credible
+investigation workflow.
+
+01  Burning-activity calendar       Historical time view and area selection                                   CORE
+
+02  Sensor-aware harmonization      Compare MODIS and VIIRS honestly                                          CORE
+
+03  Visibility gap intelligence     Make missing observations visible                                         CORE
+
+04  Unusual-season explorer         Reveal historical patterns and anomalies                                  CORE
+
+05  Explainable verification queue  Prioritize human investigation                                            EXTEND
+
+06  Drone verification handoff      Simulate an authorized close-up check                                     EXTEND
+
+07  Incident evidence replay        Tell one case from raw data to review                                     EXTEND
+
+08  Failure lab and proof           Test the solution against failure modes                                   PROOF
+
+  RECOMMENDED: complete 01-04, then build 05-06; use 07-08 to make the judging demo persuasive.                       02 / 13
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP
+FIREWATCH      FEATURE LOOKBOOK / 2026                                                                                        FEATURE 1
+
+01  Burning-activity calendar
+
+    Make the challenge requirement instantly understandable.
+
+    FIREWATCH / DEMO VIEW                                                   CORE
+
+BURNING ACTIVITY / SELECTED AREA                                         PURPOSE
+
+AREA: WESTERN US               SEP 2026             ALL SENSORS          Explore a selected area by day, week, or month using
+                                                                         harmonized active-fire observations.
+M          T               W   T                    F            S   S
+                                                                         DESIGN FOCUS
+1          2               3   4                    5            6   7
+                                                                         Large calendar cells, clear color scale, geographic
+8          9               10  11                   12           13  14  selector, and MODIS/VIIRS filters. A click reveals raw
+                                                                         observations.
+                                                                         DEMO MOMENT
+
+                                                                         Select a month, then open one day to show the actual
+                                                                         satellite records behind its color.
+
+15         16              17  18                   19           20  21
+
+    CLICK A DATE -> DETECTIONS + SENSOR PROVENANCE
+VISUAL SKETCH - ILLUSTRATIVE UI
+
+PROOF / CLAIM BOUNDARY
+
+Use a real NASA FIRMS sample and preserve acquisition times. Calendar intensity is an observation summary, not acres burned.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                        03 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                   FEATURE 2
+
+02  Sensor-aware harmonization
+
+    Explain why combining two sensor records takes care.
+
+    FIREWATCH / DEMO VIEW                                                               CORE
+
+BEFORE: SEPARATE SENSOR LAYERS                     AFTER: CANDIDATE GROUPS           PURPOSE
+
+MODIS                      VIIRS                        SOURCE LINKED, NEVER ERASED  Show a common time and location view while retaining
+                                                                                     each sensor, resolution, and observation time.
+
+                                                                                     DESIGN FOCUS
+                                                                                     Animated split-to-merged view. A candidate group
+                                                                                     opens to reveal its original MODIS and VIIRS records.
+                                                                                     DEMO MOMENT
+                                                                                     Toggle the layers, link plausible observations, and
+                                                                                     inspect one candidate group.
+
+ VISUAL SKETCH - ILLUSTRATIVE UI
+
+PROOF / CLAIM BOUNDARY
+
+MODIS and VIIRS differ in resolution and sensitivity. Grouping is a hypothesis for review; raw counts and FRP are not a direct area or growth measure.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                       04 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                                                       FEATURE 3
+
+03  Visibility gap intelligence
+
+    The most original response to a missed wildfire.
+
+                FIREWATCH / DEMO VIEW                                                CORE
+
+WHAT DID THE SATELLITES ACTUALLY SEE?                                             PURPOSE
+
+            OBSERVED                                       OLD DATA               Separate a genuine recent observation from a stale or
+                                                                                  uncertain view; surface blind spots explicitly.
+    Recent valid view                              Last view needs refresh
+                                                                                  DESIGN FOCUS
+            OBSCURED                                       UNKNOWN
+                                                                                  Coverage tiles, time-since-observation label, and a
+    Only when cloud or quality data confirms       Observation quality not known  simple reason badge. Use red sparingly for verified
+                                                                                  obstruction.
+                                                                                  DEMO MOMENT
+
+                                                                                  Turn off the hotspots, then reveal why a seemingly
+                                                                                  empty area still needs interpretation.
+
+VISUAL SKETCH - ILLUSTRATIVE UI
+
+PROOF / CLAIM BOUNDARY
+
+No hotspot does not equal no fire. Do not mark an area cloud-obscured unless cloud or quality inputs support it; otherwise say unknown.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                   05 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                               FEATURE 4
+
+04  Unusual-season explorer                                          CORE
+                                                                  PURPOSE
+    Turn the fire calendar into a meaningful historical insight.
+                                                                  Compare a selected season with a documented
+                FIREWATCH / DEMO VIEW                             reference period for the same area.
+
+THIS SEASON VS COMPARABLE HISTORY                                 DESIGN FOCUS
+                                                                  A restrained two-line chart paired with calendar tiles
+                                                                  and a clickable unusual-period callout.
+                                                                  DEMO MOMENT
+                                                                  Click an unusual week and replay the MODIS and VIIRS
+                                                                  records that drive the difference.
+
+             SELECTED YEAR       HISTORICAL BASELINE
+VISUAL SKETCH - ILLUSTRATIVE UI
+
+PROOF / CLAIM BOUNDARY
+
+Use comparable dates and sensor availability; a jump after VIIRS begins may be a sensor effect, not a real fire increase.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                          06 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                                                       FEATURE 5
+
+05  Explainable verification queue
+
+    Show where a reviewer should investigate next, with reasons.
+
+                     FIREWATCH / DEMO VIEW                        EXTEND
+
+   HUMAN REVIEW QUEUE                                             PURPOSE
+
+               NEW HOTSPOT                                        Rank candidate locations for human review using
+                                                                  interpretable observations and context.
+                 new observation + dry conditions
+                                                   01             DESIGN FOCUS
+               RECHECK AREA
+                                                                  Three clear queue cards: reason, latest observation,
+                 recent lightning + no clear view                 source status, and an Investigate action.
+
+               SENSOR CONFLICT                                                                   DEMO MOMENT
+
+                 sensor and time mismatch          02
+VISUAL SKETCH - ILLUSTRATIVE UI                                                              Compare a fresh VIIRS hotspot with a lightning area
+
+                                                                                             that has no clear recent satellite view.
+
+                                                   03
+
+PROOF / CLAIM BOUNDARY
+
+The rank is a review priority, not a fire probability or evacuation instruction. Lightning and dry weather alone do not confirm a fire.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                   07 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                      FEATURE 6
+
+06  Drone verification handoff
+
+    Make your satellite-to-field idea unforgettable and credible.
+
+                     FIREWATCH / DEMO VIEW         CHECK BEFORE FLIGHT     EXTEND
+                                                   - Authorized team
+    AUTHORIZED VERIFICATION / SIMULATION           - Airspace           PURPOSE
+                                                   - Range / weather
+           SIMULATED RESULT                        - Incident approval  Offer an incident team a suggested close-up
+VISUAL SKETCH - ILLUSTRATIVE UI                                         inspection task for a candidate location.
+
+                                                                        DESIGN FOCUS
+
+                                                                        Map route, authorization checks, launch point, and a
+                                                                        clearly labeled simulated thermal result.
+                                                                        DEMO MOMENT
+
+                                                                        Select Investigate; show a drone request, then let a
+                                                                        human reviewer mark the candidate confirmed or
+                                                                        unresolved.
+
+PROOF / CLAIM BOUNDARY
+
+A drone is conditionally useful for local checks. Flight requires qualified authorization and aviation coordination; never imply autonomous dispatch.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                      08 / 13
+FIREWATCH      FEATURE LOOKBOOK / 2026                                                                                    FEATURE 7
+
+07  Incident evidence replay
+
+    Give judges one story they can remember.
+
+               FIREWATCH / DEMO VIEW                                                  EXTEND
+
+ONE LOCATION / FULL EVIDENCE HISTORY                                               PURPOSE
+
+FIRST VIEW     VIIRS               MODIS           REVIEW            OUTCOME       Present a candidate fire through its original satellite
+                              different pass                                       observations, review actions, and final status.
+source + time  new detection                       drone simulation  human status
+                                                                                   DESIGN FOCUS
+                                                                                   Horizontal evidence timeline with source badges,
+                                                                                   imagery links, and a short explanation at each step.
+                                                                                   DEMO MOMENT
+                                                                                   Replay a real historical data window, then branch into
+                                                                                   the clearly labeled simulated verification step.
+
+             SOURCES + TIMESTAMPS + STATUS CHANGES STAY VISIBLE
+ VISUAL SKETCH - ILLUSTRATIVE UI
+
+PROOF / CLAIM BOUNDARY
+
+Historical NASA observations must be real and traceable. A simulated drone outcome is separate from historical evidence.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                    09 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                                                      FEATURE 8
+
+08  Failure lab and measured proof
+
+    Prove the concept works without inventing dramatic statistics.
+
+                     FIREWATCH / DEMO VIEW                             PROOF
+
+    TEST YOUR PROJECT AGAINST REAL FAILURE MODES                    PURPOSE
+
+         PASS GAP                                                   Replay missed-pass, obscuration, and false-alarm
+         Show observation age and unknown status                    cases; compare the app with a simple raw-hotspot
+                                                                    baseline.
+         FALSE ALARM
+         Retain sensor flags and human review                       DESIGN FOCUS
+
+         PIXEL ERROR                                                Three toggled scenarios plus a small evaluation card:
+         Explain hotspot footprint vs perimeter                     candidate recall, false review load, and observation
+        BASELINE VS IMPROVED                                        age.
+                                                                    DEMO MOMENT
+VISUAL SKETCH - ILLUSTRATIVE UI
+                                                                    Flip a failure mode on and show the UI label or review
+                                                                    priority change. Present measured results only after
+                                                                    testing.
+
+PROOF / CLAIM BOUNDARY
+
+Predefine cases and baseline. Report actual counts and limitations; no fabricated detection lead time, agreement %, or accuracy claim.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                  10 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                           VISUAL DIRECTION
+
+THE VISUAL TREATMENT
+
+Give the project a memorable wildfire identity while making every chart and operational label easy to read.
+
+HERO / CINEMATIC INTRO                                                MOTION THAT EXPLAINS
+
+                                                   ONE EARTH          01 Floating embers
+
+                                                   MANY OBSERVATIONS              Sparse behind the opening screen.
+                                                   CLEARER EVIDENCE
+                                                                      02 Hotspot pulse
+
+                                                                                  Gentle glow around detected pixels.
+
+                                                                      03 Fusion transition
+
+                                                                                  Animate two sensor layers into review groups.
+
+                                                                      04 Timeline scrub
+
+                                                                                  Move between dates without losing source labels.
+
+                                                                      05 Satellite orbit motif
+
+                                                                                  Mark illustrative motion as illustrative.
+
+ART DIRECTION
+
+Obsidian background / ember orange / warm white / satellite cyan. Use a large globe as the opening, then move into a precise 2D investigation workspace. Add a
+responsive mobile layout and a reduced-motion setting. Every example map or metric should be identified as real data or a visual sketch.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                   11 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026                                                                     EXTENSION MENU
+
+HIGH-VALUE EXTENSIONS
+
+Add these only after the eight-feature story works. Each adds context; none proves a fire on its own.
+
+GOES CONTEXT                                                                      LANDSAT CLOSE-UP
+
+Frequent broad-area views can help track a developing signal; small fires may be  Fine-resolution observations offer a closer historical check when a suitable pass
+missed.                                                                           exists.
+
+LIGHTNING + WEATHER                                                               LAND COVER
+
+Prioritize a review area after a storm or during hazardous conditions; show the   Give reviewers agricultural, forest, and settlement context without auto-labeling
+inputs.                                                                           intent.
+
+SMOKE + AIR QUALITY                                                               DATA HEALTH
+
+Show downstream exposure separately from the hotspot map and fire                 Expose API freshness, sensor notices, missing feeds, and the last successful
+confirmation.                                                                     update.
+
+DEFER      Autonomous drone dispatch, guaranteed early detection, exact fire perimeters from hotspots, and unvalidated spread predictions.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP                                                                                                               12 / 13
+FIREWATCH  FEATURE LOOKBOOK / 2026  SHIP AND CITE
+
+WHAT THE TEAM SHOULD BUILD FIRST
+
+       PASS 1 / FUNCTIONAL                                                                                                                                                                     13 / 13
+
+     01-02: calendar + two sensor layers
+
+      Real FIRMS records, filterable by area/date/source.
+
+       PASS 2 / DISTINCTIVE
+
+     03-04: gaps + historical comparison
+
+      Evidence quality and comparability explained.
+
+       PASS 3 / SHOWCASE
+
+     05-08: queue, drone, replay, proof
+
+      A simulated handoff and a defensible evaluation.
+
+SOURCE NOTES
+
+ NASA Space Apps 2026 challenge: www.spaceappschallenge.org/2026/challenges/harmonization-of-modis-and-viirs-hot-spots/ | NASA FIRMS: firms.modaps.eosdis.nasa.gov/ | FIRMS fire alert notes:
+ firms.modaps.eosdis.nasa.gov/alerts/notes.php | FAA emergency drone operations: www.faa.gov/uas/advanced_operations/emergency_situations | FAA temporary flight restrictions:
+ www.faa.gov/uas/getting_started/temporary_flight_restrictions
+
+DESIGN PRINCIPLE: REAL OBSERVATIONS, CLEAR UNCERTAINTY, HUMAN REVIEW.
+
+NASA SPACE APPS 2026 / CONCEPT AND DESIGN ROADMAP
+
