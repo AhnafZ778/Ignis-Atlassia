@@ -72,7 +72,7 @@ class GlobeTests(unittest.TestCase):
         self.assertIsNone(detail(self.db, cell="0:135")["observations"][0]["frp_mw"])
 
     def test_invalid_requests_and_empty_dataset(self):
-        for args in ({"source":"NOAA_HMS_VIIRS"},{"day":"2026-09-19"},{"day":"2026-09-99"}):
+        for args in ({"source":"NOT_A_SOURCE"},{"day":"2026-09-19"},{"day":"2026-09-99"}):
             with self.assertRaises(ValueError): snapshot(self.db, **args)
         for cell in ("bad","-1:30","360:0","0:180"):
             with self.assertRaises(ValueError): detail(self.db, cell=cell)

@@ -106,6 +106,12 @@
 .landing-overhaul .dataset-tabs button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-width:0;line-height:1.4}
 .landing-overhaul .dataset-tabs button small{display:block;position:static;margin:0;line-height:1.4}
 .landing-overhaul .stats{background:none;border:0;border-radius:0;overflow:visible}
+.landing-overhaul .insight-card{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;margin:18px 0 22px;padding:20px 22px;border:1px solid #7f5d48;border-radius:12px;background:linear-gradient(115deg,#2b2925,#152631 72%);box-shadow:0 12px 35px #0003}
+.landing-overhaul .insight-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid #e8a173;border-radius:50%;color:#ffc29e;font-size:18px}
+.landing-overhaul .insight-card .eyebrow{margin:0 0 6px;font-size:8px}
+.landing-overhaul .insight-card h3{margin:0 0 7px;font-size:19px;font-weight:500;color:#f3e3d7}
+.landing-overhaul .insight-card p{margin:0;max-width:850px;font-size:12px;line-height:1.7;color:#c6d3d8}
+.landing-overhaul .insight-card small{display:block;margin-top:10px;color:#d79b78;font-size:10px;letter-spacing:.04em}
 .landing-overhaul .month-list{height:310px;display:flex;flex-direction:row;align-items:stretch;gap:7px;padding-top:16px}
 .landing-overhaul .month-row{height:100%;display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;width:auto;gap:9px;padding:0 0 9px;border:0;border-bottom:1px solid #39546a;border-radius:0;background:none}
 .landing-overhaul .month-track{order:2;display:flex;align-items:flex-end;flex:1;width:100%;height:auto;background:transparent;border-radius:4px}

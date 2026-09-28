@@ -243,3 +243,13 @@ uv run python -m fireatlas.presentation --db data/demo.sqlite3
 The original files in `NASA_data/` and the populated databases remain ignored by Git. The bundled seed sample and NOAA historical slice work from a fresh checkout; deploying the full recent authentic snapshot requires copying the database or importing those original CSVs. Synthetic presentation data is reproducible without those full files or a NASA API connection.
 
 See [Data readiness and verification](docs/DATA_READINESS.md) for the tested scope and remaining scientific limits.
+
+### Judge-ready demonstration
+
+For a deterministic presentation from a fresh checkout, run:
+
+```powershell
+.\scripts\launch_judge_demo.ps1
+```
+
+This creates `data/judge-demo.sqlite3` locally from the versioned synthetic generator and serves the complete guided study at `http://127.0.0.1:8000/?demo=1`. Open the page once while connected so the app shell and successful API responses are cached; the atlas and insight card can then be rehearsed if the network drops. Synthetic data are labelled throughout and are never mixed into the authentic database.

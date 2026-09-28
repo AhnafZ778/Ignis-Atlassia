@@ -130,6 +130,34 @@ function renderStats() {
   $("#baseline-years").textContent = month.baseline_years.length ? `Based on ${month.baseline_years.join(", ")}` : "Needs 3 comparable prior years";
   $("#metric-change").textContent = month.anomaly_cell_days === null ? "—" : `${month.anomaly_cell_days > 0 ? "+" : ""}${month.anomaly_cell_days}`;
   $("#metric-coverage").textContent = "Unknown";
+  renderInsight(month);
+}
+
+function renderInsight(month) {
+  const card = $("#insight-card");
+  if (!card || !month) return;
+  const title = $("#insight-title"), body = $("#insight-body"), source = $("#insight-source");
+  const comparison = state.comparison?.monthly?.[state.month];
+  const daily = state.comparison?.daily?.filter(item => Number(item.date_utc.slice(5, 7)) === state.month + 1) || [];
+  const rawModis = daily.reduce((sum, item) => sum + (item.raw_pixels_by_sensor?.MODIS || 0), 0);
+  const rawViirs = daily.reduce((sum, item) => sum + (item.raw_pixels_by_sensor?.VIIRS || 0), 0);
+  const monthName = monthNames[state.month];
+  if (month.export_window_complete && rawModis && rawViirs && comparison?.detected_cell_days) {
+    const ratio = rawViirs / rawModis;
+    title.textContent = `${monthName} shows why FireAtlas compares sensors.`;
+    body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many raw pixels as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}), while the shared grid reduces them to ${comparison.detected_cell_days.toLocaleString()} detected cell-days. The signal becomes comparable without treating pixels as individual fires.`;
+    source.textContent = `${state.demo ? "Synthetic teaching example" : "Imported source records"} · ${monthName} ${state.year} · same AOI and UTC window`;
+  } else if (month.anomaly_cell_days !== null && month.baseline_median !== null) {
+    const direction = month.anomaly_cell_days >= 0 ? "above" : "below";
+    title.textContent = `${monthName} sits ${Math.abs(month.anomaly_cell_days).toLocaleString()} cell-days ${direction} its prior-year median.`;
+    body.textContent = "This compares observed satellite activity, not fire risk. Open a day to trace the number back to original sensor records.";
+    source.textContent = `Baseline years: ${month.baseline_years.join(", ") || "not available"} · coverage remains unknown`;
+  } else {
+    title.textContent = "Start with a complete observation window.";
+    body.textContent = "Choose a loaded month to compare sensors and trace a finding to its original records. Gray means the source export is incomplete, not that burning was absent.";
+    source.textContent = `${state.demo ? "Synthetic teaching example" : "Imported observations"} · source completeness is shown in the calendar`;
+  }
+  card.hidden = false;
 }
 
 function renderSourceComparison() {

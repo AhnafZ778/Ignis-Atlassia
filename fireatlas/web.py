@@ -473,7 +473,12 @@ def main():
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-showcase", action="store_true", help="leave the default authentic database empty on first launch")
+    parser.add_argument("--judge-demo", action="store_true", help="launch the deterministic synthetic judge demonstration")
     args = parser.parse_args()
+    if args.judge_demo:
+        args.db = Path("data/judge-demo.sqlite3")
+        if not args.db.exists():
+            make_demo(Path("data/judge-demo"), args.db)
     if not args.db.exists() and args.db == Path("data/demo.sqlite3"):
         make_demo(Path("data/demo"), args.db)
     if args.db == Path("data/fireatlas.sqlite3") and not args.no_showcase:
