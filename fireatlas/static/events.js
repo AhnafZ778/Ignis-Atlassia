@@ -14,7 +14,7 @@
   const coordinate = p => `${Math.abs(p.lat).toFixed(2)}°${p.lat<0?"S":"N"} / ${Math.abs(p.lon).toFixed(2)}°${p.lon<0?"W":"E"}`;
   const date = stamp => new Intl.DateTimeFormat("en",{timeZone:"UTC",month:"short",day:"numeric",year:"numeric"}).format(new Date(stamp));
   const el = (tag,text) => {const node=document.createElement(tag);node.textContent=text;return node;};
-  let map,points,layer="documented",records=[],request=0,shown=30;
+  let map,points,layer="thermal",records=[],request=0,shown=30;
   const cache={},markers=new Map();
   function regionalRecords() {
     const key=$("event-region").value;
