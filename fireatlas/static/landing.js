@@ -18,14 +18,36 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
   const links=[...document.querySelectorAll('.journey-nav a[href^="#"],#site-navigation>a[href^="#"]')];
   const sections=[...new Set(links.map(a=>document.querySelector(a.hash)).filter(Boolean))];
+  // Move the entire Earth host so its embedded observation overlay stays aligned.
+  const depthMedia=matchMedia('(min-width: 951px) and (prefers-reduced-motion: no-preference)');
+  const depthLayers=[
+    ...[...document.querySelectorAll('.globe-hero .hero-art')].map(node=>({node,anchor:node.closest('.globe-hero'),speed:.12,limit:72,hero:true})),
+    ...[...document.querySelectorAll('.lab-art,.tour-orbit')].map(node=>({node,anchor:node.parentElement,speed:.045,limit:18,hero:false}))
+  ];
+  function updateDepth(){
+    const height=window.innerHeight;
+    for(const layer of depthLayers){
+      if(!depthMedia.matches){layer.node.style.removeProperty('translate');continue;}
+      const rect=layer.anchor.getBoundingClientRect();
+      if(rect.bottom<0 || rect.top>height) continue;
+      const distance=layer.hero?Math.max(0,-rect.top):height/2-(rect.top+rect.height/2);
+      const offset=Math.max(-layer.limit,Math.min(layer.limit,distance*layer.speed));
+      layer.node.style.translate=`0 ${offset.toFixed(2)}px`;
+    }
+  }
   let scheduled=false;
   function update(){
     scheduled=false;
+    updateDepth();
     let current=sections[0];
     for(const section of sections)if(section.getBoundingClientRect().top<=170)current=section;
     for(const link of links){const active=link.hash==='#'+current?.id;link.classList.toggle('active',active);if(active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');}
   }
-  window.addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(update);}},{passive:true});update();
+  const schedule=()=>{if(!scheduled){scheduled=true;requestAnimationFrame(update);}};
+  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('resize',schedule,{passive:true});
+  depthMedia.addEventListener('change',schedule);
+  update();
   const resources=document.querySelector('.nav-resources');
   document.addEventListener('click',e=>{if(resources&&!resources.contains(e.target))resources.open=false;});
   resources?.addEventListener('click',e=>{if(e.target.closest('a'))resources.open=false;});
