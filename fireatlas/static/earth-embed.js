@@ -1,4 +1,4 @@
-// Reuse the user's self-contained earth.html scene without changing its renderer or textures.
+// Embed the FireAtlas satellite and elevation scene with its native projection bridge.
 // The landing scene fills the hero on desktop and mobile.
 document.addEventListener("DOMContentLoaded", () => {
   const host = document.getElementById("earth-frame-host");
@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!host || !hero) return;
 
   const frame = document.createElement("iframe");
-  frame.src = "/earth.html?embed=landing";
-  frame.title = "Interactive 3D Earth model. Drag to rotate; open the full Earth for all controls.";
+  frame.src = "/terrain-earth.html?embed=landing";
+  frame.title = "FireAtlas Terrain Earth with satellite imagery and World Elevation. Drag to rotate; use the globe controls to explore.";
   frame.loading = "eager";
   frame.allowFullscreen = true;
   host.append(frame);
@@ -24,6 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
     style.textContent = ".topbar,.layers,.mode-label,.dock-wrap,.footer,.cinema-return,.toast,dialog{display:none!important}#earth{touch-action:pan-y}";
     documentInFrame.head.append(style);
 
+    const unavailable = () => {
+      host.classList.remove("ready");
+      frame.remove();
+      caption.textContent = "TERRAIN PREVIEW UNAVAILABLE · OPEN FULL EARTH ↗";
+      window.dispatchEvent(new CustomEvent("earth-unavailable"));
+    };
+    frame.contentWindow.addEventListener("terrain-unavailable", unavailable, {once: true});
     const started = performance.now();
     const timer = setInterval(() => {
       const loader = documentInFrame.getElementById("loading");
@@ -33,11 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
         hero.classList.add("model-ready");
         caption.textContent = "DRAG TO ROTATE";
         window.dispatchEvent(new CustomEvent("earth-ready", {detail:{frame}}));
-      } else if (performance.now() - started > 20000 || loader?.classList.contains("error")) {
+      } else if (performance.now() - started > 90000 || loader?.classList.contains("error")) {
         clearInterval(timer);
-        frame.remove();
-        caption.textContent = "EARTH PREVIEW · OPEN FULL MODEL ↗";
-        window.dispatchEvent(new CustomEvent("earth-unavailable"));
+        unavailable();
       }
     }, 250);
   });

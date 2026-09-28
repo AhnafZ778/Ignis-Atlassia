@@ -5,6 +5,7 @@
   const format = value => new Intl.NumberFormat("en", {maximumFractionDigits:1}).format(value);
   const stamp = value => value ? value.replace("T", " · ").replace(":00Z", " UTC") : "Unknown";
   const coords = (lon, lat) => `${Math.abs(lat).toFixed(2)}°${lat < 0 ? "S" : "N"} / ${Math.abs(lon).toFixed(2)}°${lon < 0 ? "W" : "E"}`;
+  const motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
   const state = {
     data: null,
     points: [],
@@ -29,8 +30,13 @@
     documented: false,
     fires: null,
     firesLoading: null,
+    casebookYears: "2016–2026",
     region: "world",
-    selectedFire: null
+    panelView: "cases",
+    casePage: 0,
+    caseQuery: "",
+    selectedFire: null,
+    pendingZoom: null
   };
 
   function element(tag, text, className) {
@@ -40,12 +46,203 @@
     return el;
   }
 
+  function observationDate(value, includeTime = false) {
+    if (!value) return "Unknown";
+    const date = new Date(value.length === 10 ? value + "T00:00:00Z" : value);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "numeric", month: "short", year: "numeric", timeZone: "UTC",
+      ...(includeTime ? {hour: "2-digit", minute: "2-digit", hour12: false} : {})
+    }).format(date) + (includeTime ? " UTC" : "");
+  }
+
+  function renderObservationPeriod(data) {
+    const period = $("globe-period");
+    const start = data.date === "all" ? data.window_start : data.date;
+    const end = data.date === "all" ? data.window_end : data.date;
+    const range = start === end || !start || !end ? observationDate(start) : new Intl.DateTimeFormat("en-GB", {
+      day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
+    }).formatRange(new Date(start + "T00:00:00Z"), new Date(end + "T00:00:00Z"));
+    const latest = data.clusters.reduce((last, group) => !last || group.last > last ? group.last : last, null);
+    const values = data.latest_observation
+      ? [["Observed", range], ["Last detected", latest ? observationDate(latest, true) : "None in selection"]]
+      : [["Observed", "No snapshot imported"], ["Last detected", "Unavailable"]];
+    period.replaceChildren(...values.map(([label, value]) => {
+      const row = element("div");
+      row.append(element("dt", label), element("dd", value));
+      return row;
+    }));
+  }
+
   function setRotationUI(playing) {
     const btn = $("globe-rotate");
     if (!btn) return;
     const label = playing ? "Pause rotation" : "Resume rotation";
-    if (btn.textContent !== label) btn.textContent = label;
+    const symbol = playing ? "Ⅱ" : "▷";
+    if (btn.textContent !== symbol) btn.textContent = symbol;
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
     if (btn.getAttribute("aria-pressed") !== String(!playing)) btn.setAttribute("aria-pressed", String(!playing));
+  }
+
+  function updateLayerStamp() {
+    $("globe-layer-label").textContent = state.documented ? "HISTORICAL WILDFIRES" : "NASA SATELLITE EVIDENCE";
+    $("globe-layer-icon").setAttribute("href", `/vendor/lucide-icons.svg#${state.documented ? "book-open" : "satellite"}`);
+    const data = state.data;
+    $("globe-stamp").textContent = state.documented
+      ? `${state.casebookYears} · ${state.failedEarth ? "browse the sourced archive" : "illustrative fire effects"}`
+      : data?.latest_observation ? `${data.date === "all" ? data.window_start + " → " + data.window_end : data.date} · IMPORTED SNAPSHOT`
+      : "NASA observation snapshot loading";
+  }
+
+  // Cached, seamless texture sequences keep turbulent fire out of the frame loop.
+  // Footprints are illustrative areas around sourced locations, not burn perimeters.
+  let wildfireTextures;
+  function buildWildfireTextures() {
+    const width = 128, height = 160, frames = 24;
+    let seed = 712367;
+    const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+    const lattice = Float32Array.from({length: 128 * 128}, random);
+    const noise = (x, y) => {
+      const ix = Math.floor(x), iy = Math.floor(y);
+      let fx = x - ix, fy = y - iy;
+      fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+      const n = (a, b) => lattice[(b & 127) * 128 + (a & 127)];
+      return (n(ix, iy) * (1 - fx) + n(ix + 1, iy) * fx) * (1 - fy)
+        + (n(ix, iy + 1) * (1 - fx) + n(ix + 1, iy + 1) * fx) * fy;
+    };
+    const turbulence = (x, y) => noise(x, y) * .55 + noise(x * 2.03, y * 2.03) * .3 + noise(x * 4.11, y * 4.11) * .15;
+    const clamp = x => Math.max(0, Math.min(1, x));
+    const texture = (w, h, paint) => {
+      const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h;
+      const context = canvas.getContext("2d"), pixels = context.createImageData(w, h);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const rgba = paint(x, y), offset = (y * w + x) * 4;
+        for (let c = 0; c < 4; c++) pixels.data[offset + c] = rgba[c];
+      }
+      context.putImageData(pixels, 0, 0); return canvas;
+    };
+    return Array.from({length: 2}, (_, variant) => {
+      const shift = variant * 37;
+      const footprint = (x, y) => {
+        const u = (x - 48) / 40, v = (y - 48) / 35;
+        const n = turbulence(x * .11 + shift, y * .11);
+        return {n, edge: clamp((1 - Math.hypot(u, v) + (n - .5) * .65) * 5)};
+      };
+      const ground = texture(96, 96, (x, y) => {
+        const {n, edge} = footprint(x, y);
+        return [30 + n * 24, 16 + n * 12, 12 + n * 8, edge * 100];
+      });
+      const embers = texture(96, 96, (x, y) => {
+        const {n, edge} = footprint(x, y);
+        const vein = Math.pow(clamp(1 - Math.abs(n - .54) * 17), 3);
+        const grain = noise(x * 1.7 + shift, y * 1.7);
+        const heat = clamp(vein * .85 + Math.pow(grain, 9));
+        return [255, 65 + heat * 160, 10 + heat * heat * 125, edge * (heat * 210 + n * 25)];
+      });
+      const sequence = Array.from({length: frames}, (_, frame) => {
+        const angle = frame / frames * Math.PI * 2;
+        const ox = Math.cos(angle) * 2.8 + shift, oy = Math.sin(angle) * 2.8;
+        const fire = texture(width, height, (x, y) => {
+          const u = (x / width - .5) * 2, rise = 1 - y / height;
+          const n = turbulence(x * .055 + ox, y * .042 + oy);
+          const warp = (noise(x * .032 + ox, y * .028 + oy) - .5) * .55 * rise;
+          const spread = Math.pow(clamp(1 - Math.abs(u + warp)), .65);
+          const tongues = .52 + .24 * Math.sin((u + warp) * 13 + shift) + .16 * Math.sin(u * 27 - shift);
+          const envelope = spread * (.48 + tongues * .4) - rise;
+          const density = clamp((envelope + (n - .48) * .44) * 9);
+          const heat = clamp((1 - rise) * .6 + n * .55 - Math.abs(u) * .18);
+          const fine = noise(x * .46 + ox, y * .34 + oy);
+          const baseFade = clamp((height - y - 1) / 15 + (n - .5) * .7);
+          const alpha = density * clamp(y / 12) * baseFade * (.65 + fine * .35);
+          return [255, 45 + Math.pow(heat, 1.8) * 210, 5 + Math.pow(heat, 5) * 210, alpha * 245];
+        });
+        const smoke = texture(width, height, (x, y) => {
+          const u = (x / width - .5) * 2, rise = 1 - y / height;
+          const n = turbulence(x * .045 + ox * .5, y * .05 + oy * .5);
+          const drift = Math.sin(rise * 6 + angle) * .15;
+          const body = clamp(1 - Math.abs(u + drift) / (.23 + rise * .6));
+          const alpha = body * clamp((n - .34) * 2.6) * Math.sin(rise * Math.PI) * .23;
+          return [95 + n * 55, 88 + n * 47, 79 + n * 42, alpha * 255];
+        });
+        return {fire, smoke};
+      });
+      return {ground, embers, sequence};
+    });
+  }
+
+  function drawWildfire(ctx, fire, point, view, time) {
+    wildfireTextures ||= buildWildfireTextures();
+    const diameter = view.globe?.diameter || Math.min(view.width, view.height) * 2.4 / Math.sqrt(view.distance ** 2 - 1);
+    const z = view.rotation[6] * fire.vector[0] + view.rotation[7] * fire.vector[1] + view.rotation[8] * fire.vector[2];
+    const perspective = (view.distance - 1) / (view.distance - z);
+    const size = Math.max(3, Math.min(11, diameter * .013 * perspective));
+    const phase = fire.effectPhase;
+    const textures = wildfireTextures[Math.round(phase / 2.39996) % wildfireTextures.length];
+    const progress = (time * 9 + phase * 3) % textures.sequence.length;
+    const index = Math.floor(progress), blend = progress - index;
+    const facing = Math.max(0, Math.min(1, (z * view.distance - 1) / (view.distance - 1)));
+    const scale = Math.min(view.width, view.height) / 2;
+    ctx.save();
+    if (!view.globe || view.globe.clip) {
+      ctx.beginPath();
+      if (view.globe) ctx.ellipse(view.globe.x, view.globe.y, view.globe.rx, view.globe.ry, 0, 0, Math.PI * 2);
+      else ctx.arc(view.width / 2 + view.framing * scale, view.height / 2 - view.vertical * scale, diameter / 2, 0, Math.PI * 2);
+      ctx.clip();
+    }
+    // Project an east/north tangent basis so the textured ground tilts with Earth.
+    const lon = fire.lon * Math.PI / 180, lat = fire.lat * Math.PI / 180;
+    const east = [Math.cos(lon), 0, -Math.sin(lon)];
+    const north = [-Math.sin(lat) * Math.sin(lon), Math.cos(lat), -Math.sin(lat) * Math.cos(lon)];
+    const offsetStep = view.renderer === "arcgis-terrain"
+      ? Math.max(.00001, Math.min(.012, (view.distance - z) * size / view.focal)) : .012;
+    const projectOffset = axis => {
+      const v = fire.vector.map((value, i) => value + axis[i] * offsetStep);
+      const length = Math.hypot(...v);
+      return FireGlobeMath.project(v.map(value => value / length), view);
+    };
+    const e = projectOffset(east), n = projectOffset(north);
+    if (e && n) {
+      const normalization = offsetStep * (view.focal || scale * 2.4) / (view.distance - z);
+      ctx.save();
+      ctx.transform((e.x - point.x) / normalization, (e.y - point.y) / normalization,
+        (n.x - point.x) / normalization, (n.y - point.y) / normalization, point.x, point.y);
+      ctx.drawImage(textures.ground, -size * 1.65, -size * 1.65, size * 3.3, size * 3.3);
+      ctx.globalCompositeOperation = "screen";
+      ctx.globalAlpha = .8 + .2 * Math.sin(time * 5 + phase);
+      ctx.drawImage(textures.embers, -size * 1.65, -size * 1.65, size * 3.3, size * 3.3);
+      ctx.restore();
+    }
+    ctx.translate(point.x, point.y);
+    ctx.globalAlpha = .3 + facing * .7;
+    const opacity = ctx.globalAlpha;
+    const glow = ctx.createRadialGradient(0, -size * .25, 0, 0, -size * .25, size * 1.9);
+    glow.addColorStop(0, "rgba(255,128,32,.25)"); glow.addColorStop(1, "rgba(235,55,10,0)");
+    ctx.globalCompositeOperation = "screen";
+    ctx.fillStyle = glow; ctx.fillRect(-size * 2, -size * 2.2, size * 4, size * 3.5);
+    // Blend neighboring cached frames; fine turbulent filaments replace vector icons.
+    for (const [offset, weight] of [[0, 1 - blend], [1, blend]]) {
+      if (!weight) continue;
+      const frame = textures.sequence[(index + offset) % textures.sequence.length];
+      ctx.globalAlpha = opacity * weight;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.drawImage(frame.smoke, -size * 1.6, -size * 4.1, size * 3.2, size * 4);
+      ctx.globalCompositeOperation = "screen";
+      ctx.drawImage(frame.fire, -size * 1.35, -size * 2.45, size * 2.7, size * 2.6);
+    }
+    ctx.globalAlpha = opacity;
+    for (let i = 0; i < 9; i++) {
+      const travel = (time * (.24 + i * .014) + phase * .13 + i * .117) % 1;
+      const x = Math.sin(phase + i * 2.4 + travel * 3) * size * (.45 + travel * .4);
+      const y = -size * (.2 + travel * 3.4);
+      ctx.fillStyle = `rgba(255,${170 + i * 8},95,${(1 - travel) * .7})`;
+      ctx.fillRect(x, y, .7, 1.1 + (1 - travel));
+    }
+    if (fire.id === state.selectedFire) {
+      ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = .85;
+      ctx.strokeStyle = "#ffe9ba"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(0, 0, size * 1.8, size * (.35 + facing * .65), 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore(); return size;
   }
 
   function revealStatus(text) {
@@ -54,13 +251,14 @@
   }
 
   function syncControls() {
-    document.querySelectorAll("[data-globe-region],#globe-rotate,#globe-zoom-in,#globe-zoom-out").forEach(b => b.disabled = state.revealing || state.failedEarth);
+    document.querySelectorAll("[data-globe-region],#globe-rotate,#globe-zoom-in,#globe-zoom-out,#globe-reset").forEach(b => b.disabled = state.revealing || state.failedEarth);
     $("globe-source").disabled = state.revealing || !!state.loading || !state.data?.sources.length;
     $("globe-date").disabled = $("globe-source").disabled;
     $("globe-location").disabled = state.revealing || !!state.loading || !state.data?.total;
     document.querySelectorAll(".imprint-bar,#imprint-reset").forEach(b => b.disabled = state.revealing || !!state.loading);
     $("globe-documented-toggle").disabled = state.revealing;
     document.querySelectorAll(".documented-list button").forEach(b => b.disabled = state.revealing);
+    document.querySelectorAll(".globe-location-actions button").forEach(b => b.disabled = state.revealing || state.failedEarth);
   }
 
   function cancelReveal() {
@@ -111,8 +309,46 @@
   }
 
   function focus(lon, lat) {
+    state.pendingZoom = null;
     state.bridge?.focus(lon, lat);
     setRotationUI(false);
+  }
+
+  function zoomToLocation(lon, lat, altitude = 180000) {
+    if (state.failedEarth) return;
+    if (state.bridge) state.bridge.focus(lon, lat, {altitude});
+    else state.pendingZoom = {lon, lat, altitude};
+    setRotationUI(false);
+    closeEarthDetails();
+    document.querySelector(".globe-hero").scrollIntoView({behavior: motionPreference.matches ? "auto" : "smooth", block: "start"});
+  }
+
+  function openEarthDetails() {
+    const dialog = $("earth-details-dialog");
+    if (!dialog.open) dialog.showModal();
+    document.documentElement.classList.add("earth-details-visible");
+  }
+
+  function closeEarthDetails() {
+    const dialog = $("earth-details-dialog");
+    if (dialog.open) dialog.close();
+  }
+
+  function locationActions(lon, lat, altitude) {
+    const actions = element("div", undefined, "globe-location-actions");
+    const zoom = element("button", "Zoom to location ↗", "globe-location-zoom");
+    zoom.type = "button";
+    zoom.disabled = state.failedEarth;
+    zoom.addEventListener("click", () => {
+      zoomToLocation(lon, lat, altitude);
+      document.querySelector(".globe-hero").scrollIntoView({behavior: motionPreference.matches ? "auto" : "smooth", block: "start"});
+    });
+    const reset = element("button", "Full Earth", "globe-location-reset");
+    reset.type = "button";
+    reset.disabled = state.failedEarth;
+    reset.addEventListener("click", () => {state.pendingZoom = null;state.bridge?.reset();setRotationUI(false);closeEarthDetails();});
+    actions.append(zoom, reset);
+    return actions;
   }
 
   function draw(view) {
@@ -124,8 +360,9 @@
       canvas.width = width;
       canvas.height = height;
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, width, height);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, view.width, view.height);
     state.visible = [];
     setRotationUI(view.playing);
     const showDetections = $("globe-markers").checked && state.revealed;
@@ -148,17 +385,6 @@
         ctx.arc(point.x, point.y, glowRadius, 0, Math.PI * 2);
         ctx.fillStyle = recent ? `rgba(255,198,118,${glowAlpha})` : `rgba(255,112,47,${glowAlpha})`;
         ctx.fill();
-      }
-      // Place label on large clusters when view is wide enough
-      if (item.count > 400 && view.width > 900) {
-        ctx.save();
-        ctx.font = `500 ${9 * markerScale}px Inter, system-ui, sans-serif`;
-        ctx.fillStyle = "rgba(220, 232, 236, 0.65)";
-        ctx.textAlign = "center";
-        const labelY = point.y + radius + 11 * markerScale;
-        const label = `${Math.abs(item.lat).toFixed(0)}°${item.lat < 0 ? "S" : "N"} ${Math.abs(item.lon).toFixed(0)}°${item.lon < 0 ? "W" : "E"}`;
-        ctx.fillText(label, point.x, labelY);
-        ctx.restore();
       }
       if (item.id === state.selected) {
         // Animated pulsing selection ring
@@ -189,22 +415,17 @@
     }
     canvas.dataset.visible = String(state.visible.length);
     let fireCount = 0;
+    const effectTime = motionPreference.matches ? 0 : performance.now() / 1000;
     for (const fire of state.documented && !state.revealing ? state.fires || [] : []) {
       const p = FireGlobeMath.project(fire.vector, view);
       if (!p) continue;
-      const size = view.width < 600 ? 9 : 10;
-      ctx.beginPath();ctx.arc(p.x,p.y,size+5,0,Math.PI*2);ctx.fillStyle="#08171ff5";ctx.fill();
-      ctx.lineWidth=2;ctx.strokeStyle="#83cfff";ctx.stroke();
-      ctx.beginPath();ctx.moveTo(p.x,p.y-size);ctx.lineTo(p.x+size,p.y);ctx.lineTo(p.x,p.y+size);ctx.lineTo(p.x-size,p.y);ctx.closePath();
-      ctx.fillStyle = fire.id === state.selectedFire ? "#def6ff" : "#83cfff";
-      ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle="#2d6f9d";ctx.stroke();
-      if (fire.id === state.selectedFire) {
-        ctx.beginPath();ctx.arc(p.x,p.y,size+9,0,Math.PI*2);ctx.strokeStyle="#a6dfff";ctx.stroke();
-      }
-      state.visible.push({x:p.x,y:p.y,radius:size,id:fire.id,kind:"documented"});
+      const size = drawWildfire(ctx, fire, p, view, effectTime);
+      state.visible.push({x:p.x,y:p.y-size*.6,radius:size*1.5,id:fire.id,kind:"documented"});
       fireCount++;
     }
     canvas.dataset.documentedVisible = String(fireCount);
+    canvas.dataset.wildfireEffects = state.documented ? "historical" : "off";
+    canvas.dataset.effectMotion = motionPreference.matches ? "static" : "animated";
   }
 
   function attach(frame) {
@@ -234,7 +455,7 @@
         e.preventDefault(); e.stopImmediatePropagation();
       }
     }, true);
-    surface.setAttribute("aria-label", "Earth with NASA thermal detection clusters. Drag or use arrow keys to rotate. Click a point to inspect it, or use Browse detection clusters on the page.");
+    surface.setAttribute("aria-label", "Interactive Earth with documented wildfire sites and optional NASA satellite evidence. Fire effects illustrate historical case locations. Drag or use arrow keys to rotate. Select a fire or browse the wildfire casebook on the page.");
     let down = null;
     const pointers = new Set();
     surface.addEventListener("pointerdown", e => {
@@ -257,13 +478,16 @@
       }
       down = null;
       const target = state.visible.map(p => ({...p, d: Math.hypot(p.x - e.clientX, p.y - e.clientY)}))
-        .filter(p => p.d <= (p.kind === "documented" ? 20 : e.pointerType === "touch" ? 13 : 8)).sort((a, b) => Number(b.kind === "documented") - Number(a.kind === "documented") || a.d - b.d)[0];
+        .filter(p => p.d <= (p.kind === "documented" ? Math.max(16,p.radius) : e.pointerType === "touch" ? 13 : 8)).sort((a, b) => Number(b.kind === "documented") - Number(a.kind === "documented") || a.d - b.d)[0];
       if (target) target.kind === "documented" ? selectFire(target.id) : select(target.id);
     });
     draw(bridge.view);
     const selectedFire = state.documented && state.fires?.find(fire => fire.id === state.selectedFire);
+    const pendingZoom = state.pendingZoom;
     if (selectedFire) focus(selectedFire.lon, selectedFire.lat);
     else if(state.selected){const selected=state.points.find(p=>p.id===state.selected);if(selected)focus(selected.lon,selected.lat);}
+    if (pendingZoom) zoomToLocation(pendingZoom.lon, pendingZoom.lat, pendingZoom.altitude);
+    state.pendingZoom = null;
     if ($("globe-markers").checked) revealDetections();
     else scheduleLoad();
   }
@@ -280,59 +504,116 @@
     state.detailRequest++;
     state.selected = null;
     state.details = null;
+    state.selectedFire = null;
+    $("documented-detail").hidden = true;
+    $("documented-list").hidden = false;
+    if (state.fires) $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
     $("globe-selection").hidden = true;
-    $("globe-overview").hidden = state.documented;
-    $("globe-documented").hidden = !state.documented;
-    $("globe-console-title").textContent = state.documented ? "Historical casebook" : "Observation snapshot";
+    $("globe-overview").hidden = state.panelView !== "cases";
+    $("globe-documented").hidden = state.panelView !== "cases";
+    $("globe-console-title").textContent = state.panelView === "cases" ? "Wildfire atlas" : "Satellite evidence";
+    $("globe-source-label").textContent = state.panelView === "cases" ? "FIREATLAS ARCHIVE" : "NASA FIRMS";
+    $("globe-data-kind").textContent = state.panelView === "cases" ? state.casebookYears : "Imported snapshot";
+    const archiveLink = document.querySelector(".globe-console-head > a");
+    archiveLink.href = state.panelView === "cases" ? "/documented-fires.json" : "/data.html";
+    const linkLabel = state.panelView === "cases" ? "Inspect wildfire archive and sources" : "Inspect NASA data sources";
+    archiveLink.setAttribute("aria-label", linkLabel);
+    archiveLink.title = linkLabel;
     document.querySelector(".globe-console").classList.toggle("documented-view", state.documented);
     document.querySelector(".globe-console").classList.remove("has-selection", "documented-reading");
     $("globe-location").value = "";
+    renderCasePage();
+    updateLayerStamp();
   }
 
   async function toggleDocumented() {
     state.documented = !state.documented;
     $("globe-documented-toggle").setAttribute("aria-pressed", String(state.documented));
-    document.querySelector(".documented-toggle-state").textContent = state.documented ? "Hide" : "Show";
+    document.querySelector(".documented-toggle-state").textContent = state.documented ? "On" : "Off";
     clearSelection();
-    document.querySelector(".globe-console").scrollTop = 0;
+    document.querySelector(".globe-console-body").scrollTop = 0;
     if (!state.documented) {
       state.selectedFire = null;
       $("documented-detail").hidden = true;
       $("documented-list").hidden = false;
-      if (state.fires) $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
+      renderCasePage();
       draw(state.bridge?.view);
       return;
     }
-    if (state.fires) { draw(state.bridge?.view);return; }
-    if (state.firesLoading) return;
-    $("documented-status").textContent = "Loading sourced case files…";
-    state.firesLoading = json("/documented-fires.json", AbortSignal.timeout(15000));
+    await loadCasebook();
+    draw(state.bridge?.view);
+  }
+
+  function loadCasebook() {
+    if (state.fires) return Promise.resolve(true);
+    if (state.firesLoading) return state.firesLoading;
+    state.firesLoading = fetchCasebook().finally(() => { state.firesLoading = null; });
+    return state.firesLoading;
+  }
+
+  async function fetchCasebook() {
+    $("documented-status").textContent = "Loading sourced wildfire cases…";
+    $("casebook-retry").hidden = true;
     try {
-      const data = await state.firesLoading;
-      state.fires = data.events.map(fire => ({...fire,vector:FireGlobeMath.vector(fire.lon,fire.lat)}));
+      const data = await json("/documented-fires.json", AbortSignal.timeout(15000));
+      state.casebookYears = `${data.period_start.slice(0,4)}–${data.period_end.slice(0,4)}`;
+      state.fires = data.events.map((fire,index) => ({...fire,vector:FireGlobeMath.vector(fire.lon,fire.lat),effectPhase:index * 2.39996}));
+      $("wildfire-case-count").textContent = format(state.fires.length);
+      const sources = new Set(data.events.flatMap(fire => fire.sources.map(source => source.url)));
+      $("wildfire-archive-note").textContent = `${sources.size} source links · selected cases, not exhaustive`;
+      $("globe-data-kind").textContent = state.casebookYears;
       $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
-      $("documented-list").replaceChildren(...state.fires.map((fire, index) => {
+      renderCasePage();
+      syncControls();updateLayerStamp();draw(state.bridge?.view);
+      return true;
+    } catch {
+      $("documented-status").textContent = "Wildfire cases could not load. Retry the archive.";
+      $("wildfire-archive-note").textContent = "Wildfire archive unavailable";
+      $("casebook-retry").hidden = false;
+      return false;
+    }
+  }
+
+  function renderCasePage() {
+    if (!state.fires) return;
+    const query = state.caseQuery.trim().toLowerCase();
+    const matches = state.fires.filter(fire => `${fire.name} ${fire.place} ${fire.period}`.toLowerCase().includes(query));
+    const pages = Math.max(1, Math.ceil(matches.length / 4));
+    state.casePage = Math.max(0, Math.min(state.casePage, pages - 1));
+    $("casebook-prev").disabled = state.casePage === 0;
+    $("casebook-next").disabled = state.casePage >= pages - 1;
+    $("casebook-page").textContent = matches.length ? `${state.casePage + 1} / ${pages} · ${matches.length} cases` : "No matching cases";
+    $("documented-status").textContent = matches.length ? "" : "Try another name, place or year.";
+    $("documented-list").replaceChildren(...matches.slice(state.casePage * 4, state.casePage * 4 + 4).map(fire => {
+        const index = state.fires.indexOf(fire);
         const button = element("button");button.type="button";button.dataset.fireId=fire.id;
         const number = element("span",String(index + 1).padStart(2,"0"),"documented-number");
         number.setAttribute("aria-hidden","true");
         const copy = element("span",undefined,"documented-card-copy");
-        const toll=element("small",`${fire.period} · ${fire.deaths?.direct?.label||"Fatality count unavailable"}`,"documented-case-toll");
+        const toll=element("small",fire.period,"documented-case-date");
         copy.append(element("strong",fire.name),element("span",fire.place),toll);
         const arrow = element("span","↗","documented-card-arrow");arrow.setAttribute("aria-hidden","true");
         button.append(number,copy,arrow);
         button.addEventListener("click",()=>selectFire(fire.id));return button;
       }));
-      syncControls();draw(state.bridge?.view);
-    } catch {
-      $("documented-status").textContent = "Reports could not load.";
-      const retry = element("button","Retry reports");retry.type="button";
-      retry.addEventListener("click",()=>{state.documented=false;toggleDocumented();});
-      $("documented-list").replaceChildren(retry);
-    } finally {state.firesLoading=null;}
+  }
+
+  function setPanelView(view) {
+    state.panelView = view;
+    clearSelection();
+    const satellite = view === "satellite";
+    $("globe-evidence-tools").hidden = !satellite;
+    $("globe-evidence-tools").open = satellite;
+    $("wildfire-archive-note").hidden = satellite;
+    document.querySelectorAll("[data-console-view]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.consoleView === view)));
+    renderCasePage();
+    document.querySelector(".globe-console-body").scrollTop = 0;
   }
 
   function selectFire(id) {
-    if (!state.documented || state.revealing) return;
+    if (state.revealing) return;
+    if (state.panelView !== "cases") setPanelView("cases");
+    if (!state.documented) toggleDocumented();
     const fire = state.fires?.find(item => item.id === id);
     if (!fire) return;
     clearSelection();state.selectedFire=id;
@@ -341,14 +622,15 @@
     $("documented-list").hidden=true;
     $("documented-status").textContent="";
     const detail=$("documented-detail");detail.hidden=false;detail.replaceChildren();
-    const back=element("button","← Back to casebook","documented-back");back.type="button";
+    const back=element("button","← Layer details","documented-back");back.type="button";
     back.addEventListener("click",()=>{
       document.querySelector(".globe-console").classList.remove("documented-reading");
       state.selectedFire=null;detail.hidden=true;$("documented-list").hidden=false;
-      $("documented-status").textContent=`${state.fires.length} sourced case files · select one to explore`;
-      document.querySelector(`[data-fire-id="${fire.id}"]`)?.focus();
+      renderCasePage();
+      $("earth-details-close").focus({preventScroll: true});
     });
     detail.append(back,element("span",`${fire.period} · ${fire.unit||"Wildfire"}`,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
+    detail.insertBefore(locationActions(fire.lon, fire.lat), detail.querySelector(".documented-summary"));
     const fatalityGrid=element("div",undefined,"documented-fatalities");
     const deathRows=[
       ["Direct deaths",fire.deaths?.direct],
@@ -381,7 +663,8 @@
     next.addEventListener("click",()=>selectFire(state.fires[index+1].id));
     navigation.append(previous,element("span",`${index+1} / ${state.fires.length}`),next);
     detail.append(element("h4","News coverage & supporting sources"),links,navigation);
-    document.querySelector(".globe-console").scrollTop=0;
+    document.querySelector(".globe-console-body").scrollTop=0;
+    openEarthDetails();
     back.focus({preventScroll:true});
   }
 
@@ -496,6 +779,8 @@
     $("globe-date").disabled = true;
     $("globe-location").disabled = true;
     $("globe-total").textContent = "—";
+    $("globe-cell-count").textContent = "Loading mapped groups…";
+    $("globe-period").replaceChildren();
     $("globe-retry").hidden = true;
     $("globe-status").textContent = "Loading data…";
     if ($("globe-markers").checked) revealStatus("Loading data…");
@@ -512,9 +797,9 @@
       state.windowEnd = data.window_end;
       state.points = data.clusters.map(item => ({...item, vector: FireGlobeMath.vector(item.lon, item.lat)}));
       $("globe-total").textContent = format(data.total);
-      $("globe-cell-count").textContent = `${format(data.clusters.length)} geographic groups`;
-      $("globe-period").textContent = data.latest_observation ? `${data.window_start} → ${data.window_end} · UTC\nLatest observation ${stamp(data.latest_observation)}` : "No NASA FIRMS snapshot imported on this server.";
-      $("globe-stamp").textContent = data.latest_observation ? `${day === "all" ? data.window_start + " → " + data.window_end : day} · IMPORTED SNAPSHOT` : "NO NASA OBSERVATIONS IMPORTED";
+      $("globe-cell-count").textContent = `${format(data.clusters.length)} mapped groups · ${data.cluster_degrees}° cells`;
+      renderObservationPeriod(data);
+      updateLayerStamp();
       const sourceOptions = [new Option("All satellites", "all"), ...data.sources.map(s => new Option(s.label, s.source_id))];
       $("globe-source").replaceChildren(...sourceOptions);
       $("globe-source").value = source;
@@ -538,8 +823,9 @@
     } catch (error) {
       if (request !== state.request) return false;
       $("globe-status").textContent = error.name === "TimeoutError" ? "Snapshot request timed out. Retry loading the imported data." : error.message;
-      $("globe-stamp").textContent = "OBSERVATION DATA UNAVAILABLE";
+      if (!state.documented) $("globe-stamp").textContent = "SATELLITE EVIDENCE UNAVAILABLE";
       $("globe-cell-count").textContent = "Snapshot unavailable";
+      $("globe-period").replaceChildren();
       $("globe-retry").hidden = false;
       $("globe-source").disabled = false;
       $("globe-date").disabled = false;
@@ -554,6 +840,7 @@
   }
 
   async function select(id) {
+    if (state.panelView !== "satellite") setPanelView("satellite");
     const item = state.points.find(c => c.id === id);
     if (!item) return;
     const request = ++state.detailRequest;
@@ -571,20 +858,28 @@
     state.selectedFire=null;
     $("documented-detail").hidden=true;$("documented-list").hidden=false;
     if(state.fires) $("documented-status").textContent=`${state.fires.length} sourced case files · select one to explore`;
-    $("globe-console-title").textContent="Observation snapshot";
+    $("globe-console-title").textContent="Satellite evidence";
+    $("globe-source-label").textContent="NASA FIRMS";
+    $("globe-data-kind").textContent="Imported snapshot";
+    const sourceLink = document.querySelector(".globe-console-head > a");
+    sourceLink.href="/data.html";
+    sourceLink.setAttribute("aria-label", "Inspect NASA data sources");
+    sourceLink.title="Inspect NASA data sources";
     document.querySelector(".globe-console").classList.remove("documented-view", "documented-reading");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
-    const close = element("button", state.documented ? "← Back to fire casebook" : "← Back to observations", "globe-close");
+    const close = element("button", "← Back to satellite data", "globe-close");
     close.type = "button";
-    close.addEventListener("click", () => { clearSelection(); (state.documented ? $("globe-documented-toggle") : $("globe-location")).focus(); });
+    close.addEventListener("click", () => { clearSelection(); $("globe-location").focus(); });
     panel.prepend(close);
+    openEarthDetails();
     try {
       const data = await json(`/api/globe/detail?${new URLSearchParams({cell: id, source: state.data.source, date: state.data.date})}`, AbortSignal.any([state.detailController.signal, AbortSignal.timeout(30000)]));
       if (request !== state.detailRequest) return;
       state.details = data;
       panel.replaceChildren();
       panel.append(close, element("span", "1° GEOGRAPHIC GROUP", "globe-kicker"), element("h3", coords(item.lon, item.lat)));
+      panel.append(locationActions(item.lon, item.lat, 350000));
       const facts = element("div", undefined, "globe-facts");
       for (const [key, value] of [["Detections", format(data.total)], ["Peak pixel FRP", item.max_frp_mw == null ? "Unknown" : `${format(item.max_frp_mw)} MW`]]) {
         const fact = element("div");fact.append(element("strong", value), element("span", key));facts.append(fact);
@@ -624,6 +919,7 @@
   window.addEventListener("earth-unavailable", () => {
     state.failedEarth = true;
     state.bridge?.cancelOrbit();state.bridge = null;
+    updateLayerStamp();
     $("globe-status").textContent = "3D unavailable · browse locations below.";
     if ($("globe-markers").checked) revealDetections();
     else scheduleLoad();
@@ -638,6 +934,8 @@
       if(!state.documented) await toggleDocumented();
       else if(state.firesLoading) await state.firesLoading.catch(()=>{});
       selectFire(id);
+      const fire = state.fires?.find(item => item.id === id);
+      if (fire) zoomToLocation(fire.lon, fire.lat);
       return;
     }
     if(state.loading) await state.loading;
@@ -649,6 +947,8 @@
     $("globe-markers").checked=true;
     await revealDetections();
     select(id);
+    const item = state.points.find(point => point.id === id);
+    if (item) zoomToLocation(item.lon, item.lat, 350000);
   });
 
   function setupTooltips() {
@@ -684,9 +984,23 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    const dialog = $("earth-details-dialog");
+    $("earth-details-open").addEventListener("click", () => {
+      if (!state.selectedFire && !state.selected) setPanelView(state.documented ? "cases" : $("globe-markers").checked ? "satellite" : state.panelView);
+      openEarthDetails();
+    });
+    $("earth-details-close").addEventListener("click", closeEarthDetails);
+    dialog.addEventListener("close", () => {document.documentElement.classList.remove("earth-details-visible");$("earth-details-open").focus({preventScroll:true});});
+    dialog.addEventListener("click", event => {if(event.target===dialog){const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)closeEarthDetails();}});
+    document.querySelector(".browse-map-cases").addEventListener("click", () => {closeEarthDetails();document.querySelector('[data-event-layer="documented"]').click();});
+    document.querySelectorAll("[data-console-view]").forEach(button => button.addEventListener("click", () => setPanelView(button.dataset.consoleView)));
+    $("casebook-search").addEventListener("input", e => { state.caseQuery = e.target.value; state.casePage = 0; renderCasePage(); });
+    for (const [id, step] of [["casebook-prev", -1], ["casebook-next", 1]]) $(id).addEventListener("click", () => { state.casePage += step; renderCasePage(); });
     $("globe-markers").checked = false;
     $("globe-markers").addEventListener("change", revealDetections);
     $("globe-documented-toggle").addEventListener("click", toggleDocumented);
+    $("casebook-retry").addEventListener("click", loadCasebook);
+    loadCasebook();
     setupTooltips();
     $("globe-date").addEventListener("change", load);
     $("globe-source").addEventListener("change", load);
@@ -697,10 +1011,12 @@
     });
     $("globe-zoom-in").addEventListener("click", () => state.bridge?.zoom(-0.3));
     $("globe-zoom-out").addEventListener("click", () => state.bridge?.zoom(0.3));
+    $("globe-reset").addEventListener("click", () => {state.pendingZoom=null;state.bridge?.reset();setRotationUI(false);});
     document.querySelectorAll("[data-globe-region]").forEach(button => button.addEventListener("click", () => {
       clearSelection();
       state.region=button.dataset.regionKey;updateLocations();
       focus(...button.dataset.globeRegion.split(",").map(Number));
+      closeEarthDetails();
     }));
     // Fetch after the Earth becomes visible, or immediately on an explicit request.
     updateLocations();

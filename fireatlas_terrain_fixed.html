@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FireAtlas 3D Terrain Demo</title>
+
+<link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css">
+<script src="https://js.arcgis.com/4.32/"></script>
+
+<style>
+html, body, #viewDiv {
+    padding:0;
+    margin:0;
+    height:100%;
+    width:100%;
+    overflow:hidden;
+}
+
+#panel {
+    position:absolute;
+    top:15px;
+    left:15px;
+    z-index:10;
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    font-family:Arial;
+    width:260px;
+    box-shadow:0 2px 10px rgba(0,0,0,.25);
+}
+
+#panel h3 {
+    margin-top:0;
+}
+
+button {
+    width:100%;
+    padding:8px;
+    margin-top:8px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="panel">
+<h3>🔥 FireAtlas Terrain</h3>
+<p>
+3D terrain using Esri satellite imagery + World Elevation.
+</p>
+
+<label>
+Terrain exaggeration:
+<select id="terrain">
+<option value="1">1x</option>
+<option value="2">2x</option>
+<option value="3" selected>3x</option>
+</select>
+</label>
+
+<button id="california">Go to California Fire Region</button>
+<button id="world">Reset Globe</button>
+</div>
+
+<div id="viewDiv"></div>
+
+
+<script type="module">
+
+const [
+ArcGISMap,
+SceneView,
+GraphicsLayer,
+Graphic,
+Point,
+SimpleMarkerSymbol
+] = await $arcgis.import([
+"@arcgis/core/Map.js",
+"@arcgis/core/views/SceneView.js",
+"@arcgis/core/layers/GraphicsLayer.js",
+"@arcgis/core/Graphic.js",
+"@arcgis/core/geometry/Point.js",
+"@arcgis/core/symbols/SimpleMarkerSymbol.js"
+]);
+
+
+const fireLayer = new GraphicsLayer();
+
+
+const map = new ArcGISMap({
+    basemap:"satellite",
+    ground:"world-elevation",
+    layers:[fireLayer]
+});
+
+
+const view = new SceneView({
+    container:"viewDiv",
+    map:map,
+    qualityProfile:"medium",
+    camera:{
+        position:{
+            longitude:0,
+            latitude:20,
+            z:18000000
+        },
+        tilt:20
+    },
+    environment:{
+        atmosphereEnabled:true
+    }
+});
+
+
+// Demo MODIS/VIIRS hotspots
+const fires=[
+[-121.5,39.7,"VIIRS"],
+[-118.2,34.1,"MODIS"],
+[150,-25,"VIIRS"],
+[23,-2,"MODIS"]
+];
+
+
+fires.forEach(f=>{
+    fireLayer.add(new Graphic({
+        geometry:new Point({
+            longitude:f[0],
+            latitude:f[1]
+        }),
+        symbol:new SimpleMarkerSymbol({
+            color:f[2]=="VIIRS" ? "red":"orange",
+            size:12,
+            outline:{
+                color:"white",
+                width:1
+            }
+        }),
+        attributes:{
+            sensor:f[2]
+        },
+        popupTemplate:{
+            title:"Fire Observation",
+            content:"Sensor: {sensor}"
+        }
+    }));
+});
+
+
+document.getElementById("california").onclick=()=>{
+view.goTo({
+center:[-121.5,39.7],
+zoom:6,
+tilt:45
+});
+};
+
+
+document.getElementById("world").onclick=()=>{
+view.goTo({
+position:{
+longitude:0,
+latitude:20,
+z:18000000
+},
+tilt:20
+});
+};
+
+
+// Lightweight terrain exaggeration.
+// Avoids custom elevation processing that caused long loading.
+document.getElementById("terrain").onchange=(e)=>{
+    view.ground.navigationConstraint = {
+        type:"none"
+    };
+
+    view.goTo({
+        tilt: Number(e.target.value)*15
+    },{
+        duration:500
+    });
+};
+
+</script>
+
+</body>
+</html>

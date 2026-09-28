@@ -36,7 +36,7 @@
     new ResizeObserver(entries=>{const next=entries[0].contentRect.width;if(next!==width){width=next;map.invalidateSize();resetView();}}).observe($("event-map"));
   }
   function globeButton(record){
-    const button=el("button","Explore on 3D Earth →");button.type="button";button.className="event-globe-link";
+    const button=el("button","Zoom on 3D Earth →");button.type="button";button.className="event-globe-link";
     button.addEventListener("click",()=>{
       window.dispatchEvent(new CustomEvent("fireatlas-map-selection",{detail:{layer,id:record.id}}));
       document.querySelector(".globe-hero").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"start"});
@@ -83,6 +83,7 @@
   function render(data){
     records=layer==="thermal"?data.clusters:data.events;
     $("event-map").dataset.layer=layer;$("event-map").dataset.points=records.length;
+    $("event-map").setAttribute("aria-label",layer==="thermal"?"Map of NASA satellite detection groups":layer==="documented"?"Map of documented historical wildfires":"Map of NASA EONET reported events");
     $("event-count").textContent=number(layer==="thermal"?data.total:records.length);
     const thermal=layer==="thermal",documented=layer==="documented";
     $("event-count-label").textContent=thermal?"SATELLITE DETECTIONS · WORLDWIDE":documented?"SOURCED CASE FILES · SELECTED":"NASA EONET · CURATED SAMPLE";

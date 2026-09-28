@@ -62,6 +62,7 @@ ASSETS = {
     "/story.js": ("story.js", "text/javascript; charset=utf-8"),
     "/events.js": ("events.js", "text/javascript; charset=utf-8"),
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
+    "/terrain-earth.html": ("terrain-earth.html", "text/html; charset=utf-8"),
     "/globe.js": ("globe.js", "text/javascript; charset=utf-8"),
     "/documented-fires.json": ("documented-fires.json", "application/json; charset=utf-8"),
     "/globe-math.js": ("globe-math.js", "text/javascript; charset=utf-8"),

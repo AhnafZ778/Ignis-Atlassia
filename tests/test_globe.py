@@ -100,6 +100,9 @@ class GlobeTests(unittest.TestCase):
         module = str(Path("fireatlas/static/globe-math.js").resolve())
         script = """
 const assert=require('node:assert/strict'),m=require(process.argv[1]);
+const terrainPoint=m.vector(15,20),screen={x:310,y:180};
+assert.equal(m.project(terrainPoint,{project:point=>point===terrainPoint?screen:null}),screen);
+assert.equal(m.project(terrainPoint,{project:()=>null}),null);
 const v={width:1000,height:800,rotation:[1,0,0,0,1,0,0,0,1],distance:3,framing:0,vertical:0};
 assert.deepEqual(m.project(m.vector(0,0),v),{x:500,y:400});
 assert.equal(m.project(m.vector(180,0),v),null);

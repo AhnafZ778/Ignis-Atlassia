@@ -294,11 +294,13 @@ dialog{max-width:min(460px,calc(100vw - 32px));padding:28px;background:#09131f;c
    resize();gl.useProgram(program);
    gl.uniform2f(uniform.uResolution,canvas.width,canvas.height);
    gl.uniformMatrix3fv(uniform.uRotation,false,rotation(state.yaw,state.pitch));
-   const landingDiameter=Math.min(innerHeight*.78,innerWidth*.46);
+   const landingDiameter=innerWidth>950
+     ? Math.max(220,Math.min(innerHeight-310,innerWidth-(innerWidth>1200?780:700)))
+     : Math.min(innerHeight*.84,innerWidth*.88);
    const landingDistance=Math.sqrt(1.+Math.pow(2.40*Math.min(innerWidth,innerHeight)/landingDiameter,2.));
    const view={width:innerWidth,height:innerHeight,rotation:rotation(state.yaw,state.pitch),
-     distance:embedded&&innerWidth>950?Math.max(1.65,landingDistance+state.distance-initialDistance):state.distance+(embedded&&innerWidth>650&&innerWidth<=950?.5:0.),
-     framing:embedded?0.:innerWidth>850?.32:0.,vertical:embedded?(innerWidth<=760?-.17:innerWidth<=950?-.32:.03):innerWidth<701?-.03:.035,
+     distance:embedded?Math.max(1.65,landingDistance+state.distance-initialDistance):state.distance,
+     framing:embedded?0.:innerWidth>850?.32:0.,vertical:embedded?(innerWidth>950?.15:.025):innerWidth<701?-.03:.035,
      playing:state.playing,revealing:Boolean(revealOrbit)};
    gl.uniform1f(uniform.uDistance,view.distance);
    gl.uniform1f(uniform.uFraming,view.framing);

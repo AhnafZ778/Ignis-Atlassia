@@ -44,6 +44,11 @@ class WebMvpTests(unittest.TestCase):
         _, earth = self.get("/earth.html")
         self.assertIn(b"Earth \xe2\x80\x94 An orbital portrait", earth)
         self.assertGreater(len(earth), 10_000_000)
+        _, terrain = self.get("/terrain-earth.html")
+        self.assertIn(b"world-elevation", terrain)
+        self.assertIn(b"window.fireAtlasEarth", terrain)
+        _, embed = self.get("/earth-embed.js")
+        self.assertIn(b"/terrain-earth.html?embed=landing", embed)
         query = "year=2015&series=joint&bbox=-122,39,-120,41"
         _, body = self.get("/api/calendar?" + query)
         result = json.loads(body)

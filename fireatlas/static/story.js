@@ -25,7 +25,7 @@
       }},
     {topic:"05 / EXPLORE",icon:"✦",title:"Take the next step.",
       description:"The Training Lab turns these ideas into a clearly simulated crew exercise. The Research Lab lets you inspect overlap and question the method.",
-      target:"open-research-study",focus:".lab-grid",apply: async () => {}},
+      target:"open-research-study",focus:".workspace-links",apply: async () => {}},
   ];
   let current = -1, focus = null, opening = null, sequence = 0;
   const motion = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
@@ -36,6 +36,8 @@
     opening?.focus(); opening = null;
   }
   async function show(index) {
+    const workspace = $("study-workspace");
+    if (workspace?.tagName === "DETAILS") workspace.open = true;
     const turn = ++sequence, step = steps[index];
     if (!step) return;
     $("story-next").disabled = $("story-back").disabled = true;
@@ -66,7 +68,7 @@
     }
   }
   document.addEventListener("DOMContentLoaded", () => {
-    for (const id of ["start-tour","hero-start-tour"]) $(id).addEventListener("click", event => {
+    for (const id of ["start-tour","hero-start-tour"]) $(id)?.addEventListener("click", event => {
       opening = event.currentTarget; show(0);
     });
     $("story-close").addEventListener("click", close);

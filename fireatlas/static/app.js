@@ -118,7 +118,7 @@ async function loadCalendar(next = {}) {
   $("#aoi-status").textContent = `Selected AOI: ${state.bbox}${complete ? "" : " · no complete export"}`;
   render();
   $("#start-tour").disabled = false;
-  $("#hero-start-tour").disabled = false;
+  if ($("#hero-start-tour")) $("#hero-start-tour").disabled = false;
   if (state.day) await loadDay(state.day);
 }
 
@@ -208,61 +208,111 @@ function renderSourceComparison() {
   });
 }
 
+function selectCalendarMonth(index) {
+  if (index < 0 || index > 11) return;
+  stopMapPlayback(); mapDay = null; state.month = index; state.day = null;
+  render(); clearDay();
+}
+
 function renderMonths() {
   const container = $("#monthly-bars"); container.replaceChildren();
+  const completeMonths = state.data.monthly.filter(item => item.export_window_complete);
+  $("#month-completeness").textContent = `${completeMonths.length} / 12 complete month exports · ${state.year}`;
   const max = Math.max(1, ...state.data.monthly.map(item => item.detected_cell_days || 0));
-  const peakIndex = state.data.monthly.reduce((best, item, i) => (item.detected_cell_days || 0) > (state.data.monthly[best]?.detected_cell_days || 0) ? i : best, 0);
   state.data.monthly.forEach((item, index) => {
     const button = document.createElement("button");
-    const isPeak = item.detected_cell_days !== null && item.detected_cell_days > 0 && index === peakIndex;
+    const partial = item.detected_cell_days === null && item.partial_import_detected_cell_days > 0;
+    const isPeak = item.detected_cell_days !== null && item.detected_cell_days > 0 && item.detected_cell_days === max;
     button.type = "button"; button.className = "month-row" + (index === state.month ? " chosen" : "") + (isPeak ? " peak" : "");
+    button.setAttribute("aria-pressed", String(index === state.month));
     const tooltipText = item.detected_cell_days === null
-      ? `${monthNames[index]} ${state.year}: Source export not loaded. This does not mean zero burning — the data may be missing or incomplete.`
-      : `${monthNames[index]} ${state.year}: ${item.detected_cell_days} detected cell-days${isPeak ? " · PEAK MONTH for this year and area" : ""}. Click to view the daily calendar.`;
-    button.setAttribute("aria-label", tooltipText);
-    button.title = tooltipText;
-    const label = document.createElement("span"); label.className = "month-label";
-    label.textContent = isPeak ? `${shortMonths[index]} ●` : shortMonths[index];
+      ? `${monthNames[index]} ${state.year}: ${partial ? "At least " + item.partial_import_detected_cell_days.toLocaleString() + " imported cell-days; partial export." : "Source export not loaded; activity unknown."}`
+      : `${monthNames[index]} ${state.year}: ${item.detected_cell_days.toLocaleString()} detected cell-days${isPeak ? " · highest among complete loaded months" : ""}. Open the daily calendar.`;
+    button.setAttribute("aria-label", tooltipText); button.title = tooltipText;
+    const label = document.createElement("span"); label.className = "month-label"; label.textContent = shortMonths[index];
     const track = document.createElement("span"); track.className = "month-track";
     const fill = document.createElement("span"); fill.className = "month-fill" + (item.detected_cell_days === null ? " missing" : "");
-    fill.style.width = item.detected_cell_days === null ? "100%" : `${Math.max(4, item.detected_cell_days / max * 100)}%`;
-    fill.style.setProperty("--activity", item.detected_cell_days === null ? "15%" : `${Math.max(2, item.detected_cell_days / max * 100)}%`);
+    fill.style.width = item.detected_cell_days === null ? "100%" : `${item.detected_cell_days / max * 100}%`;
+    fill.style.setProperty("--activity", item.detected_cell_days === null ? "100%" : `${item.detected_cell_days / max * 100}%`);
     track.append(fill);
-    const count = document.createElement("span"); count.className = "month-count"; count.textContent = showValue(item.detected_cell_days);
+    const count = document.createElement("span"); count.className = "month-count";
+    count.textContent = item.detected_cell_days === null ? partial ? `≥${item.partial_import_detected_cell_days.toLocaleString()}` : "—" : item.detected_cell_days.toLocaleString();
     button.append(label, track, count);
-    button.addEventListener("click", () => { stopMapPlayback(); mapDay = null; state.month = index; state.day = null; render(); clearDay(); });
-    container.append(button);
+    button.addEventListener("click", () => selectCalendarMonth(index)); container.append(button);
   });
 }
 
+function calendarHeat(value, maximum) {
+  const t = Math.log1p(value) / Math.log1p(Math.max(1, maximum));
+  const low = [35, 58, 65], high = [255, 177, 99];
+  return {color: `rgb(${low.map((channel, i) => Math.round(channel + (high[i] - channel) * t)).join(",")})`, dark: t > .58};
+}
+
 function renderDays() {
-  $("#days-title").textContent = `${monthNames[state.month]} ${state.year}`;
-  const grid = $("#day-grid"); grid.replaceChildren();
-  const first = new Date(Date.UTC(state.year, state.month, 1));
-  const offset = (first.getUTCDay() + 6) % 7;
-  for (let i = 0; i < offset; i++) {
-    const blank = document.createElement("span"); blank.className = "day blank"; grid.append(blank);
-  }
+  const data = state.data, month = data.monthly[state.month];
   const days = new Date(Date.UTC(state.year, state.month + 1, 0)).getUTCDate();
-  const dayMax = Math.max(1, ...state.data.daily.filter(d => Number(d.date_utc.slice(5,7)) === state.month + 1).map(d => d.detected_cell_days || 0));
+  const rows = data.daily.filter(row => Number(row.date_utc.slice(5, 7)) === state.month + 1);
+  const byDate = new Map(rows.map(row => [row.date_utc, row]));
+  const positive = rows.filter(row => row.detected_cell_days > 0);
+  const maximum = Math.max(0, ...positive.map(row => row.detected_cell_days));
+  const scaleMaximum = Math.max(0, ...data.daily.map(row => row.detected_cell_days || 0));
+  $("#days-title").textContent = `${monthNames[state.month]} ${state.year}`;
+  $("#calendar-prev").disabled = state.month === 0; $("#calendar-next").disabled = state.month === 11;
+  $("#calendar-context").textContent = `${state.demo || data.demo_data ? "SYNTHETIC EXAMPLE" : "IMPORTED OBSERVATIONS"} · ${data.sources.join(" + ").replaceAll("_", " ")} · AOI ${data.bbox.map((value, i) => ["W", "S", "E", "N"][i] + " " + value + "°").join(", ")} · UTC`;
+  $("#calendar-grid-version").textContent = `Method: ${data.grid} · ${state.series === "joint" ? "Joint cell-day aggregation of the selected MODIS and VIIRS products." : "Single source series; cross-sensor harmonization is not applied in this view."}`;
+  const peakDates = positive.filter(row => row.detected_cell_days === maximum).map(row => Number(row.date_utc.slice(8)));
+  $("#calendar-month-summary").textContent = month.export_window_complete
+    ? `${days}/${days} export days complete · ${positive.length} days with detections${maximum ? ` · Peak ${maximum.toLocaleString()} cells on ${(peakDates.length > 3 ? peakDates.length + " dates" : peakDates.map(day => day + " " + shortMonths[state.month]).join(", "))}` : ""}`
+    : `${month.partial_import_detected_cell_days > 0 ? "Partial records available" : "No complete export loaded"} · Full-month activity unknown`;
+  const grid = $("#day-grid"); grid.replaceChildren();
+  const offset = (new Date(Date.UTC(state.year, state.month, 1)).getUTCDay() + 6) % 7;
+  for (let i = 0; i < offset; i++) {const blank = document.createElement("span"); blank.className = "day blank"; blank.setAttribute("aria-hidden", "true"); grid.append(blank);}
   for (let dayNumber = 1; dayNumber <= days; dayNumber++) {
     const stamp = `${state.year}-${String(state.month + 1).padStart(2,"0")}-${String(dayNumber).padStart(2,"0")}`;
-    const item = state.data.daily.find(entry => entry.date_utc === stamp);
+    const item = byDate.get(stamp) || {detected_cell_days: null, partial_import_detected_cell_days: 0, raw_pixels_by_sensor: {}};
+    const value = item.detected_cell_days, partial = value === null && item.partial_import_detected_cell_days > 0;
+    const countValue = value ?? (partial ? item.partial_import_detected_cell_days : null);
+    const peak = value !== null && value === maximum && maximum > 0;
     const button = document.createElement("button"); button.type = "button";
-    const isDayPeak = item.detected_cell_days !== null && item.detected_cell_days === dayMax && dayMax > 0;
-    button.className = `day ${item.detected_cell_days === null ? "unloaded" : item.detected_cell_days > 0 ? "detected" : "clear-export"}` + (stamp === state.day ? " chosen" : "") + (isDayPeak ? " day-peak" : "");
-    const dayTooltip = item.detected_cell_days === null
-      ? `${stamp} UTC · Source export not loaded. Missing data does not mean no burning.`
-      : item.detected_cell_days > 0
-        ? `${stamp} UTC · ${item.detected_cell_days} detected cell-days${isDayPeak ? " · HIGHEST this month" : ""}. Click to inspect source observations.`
-        : `${stamp} UTC · No thermal detections in this export. Cloud cover and satellite pass gaps remain unknown.`;
-    button.setAttribute("aria-label", dayTooltip);
-    button.title = dayTooltip;
-    const number = document.createElement("span"); number.textContent = dayNumber;
-    const count = document.createElement("small"); count.textContent = item.detected_cell_days === null ? "·" : item.detected_cell_days > 0 ? `${item.detected_cell_days} cell` : "0";
-    button.append(number, count);
-    button.addEventListener("click", async () => { state.day = stamp; mapDay = dayNumber; renderDays(); renderTimeline(); syncView(); updateContextLayer(); updateMap(); await loadDay(stamp); document.querySelector("#evidence-section").scrollIntoView({behavior:"smooth",block:"start"}); });
+    button.dataset.date = stamp;
+    button.className = `day ${partial ? "partial-export" : value === null ? "unloaded" : value > 0 ? "detected" : "clear-export"}${stamp === state.day ? " chosen" : ""}${peak ? " day-peak" : ""}`;
+    button.tabIndex = stamp === (state.day || `${state.year}-${String(state.month + 1).padStart(2,"0")}-01`) ? 0 : -1;
+    button.setAttribute("aria-pressed", String(stamp === state.day));
+    const raw = Object.entries(item.raw_pixels_by_sensor || {}).map(([sensor, count]) => `${sensor}: ${count.toLocaleString()} raw pixels`).join("; ");
+    const status = partial ? `At least ${countValue.toLocaleString()} detected cells, partial export` : value === null ? "Activity unknown, source export incomplete" : `${value.toLocaleString()} detected ${value === 1 ? "cell" : "cells"}, complete export`;
+    button.setAttribute("aria-label", `${stamp} UTC · ${status}${raw ? " · " + raw : ""}${peak ? " · Highest count this month" : ""}. Inspect source records.`);
+    button.title = button.getAttribute("aria-label");
+    if (value > 0) {const heat = calendarHeat(value, scaleMaximum); button.style.setProperty("--day-heat", heat.color); button.classList.toggle("dark-ink", heat.dark);}
+    const number = document.createElement("span"); number.className = "day-number"; number.textContent = dayNumber;
+    const count = document.createElement("strong"); count.className = "day-count"; count.textContent = countValue === null ? "—" : `${partial ? "≥" : ""}${countValue.toLocaleString()}`;
+    button.style.setProperty("--count-size", `${Math.max(10, 18 - Math.max(0, count.textContent.length - 3) * 1.5)}px`);
+    const unit = document.createElement("small"); unit.className = "day-unit"; unit.textContent = value === null ? partial ? "partial" : "unknown" : value === 1 ? "cell" : "cells";
+    button.append(number, count, unit);
+    button.addEventListener("keydown", event => {
+      const steps = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7};
+      let target = steps[event.key] === undefined ? null : dayNumber + steps[event.key];
+      if (event.key === "Home") target = Math.max(1, dayNumber - (offset + dayNumber - 1) % 7);
+      if (event.key === "End") target = Math.min(days, dayNumber + 6 - (offset + dayNumber - 1) % 7);
+      if (target === null) return;
+      event.preventDefault();
+      const next = grid.querySelector(`[data-date$="-${String(Math.max(1, Math.min(days, target))).padStart(2,"0")}"]`);
+      if (next) {grid.querySelectorAll("button").forEach(node => node.tabIndex = -1); next.tabIndex = 0; next.focus();}
+    });
+    button.addEventListener("click", async () => { state.day = stamp; mapDay = dayNumber; renderDays(); renderTimeline(); syncView(); updateContextLayer(); updateMap(); await loadDay(stamp); if (state.day === stamp) document.querySelector("#evidence-section").scrollIntoView({behavior:"smooth",block:"start"}); });
     grid.append(button);
+  }
+  const scale = $("#calendar-scale"); scale.replaceChildren();
+  if (maximum) {
+    const label = document.createElement("span"); label.textContent = "Cells per day · year-wide logarithmic scale"; scale.append(label);
+    const values = [...new Set([1, ...Array.from({length: 4}, (_, i) => Math.round(Math.expm1(Math.log1p(scaleMaximum) * (i + 1) / 4)))])].filter(value => value > 0);
+    for (const value of values) {const tick = document.createElement("span"), swatch = document.createElement("i"); swatch.style.background = calendarHeat(value, scaleMaximum).color; tick.append(swatch, document.createTextNode(value.toLocaleString())); scale.append(tick);}
+  }
+  const selected = state.day && byDate.get(state.day), summary = $("#calendar-day-summary");
+  summary.hidden = !selected;
+  if (selected) {
+    const count = selected.detected_cell_days;
+    const sensors = Object.entries(selected.raw_pixels_by_sensor || {}).map(([sensor, n]) => `${sensor}: ${n.toLocaleString()} pixels`).join(" · ");
+    summary.textContent = `${state.day} UTC · ${count === null ? selected.partial_import_detected_cell_days > 0 ? "≥" + selected.partial_import_detected_cell_days.toLocaleString() + " cells (partial export)" : "Unknown activity (incomplete export)" : count.toLocaleString() + ` distinct detected ${count === 1 ? "cell" : "cells"}`}${sensors ? " · " + sensors : ""}`;
   }
 }
 
@@ -523,6 +573,12 @@ function render() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   initMap();
+  const workspace = document.getElementById("study-workspace");
+  if (workspace?.tagName === "DETAILS") workspace.addEventListener("toggle", () => {
+    if (workspace.open) requestAnimationFrame(() => map.invalidateSize({pan: false}));
+  });
+  $("#calendar-prev").addEventListener("click", () => selectCalendarMonth(state.month - 1));
+  $("#calendar-next").addEventListener("click", () => selectCalendarMonth(state.month + 1));
   initStudyTools();
   $("#additional-source").addEventListener("change", async event => {
     if (!event.target.value) return;

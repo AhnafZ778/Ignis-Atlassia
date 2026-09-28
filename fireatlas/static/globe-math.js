@@ -5,6 +5,7 @@
     return [Math.cos(b) * Math.sin(a), Math.sin(b), Math.cos(b) * Math.cos(a)];
   };
   function project(point, view) {
+    if (typeof view.project === "function") return view.project(point);
     const r = view.rotation;
     const x = r[0]*point[0] + r[1]*point[1] + r[2]*point[2];
     const y = r[3]*point[0] + r[4]*point[1] + r[5]*point[2];
