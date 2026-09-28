@@ -48,6 +48,7 @@ ASSETS = {
     "/ui.js": ("ui.js", "text/javascript; charset=utf-8"),
     "/landing.css": ("landing.css", "text/css; charset=utf-8"),
     "/landing.js": ("landing.js", "text/javascript; charset=utf-8"),
+    "/firewatch-landing.js": ("firewatch-landing.js", "text/javascript; charset=utf-8"),
     "/vendor/lucide-icons.svg": ("vendor/lucide-icons.svg", "image/svg+xml"),
     "/vendor/ui-primitives.css": ("vendor/ui-primitives.css", "text/css; charset=utf-8"),
     "/vendor/LUCIDE_LICENSE.txt": ("vendor/LUCIDE_LICENSE.txt", "text/plain; charset=utf-8"),
