@@ -6,9 +6,10 @@
 
 | Field | Value |
 |---|---|
-| Last audit | 2026-09-29 (baseline audit) |
+| Last audit | 2026-09-29 (numeric baseline; implementation checked through R5) |
 | Audit score (100) | **31.8** · Tier 1 target 54.2 · Tier 1 + 2 target 88.0 |
 | Local rubric (118) | **≈65** · target ≈106 |
+| Post-R5 score delta | **0 points assigned** · the tour exposes existing records; it adds no calibration or independent validation |
 | Branch | UNDECIDED (Gate 0 pending) |
 | Tier 1 freeze date | 2026-11-08 (Branch A) |
 | Deadline risk | RED (user deadline 2026-10-01; repository checks remain open) |
@@ -48,7 +49,7 @@
 | C9 | Responder workflow, resident info, alert separation | 6 | 2 | 2.4 | 3 | 4 | Briefing card with fixed label (`briefing.py:42-45`) |
 | C10 | Validation, replay, leakage, baselines | 8 | 2 | 3.2 | 4 | 5 | Recount verifier + CAL FIRE association 7/25; MODIS masks 0/17 |
 | C11 | Interface clarity and demo reliability | 4 | 3 | 2.4 | 5 | 5 | Works locally; cluttered; ArcGIS globe failed to load |
-| C12 | Build, docs, reproducibility | 4 | 2 | 1.6 | 5 | 5 | 81 tests pass; no LICENSE; repo 2 commits behind; ~40 untracked files |
+| C12 | Build, docs, reproducibility | 4 | 2 | 1.6 | 5 | 5 | 78 tests pass; code changes are pushed and worktree is clean; license and public/CI verification remain open |
 | | **Total** | 100 | | **31.8** | 54.2 | 88.0 | Arithmetic: 7.2+7.2+1.6+0+1.4+0+2.0+2.8+2.4+3.2+2.4+1.6 = 31.8 |
 
 ## 4. Local rubric estimate (Auditor only)
@@ -75,14 +76,14 @@
 | G0-T1 | Written ruling | NOT STARTED | | |
 | G0-T2 | Choose branch | NOT STARTED | | |
 | G0-T3 | Re-read statement 28 Oct | NOT STARTED | | |
-| C12-T1 | Commit + push, repo public | IN PROGRESS | `d43c602` is on `origin/main`; repository visibility not verified | 2026-09-29 |
+| C12-T1 | Commit + push, repo public | IN PROGRESS | R4/R5 changes pushed to `origin/main`; repository visibility not verified | 2026-09-29 |
 | C12-T2 | Launcher, smoke test, CI | IN PROGRESS | `scripts/smoke_test.sh "$PWD"` passes; GitHub CI run pending | 2026-09-29 |
 | C12-T3 | Declare dependencies | DONE (evidence: locked optional NumPy extra; core installs without GDAL) | Local `uv sync --frozen`; 82-test suite; missing GDAL guidance check | 2026-09-29 |
 | R1 | Delete disaster casebook | DONE (evidence: JSON asset/route, 3D toggle and animated fire effects removed; landing/browser check confirms no casebook controls, satellite details and EONET layer work with 0 page errors; 82 tests pass; `/`, `/method.html`, `/data.html` return 200 and retired JSON returns 404) | local checks, 2026-09-29 | 2026-09-29 |
 | R2 | Archive + remove training lab | DONE (evidence: preserved on `origin/archive/training-lab`; page, API routes, assets, imports, service-worker, styles, navigation, and feature-only tests removed from `main`; retired page/API paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
 | R3 | Remove PWA | DONE (evidence: PWA routes/assets/metadata removed; legacy root-worker registrations and `fireatlas-app-shell-*` caches are cleared on the next secure visit; retired paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
 | R4 | Remove synthetic demo UI | DONE (evidence: removed data selector, synthetic tour, generated context/exposure controls and judge launcher; server returns 400 for `demo` query parameters, 404 for retired generator endpoints, and refuses synthetic databases; 78 tests pass; edited JavaScript syntax checks pass) | local checks, 2026-09-29 | 2026-09-29 |
-| R5 | Replace synthetic tour | NOT STARTED | | |
+| R5 | Replace synthetic tour | DONE (evidence: four-step walkthrough reads the active calendar, highlights area/sensor/calendar controls, selects a positive date from `/api/calendar`, and opens the existing method-page source inspector; no-data and row-mismatch states are explicit) | local checks, 2026-09-29 | 2026-09-29 |
 | R6 | Remove EONET from home | NOT STARTED | | |
 | R7 | Demote NRT globe | NOT STARTED | | |
 | R8 | Remove ArcGIS globe from home | NOT STARTED | | |
@@ -120,7 +121,7 @@
 | C11-T2 | Remove visual noise | NOT STARTED | | |
 | C11-T3 | Sensor timeline | NOT STARTED | | |
 | C11-T4 | Method page sections | NOT STARTED | | |
-| C11-T5 | 4-step tour | NOT STARTED | | |
+| C11-T5 | 4-step tour | DONE (uses current interface and live imported records; the proposed region chips, 25-year heatmap, and percentile badge are not implemented and are not claimed by the tour) | local checks, browser interaction, 2026-09-29 | 2026-09-29 |
 | C11-T6 | Empty/error states | NOT STARTED | | |
 | C11-T7 | Reliability + Lighthouse | NOT STARTED | | |
 | C11-T8 | 5-person usability test | NOT STARTED | | |
@@ -168,7 +169,7 @@
 
 | Measure | Value | Command | Date |
 |---|---|---|---|
-| Test suite | 78 tests OK after R4 removal | `uv run python -m unittest discover -s tests -v` | 2026-09-29 |
+| Test suite | 78 tests OK after R5 tour | `uv run python -m unittest discover -s tests` | 2026-09-29 |
 | Park 2024-07-25 MODIS | 603 pixels → 415 cells; S-NPP 0 rows | `/api/harmonization` | 2026-09-29 |
 | Smoke test calendar value (C12-T2) | 1,668 joint detected cell-days; authentic MODIS/S-NPP provenance; HTTP 200 | `bash scripts/smoke_test.sh "$PWD"` | 2026-09-29 |
 | Calibration results (C2-T5): region · r_all · LOYO median abs log error (MoY / single / none) · coverage · beats baselines | — | `python -m fireatlas.calibration --region …` | |
@@ -191,3 +192,4 @@
 | 2026-09-29 | Lead engineer | Completed R2: archived the fictional Training Lab and removed it from the active application | `origin/archive/training-lab`; 78 tests OK; retired page/API paths return 404; PWA browser check passes |
 | 2026-09-29 | Lead engineer | Completed R3: removed installable PWA metadata, routes and offline shell, including cleanup for existing browser registrations | 78 tests OK; browser page checks report no manifest, worker or JS exceptions; retired PWA paths return 404 |
 | 2026-09-29 | Lead engineer | Completed R4: removed the user-facing synthetic showcase, generated context/mask endpoints, and demo launcher; left generators as test fixtures only | 78 tests OK; demo queries return 400, removed routes return 404, CLI refuses synthetic databases; edited JavaScript syntax checks pass |
+| 2026-09-29 | Lead engineer | Completed R5/C11-T5: added a four-step authentic-data walkthrough tied to the current area controls, source comparison, calendar, and a real positive day when available | `/tour.js` reads `/api/calendar` and `/api/observations`, then hands off to the dated source inspector; 78 tests OK; local Chrome interaction verified |

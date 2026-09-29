@@ -19,8 +19,10 @@
   <link rel="stylesheet" href="/globe.css">
   <link rel="stylesheet" href="/vendor/ui-primitives.css">
   <link rel="stylesheet" href="/landing.css">
+  <link rel="stylesheet" href="/tour.css">
   <script src="/ui.js" defer></script>
   <script src="/landing.js" defer></script>
+  <script src="/tour.js" defer></script>
 </head>
 <body class="atlas-page landing-overhaul">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -40,6 +42,7 @@
         <p class="intro">Explore where and when NASA satellites detected heat in a selected area. Compare MODIS and VIIRS on a shared daily grid, then trace each result to its original record.</p>
         <div class="hero-actions">
           <a class="hero-primary ui-button ui-button-primary" href="/?lite=1&amp;series=joint&amp;year=2024&amp;month=7&amp;bbox=-122%2C39.5%2C-121.3%2C40.5#calendar-section">Explore the real calendar <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#arrow-right"></use></svg></a>
+          <button id="start-calendar-tour" class="hero-tour-link" type="button" aria-controls="calendar-tour" disabled>Preparing data tour…</button>
           <a class="hero-data-link" href="/method.html">See how it works ↗</a>
         </div>
         <p class="hero-scope">Historical study · Northern California · July 2022–2025</p>
@@ -213,6 +216,14 @@
   </div>
   </main>
   <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>
+  <aside id="calendar-tour" class="calendar-tour" role="region" aria-labelledby="calendar-tour-title" aria-describedby="calendar-tour-copy" hidden>
+    <div class="calendar-tour-top"><span id="calendar-tour-count">01 / 04</span><button id="calendar-tour-close" type="button" aria-label="Close data tour">×</button></div>
+    <div class="calendar-tour-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="eyebrow">AUTHENTIC RECORD WALKTHROUGH</p>
+    <h2 id="calendar-tour-title" tabindex="-1">Loading the study…</h2>
+    <p id="calendar-tour-copy" aria-live="polite"></p>
+    <div class="calendar-tour-actions"><button id="calendar-tour-skip" type="button">Skip tour</button><div><button id="calendar-tour-back" type="button">Back</button><button id="calendar-tour-next" type="button">Next <span aria-hidden="true">→</span></button></div></div>
+  </aside>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

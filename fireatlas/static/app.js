@@ -822,4 +822,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) { toast(error.message); }
   calendarInitialized = true;
   if (pendingValidityDetail) await applyValidityDay(pendingValidityDetail);
+  document.dispatchEvent(new CustomEvent("fireatlas:study-ready"));
 });
