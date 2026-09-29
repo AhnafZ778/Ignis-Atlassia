@@ -11,7 +11,7 @@
 | Local rubric (118) | **≈65** · target ≈106 |
 | Branch | UNDECIDED (Gate 0 pending) |
 | Tier 1 freeze date | 2026-11-08 (Branch A) |
-| Deadline risk | GREEN (no work scheduled yet slipped) |
+| Deadline risk | RED (user deadline 2026-10-01; repository checks remain open) |
 | Public repo URL | — |
 | Public demo URL | — |
 
@@ -22,7 +22,7 @@
 | G0-T1 Written ruling from Local Lead | NOT STARTED | |
 | G0-T2 Branch chosen (A/B) | NOT STARTED | |
 | G0-T3 Official statement copied (28 Oct) | NOT STARTED | |
-| Gate 1 (C12-T1…T3) repo integrity | NOT STARTED | |
+| Gate 1 (C12-T1…T3) repo integrity | IN PROGRESS | `d43c602` on `origin/main`; clean-clone smoke and local suite pass; GitHub CI and public access not verified |
 | Tier 1 complete (all C1, C2, C10-T1…T7 DONE) | NOT STARTED | |
 
 ## 2. Requirement trace (fill after G0-T3)
@@ -75,9 +75,9 @@
 | G0-T1 | Written ruling | NOT STARTED | | |
 | G0-T2 | Choose branch | NOT STARTED | | |
 | G0-T3 | Re-read statement 28 Oct | NOT STARTED | | |
-| C12-T1 | Commit + push, repo public | NOT STARTED | | |
-| C12-T2 | Launcher, smoke test, CI | NOT STARTED | | |
-| C12-T3 | Declare dependencies | NOT STARTED | | |
+| C12-T1 | Commit + push, repo public | IN PROGRESS | `d43c602` is on `origin/main`; repository visibility not verified | 2026-09-29 |
+| C12-T2 | Launcher, smoke test, CI | IN PROGRESS | `scripts/smoke_test.sh "$PWD"` passes; GitHub CI run pending | 2026-09-29 |
+| C12-T3 | Declare dependencies | DONE (evidence: locked optional NumPy extra; core installs without GDAL) | Local `uv sync --frozen`; 82-test suite; missing GDAL guidance check | 2026-09-29 |
 | R1 | Delete disaster casebook | NOT STARTED | | |
 | R2 | Archive + remove training lab | NOT STARTED | | |
 | R3 | Remove PWA | NOT STARTED | | |
@@ -168,9 +168,9 @@
 
 | Measure | Value | Command | Date |
 |---|---|---|---|
-| Test suite | 81 tests OK | `uv run python -m unittest discover -s tests` | 2026-09-29 |
+| Test suite | 82 tests OK | `uv run python -m unittest discover -s tests` | 2026-09-29 |
 | Park 2024-07-25 MODIS | 603 pixels → 415 cells; S-NPP 0 rows | `/api/harmonization` | 2026-09-29 |
-| Smoke test calendar value (C12-T2) | — | `scripts/smoke_test.sh` | |
+| Smoke test calendar value (C12-T2) | 1,668 joint detected cell-days; authentic MODIS/S-NPP provenance; HTTP 200 | `bash scripts/smoke_test.sh "$PWD"` | 2026-09-29 |
 | Calibration results (C2-T5): region · r_all · LOYO median abs log error (MoY / single / none) · coverage · beats baselines | — | `python -m fireatlas.calibration --region …` | |
 | Step test 2012 (C10-T2) | — | | |
 | MCD64A1 Spearman (harmonized / naive / MODIS-only) | — | | |
@@ -186,3 +186,4 @@
 | When (UTC) | Who | What changed | Evidence |
 |---|---|---|---|
 | 2026-09-29 | Lead engineer (audit) | Baseline scorecard created from audit | Audit report, 81 tests OK |
+| 2026-09-29 | Lead engineer | Added Linux launcher, fresh-clone smoke test, CI workflow, optional NumPy mask extra and actionable GDAL errors | Commit `d43c602`; smoke pass; 82 tests; GitHub CI pending |
