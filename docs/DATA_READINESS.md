@@ -21,7 +21,7 @@ This is readiness for the demonstration, not scientific or operational validatio
 | Research comparison | September 2026: 562 pixels, 250 union cell-days, 125 shared cell-days, three candidate groups and an exploratory ratio band | Synthetic inputs, real application calculations |
 | Exposure demonstration | 720 source/cell/day mask entries; 360 assumed observed cell-days per sensor | Explicitly fabricated mask; real coverage remains unknown |
 | Vegetation / cover / weather controls | 100 local GeoJSON cells per layer, restricted to the showcase AOI | Illustrative synthetic values; weather is an arbitrary index, not FWI |
-| Training Lab | Existing Alder Creek replay, crew/route/briefing interactions and offline recovery | Fictional exercise |
+| Training Lab | Preserved on `archive/training-lab`; not served from `main` after 29 September 2026 | Archived fictional exercise |
 | Event reports | Existing NASA EONET feed/cache, kept separate from synthetic data | Reported events; availability depends on feed/cache |
 
 The 866,956 accepted NASA detections and 49,420 NOAA observations total **916,376
@@ -32,13 +32,14 @@ ledger outside the atlas grid. No synthetic rows were added to this database.
 
 - **51 automated tests passed:** ingestion, exclusions, harvester behavior,
   calendars, research, portable evidence, web endpoints, training behavior and
-  six new presentation tests.
+  six new presentation tests (before the training feature was archived).
 - **Build passed:** Python wheel and source distribution.
 - **JavaScript syntax checks and `git diff --check` passed.**
 - **Desktop (1440 px) and mobile (390 px) browser checks passed:** presentation
   links, all three local context layers, sensor changes, switching back to
   authentic data, ZIP export and independent verification, research JSON export,
-  exposure-mask clearing after cutoff changes, and training replay advancement.
+  exposure-mask clearing after cutoff changes, and training replay advancement
+  (before the training feature was archived).
   No JavaScript page errors occurred. External browser requests were blocked
   during these checks; the large Earth embed was omitted from this focused test.
   The local application server remained connected. This does not claim that the
@@ -63,7 +64,7 @@ uv build
 - `/?demo=1&year=2026&month=9&series=joint#calendar-section`: full-year showcase.
 - `/research.html?demo=1&year=2026&month=9&exposure=synthetic`: populated research
   comparison with the fabricated mask explicitly selected.
-- `/training.html`: existing response exercise.
+- The former `/training.html` exercise is preserved on `archive/training-lab`.
 - `/api/presentation`: versioned generation method and original CSV hashes.
 
 ## Boundaries for the next phase

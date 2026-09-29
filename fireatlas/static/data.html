@@ -4,7 +4,7 @@
   <header class="topbar">
     <a class="brand" href="/" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
     <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><span></span><span></span><span class="menu-label">Menu</span></button>
-    <nav id="site-navigation" aria-label="Project navigation"><a href="/">Overview</a><a href="/#atlas-section">Atlas</a><a href="/training.html">Training lab</a><a href="/research.html">Research lab</a><a href="/data.html" class="active" aria-current="page">Data sources</a></nav>
+    <nav id="site-navigation" aria-label="Project navigation"><a href="/">Overview</a><a href="/#atlas-section">Atlas</a><a href="/research.html">Research lab</a><a href="/data.html" class="active" aria-current="page">Data sources</a></nav>
     <span class="header-tag"><i></i> A NASA SPACE APPS PROJECT <span>↗</span></span>
   </header>
 
@@ -18,7 +18,6 @@
     <div class="download-grid">
       <article><span>SYNTHETIC / SEASONAL ATLAS</span><h3>Four years. Twelve months.</h3><p>Explore 2023–2026, compare sensors, replay daily detections and inspect three-year baselines. Local vegetation, land cover and weather illustrations work without NASA imagery services.</p><a href="/?demo=1&amp;year=2026&amp;month=9&amp;series=joint&amp;bbox=-122,39,-120,41#calendar-section">Explore seasonal showcase ↗</a></article>
       <article><span>SYNTHETIC / RESEARCH LAB</span><h3>Follow the evidence.</h3><p>Inspect daily overlap, exploratory ratio bands, candidate groups and exposure calculations with an explicitly fabricated observation mask. Export the report and its provenance.</p><a href="/research.html?demo=1&amp;year=2026&amp;month=9&amp;exposure=synthetic">Open populated research study ↗</a></article>
-      <article><span>SIMULATED / TRAINING LAB</span><h3>Practice the response.</h3><p>Replay the existing fictional exercise with crew updates, routes, briefings and connectivity drills. The training page supports offline recovery after its initial load.</p><a href="/training.html">Enter training exercise ↗</a></article>
     </div>
     <details class="download-recipe"><summary>What is generated, and what remains unknown?</summary><p>NASA CSV attributes seed the synthetic detection examples. Vegetation, cover and weather layers are independent illustrations, not values inferred from hotspots. Weather values use arbitrary units and are not computed FWI. The synthetic VIIRS comparison uses the existing S-NPP schema; it does not claim NOAA-20 or NOAA-21 observations came from S-NPP.</p><p>Full-month coverage statements apply only to the generated scenario. Real missing days remain unknown. Calibrated sensor sensitivity, SAR change evidence and spread forecasts still require suitable measurements and validation; no synthetic output is presented as a verified result. Remote base maps and authentic satellite imagery still require connectivity.</p><a href="/api/presentation" target="_blank" rel="noopener">Inspect generation method and original file hashes ↗</a></details>
   </section>

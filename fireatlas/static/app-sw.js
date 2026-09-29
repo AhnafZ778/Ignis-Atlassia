@@ -1,4 +1,4 @@
-/* Online application with an explicit offline landing. Training owns its narrower scope. */
+/* Online application with an explicit offline landing. */
 const CACHE = "fireatlas-app-shell-v11";
 const SHELL = ["/method.html", "/method.css", "/method.js", "/", "/offline.html", "/styles.css", "/design.css", "/landing.css", "/validity.css", "/app.js", "/story.js", "/landing.js", "/validity.js", "/incident-media/park-fire-flames.jpg", "/incident-media/park-fire-02.jpg", "/incident-media/park-fire-04.jpg", "/incident-media/park-fire-05.jpg", "/incident-media/park-fire-06.jpg", "/incident-media/park-fire.jpg", "/app-icon-192.png", "/app-icon-512.png"];
 const DEMO_API = new Set(["/api/meta", "/api/calendar", "/api/harmonization", "/api/briefing", "/api/observations", "/api/map", "/api/context", "/api/presentation", "/api/research"]);

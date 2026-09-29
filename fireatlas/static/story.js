@@ -56,7 +56,7 @@
       $("story-progress-fill").style.width = `${(index+1)*20}%`;
       $("story-back").disabled = index === 0;
       $("story-next").disabled = false;
-      $("story-next").innerHTML = index === steps.length - 1 ? "Open Training Lab <span aria-hidden='true'>↗</span>" : "Next stop <span aria-hidden='true'>→</span>";
+      $("story-next").innerHTML = index === steps.length - 1 ? "Open data sources <span aria-hidden='true'>↗</span>" : "Next stop <span aria-hidden='true'>→</span>";
       const anchor = document.getElementById(step.target);
       anchor?.scrollIntoView({behavior:motion(),block:"start"});
       $("story-title").focus({preventScroll:true});
@@ -71,7 +71,7 @@
     $("story-close").addEventListener("click", close);
     $("story-back").addEventListener("click", () => show(current - 1));
     $("story-next").addEventListener("click", () => {
-      if (current === steps.length - 1) location.href = "/training.html";
+      if (current === steps.length - 1) location.href = "/data.html";
       else show(current + 1);
     });
     document.addEventListener("keydown", event => { if (event.key === "Escape" && current >= 0) close(); });

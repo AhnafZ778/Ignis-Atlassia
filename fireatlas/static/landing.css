@@ -60,7 +60,7 @@
 .reading-guide article{position:relative;padding:27px 24px;border-left:1px solid #263c4b}.reading-guide article>.ui-icon{color:#82afcc;width:23px;height:23px;margin-bottom:15px}.reading-guide article h3{font-size:13px;font-weight:500;color:#d4e5ef;margin:0 0 10px}.reading-guide article p{font-size:12px;line-height:1.7;color:#8faaba;margin:0;max-width:230px}.reading-guide article>.info-help{position:absolute;right:15px;top:17px}
 .landing-overhaul .info-help{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;min-width:25px;border:0;border-radius:50%;padding:4px;background:transparent;color:#8eb2c9;cursor:help;vertical-align:middle;margin:0 0 0 4px}.landing-overhaul .info-help:hover{background:#2e4a5d;color:#e4f3fc}.info-help .ui-icon{width:14px;height:14px}
 .landing-overhaul .globe-tooltip{z-index:1600;background:#192d3d;border-color:#537993;color:#e0edf5;font:12px/1.8 var(--sans);padding:14px 16px;box-shadow:0 15px 40px #0008;max-width:min(310px,calc(100vw - 24px))}
-/* Global map, with readable interactive layers and a calm canvas. */
+/* Global map,with readable interactive layers and a calm canvas. */
 .landing-overhaul .live-events{border:1px solid #304a5d;border-radius:16px;background:#101c26;box-shadow:0 15px 50px #0002;overflow:hidden;margin:0 0 84px}
 .landing-overhaul .live-events-heading{padding:30px 32px;align-items:center;background:linear-gradient(110deg,#132431,#101b24)}
 .landing-overhaul .live-events-heading .eyebrow{font-size:9px;color:#86b5d4;margin-bottom:15px}.landing-overhaul .live-events h2{font-size:clamp(28px,3vw,39px);letter-spacing:-.05em;line-height:1.2;margin-bottom:13px}.landing-overhaul .live-events h2 em{color:#93bad1}.landing-overhaul .live-events-heading p:last-child{font-size:12px;line-height:1.8;color:#a0b9ca;max-width:570px}
@@ -106,8 +106,8 @@
 .landing-overhaul .panel{background:#122330;border-color:#355166;border-radius:13px;padding:24px}.landing-overhaul .panel-head{margin-bottom:22px}.landing-overhaul .panel h3{font-size:22px;font-weight:400}.landing-overhaul .panel-note{font-size:9px;color:#88aabe}.landing-overhaul .panel .eyebrow{font-size:8px;color:#a6c3d6}.landing-overhaul .content-grid{gap:20px;grid-template-columns:1fr 1.2fr}.landing-overhaul .month-row{height:36px;gap:12px;border-radius:5px;color:#aac2d1}.landing-overhaul .month-row:hover,.landing-overhaul .month-row.chosen{background:#28475b;border-color:#4d6c83}.landing-overhaul .month-label,.landing-overhaul .month-count{font-size:10px}.landing-overhaul .month-track{background:#091721;height:7px}.landing-overhaul .month-fill{background:linear-gradient(90deg,#a76e48,#f1b37f)}.landing-overhaul .day{height:67px;border-color:#3a566b;background:#1b3040;border-radius:7px;font-size:12px}.landing-overhaul .day:hover{border-color:#b9d9e9}.landing-overhaul .day-grid{gap:7px}.landing-overhaul .legend{gap:12px;flex-wrap:wrap;font-size:10px}.landing-overhaul .footnote{font-size:11px;color:#8ca8ba;border-color:#304b5e;line-height:1.7}
 .landing-overhaul .study-tools{margin-top:24px}.landing-overhaul .study-heading h3{font-size:23px}.landing-overhaul .study-heading p{font-size:12px;color:#98b0c0}.landing-overhaul .study-actions button,.landing-overhaul .saved-view-controls button{min-height:40px;border-radius:7px;font-size:11px;background:#1d394d;border-color:#4b6c82;color:#d4e8f5}.landing-overhaul .saved-view-controls{gap:12px}.landing-overhaul .saved-view-controls label{font-size:9px;color:#89aabd}.landing-overhaul .saved-view-controls input,.landing-overhaul .saved-view-controls select{min-height:42px;background:#0b1a26;border-color:#36566c;font-size:12px}.landing-overhaul .study-provenance summary{font-size:12px;color:#b0cee2}.landing-overhaul .study-note,.landing-overhaul .study-provenance p{font-size:11px;line-height:1.8;color:#8eaabb}
 .landing-overhaul .evidence-section{margin-bottom:65px}.landing-overhaul .evidence-grid{grid-template-columns:1.35fr 1fr;gap:20px}.landing-overhaul .evidence-back{font-size:11px;margin-left:auto}.landing-overhaul .evidence-date{font-size:9px;border-color:#405d72;color:#bed2df;background:#132735}.landing-overhaul .method-panel p{font-size:12px;line-height:1.9;color:#9cb6c8}.landing-overhaul .records details{border-color:#365368;background:#132938;border-radius:8px;padding:12px}.landing-overhaul .records summary{font-size:12px;line-height:1.8;color:#d5e5f1}
-.landing-overhaul .labs-heading{margin:0 0 28px}.landing-overhaul .labs-heading h2{font-size:37px;font-weight:400;letter-spacing:-.05em}.landing-overhaul .labs-heading>p:last-child{font-size:13px;color:#98b0c1}.landing-overhaul .lab-grid{gap:20px}.landing-overhaul .training-entry{background:#132531;border:1px solid #35566b;border-radius:14px;overflow:hidden}.landing-overhaul .training-entry h2{font-size:27px;font-weight:400}.landing-overhaul .training-entry p{font-size:12px;line-height:1.8;color:#a0b9c9}.landing-overhaul .training-entry>a{font-size:12px;padding:13px 17px;border-color:#466c83;border-radius:8px;background:#1c3a50;color:#e0f1fb}.landing-overhaul .lab-art{opacity:.8}.landing-overhaul footer{padding:35px 0;margin-top:60px;border-top:1px solid #2d475b;gap:25px}.landing-overhaul footer>span{color:#cfdfeb;font-size:13px;letter-spacing:.15em}.landing-overhaul footer>span small{display:block;font-size:9px;letter-spacing:0;font-weight:400;margin-top:8px;color:#718ea2}.landing-overhaul footer p{font-size:10px;color:#7897ab;line-height:1.8;max-width:370px}
-/* The guide remains an easy-to-dismiss assistant, rather than blocking the page. */
+.landing-overhaul .labs-heading{margin:0 0 28px}.landing-overhaul .labs-heading h2{font-size:37px;font-weight:400;letter-spacing:-.05em}.landing-overhaul .labs-heading>p:last-child{font-size:13px;color:#98b0c1}.landing-overhaul .lab-grid{gap:20px}.landing-overhaul .lab-art{opacity:.8}.landing-overhaul footer{padding:35px 0;margin-top:60px;border-top:1px solid #2d475b;gap:25px}.landing-overhaul footer>span{color:#cfdfeb;font-size:13px;letter-spacing:.15em}.landing-overhaul footer>span small{display:block;font-size:9px;letter-spacing:0;font-weight:400;margin-top:8px;color:#718ea2}.landing-overhaul footer p{font-size:10px;color:#7897ab;line-height:1.8;max-width:370px}
+/* The guide remains an easy-to-dismiss assistant,rather than blocking the page. */
 .landing-overhaul .story-dock{border-color:#b88a67;background:#162532;border-radius:14px;box-shadow:0 20px 70px #0008}.landing-overhaul .story-dock p{font-size:13px;line-height:1.7}.landing-overhaul #story-close{width:34px;height:34px}.landing-overhaul .story-actions button{min-height:43px}
 @media(min-width:1500px){.landing-overhaul .globe-console{width:300px}.landing-overhaul .globe-hero .hero-copy{max-width:285px}.landing-overhaul .globe-flight-dock{width:650px}}
 @media(min-width:951px) and (max-width:1200px){.landing-overhaul .header-tag{display:none}.landing-overhaul .topbar nav{margin-left:auto;margin-right:0}.landing-overhaul .globe-console{width:248px;right:16px;padding:13px}.landing-overhaul .globe-hero .hero-copy{left:24px;width:220px;max-width:22vw}.landing-overhaul .globe-hero h1{font-size:37px}.landing-overhaul .hero-primary{white-space:normal}.landing-overhaul .globe-dock-main{grid-template-columns:1fr}.landing-overhaul .globe-regions{justify-content:center}.landing-overhaul .globe-tools{justify-content:center}.landing-overhaul .globe-flight-dock{width:46vw}.reading-guide{grid-template-columns:1fr 1fr}.reading-guide article{border-bottom:1px solid #293f4f}.reading-guide article:nth-child(3){border-left:0}.landing-overhaul .live-events-grid{grid-template-columns:minmax(0,1fr) 260px}}
@@ -217,9 +217,9 @@
 .landing-overhaul .globe-hero .hero-coordinate > .hero-snapshot-label {font-size: 10px; letter-spacing: .1em;}
 .landing-overhaul .globe-hero .hero-coordinate > #globe-stamp {font-size: 10px;}
 .landing-overhaul .globe-flight-dock {bottom: 22px;}
-.landing-overhaul :is(#top, #live-events, #study-workspace, #reading-guide, #atlas-section, #calendar-section, #evidence-section) {scroll-margin-top: 170px;}
+.landing-overhaul :is(#top,#live-events,#study-workspace,#reading-guide,#atlas-section,#calendar-section,#evidence-section) {scroll-margin-top: 170px;}
 
-/* The source, measurement, time window and controls each have their own rhythm. */
+/* The source,measurement,time window and controls each have their own rhythm. */
 .landing-overhaul .globe-console {
   width: 308px;
   right: clamp(20px, 2.2vw, 40px);
@@ -348,7 +348,7 @@
   .globe-about summary .ui-icon {transition: none;}
 }
 
-/* One stable explorer header, one scrolling content area. */
+/* One stable explorer header,one scrolling content area. */
 .landing-overhaul .globe-console {
   display: flex; flex-direction: column; overflow: hidden;
   padding: 16px 0 0; width: 308px;
@@ -393,7 +393,7 @@
   .workspace-introduction {align-items: flex-start; flex-direction: column; gap: 10px;}
 }
 
-/* Quantified calendar: exact counts, independent missingness, readable dates. */
+/* Quantified calendar: exact counts,independent missingness,readable dates. */
 .calendar-context {padding: 16px 0; border-bottom: 1px solid #8aa6b42b; font-size: 11px; line-height: 1.8; letter-spacing: .025em; color: #b3c7d3; overflow-wrap: anywhere;}
 .landing-overhaul .calendar-analysis {grid-template-columns: minmax(240px, .72fr) minmax(0, 1.28fr); gap: 34px; margin-top: 18px;}
 .landing-overhaul .calendar-analysis .panel {padding: 22px 0; min-width: 0;}
@@ -452,7 +452,7 @@
   .landing-overhaul .calendar-analysis .month-count {font-size: 9px;}
 }
 
-/* Lean landing: two layers, optional details, and essential camera controls. */
+/* Lean landing: two layers,optional details,and essential camera controls. */
 .landing-overhaul .globe-hero::after {display:none;background:none;}
 .landing-overhaul .floating-header > .brand {background:none;box-shadow:none;filter:none;}
 .landing-overhaul .floating-header .brand-word {text-shadow:none;}
@@ -484,10 +484,7 @@
 .earth-details-dialog .globe-dock-sub {display:flex;flex-direction:column;gap:14px;margin:22px 0;padding-top:16px;border-top:1px solid #8299a930;}
 .earth-details-dialog .globe-regions {flex-wrap:wrap;margin-top:12px;gap:6px;}
 .earth-details-dialog .earth-region-options {margin:16px 0;}
-.landing-overhaul .earth-details-dialog .globe-console.has-selection > .console-source,
-.earth-details-dialog .globe-console.has-selection .hero-coordinate,
-.earth-details-dialog .globe-console.has-selection .globe-dock-sub,
-.earth-details-dialog .globe-console.has-selection .earth-region-options {display:none;}
+.landing-overhaul .earth-details-dialog .globe-console.has-selection > .console-source,.earth-details-dialog .globe-console.has-selection .hero-coordinate,.earth-details-dialog .globe-console.has-selection .globe-dock-sub,.earth-details-dialog .globe-console.has-selection .earth-region-options {display:none;}
 .landing-overhaul .earth-details-dialog .globe-console.has-selection .globe-console-head h2 {font-size:13px;font-weight:400;color:#93adbd;}
 .landing-overhaul .earth-details-dialog .globe-console.has-selection .globe-console-head > a {display:none;}
 .landing-overhaul .live-events {border:0;border-radius:0;background:none;box-shadow:none;overflow:visible;margin-bottom:36px;}

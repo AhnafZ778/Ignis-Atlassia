@@ -171,19 +171,11 @@ class WebMvpTests(unittest.TestCase):
             self.get("/api/study?year=2015&month=7&day=2014-07-01")
         self.assertEqual(caught.exception.code, 400)
 
-    def test_training_routes_and_causal_snapshots(self):
-        _, page = self.get("/training.html")
-        self.assertIn(b"SIMULATED EXERCISE", page)
-        _, body = self.get("/api/training/scenario")
-        self.assertTrue(json.loads(body)["synthetic"])
-        _, body = self.get("/api/training/snapshot?elapsed=1199")
-        data = json.loads(body)
-        self.assertEqual(data["zone"]["id"], "zone-1")
-        self.assertEqual(len(data["observations"]), 1)
-        for invalid in ["-1", "3601", "nan", "1.5"]:
-            with self.assertRaises(HTTPError) as caught:
-                self.get("/api/training/snapshot?elapsed=" + invalid)
-            self.assertEqual(caught.exception.code, 400)
+    def test_archived_training_page_and_api_are_not_served(self):
+        for path in ("/training.html", "/api/training/scenario", "/api/training/snapshot"):
+            with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
+                self.get(path)
+            self.assertEqual(caught.exception.code, 404)
 
     def test_research_report_mask_import_and_input_validation(self):
         _, page = self.get("/research.html")

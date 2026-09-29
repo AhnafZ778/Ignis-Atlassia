@@ -1,4 +1,4 @@
-# FireAtlas — atlas, training and research labs
+# FireAtlas — satellite observations and a burning activity calendar
 
 [![CI](https://github.com/AhnafZ778/NASA-Spaceapps/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhnafZ778/NASA-Spaceapps/actions/workflows/ci.yml)
 
@@ -10,7 +10,7 @@ The **[Data & Method page](http://127.0.0.1:8000/method.html)** traces the exist
 
 The landing page now leads with a five-scene **Park Fire 2024 historical evidence story** using authentic imported MODIS and VIIRS records. Scrubbing a UTC day updates the detection map, source counts, daily grid diagram, and calendar selection. A Grove Fire 2025 case uses the same controls. The Park timeline explicitly marks NASA's July 2024 S-NPP processing gap and leaves pass/cloud coverage unknown. The proof scene also shows the fixed 25-incident CAL FIRE context check (7 nearby points, 18 without a nearby point) without turning it into a sensitivity claim. See the [fixed case protocol, results, and open validation gates](docs/VALIDITY_CASES.md) and [video storyboard](docs/VIDEO_STORYBOARD.md).
 
-FireAtlas now includes an installable mobile web app. Open `/install.html` for installation instructions; see [mobile setup and verification](docs/MOBILE_APP.md). The prepared Training Lab works offline. There is no native APK/iOS build, and the globe and analysis tools still require the server. A physical-phone rehearsal and reachable HTTPS host remain necessary.
+FireAtlas includes an installable mobile web app. Open `/install.html` for installation instructions; see [mobile setup and verification](docs/MOBILE_APP.md). The calendar and analysis tools require the server. A physical-phone rehearsal and reachable HTTPS host remain necessary.
 
 Native-mask downloads, processing, and separate analytical recount: [Native mask validation](docs/NATIVE_MASK_VALIDATION.md).
 
@@ -26,7 +26,7 @@ The launcher installs the locked core dependencies and starts the local demo. To
 
 Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
 
-**Guided tour:** Use **Start the guided tour** on the landing page. Five interactive stops move through the AOI map, monthly activity, sensor switch, original evidence, and the Training Lab. The example shows four MODIS raw pixels, twelve VIIRS raw pixels, and four joint cell-days in July 2015; the measures and synthetic source are labelled. This tour uses the normal controls and queries. Shared atlas links, CSV exports and study bundles retain the selected demo/authentic context. The Research Lab also opens the same mode from the atlas.
+**Guided tour:** Use **Start the guided tour** on the landing page. Five interactive stops move through the AOI map, monthly activity, sensor switch, original evidence, and data sources. The example shows four MODIS raw pixels, twelve VIIRS raw pixels, and four joint cell-days in July 2015; the measures and synthetic source are labelled. This tour uses the normal controls and queries. Shared atlas links, CSV exports and study bundles retain the selected demo/authentic context. The Research Lab also opens the same mode from the atlas.
 
 The homepage uses the satellite Earth and World Elevation terrain from the supplied `fireatlas_terrain_fixed.html` demo, integrated through `/terrain-earth.html`. Its native ArcGIS projection keeps the clickable NASA FIRMS detections, historical flame textures, region navigation, zoom, rotation and date/sensor filters aligned with the globe. Elevation is sampled from the displayed terrain at close zooms. An accessible case/evidence list supplies the same records when 3D is unavailable. “Explore terrain Earth” opens the terrain globe with California and reset controls; the original self-contained visual model remains available at `/earth.html`. The terrain view loads ArcGIS Maps SDK 4.32, Esri imagery and World Elevation over the network and retains their attribution. Surface imagery is separate from the dated NASA detection overlay.
 
@@ -34,7 +34,7 @@ The landing globe uses **authentic NASA NRT imports only**, independently of the
 
 The globe window includes the latest imported NASA observation date and seven preceding UTC dates. It follows the imported database rather than calling NASA APIs. Date/source filters and cluster details are cached briefly, with database changes invalidating the cache. Empty sources and failed requests are shown explicitly; neither NOAA HMS nor synthetic data substitutes for missing NASA globe data. A fresh checkout must import the recent NASA CSVs or receive the local database to reproduce this global overlay. [Globe implementation and verification](docs/GLOBE_OBSERVATIONS.md) records the supported behavior and interpretation.
 
-The atlas, Training Lab, and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
+The atlas and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
 
 The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. In authentic mode, the Fire weather layer says no GFWED data are loaded. In demo mode, local synthetic context illustrations are available for the 2023–2026 Northern California scenario; the weather illustration uses arbitrary units, not computed FWI. To run the synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations remain in separate databases.
 
@@ -203,33 +203,7 @@ Declare `--complete-month` only when the file contains the entire requested AOI/
 
 The web interface vendors [Leaflet 1.9.4](https://leafletjs.com/download.html) under its BSD 2-Clause license in `fireatlas/static/vendor/`.
 
-## Phase 3: Training Lab
-
-Open **http://127.0.0.1:8000/training.html**, or select **Training** from the homepage. The fictional Alder Creek incident runs from 12:00 to 13:00 UTC with synthetic zones, routes, observations and three crews. It has no external map-tile dependency.
-
-1. Play the replay, step five minutes, or scrub the timeline. New evidence appears only at its publication time.
-2. At 12:20, inspect the zone revision, Crew Alpha's zone intersection, and the conflicting route. At 12:25, the first route expires; a revised route arrives at 12:30.
-3. Switch to **Crew device**, choose a crew and acknowledge the route briefing or an alert. Acknowledging an alert does not clear its underlying condition.
-4. Enable **Stale GPS** to hold an old location for the selected crew. Enable **Airplane mode** and advance time: cached evidence remains visible, crew status becomes unknown and routes still expire. Disable the drill to fetch the current snapshot. Actual browser offline events use the same path.
-5. Export the JSON exercise record with the current received snapshot, local assessment, drills and acknowledgments. Rewinding removes later acknowledgments; restarting clears them all.
-
-The snapshot includes a scenario version and deterministic SHA-256 identifier. It is not signed. Acknowledgments remain in the browser tab and are not sent to another user or device. The local alert prototype includes visual, screen-reader and optional sound cues while the page is open. It is not a background notification service. The loaded page can continue local checks after disconnection, and Phase 7 adds offline reload for a prepared tab. Physical-device airplane-mode and GPS tests remain pending.
-
-### Phase 7: offline training recovery
-
-1. Open `/training.html` while connected. Wait for **Offline page ready** and **Progress saved in this tab**.
-2. Advance the replay, choose a crew and acknowledge a briefing or alert. Your replay position, selected view, GPS/offline drills and local acknowledgments are saved automatically in this tab.
-3. Disconnect and reload the same tab. It restores the last received snapshot, pauses the replay, and marks crew status unknown until a fresh server response arrives. The exercise clock stays at its saved time; wall-clock time away does not advance this simulation.
-4. Continue forward offline and export the exercise record. Rewinding earlier than the received snapshot requires reconnection. A new offline tab without a saved briefing cannot invent one.
-5. Reconnect to receive evidence appropriate to the current replay time. A scenario-version change starts a new briefing. Restart clears the record only after the new briefing is successfully received.
-
-The offline pack caches only the Training Lab page, scripts, styles, fonts and local map library. API responses, the atlas, credentials and future snapshots are excluded. Recovery uses per-tab `sessionStorage`: export your record before closing the tab. Browser storage can be cleared or unavailable; the page reports that condition. This does not add cross-device acknowledgment delivery or real incident operations.
-
-The service worker requires localhost or HTTPS. Its scope is `/training.html`. When changing any asset in its pack, increment `CACHE` in `fireatlas/static/training-sw.js`; a new pack activates once existing Training Lab tabs close. The implementation follows browser [service-worker lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers) and [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) behavior.
-
-Exercise rules use a 120-second GPS limit, 90-second heartbeat limit, 100-meter accuracy limit and 300-second snapshot validity. These are fictional exercise parameters, not operational thresholds. All aging follows the displayed replay clock; pausing or hiding the page pauses the exercise.
-
-Run `uv run python -m unittest discover -s tests -v` to check the data pipeline, web endpoints and training behavior. The training tests also use **Node.js** to exercise the same local rule code used by the browser.
+The fictional Training Lab and its crew-response simulation have been moved off `main` to the `archive/training-lab` branch because they are outside the MODIS–VIIRS calendar challenge.
 
 ## Phase 4: Research Lab
 

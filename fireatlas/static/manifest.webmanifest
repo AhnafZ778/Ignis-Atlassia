@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "FireAtlas — Earth, Evidence & Training",
+  "name": "FireAtlas — Earth & Evidence",
   "short_name": "FireAtlas",
-  "description": "Explore satellite fire observations, compare seasonal patterns and rehearse a fictional crew exercise.",
+  "description": "Explore satellite fire observations and compare seasonal patterns.",
   "start_url": "/?launch=app",
   "scope": "/",
   "display": "standalone",
@@ -13,7 +13,6 @@
     {"src": "/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
   ],
   "shortcuts": [
-    {"name": "Training Lab", "url": "/training.html", "description": "Open the fictional crew exercise"},
     {"name": "Seasonal showcase", "url": "/?demo=1&year=2026&month=9&series=joint#calendar-section"},
     {"name": "Research Lab", "url": "/research.html?demo=1&year=2026&month=9&exposure=synthetic"}
   ]

@@ -25,7 +25,6 @@ from urllib.parse import parse_qs, urlsplit
 from .core import SERIES, _complete_month, calendar, connect, ingest, validate_bbox
 from .fetch import FIRMS_SOURCES
 from .demo import make_demo
-from .training import public_scenario, snapshot
 from .research import report as research_report, coverage_example
 from .study import build_bundle
 from .pilots import PilotSync, PILOTS
@@ -86,13 +85,6 @@ ASSETS = {
     "/earth-poster-1440.webp": ("earth-poster-1440.webp", "image/webp"),
     "/earth-poster-820.webp": ("earth-poster-820.webp", "image/webp"),
     "/earth-poster-390.webp": ("earth-poster-390.webp", "image/webp"),
-    "/training.html": ("training.html", "text/html; charset=utf-8"),
-    "/training.css": ("training.css", "text/css; charset=utf-8"),
-    "/training.js": ("training.js", "text/javascript; charset=utf-8"),
-    "/training-state.js": ("training-state.js", "text/javascript; charset=utf-8"),
-    "/training-store.js": ("training-store.js", "text/javascript; charset=utf-8"),
-    "/training-offline.js": ("training-offline.js", "text/javascript; charset=utf-8"),
-    "/training-sw.js": ("training-sw.js", "text/javascript; charset=utf-8"),
     "/research.html": ("research.html", "text/html; charset=utf-8"),
     "/research.css": ("research.css", "text/css; charset=utf-8"),
     "/research.js": ("research.js", "text/javascript; charset=utf-8"),
@@ -297,9 +289,6 @@ def handler_factory(database: Path):
                             globe_cache[key] = (time.monotonic(), body)
                     self._json(body)
                     return
-                if url.path == "/api/training/scenario":
-                    self._json(public_scenario())
-                    return
                 if url.path == "/api/data/status":
                     self._json(pilot_sync.status())
                     return
@@ -309,9 +298,6 @@ def handler_factory(database: Path):
                             self._json(latest_events(event_cache, refresh=params.get("refresh", ["0"])[0] == "1"))
                     except ValueError as exc:
                         self._json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
-                    return
-                if url.path == "/api/training/snapshot":
-                    self._json(snapshot(int(params.get("elapsed", ["0"])[0])))
                     return
                 with connect(self._database_for(params)) as db:
                     if url.path == "/api/presentation":
