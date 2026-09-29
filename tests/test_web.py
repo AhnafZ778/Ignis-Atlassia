@@ -41,7 +41,12 @@ class WebMvpTests(unittest.TestCase):
     def test_calendar_map_observations_and_exports(self):
         _, home = self.get("/")
         self.assertIn(b"Burning activity calendar", home)
-        self.assertIn(b"earth-frame-host", home)
+        self.assertIn(b"archive-timeline", home)
+        self.assertNotIn(b"earth-frame-host", home)
+        _, archive_script = self.get("/archive-hero.js")
+        self.assertIn(b"/api/archive-overview", archive_script)
+        _, overview = self.get("/api/archive-overview")
+        self.assertEqual(json.loads(overview)["status"], "unavailable")
         _, earth = self.get("/earth.html")
         self.assertIn(b"Earth \xe2\x80\x94 An orbital portrait", earth)
         self.assertGreater(len(earth), 10_000_000)

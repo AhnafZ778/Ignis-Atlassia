@@ -11,16 +11,13 @@
   <script src="/vendor/leaflet.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/study-ui.js" defer></script>
-  <script src="/earth-embed.js" defer></script>
-  <script src="/globe-math.js" defer></script>
-  <script src="/globe.js" defer></script>
   <link rel="stylesheet" href="/design.css">
-  <link rel="stylesheet" href="/globe.css">
   <link rel="stylesheet" href="/vendor/ui-primitives.css">
   <link rel="stylesheet" href="/landing.css">
   <link rel="stylesheet" href="/tour.css">
   <script src="/ui.js" defer></script>
   <script src="/landing.js" defer></script>
+  <script src="/archive-hero.js" defer></script>
   <script src="/tour.js" defer></script>
 </head>
 <body class="atlas-page landing-overhaul">
@@ -34,98 +31,37 @@
   </header>
 
   <main id="main-content">
-    <section class="hero globe-hero" id="top" aria-label="Interactive NASA fire observation globe">
-      <div class="hero-copy">
-        <p class="eyebrow hero-challenge-label">NASA SPACE APPS 2026 · MODIS + VIIRS HOT SPOTS</p>
-        <h1><span>Two sensors.</span> <span>One burning</span> <em>activity calendar.</em></h1>
-        <p class="intro">Explore where and when NASA satellites detected heat in a selected area. Compare MODIS and VIIRS on a shared daily grid, then trace each result to its original record.</p>
+    <section class="hero archive-hero" id="top" aria-labelledby="archive-hero-title">
+      <div class="archive-hero-copy">
+        <p class="eyebrow">NASA SPACE APPS 2026 &middot; CHALLENGE CORE</p>
+        <h1 id="archive-hero-title"><span>Two sensors.</span><span>One shared</span><em>fire calendar.</em></h1>
+        <p class="intro">Explore authentic MODIS and VIIRS observations together, month by month, to understand where fire activity was detected in the imported archive.</p>
         <div class="hero-actions">
           <a class="hero-primary ui-button ui-button-primary" href="/?lite=1&amp;series=joint&amp;year=2024&amp;month=7&amp;bbox=-122%2C39.5%2C-121.3%2C40.5#calendar-section">Explore the real calendar <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#arrow-right"></use></svg></a>
-          <button id="start-calendar-tour" class="hero-tour-link" type="button" aria-controls="calendar-tour" disabled>Preparing data tour…</button>
-          <a class="hero-data-link" href="/method.html">See how it works ↗</a>
+          <button id="start-calendar-tour" class="hero-tour-link" type="button" aria-controls="calendar-tour" disabled>Preparing data tour&hellip;</button>
+          <a class="hero-data-link" href="/method.html">See how it works &#8599;</a>
         </div>
-        <p class="hero-scope">Historical study · Northern California · July 2022–2025</p>
+        <p class="hero-scope" id="archive-scope-label">Reading verified archive scope&hellip;</p>
       </div>
-      <div class="hero-art earth-hero">
-        <div class="earth-fallback" aria-hidden="true"></div>
-        <div id="earth-frame-host" class="earth-frame-host" aria-label="Interactive three-dimensional Earth"></div>
-        <div id="globe-reveal-status" class="globe-reveal-status" role="status" hidden></div>
-        <div class="earth-controls"><span id="earth-caption">GLOBE: SEPARATE DATED NASA NRT SNAPSHOT · DRAG TO ROTATE</span><a href="/terrain-earth.html" target="_blank" rel="noopener noreferrer">Explore terrain Earth ↗</a></div>
-      </div>
-      <div id="globe-point-callout" class="globe-point-callout" hidden>
-        <svg class="point-callout-connector" aria-hidden="true"><defs><marker id="point-callout-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8"/></marker></defs><path id="point-callout-line" marker-end="url(#point-callout-arrow)"/></svg>
-        <section class="point-callout-card" aria-label="Selected Earth location" aria-live="polite" aria-atomic="true">
-          <button id="point-callout-close" type="button" aria-label="Dismiss selected location">×</button>
-          <span id="point-callout-kind" class="point-callout-kind"></span>
-          <h2 id="point-callout-title"></h2>
-          <p id="point-callout-meta"></p>
-          <div class="point-callout-actions"><button id="point-callout-details" type="button" aria-haspopup="dialog" aria-controls="earth-details-dialog">Details ↗</button><button id="point-callout-zoom" type="button">Zoom</button><button id="point-callout-back" type="button" aria-label="Back to full Earth" hidden>← Full Earth</button></div>
-        </section>
-      </div>
-
-      <div class="globe-flight-dock lean-earth-controls" aria-label="Earth layers and navigation">
-        <div class="earth-layer-controls" role="group" aria-label="Earth layers">
-          <label class="globe-toggle-label" for="globe-markers"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#satellite"></use></svg><span class="thermal-toggle-copy"><strong>Satellite signals</strong></span><input id="globe-markers" type="checkbox" aria-label="Show NASA satellite signals on Earth"></label>
-          <button id="earth-details-open" class="earth-details-open" type="button" aria-haspopup="dialog" aria-controls="earth-details-dialog">Details <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#arrow-up-right"></use></svg></button>
+      <div class="archive-hero-visual" aria-label="Historical MODIS and VIIRS archive overview">
+        <div class="archive-visual-header"><span>HISTORICAL ARCHIVE / SCOPE TRACE</span><b id="archive-status" class="archive-status is-loading">LOADING</b></div>
+        <div class="archive-visual-grid">
+          <section class="archive-timeline-panel" aria-labelledby="archive-timeline-title">
+            <div class="archive-panel-head"><div><span class="archive-kicker">01 / SENSOR TIMELINE</span><h2 id="archive-timeline-title">Imported month windows</h2></div><span id="archive-window-label" class="archive-window-label">Verifying&hellip;</span></div>
+            <div id="archive-timeline" class="archive-timeline" role="img" aria-label="Imported MODIS and VIIRS archive month windows"></div>
+            <p class="archive-caption">What this shows: months with a complete imported FIRMS export for each sensor.</p>
+            <p class="archive-caption archive-caption-limit">What this does not show: satellite pass, cloud, or no-detection coverage.</p>
+          </section>
+          <section class="archive-footprint-panel" aria-labelledby="archive-footprint-title">
+            <div class="archive-panel-head"><div><span class="archive-kicker">02 / VERIFIED SCOPE</span><h2 id="archive-footprint-title">Archive footprint</h2></div><span class="archive-coordinate-badge">W &middot; S &middot; E &middot; N</span></div>
+            <div class="archive-footprint" role="img" aria-label="Imported archive bounding box diagram"><div class="archive-footprint-grid"></div><div class="archive-footprint-box"><i></i><span id="archive-footprint-label">Awaiting archive metadata</span></div><span class="archive-compass">N</span><span class="archive-axis axis-west">W</span><span class="archive-axis axis-east">E</span><span class="archive-axis axis-south">S</span></div>
+            <p id="archive-footprint-note" class="archive-footprint-note">The outline is the geographic extent recorded on the imported archive windows.</p>
+          </section>
         </div>
-        <div class="globe-tools" role="group" aria-label="Earth camera controls">
-          <button id="globe-rotate" type="button" aria-pressed="false" aria-label="Pause Earth rotation" title="Pause or resume Earth rotation">Ⅱ</button>
-          <button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">+</button>
-          <button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button>
-          <button id="globe-reset" type="button" aria-label="Return to full Earth" title="Full Earth">↺</button>
-        </div>
+        <div class="archive-evidence-strip" aria-live="polite"><div><strong id="archive-pair-months">&mdash;</strong><span>paired months</span></div><div><strong id="archive-record-count">&mdash;</strong><span>complete-window rows</span></div><div><strong id="archive-date-range">&mdash;</strong><span>verified window</span></div></div>
+        <p class="archive-limit-note">Observation records are evidence of detected heat, not fire perimeters or proof that an area without detections was fire-free. <a href="/data.html">Inspect provenance &#8599;</a></p>
       </div>
-
-      <aside class="orbital-note" aria-label="Observation sources"><span class="orbital-kicker">HISTORICAL SENSOR PAIR</span><div class="orbital-diagram" aria-hidden="true"><svg viewBox="0 0 180 130"><circle cx="90" cy="65" r="30"/><ellipse cx="90" cy="65" rx="78" ry="24" transform="rotate(-30 90 65)"/><ellipse cx="90" cy="65" rx="67" ry="37" transform="rotate(40 90 65)"/><path d="M60 65h60M90 35c-20 15-20 45 0 60 20-15 20-45 0-60"/><circle class="sat-dot" cx="151" cy="32" r="4"/><circle class="sat-dot secondary" cx="45" cy="26" r="3"/></svg></div><div class="sensor-caption"><span>01</span><strong>MODIS<small>TERRA + AQUA</small></strong><i></i></div><div class="sensor-caption"><span>02</span><strong>VIIRS<small>SUOMI NPP</small></strong><i></i></div><p>Original pixels retained.<br>Shared grid for the calendar.</p></aside>
-      <aside class="orbital-note real-source-note" id="real-source-note" aria-label="Authentic satellite data" hidden><span class="orbital-kicker">NASA FIRMS / REGIONAL ARCHIVE</span><strong id="hero-real-count">—</strong><span class="real-source-unit">IMPORTED DETECTIONS</span><div class="real-source-rule"></div><p>July 2022–June 2026 archive.<br>2026 imports are partial.</p><a href="/data.html">Inspect provenance ↗</a></aside>
-      <div class="hero-bottom"><a class="hero-atlas-link" href="/method.html"><span aria-hidden="true">↓</span> FOLLOW THE DATA</a></div>
     </section>
-    <dialog id="earth-details-dialog" class="earth-details-dialog" aria-labelledby="globe-console-title">
-      <aside class="globe-console" aria-labelledby="globe-console-title">
-        <div class="console-source"><span class="console-source-label"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#satellite"></use></svg><span id="globe-source-label">NASA FIRMS</span></span><span id="globe-data-kind" class="console-snapshot-badge">Imported snapshot</span></div>
-        <div class="globe-console-head"><button id="earth-details-close" class="earth-details-close" type="button" aria-label="Close Earth details">×</button><h2 id="globe-console-title">Satellite evidence</h2><a href="/data.html" aria-label="Inspect NASA data sources" title="Inspect NASA data sources"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#arrow-up-right"></use></svg></a></div>
-        <div class="globe-console-body">
-          <div class="hero-coordinate"><span class="hero-snapshot-label"><svg class="ui-icon" aria-hidden="true"><use id="globe-layer-icon" href="/vendor/lucide-icons.svg#satellite"></use></svg><span id="globe-layer-label">NASA SATELLITE EVIDENCE</span></span><span id="globe-stamp">DRAG TO EXPLORE</span></div>
-        <div id="globe-selection" hidden aria-live="polite"></div>
-        <details id="globe-evidence-tools" class="globe-evidence-tools">
-          <summary><span><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#satellite"></use></svg><strong id="globe-total">—</strong> satellite detections</span><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary>
-          <p class="globe-reading-definition">NASA FIRMS heat observations support the wider picture. Repeated detections can describe one fire, and some heat sources are not wildfires.</p>
-          <small id="globe-cell-count">Preparing mapped groups…</small>
-          <dl id="globe-period" class="globe-period"><div><dt>Observed</dt><dd>Loading dates…</dd></div><div><dt>Last detected</dt><dd>—</dd></div></dl>
-          <div class="globe-filters">
-            <label>Observation date<select id="globe-date" disabled><option value="all">All dates</option></select></label>
-            <label>Satellite sensor<select id="globe-source" disabled><option value="all">All satellites</option></select></label>
-          </div>
-          <label class="globe-browse">Inspect satellite evidence<select id="globe-location" disabled><option value="">Browse largest groups…</option></select></label>
-          <p id="globe-status" role="status">Detections are hidden.</p>
-          <button id="globe-retry" type="button" hidden>Retry data</button>
-          <a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">How NASA detects fires ↗</a>
-        </details>
-        <div class="globe-dock-sub">
-          <div class="globe-legend" role="group" aria-label="Detection legend">
-            <button type="button" data-tooltip="Amber marks groups whose last observation is before the latest day in this selection. Color shows recency, not fire intensity."><span class="legend-dot earlier" aria-hidden="true"></span> Earlier</button>
-            <button id="globe-latest-key" type="button" data-tooltip="Gold marks groups observed on the latest day in this selection. It does not mean a fire is still burning."><span class="legend-dot latest" aria-hidden="true"></span> Latest</button>
-            <button type="button" data-tooltip="Larger dots contain more satellite detections in a 1° geographic cell. Multiple detections may describe the same fire; size is not burned area or severity.">Size ⓘ</button>
-          </div>
-          <div id="globe-imprint" class="globe-imprint" aria-label="Daily observation profile">
-            <div class="imprint-meta">
-              <span class="imprint-label">Detections by day · UTC</span>
-              <button id="imprint-reset" type="button" class="imprint-reset-btn" hidden>All dates</button>
-            </div>
-            <div id="globe-imprint-bars" class="imprint-bars" role="group" aria-label="Daily detection counts"></div>
-          </div>
-        </div><details class="earth-region-options"><summary>Go to a region</summary><div class="globe-regions" role="group" aria-label="Look at a region">
-            <button type="button" data-globe-region="20,10" data-region-key="world">World</button>
-            <button type="button" data-globe-region="15,50" data-region-key="europe">Europe</button>
-            <button type="button" data-globe-region="20,-5" data-region-key="africa">Africa</button>
-            <button type="button" data-globe-region="-60,-12" data-region-key="south-america">S. America</button>
-            <button type="button" data-globe-region="-110,40" data-region-key="north-america">N. America</button>
-            <button type="button" data-globe-region="100,25" data-region-key="asia">Asia</button>
-            <button type="button" data-globe-region="135,-25" data-region-key="oceania">Australia</button>
-          </div></details>
-        </div>
-      </aside>
-    </dialog>
     <div class="shell">
     <section id="study-workspace" class="landing-workspace" aria-labelledby="workspace-title">
       <div class="landing-workspace-content">
@@ -207,7 +143,6 @@
   </section>
   </div>
   </main>
-  <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>
   <aside id="calendar-tour" class="calendar-tour" role="region" aria-labelledby="calendar-tour-title" aria-describedby="calendar-tour-copy" hidden>
     <div class="calendar-tour-top"><span id="calendar-tour-count">01 / 04</span><button id="calendar-tour-close" type="button" aria-label="Close data tour">×</button></div>
     <div class="calendar-tour-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>

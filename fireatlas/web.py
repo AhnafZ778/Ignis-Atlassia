@@ -29,6 +29,7 @@ from .study import build_bundle
 from .pilots import PilotSync, PILOTS
 from .bootstrap import populate_showcase
 from .archive import BBOX as NASA_ARCHIVE_BBOX, SAMPLE as NASA_ARCHIVE_SAMPLE, import_bundle as import_nasa_archive
+from .archive_overview import archive_overview
 from .globe import snapshot as globe_snapshot, detail as globe_detail
 from .briefing import responder_briefing
 from .harmonization import month_audit
@@ -43,6 +44,7 @@ ASSETS = {
     "/ui.js": ("ui.js", "text/javascript; charset=utf-8"),
     "/landing.css": ("landing.css", "text/css; charset=utf-8"),
     "/landing.js": ("landing.js", "text/javascript; charset=utf-8"),
+    "/archive-hero.js": ("archive-hero.js", "text/javascript; charset=utf-8"),
     "/tour.css": ("tour.css", "text/css; charset=utf-8"),
     "/tour.js": ("tour.js", "text/javascript; charset=utf-8"),
     "/validity.css": ("validity.css", "text/css; charset=utf-8"),
@@ -282,6 +284,8 @@ def handler_factory(database: Path):
                                       filename=f"fireatlas_validity_{case_id}.zip")
                     elif url.path == "/api/research":
                         self._json(research_report(db, **_research_context(params)))
+                    elif url.path == "/api/archive-overview":
+                        self._json(archive_overview(db))
                     elif url.path == "/api/meta":
                         rows = db.execute("""
                             SELECT DISTINCT year FROM (

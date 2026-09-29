@@ -48,26 +48,26 @@
 | C8 | Containment boundaries and operational safety | 7 | 2 | 2.8 | 3 | 4 | Limits text exists; no banned-phrase test |
 | C9 | Responder workflow, resident info, alert separation | 6 | 2 | 2.4 | 3 | 4 | Briefing card with fixed label (`briefing.py:42-45`) |
 | C10 | Validation, replay, leakage, baselines | 8 | 2 | 3.2 | 4 | 5 | Recount verifier + CAL FIRE association 7/25; MODIS masks 0/17 |
-| C11 | Interface clarity and demo reliability | 4 | 3 | 2.4 | 5 | 5 | Works locally; cluttered; ArcGIS globe failed to load |
+| C11 | Interface clarity and demo reliability | 4 | 4 | 3.2 | 5 | 5 | R7 replaces the NRT globe hero with a responsive, data-driven archive timeline and explicit scope/limits; ArcGIS remains outside the home story |
 | C12 | Build, docs, reproducibility | 4 | 2 | 1.6 | 5 | 5 | 78 tests pass; code changes are pushed and worktree is clean; license and public/CI verification remain open |
-| | **Total** | 100 | | **31.8** | 54.2 | 88.0 | Arithmetic: 7.2+7.2+1.6+0+1.4+0+2.0+2.8+2.4+3.2+2.4+1.6 = 31.8 |
+| | **Total** | 100 | | **32.6** | 54.2 | 88.0 | R7 raises C11 presentation points from 2.4 to 3.2; scientific validity is unchanged |
 
 ## 4. Local rubric estimate (Auditor only)
 
 | # | Criterion | Max | Now | Target | Justification (one sentence) |
 |---|---|---:|---:|---:|---|
 | 1 | Impact | 20 | 10 | 17 | Clear problem, one region only, no user evidence |
-| 2 | Creativity | 20 | 11 | 16 | Evidence tracing is distinctive; calendar view conventional |
+| 2 | Creativity | 20 | 11 | 16 | Evidence tracing is distinctive; archive timeline adds a focused comparison layer |
 | 3 | Validity | 20 | 11 | 18 | Authentic data; no calibration or held-out test yet |
-| 4 | Relevance | 20 | 11 | 19 | Harmonization not implemented; off-topic features present |
-| 5 | Presentation | 20 | 12 | 18 | Polished visuals; no video/slides; story diluted |
+| 4 | Relevance | 20 | 12 | 19 | The landing story now leads with the MODIS/VIIRS historical archive; harmonization remains descriptive |
+| 5 | Presentation | 20 | 13 | 18 | Clearer archive-led hero; no video/slides yet |
 | 6 | Teamwork | 5 | 2 | 5 | Two committers; no PR/review evidence |
 | 7 | User experience | 5 | 3 | 5 | Usable but crowded |
 | 8 | NASA data usage | 5 | 4 | 5 | FIRMS central; versions not surfaced in UI |
 | 9 | Challenge category named | 1 | 1 | 1 | |
 | 10 | Repository access | 1 | 0 | 1 | Latest work not pushed |
 | 11 | Project page complete | 1 | 0 | 1 | Not submitted |
-| | **Total** | 118 | **≈65** | **≈106** | |
+| | **Total** | 118 | ~67 | ~106 | |
 
 ## 5. Task status
 
@@ -85,7 +85,7 @@
 | R4 | Remove synthetic demo UI | DONE (evidence: removed data selector, synthetic tour, generated context/exposure controls and judge launcher; server returns 400 for `demo` query parameters, 404 for retired generator endpoints, and refuses synthetic databases; 78 tests pass; edited JavaScript syntax checks pass) | local checks, 2026-09-29 | 2026-09-29 |
 | R5 | Replace synthetic tour | DONE (evidence: four-step walkthrough reads the active calendar, highlights area/sensor/calendar controls, selects a positive date from `/api/calendar`, and opens the existing method-page source inspector; no-data and row-mismatch states are explicit) | local checks, 2026-09-29 | 2026-09-29 |
 | R6 | Remove EONET from home | DONE (evidence: removed landing section/navigation, Data page status widget, feed JS/module, API route, CLI command, styles, and feature-only tests; `/api/events` and `/events.js` return 404; pages contain no EONET UI) | full tests + local route/page checks, 2026-09-29 | 2026-09-29 |
-| R7 | Demote NRT globe | NOT STARTED | | |
+| R7 | Demote NRT globe | DONE (home no longer loads the NRT globe; `/api/archive-overview` reads only non-synthetic complete MODIS_SP/VIIRS_SNPP_SP windows; NRT assets/API remain separately served) | targeted tests + served-page checks; full suite reached 76 tests with 7 pre-existing environment failures (`tzdata`/Windows SQLite cleanup) | 2026-09-29 |
 | R8 | Remove ArcGIS globe from home | NOT STARTED | | |
 | R9 | Delete earth.html + terrain HTML | NOT STARTED | | |
 | R10 | Merge Research Lab into method | NOT STARTED | | |
@@ -117,9 +117,9 @@
 | C10-T5 | MODIS mask fix + review | NOT STARTED | | |
 | C10-T6 | Recount verifier v2 | NOT STARTED | | |
 | C10-T7 | Leakage rules | NOT STARTED | | |
-| C11-T1 | Home structure | NOT STARTED | | |
+| C11-T1 | Home structure | DONE (R7 hero leads with historical archive scope and calendar CTA; no NRT globe in the primary story) | local served-page check, 2026-09-29 | 2026-09-29 |
 | C11-T2 | Remove visual noise | NOT STARTED | | |
-| C11-T3 | Sensor timeline | NOT STARTED | | |
+| C11-T3 | Sensor timeline | DONE (42 paired MODIS/SP + VIIRS/S-NPP month windows rendered from `archive_overview`; missing/partial months use explicit states) | `tests/test_archive_overview.py`, `/api/archive-overview`, 2026-09-29 | 2026-09-29 |
 | C11-T4 | Method page sections | NOT STARTED | | |
 | C11-T5 | 4-step tour | DONE (uses current interface and live imported records; the proposed region chips, 25-year heatmap, and percentile badge are not implemented and are not claimed by the tour) | local checks, browser interaction, 2026-09-29 | 2026-09-29 |
 | C11-T6 | Empty/error states | NOT STARTED | | |
@@ -162,8 +162,10 @@
 
 | Region | Product | Years | Rows | Complete months | SHA-256 |
 |---|---|---|---:|---:|---|
-| norcal | MODIS_SP | 2022-07 → 2026-06 | 8,151 | — | (from bundle manifest) |
-| norcal | VIIRS_SNPP_SP | 2022-07 → 2026-06 | 22,672 | — | (from bundle manifest) |
+| norcal | MODIS_SP | 2022-07 to 2026-06 (partial tail) | 8,151 | 42 paired-window months | from bundle manifest |
+| norcal | VIIRS_SNPP_SP | 2022-07 to 2026-06 (partial tail) | 22,672 | 42 paired-window months | from bundle manifest |
+
+R7 presentation scope: the packaged bundle has 30,823 authentic rows in total; 1,599 rows outside complete export windows are not promoted into the hero. The complete paired windows represented there are 42 months (2022-07 to 2025-12), 7,793 MODIS rows and 21,431 VIIRS S-NPP rows, in bbox `[-122.2, 38.8, -120.0, 41.0]`. Pass opportunities, cloud masking, and no-detection conditions remain unknown.
 
 ## 7. Ground truth and measured results
 
@@ -194,3 +196,4 @@
 | 2026-09-29 | Lead engineer | Completed R4: removed the user-facing synthetic showcase, generated context/mask endpoints, and demo launcher; left generators as test fixtures only | 78 tests OK; demo queries return 400, removed routes return 404, CLI refuses synthetic databases; edited JavaScript syntax checks pass |
 | 2026-09-29 | Lead engineer | Completed R5/C11-T5: added a four-step authentic-data walkthrough tied to the current area controls, source comparison, calendar, and a real positive day when available | `/tour.js` reads `/api/calendar` and `/api/observations`, then hands off to the dated source inspector; 78 tests OK; local Chrome interaction verified |
 | 2026-09-29 | Lead engineer | Completed R6: removed the off-challenge EONET reported-event map and feed while retaining the separate NASA FIRMS 3D globe | Feed route and asset return 404; landing and Data sources pages contain no EONET UI; 74 tests OK |
+| 2026-09-29 | Lead engineer | Completed R7/C11-T1/C11-T3: demoted the rolling NRT globe from the landing story and added a historical MODIS/VIIRS archive timeline plus imported-footprint scope panel | `archive_overview` unit tests; home/API/method/data served checks; complete pair 42 months; NRT APIs/assets preserved; full-suite environment blockers recorded above |
