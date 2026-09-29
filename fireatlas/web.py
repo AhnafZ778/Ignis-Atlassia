@@ -40,13 +40,6 @@ from .validity import CASES as VALIDITY_CASES, report as validity_report, build_
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
 ASSETS = {
-    "/manifest.webmanifest": ("manifest.webmanifest", "application/manifest+json"),
-    "/app-sw.js": ("app-sw.js", "text/javascript; charset=utf-8"),
-    "/install.js": ("install.js", "text/javascript; charset=utf-8"),
-    "/install.html": ("install.html", "text/html; charset=utf-8"),
-    "/offline.html": ("offline.html", "text/html; charset=utf-8"),
-    "/app-icon-192.png": ("app-icon-192.png", "image/png"),
-    "/app-icon-512.png": ("app-icon-512.png", "image/png"),
     "/": ("index.html", "text/html; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/design.css": ("design.css", "text/css; charset=utf-8"),

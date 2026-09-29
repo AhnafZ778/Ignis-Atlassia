@@ -4,13 +4,13 @@
 
 The **[Data & Method page](http://127.0.0.1:8000/method.html)** traces the existing NASA archive into the calendar with a connected visual workflow, actual cell examples, original source records and an on-demand analytical recount. The implementation plan is in [docs/DATA_METHOD_PAGE_PLAN.md](docs/DATA_METHOD_PAGE_PLAN.md).
 
-## Presentation guide and mobile app
+## Presentation materials
 
-[Download the 22-page feature polish guide](docs/presentation/FireAtlas_Feature_Polish_Guide.pdf) for 16 prioritized features, exact pages, actual screenshots and presentation checks.
+The [22-page feature polish guide](docs/presentation/FireAtlas_Feature_Polish_Guide.pdf) is an archived screenshot record from 27 September 2026, not a current presentation or setup guide.
 
 The landing page now leads with a five-scene **Park Fire 2024 historical evidence story** using authentic imported MODIS and VIIRS records. Scrubbing a UTC day updates the detection map, source counts, daily grid diagram, and calendar selection. A Grove Fire 2025 case uses the same controls. The Park timeline explicitly marks NASA's July 2024 S-NPP processing gap and leaves pass/cloud coverage unknown. The proof scene also shows the fixed 25-incident CAL FIRE context check (7 nearby points, 18 without a nearby point) without turning it into a sensitivity claim. See the [fixed case protocol, results, and open validation gates](docs/VALIDITY_CASES.md) and [video storyboard](docs/VIDEO_STORYBOARD.md).
 
-FireAtlas includes an installable mobile web app. Open `/install.html` for installation instructions; see [mobile setup and verification](docs/MOBILE_APP.md). The calendar and analysis tools require the server. A physical-phone rehearsal and reachable HTTPS host remain necessary.
+The archived guide is a historical snapshot from 27 September 2026; see its notice before using any screenshots or demo instructions.
 
 Native-mask downloads, processing, and separate analytical recount: [Native mask validation](docs/NATIVE_MASK_VALIDATION.md).
 

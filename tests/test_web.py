@@ -177,6 +177,13 @@ class WebMvpTests(unittest.TestCase):
                 self.get(path)
             self.assertEqual(caught.exception.code, 404)
 
+    def test_removed_pwa_assets_are_not_served(self):
+        for path in ("/install.html", "/install.js", "/manifest.webmanifest",
+                     "/app-sw.js", "/offline.html", "/app-icon-192.png"):
+            with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
+                self.get(path)
+            self.assertEqual(caught.exception.code, 404)
+
     def test_research_report_mask_import_and_input_validation(self):
         _, page = self.get("/research.html")
         self.assertIn(b"EXPLORATORY RESEARCH", page)

@@ -1,7 +1,14 @@
 // Shared navigation behavior; data tools retain their own state and controls.
 document.addEventListener("DOMContentLoaded", () => {
   if ("serviceWorker" in navigator && window.isSecureContext) {
-    navigator.serviceWorker.register("/app-sw.js", {scope:"/",updateViaCache:"none"}).catch(() => {});
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      for (const registration of registrations) {
+        if (registration.active?.scriptURL.endsWith("/app-sw.js")) registration.unregister();
+      }
+    }).catch(() => {});
+    if ("caches" in window) caches.keys().then(names => Promise.all(
+      names.filter(name => name.startsWith("fireatlas-app-shell-")).map(name => caches.delete(name))
+    )).catch(() => {});
   }
   const toggle = document.querySelector(".nav-toggle");
   const navigation = document.querySelector("#site-navigation");
