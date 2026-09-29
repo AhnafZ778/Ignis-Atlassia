@@ -78,7 +78,7 @@
 | C12-T1 | Commit + push, repo public | IN PROGRESS | `d43c602` is on `origin/main`; repository visibility not verified | 2026-09-29 |
 | C12-T2 | Launcher, smoke test, CI | IN PROGRESS | `scripts/smoke_test.sh "$PWD"` passes; GitHub CI run pending | 2026-09-29 |
 | C12-T3 | Declare dependencies | DONE (evidence: locked optional NumPy extra; core installs without GDAL) | Local `uv sync --frozen`; 82-test suite; missing GDAL guidance check | 2026-09-29 |
-| R1 | Delete disaster casebook | NOT STARTED | | |
+| R1 | Delete disaster casebook | DONE (evidence: JSON asset/route, 3D toggle and animated fire effects removed; landing/browser check confirms no casebook controls, satellite details and EONET layer work with 0 page errors; 82 tests pass; `/`, `/method.html`, `/data.html` return 200 and retired JSON returns 404) | local checks, 2026-09-29 | 2026-09-29 |
 | R2 | Archive + remove training lab | NOT STARTED | | |
 | R3 | Remove PWA | NOT STARTED | | |
 | R4 | Remove synthetic demo UI | NOT STARTED | | |
@@ -187,3 +187,4 @@
 |---|---|---|---|
 | 2026-09-29 | Lead engineer (audit) | Baseline scorecard created from audit | Audit report, 81 tests OK |
 | 2026-09-29 | Lead engineer | Added Linux launcher, fresh-clone smoke test, CI workflow, optional NumPy mask extra and actionable GDAL errors | Commit `d43c602`; smoke pass; 82 tests; GitHub CI pending |
+| 2026-09-29 | Lead engineer | Completed R1: removed the global historical disaster casebook and its map/3D presentation code | 82 tests OK; targeted local Playwright interaction check; required-page HTTP checks |

@@ -81,7 +81,6 @@ ASSETS = {
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
     "/terrain-earth.html": ("terrain-earth.html", "text/html; charset=utf-8"),
     "/globe.js": ("globe.js", "text/javascript; charset=utf-8"),
-    "/documented-fires.json": ("documented-fires.json", "application/json; charset=utf-8"),
     "/globe-math.js": ("globe-math.js", "text/javascript; charset=utf-8"),
     "/globe.css": ("globe.css", "text/css; charset=utf-8"),
     "/earth-poster-1440.webp": ("earth-poster-1440.webp", "image/webp"),

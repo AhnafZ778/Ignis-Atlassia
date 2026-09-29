@@ -104,39 +104,7 @@ Repeat the delayed-data and pose checks against a populated server:
 uv run --with playwright python scripts/verify_globe_reveal.py
 ```
 
-## Documented wildfire layer — 27 September 2026
-
-The “Documented wildfires” toggle loads six curated historical cases from
-`/documented-fires.json`: Jasper, Valparaíso, Evros, Lahaina, Mallacoota and the
-Camp Fire. Blue diamond markers and a case picker open a dated summary with
-direct news reports in new tabs. Camp Fire also links to NASA imagery.
-
-This layer works independently of the thermal-detection toggle and NASA API
-availability. These are selected historical examples, not a current incident
-feed. Coordinates represent approximate affected communities, not ignition
-points or fire boundaries. Cases are not inferred from or matched to the
-current satellite snapshot; satellite date and source filters do not filter
-the historical collection. Source publication dates appear beside each link.
-
-Verification: all 56 existing automated tests passed. Browser checks covered
-the six-case picker, globe marker selection, external report tabs, independent
-layer visibility and mobile layout at 390×844. No JavaScript exceptions or
-horizontal overflow were observed. Desktop was checked at 1366×768.
-
-### Casebook navigation polish
-
-The documented wildfire toggle now sits at the top of the information panel.
-Numbered cards separate the event, location and date; a desktop scroll hint
-exposes the rest of the collection. Report details have a prominent sticky
-“Back to all wildfires” button and Previous/Next controls with a case counter.
-Returning restores focus to the selected card. Larger blue globe markers have
-a wider hit area. The satellite detail view also has an explicit back button.
-
-Browser checks passed for marker selection, source links, Previous/Next limits,
-back navigation, focus restoration and showing/hiding the layer. Layout checks
-at 1366, 1024, 820 and 390 px found no horizontal overflow or JavaScript errors.
-
-## Worldwide 2D and 3D browsing — 28 September 2026
+## Worldwide 2D and 3D browsing — 29 September 2026
 
 The former EONET-only map now defaults to `/api/globe?source=all&date=all`,
 using the same authentic global FIRMS snapshot as Earth: 866,956 imported
@@ -145,22 +113,19 @@ existing data already included worldwide locations; no synthetic observations
 or new claims of live activity were added. The previous 200-event EONET sample
 contained only IRWIN reports and was unsuitable as a global coverage map.
 
-The 2D layer selector separates satellite groups, six documented historical
-cases, and the existing EONET report sample. Every layer exposes its provenance
-and date limitations. Regional navigation and worldwide reset cover Africa,
-Asia, Europe, North America, South America and Oceania. These regional views
-use broad rectangular geographic windows, not administrative boundaries.
-All groups are drawn; the list pages through 30 at a time. At global zoom,
-marker sizes shrink to preserve geographic readability. Orange/gold satellite
-colors follow the globe's earlier/latest observation-day convention.
+The landing 2D map now exposes the imported NASA satellite snapshot and a
+separate NASA EONET reported-event sample. EONET remains a curated feed and is
+not part of the MODIS–VIIRS calendar. Regional navigation and worldwide reset
+cover Africa, Asia, Europe, North America, South America and Oceania; these are
+broad rectangular windows rather than administrative boundaries. Satellite
+groups retain their detection count and last-observed date in the map list.
 
-Satellite and historical popups link to the matching 3D selection. A satellite
-handoff restores the full snapshot's date and source selection so its evidence
-matches the 2D point. The globe now has World/Europe controls and a location
-picker scoped to the chosen regional window. The 2D map loads as it approaches
-the viewport, retaining lazy loading on the landing page.
+The 3D Earth panel is now limited to satellite evidence. The historical
+casebook endpoint, fire textures, picker, and death-count summaries have been
+removed. The FIRMS snapshot remains an imported historical snapshot; it is not
+labelled as a live observation stream. The map loads as it approaches the
+viewport, preserving lazy loading on the landing page.
 
-Browser verification passed: exact global totals/group counts; nonempty data
-in all six regional windows; satellite and historical handoff to 3D; historical
-source links; EONET sample labelling; pagination; worldwide reset; and layouts
-at 1440, 1024, 820 and 390 px without horizontal overflow or JavaScript errors.
+The R1 cleanup is implemented in code. Automated and served-page checks are
+pending; earlier browser-verification statements above describe the prior
+casebook version and have been removed with that feature.
