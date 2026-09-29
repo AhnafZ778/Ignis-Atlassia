@@ -11,7 +11,6 @@ from .fetch import FIRMS_SOURCES, fetch_month
 from .research import report as research_report
 from .fetch import availability
 from .pilots import PilotSync
-from .events import harvest as harvest_events
 from .hms import harvest_month as harvest_hms_month
 
 
@@ -22,7 +21,6 @@ def main() -> None:
     commands.add_parser("init", help="create the local database")
     commands.add_parser("firms-status", help="check NASA source availability using the server credential")
     commands.add_parser("sync-pilots", help="import July 2021–2024 standard-product pilots and verify totals")
-    commands.add_parser("harvest-events", help="cache recent reported wildfire events from NASA EONET")
     hms_parser = commands.add_parser("harvest-hms", help="import a complete NOAA HMS VIIRS historical month")
     hms_parser.add_argument("--month", required=True, help="finished month, YYYY-MM")
     hms_parser.add_argument("--bbox", nargs=4, type=float, required=True, metavar=("W", "S", "E", "N"))
@@ -63,9 +61,6 @@ def main() -> None:
         sync = PilotSync(args.db)
         sync.run()
         result = sync.status()
-    elif args.command == "harvest-events":
-        snapshot = harvest_events(Path(args.db).with_suffix(".events.json"))
-        result = {"source": snapshot["source"], "events_cached": snapshot["count"], "fetched_utc": snapshot["fetched_utc"]}
     elif args.command == "harvest-hms":
         result = harvest_hms_month(db, month=args.month, bbox=tuple(args.bbox),
                                    directory=args.directory, refresh=args.refresh)

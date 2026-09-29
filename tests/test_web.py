@@ -7,7 +7,6 @@ import tempfile
 import threading
 import unittest
 import zipfile
-from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError
@@ -117,17 +116,6 @@ class WebMvpTests(unittest.TestCase):
             urlopen(request)
         self.assertEqual(caught.exception.code, 403)
 
-    def test_cached_eonet_feed_is_separate_from_firms_data(self):
-        cache = Path(self.temp.name) / "demo.events.json"
-        cache.write_text(json.dumps({"kind": "reported-wildfire-events", "fetched_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                                     "count": 1, "events": [{"id": "EONET_123", "title": "Wildfire report"}]}))
-        _, body = self.get("/api/events")
-        feed = json.loads(body)
-        self.assertEqual(feed["count"], 1)
-        self.assertEqual(feed["kind"], "reported-wildfire-events")
-        _, body = self.get("/api/calendar?year=2015&series=joint&bbox=-122,39,-120,41")
-        self.assertEqual(json.loads(body)["monthly"][6]["detected_cell_days"], 4)
-
     def test_synthetic_mode_and_showcase_routes_are_retired(self):
         real = Path(self.temp.name) / "authentic.sqlite3"
         with connect(real):
@@ -185,6 +173,17 @@ class WebMvpTests(unittest.TestCase):
             with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
                 self.get(path)
             self.assertEqual(caught.exception.code, 404)
+
+    def test_eonet_world_snapshot_and_feed_are_retired(self):
+        for path in ("/api/events", "/events.js"):
+            with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
+                self.get(path)
+            self.assertEqual(caught.exception.code, 404)
+        _, home = self.get("/")
+        _, data = self.get("/data.html")
+        for page in (home, data):
+            self.assertNotIn(b"live-events", page)
+            self.assertNotIn(b"NASA EONET", page)
 
     def test_research_report_mask_import_and_input_validation(self):
         _, page = self.get("/research.html")

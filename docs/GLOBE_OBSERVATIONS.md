@@ -104,21 +104,18 @@ Repeat the delayed-data and pose checks against a populated server:
 uv run --with playwright python scripts/verify_globe_reveal.py
 ```
 
-## Worldwide 2D and 3D browsing — 29 September 2026
+## Worldwide browsing — 29 September 2026
 
-The former EONET-only map now defaults to `/api/globe?source=all&date=all`,
-using the same authentic global FIRMS snapshot as Earth: 866,956 imported
-observations in 7,307 one-degree groups, dated September 20–27, 2026. The
-existing data already included worldwide locations; no synthetic observations
-or new claims of live activity were added. The previous 200-event EONET sample
-contained only IRWIN reports and was unsuitable as a global coverage map.
+The landing page previously had a 2D world snapshot that combined an imported
+NASA FIRMS view with a separate NASA EONET reported-event sample. Cleanup task
+R6 removed that section, navigation, EONET feed, and `/api/events` route because
+they were separate from the historical MODIS–VIIRS calendar. EONET reports were
+never used as satellite detections or calendar inputs.
 
-The landing 2D map now exposes the imported NASA satellite snapshot and a
-separate NASA EONET reported-event sample. EONET remains a curated feed and is
-not part of the MODIS–VIIRS calendar. Regional navigation and worldwide reset
-cover Africa, Asia, Europe, North America, South America and Oceania; these are
-broad rectangular windows rather than administrative boundaries. Satellite
-groups retain their detection count and last-observed date in the map list.
+The separate 3D Earth panel still uses `/api/globe?source=all&date=all` and the
+authentic imported NASA FIRMS snapshot: 866,956 observations in 7,307 one-degree
+groups, dated September 20–27, 2026. This is an imported snapshot, not a live
+stream. Groups retain their detection count and last-observed date in the panel.
 
 The 3D Earth panel is now limited to satellite evidence. The historical
 casebook endpoint, fire textures, picker, and death-count summaries have been
@@ -126,6 +123,6 @@ removed. The FIRMS snapshot remains an imported historical snapshot; it is not
 labelled as a live observation stream. The map loads as it approaches the
 viewport, preserving lazy loading on the landing page.
 
-The R1 cleanup is implemented in code. Automated and served-page checks are
-pending; earlier browser-verification statements above describe the prior
-casebook version and have been removed with that feature.
+R1 automated and served-page checks passed on 29 September 2026. Historical
+browser notes above describe the prior casebook version and are not current
+feature claims.

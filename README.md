@@ -24,7 +24,7 @@ bash scripts/launch_demo.sh
 
 The launcher installs the locked core dependencies and starts the local site. To process native MODIS/VIIRS mask files, install the optional NumPy extra with `uv sync --extra masks` and a system GDAL build with the required HDF4/netCDF drivers; see [native-mask setup](docs/NATIVE_MASK_VALIDATION.md).
 
-Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
+Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the calendar and imported points still work if those external tiles fail.
 
 The homepage offers a four-step guide through the selected imported calendar: area and year, sensor comparison, calendar gaps, and an available source record. It uses the live calendar API and shows an explicit empty result when no detected day is available. Synthetic generators and the old presentation provenance code remain for automated tests only; the server rejects `demo` query parameters and refuses to start against a database containing generated demonstration batches.
 
@@ -36,7 +36,7 @@ The globe window includes the latest imported NASA observation date and seven pr
 
 The atlas and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
 
-The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. The Fire weather layer reports that no GFWED data are loaded. Synthetic context illustrations are no longer part of the website.
+The sensor atlas map only shows **imported** records. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. The Fire weather layer reports that no GFWED data are loaded. Synthetic context illustrations are no longer part of the website.
 
 The atlas also provides a **historical responder brief** for the selected month. It ranks up to five observed active dates from the existing calendar, reports complete versus unknown export days, and links each date to its source observations. It is explicitly non-operational: it does not select an observation sector, issue a flight plan, dispatch a UAS, forecast spread, issue an alert, or recommend containment.
 
@@ -151,16 +151,6 @@ uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 sync-pilots
 The sync exits nonzero on failure. Status is retained in `data/fireatlas.sync.json`, and successful checks in `data/fireatlas.validation.json`. CSV downloads are cached under `data/downloads/`. Completed imports are retained and reused; incomplete monthly requests never receive a complete-export marker. A demo database is rejected before authentic imports can begin.
 
 **Development environment note (29 September 2026):** FIRMS API connections timed out during earlier local checks, including the documented secondary host. A key's presence does not verify its validity or source availability. The user-supplied Archive Download files now complete the local historical MODIS/S-NPP export pilot without an API request. Scientific calibration and independent validation remain pending; the independent NOAA HMS pilot is also real satellite data. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
-
-### Reachable NASA event-feed workaround
-
-The [NASA EONET v3 wildfire-event feed](https://eonet.gsfc.nasa.gov/docs/v3) is reachable from this machine. `fireatlas.events` harvests up to 200 recent reported event points, validates their type, coordinates and timestamps, and atomically caches a snapshot in ignored `data/fireatlas.events.json`. The homepage displays the event map and a shortlist; the Data sources page shows the feed status. The cache refreshes after one hour or when **Refresh** is pressed. If NASA is temporarily unreachable, the last snapshot is labelled cached. To refresh it from the terminal:
-
-```bash
-uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 harvest-events
-```
-
-EONET's wildfire category can include prescribed fires. Its reported event locations are **not** MODIS/VIIRS detections and never feed the sensor calendar, baselines or research calculations. The 200-point limit is a recent sample, not a complete global event count.
 
 For historical sensor records while the area API is inaccessible, use the [NASA FIRMS Archive Download](https://firms.modaps.eosdis.nasa.gov/download/) from a connection that can reach it, then import the downloaded CSV with `fireatlas.cli ingest` below. The archive requires an Earthdata login or email verification. Declare `--complete-month` only for a verified full month and matching AOI export; otherwise import it as partial and leave official monthly counts unknown.
 

@@ -27,7 +27,6 @@ from .fetch import FIRMS_SOURCES
 from .research import report as research_report
 from .study import build_bundle
 from .pilots import PilotSync, PILOTS
-from .events import latest as latest_events
 from .bootstrap import populate_showcase
 from .archive import BBOX as NASA_ARCHIVE_BBOX, SAMPLE as NASA_ARCHIVE_SAMPLE, import_bundle as import_nasa_archive
 from .globe import snapshot as globe_snapshot, detail as globe_detail
@@ -68,7 +67,6 @@ ASSETS = {
     "/fonts/space-grotesk.ttf": ("fonts/space-grotesk.ttf", "font/ttf"),
     "/study-ui.js": ("study-ui.js", "text/javascript; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
-    "/events.js": ("events.js", "text/javascript; charset=utf-8"),
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
     "/terrain-earth.html": ("terrain-earth.html", "text/html; charset=utf-8"),
     "/globe.js": ("globe.js", "text/javascript; charset=utf-8"),
@@ -128,8 +126,6 @@ def handler_factory(database: Path):
     database = Path(database)
     globe_lock = threading.Lock()
     globe_cache = {}
-    event_lock = threading.Lock()
-    event_cache = database.with_suffix(".events.json")
     pilot_sync = PilotSync(database)
     class Handler(BaseHTTPRequestHandler):
         def _local_data_action(self, content_type):
@@ -266,13 +262,6 @@ def handler_factory(database: Path):
                     return
                 if url.path == "/api/data/status":
                     self._json(pilot_sync.status())
-                    return
-                if url.path == "/api/events":
-                    try:
-                        with event_lock:
-                            self._json(latest_events(event_cache, refresh=params.get("refresh", ["0"])[0] == "1"))
-                    except ValueError as exc:
-                        self._json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
                     return
                 with connect(database) as db:
                     if url.path == "/api/validity":

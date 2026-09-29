@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     '[data-layer="landcover"]':'Land cover describes surface categories such as forest or cropland. Check the layer status for its source and date.',
     '[data-series="joint"]':'The joint series counts each 1 km cell once per UTC day across the historic MODIS and VIIRS S-NPP records. It requires both source products.',
     '#use-map-aoi':'Uses the current map bounds as your study area for the calendar and evidence. It does not change the global snapshot.',
-    '[data-event-layer="reported"]':'NASA EONET curates reported events. Its sample may be dominated by US sources and can include prescribed fires; it is not global satellite coverage.',
     '#export-observations':'Downloads the original observations for this selection. Availability follows the source exports that have been imported.',
     '#download-study':'Downloads a ZIP containing the selected study, calendar, source ledger and checksums. Context map imagery is not included.'
   };

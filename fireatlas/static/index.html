@@ -11,7 +11,6 @@
   <script src="/vendor/leaflet.js" defer></script>
   <script src="/app.js" defer></script>
   <script src="/study-ui.js" defer></script>
-  <script src="/events.js" defer></script>
   <script src="/earth-embed.js" defer></script>
   <script src="/globe-math.js" defer></script>
   <script src="/globe.js" defer></script>
@@ -30,7 +29,7 @@
     <a class="brand" href="/" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
     <div class="navigation-glass">
     <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#menu"></use></svg><span class="menu-label">Menu</span></button>
-    <nav id="site-navigation" aria-label="Project navigation"><a href="#top" class="active">Overview</a><a href="/method.html">Data &amp; method</a><a href="#study-workspace">Fire calendar</a><a href="#live-events">World snapshot</a><details class="nav-resources"><summary>Labs &amp; sources <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary><div><a href="/research.html">Research lab</a><a href="/data.html">Data sources</a></div></details></nav>
+    <nav id="site-navigation" aria-label="Project navigation"><a href="#top" class="active">Overview</a><a href="/method.html">Data &amp; method</a><a href="#study-workspace">Fire calendar</a><details class="nav-resources"><summary>Labs &amp; sources <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary><div><a href="/research.html">Research lab</a><a href="/data.html">Data sources</a></div></details></nav>
     </div>
   </header>
 
@@ -206,13 +205,6 @@
     <p id="research-entry-copy" hidden></p>
   </div>
   </section>
-    <p id="reading-guide" class="landing-reading-note">The historical calendar above uses a regional standard-product archive. The world map below shows separate, dated near-real-time snapshots.</p>
-    <section class="live-events" id="live-events" aria-labelledby="live-events-title">
-      <div class="live-events-heading"><div><p class="eyebrow">03 / SEPARATE WORLD SNAPSHOT</p><h2 id="live-events-title">Recent signals, <em>in context.</em></h2><p>Browse dated NASA near-real-time detections on a global map. This layer is separate from the historical MODIS–VIIRS calendar study.</p></div><div class="live-events-summary"><strong id="event-count">—</strong><span id="event-count-label">SATELLITE DETECTIONS · WORLDWIDE</span><small id="event-updated">Loading NASA satellite signals…</small></div></div>
-      <div class="event-map-toolbar"><div class="event-layer-tabs" role="group" aria-label="Fire map layer"><button type="button" data-event-layer="thermal" aria-pressed="true"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#satellite"></use></svg> Satellite signals</button><button type="button" data-event-layer="reported" aria-label="NASA EONET curated event sample" title="NASA EONET curated event sample" aria-pressed="false"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#layers"></use></svg> EONET report sample</button></div><label>Explore region <select id="event-region"><option value="world">Worldwide</option><option value="africa">Africa</option><option value="asia">Asia</option><option value="europe">Europe</option><option value="north-america">North America</option><option value="south-america">South America</option><option value="oceania">Oceania</option></select></label></div>
-      <div class="live-events-grid"><div class="event-map-wrap"><div id="event-map" role="application" aria-label="Map of NASA satellite detection groups"></div><div class="event-map-legend"><span id="event-legend" data-layer="thermal">● THERMAL DETECTION GROUPS</span><button id="event-reset" type="button">↺ Worldwide view</button></div></div><div class="event-side"><div class="event-side-heading"><span id="event-list-heading">LARGEST DETECTION GROUPS</span><button id="event-refresh" type="button">↻ Reload</button></div><p id="events-status" role="status">Loading NASA satellite signals…</p><div id="event-list" class="event-list"></div><button id="event-more" type="button" hidden>Show more locations</button><a id="event-source-link" href="https://firms.modaps.eosdis.nasa.gov/active_fire/" target="_blank" rel="noopener noreferrer">About NASA FIRMS ↗</a></div></div>
-      <p id="event-layer-note" class="live-events-note">NASA satellite detections grouped in 1° cells. These signals show observed heat, not verified fire boundaries or a count of wildfires. Open a group to inspect its source evidence and zoom to its location on Earth.</p>
-    </section>
   </div>
   </main>
   <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>

@@ -10,15 +10,6 @@
     if (className) el.className = className;
     return el;
   }
-  async function eventStatus() {
-    try {
-      const response = await fetch("/api/events");
-      const feed = await response.json();
-      if (!response.ok) throw new Error(feed.error || "Event feed unavailable");
-      $("eonet-count").textContent = feed.count.toLocaleString();
-      $("eonet-state").textContent = `${feed.stale ? "Cached copy" : "NASA EONET connected"} · ${new Date(feed.fetched_utc).toLocaleString()}`;
-    } catch (error) { $("eonet-state").textContent = error.message; }
-  }
   function pilotLink(pilot) {
     return `/?${new URLSearchParams({year:2025,month:7,series:"joint",bbox:pilot.bbox.join(",")})}#calendar-section`;
   }
@@ -174,5 +165,4 @@
     } catch (error) { $("data-error").hidden = false; $("data-error").textContent = error.message; $("sync-pilots").disabled = false; }
   });
   refresh();
-  eventStatus();
 })();
