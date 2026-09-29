@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       :report.sources.every(source=>source.full_month_export)
         ?'Authentic standard FIRMS exports · pass/cloud coverage still unknown.'
         :'Selected month lacks a complete paired standard export; counts may be partial.';
-    const c=new URLSearchParams({lite:'1',demo:'0',series:'joint',year:report.selected_date_utc.slice(0,4),month:String(Number(report.selected_date_utc.slice(5,7))),day:report.selected_date_utc,bbox:report.bbox.join(',')});
+    const c=new URLSearchParams({lite:'1',series:'joint',year:report.selected_date_utc.slice(0,4),month:String(Number(report.selected_date_utc.slice(5,7))),day:report.selected_date_utc,bbox:report.bbox.join(',')});
     $('#validity-open-calendar').href=`/?${c}#calendar-section`;
     $('#validity-official-link').href=report.official_reference.url;
     $('#validity-source-notice').hidden=!report.source_notice;

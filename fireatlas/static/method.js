@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const fmt = n => Number(n).toLocaleString('en-US');
   const explicitContext = params.get('context') === 'calendar';
   let report = null, recordRequest = 0, checkRequest = 0, auditUrl = null, selectedCell = null;
-  let context = explicitContext ? {year:params.get('year'),month:params.get('month'),series:params.get('series')||'joint',bbox:params.get('bbox'),demo:params.get('demo')||'0',day:params.get('day')||''} : null;
+  let context = explicitContext ? {year:params.get('year'),month:params.get('month'),series:params.get('series')||'joint',bbox:params.get('bbox'),day:params.get('day')||''} : null;
   const archiveCache = new Map();
   function node(tag, attrs, parent, text) { const n=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(attrs||{})) n.setAttribute(k,v); if(text!==undefined)n.textContent=text; parent.append(n); return n; }
   function svgText(parent,x,y,text,size=11,color='#b6cdd1') {return node('text',{x,y,fill:color,'font-family':'DM, sans-serif','font-size':size,'text-anchor':'middle'},parent,text);}
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#flow-context').textContent=report.title;const dateSelect=$('#flow-day');dateSelect.replaceChildren();for(const d of report.days)dateSelect.add(new Option(d.date_utc,d.date_utc,false,d.date_utc===day.date_utc));dateSelect.disabled=false;
     $('#flow-pixels').textContent=fmt(Object.values(day.raw_pixels).reduce((a,b)=>a+b,0));
     $('#flow-cells').textContent=fmt(day.joint_detected_cell_days);$('#flow-date').textContent=day.date_utc+' UTC';
-    $('#flow-calendar-link').href=calendarUrl({demo:'0',series:'joint',year:day.date_utc.slice(0,4),month:Number(day.date_utc.slice(5,7)),day:day.date_utc,bbox:report.bbox.join(',')});
+    $('#flow-calendar-link').href=calendarUrl({series:'joint',year:day.date_utc.slice(0,4),month:Number(day.date_utc.slice(5,7)),day:day.date_utc,bbox:report.bbox.join(',')});
     const svg=$('#flow-calendar');svg.replaceChildren();node('title',{},svg,'Actual counts for days in the selected historical case');
     const maximum=Math.max(1,...report.days.map(d=>d.joint_detected_cell_days));
     report.days.forEach((d,i)=>{const x=9+(i%5)*38,y=18+Math.floor(i/5)*43,active=d.date_utc===day.date_utc;
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('fireatlas:validity-report',event=>{
     const next=event.detail,changed=report?.case_id!==next.case_id;report=next;
     const day=report.days.find(d=>d.date_utc===report.selected_date_utc);drawFlow(day);if(changed)resetProof();
-    if(!context||!explicitContext)context={demo:'0',year:day.date_utc.slice(0,4),month:Number(day.date_utc.slice(5,7)),series:'joint',bbox:report.bbox.join(','),day:day.date_utc};
+    if(!context||!explicitContext)context={year:day.date_utc.slice(0,4),month:Number(day.date_utc.slice(5,7)),series:'joint',bbox:report.bbox.join(','),day:day.date_utc};
     $('#method-calendar').href=calendarUrl(context);
     if(!explicitContext||!$('#record-day').value){$('#record-day').value=context.day||`${context.year}-${String(context.month).padStart(2,'0')}-01`;loadRecords();}
   });
@@ -89,12 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!/^\d{4}-\d{2}-\d{2}$/.test(selected)){$('#record-status').textContent='Choose a valid UTC date.';return;}
     context={...context,day:selected,year:selected.slice(0,4),month:Number(selected.slice(5,7))};
     const c={...context};$('#context-calendar').href=calendarUrl(c);$('#method-calendar').href=calendarUrl(c);
-    $('#record-context').textContent=`${explicitContext?'Your calendar selection':selected===report?.selected_date_utc?'Historical case':'Source inspection'} · ${c.demo==='1'?'SYNTHETIC EXAMPLE':'Imported archive'} · ${c.series} · ${selected} UTC · AOI ${c.bbox}`;
+    $('#record-context').textContent=`${explicitContext?'Your calendar selection':selected===report?.selected_date_utc?'Historical case':'Source inspection'} · Imported archive · ${c.series} · ${selected} UTC · AOI ${c.bbox}`;
     $('#record-status').textContent='Loading original source rows…';$('#method-source-rows').replaceChildren();$('#method-source-table').replaceChildren();$('#method-ledger').replaceChildren();$('#method-version-note').textContent='';$('#method-audit-status').textContent='Loading monthly comparison…';$('#method-audit-download').removeAttribute('href');
-    const query=new URLSearchParams(c);$('#method-study-download').href=`/api/study?${query}`;const monthKey=new URLSearchParams({demo:c.demo,year:c.year,month:c.month,series:c.series,bbox:c.bbox}).toString();
+    const query=new URLSearchParams(c);$('#method-study-download').href=`/api/study?${query}`;const monthKey=new URLSearchParams({year:c.year,month:c.month,series:c.series,bbox:c.bbox}).toString();
     try{
       const cached=archiveCache.get(monthKey);
-      const [obs,both]=await Promise.all([json(`/api/observations?${new URLSearchParams({date:selected,series:c.series,bbox:c.bbox,demo:c.demo})}`),cached?Promise.resolve(cached):Promise.all([json(`/api/harmonization?${query}`),json(`/api/calendar?${query}`)])]);
+      const [obs,both]=await Promise.all([json(`/api/observations?${new URLSearchParams({date:selected,series:c.series,bbox:c.bbox})}`),cached?Promise.resolve(cached):Promise.all([json(`/api/harmonization?${query}`),json(`/api/calendar?${query}`)])]);
       if(generation!==recordRequest)return;archiveCache.set(monthKey,both);const [audit,calendar]=both;
       $('#record-status').textContent=`${fmt(obs.observations.length)} ${obs.truncated?'displayed pixels · truncated; download the study for the full selection':'source pixels'} · ${selected} UTC`;
       if(!obs.observations.length)$('#record-status').textContent='No imported detections on this day. Pass and cloud coverage remain unknown.';
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
       for(const s of audit.sources){const tr=document.createElement('tr');for(const value of [s.source_id,s.product_versions.join(', ')||'Unknown',fmt(s.raw_pixels),fmt(s.detected_cell_days),s.full_month_export?'Complete':'Incomplete']){const td=document.createElement('td');td.textContent=value;tr.append(td);}body.append(tr);}table.append(body);$('#method-source-table').append(table);
       const readings={'mixed-product-versions-across-years':'Product versions differ across years. Historical comparisons are descriptive.','same-observed-product-versions':'Observed product versions match. Observation opportunities remain unknown.','no-qualifying-baseline-years':'No qualifying historical baseline.','unknown-where-source-has-no-detections':'Historical version comparison incomplete where no source rows exist.'};$('#method-version-note').textContent=readings[audit.baseline_version_status]||audit.baseline_version_status;
       if(auditUrl)URL.revokeObjectURL(auditUrl);auditUrl=URL.createObjectURL(new Blob([JSON.stringify(audit,null,2)],{type:'application/json'}));const link=$('#method-audit-download');link.href=auditUrl;link.download=`fireatlas_method_audit_${c.year}_${c.month}.json`;
-      for(const source of calendar.provenance||[]){const item=document.createElement('article');item.className='method-ledger-item';const title=document.createElement('strong'),uri=document.createElement('p'),hash=document.createElement('code');title.textContent=`${source.source_id} · ${source.demo?'Synthetic':'Imported'} · retrieved ${source.retrieved_utc}`;uri.textContent=source.source_uri;hash.textContent='SHA-256 '+source.file_sha256;item.append(title,uri,hash);$('#method-ledger').append(item);}
+      for(const source of calendar.provenance||[]){const item=document.createElement('article');item.className='method-ledger-item';const title=document.createElement('strong'),uri=document.createElement('p'),hash=document.createElement('code');title.textContent=`${source.source_id} · Imported · retrieved ${source.retrieved_utc}`;uri.textContent=source.source_uri;hash.textContent='SHA-256 '+source.file_sha256;item.append(title,uri,hash);$('#method-ledger').append(item);}
       if(!calendar.provenance?.length)$('#method-ledger').textContent='No source imports for this selection.';
     }catch(e){if(generation!==recordRequest)return;$('#record-status').textContent=`Evidence unavailable: ${e.message}`;$('#method-audit-status').textContent='Monthly audit unavailable.';}
   }

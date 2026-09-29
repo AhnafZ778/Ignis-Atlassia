@@ -1,8 +1,7 @@
-"""Generate clearly labelled synthetic FIRMS-shaped records for a reproducible demo."""
+"""Build synthetic FIRMS-shaped fixtures for automated tests only."""
 
 from __future__ import annotations
 
-import argparse
 import csv
 from pathlib import Path
 
@@ -53,15 +52,3 @@ def make_demo(directory: Path, database: Path) -> None:
                 print(f"{path.name}: {result['rows_inserted']} inserted")
     finally:
         db.close()
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--directory", type=Path, default=Path("data/demo"))
-    parser.add_argument("--db", type=Path, default=Path("data/demo.sqlite3"))
-    args = parser.parse_args()
-    make_demo(args.directory, args.db)
-
-
-if __name__ == "__main__":
-    main()

@@ -22,23 +22,23 @@ The [PRD](PRD.md) defines the full NASA Space Apps project. The local web MVP ru
 bash scripts/launch_demo.sh
 ```
 
-The launcher installs the locked core dependencies and starts the local demo. To process native MODIS/VIIRS mask files, install the optional NumPy extra with `uv sync --extra masks` and a system GDAL build with the required HDF4/netCDF drivers; see [native-mask setup](docs/NATIVE_MASK_VALIDATION.md).
+The launcher installs the locked core dependencies and starts the local site. To process native MODIS/VIIRS mask files, install the optional NumPy extra with `uv sync --extra masks` and a system GDAL build with the required HDF4/netCDF drivers; see [native-mask setup](docs/NATIVE_MASK_VALIDATION.md).
 
-Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
+Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
 
-**Guided tour:** Use **Start the guided tour** on the landing page. Five interactive stops move through the AOI map, monthly activity, sensor switch, original evidence, and data sources. The example shows four MODIS raw pixels, twelve VIIRS raw pixels, and four joint cell-days in July 2015; the measures and synthetic source are labelled. This tour uses the normal controls and queries. Shared atlas links, CSV exports and study bundles retain the selected demo/authentic context. The Research Lab also opens the same mode from the atlas.
+The former synthetic guided tour and generated-data mode have been removed from the website. Synthetic generators and the old presentation provenance code remain for automated tests only. The server rejects `demo` query parameters and refuses to start against a database containing generated demonstration batches.
 
 The homepage uses the satellite Earth and World Elevation terrain from the supplied `fireatlas_terrain_fixed.html` demo, integrated through `/terrain-earth.html`. Its native ArcGIS projection keeps the clickable NASA FIRMS detections, historical flame textures, region navigation, zoom, rotation and date/sensor filters aligned with the globe. Elevation is sampled from the displayed terrain at close zooms. An accessible case/evidence list supplies the same records when 3D is unavailable. “Explore terrain Earth” opens the terrain globe with California and reset controls; the original self-contained visual model remains available at `/earth.html`. The terrain view loads ArcGIS Maps SDK 4.32, Esri imagery and World Elevation over the network and retains their attribution. Surface imagery is separate from the dated NASA detection overlay.
 
-The landing globe uses **authentic NASA NRT imports only**, independently of the atlas's synthetic/authentic selector. With the current CSVs, it represents all **866,956 detections** as **7,307 one-degree geographic clusters** over September 20–27, 2026. Each marker sits at its observations' mean coordinates; its size indicates detection count, and brighter points include observations from the latest day in the selected snapshot. Selecting a cell also displays up to 12 latest records at their original coordinates in cyan. These are detection groups, not fire incidents or perimeters. The panel identifies the first/last observations and maximum individual-pixel FRP; it does not infer ignition time, wildfire severity or current containment. Multiple satellites and repeat passes may observe the same fire.
+The landing globe uses **authentic NASA NRT imports only**. With the current local database, it represents **866,956 detections** as **7,307 one-degree geographic clusters** over September 20–27, 2026. Each marker sits at its observations' mean coordinates; its size indicates detection count, and brighter points include observations from the latest day in the selected snapshot. Selecting a cell also displays up to 12 latest records at their original coordinates in cyan. These are detection groups, not fire incidents or perimeters. The panel identifies the first/last observations and maximum individual-pixel FRP; it does not infer ignition time, wildfire severity or current containment. Multiple satellites and repeat passes may observe the same fire.
 
-The globe window includes the latest imported NASA observation date and seven preceding UTC dates. It follows the imported database rather than calling NASA APIs. Date/source filters and cluster details are cached briefly, with database changes invalidating the cache. Empty sources and failed requests are shown explicitly; neither NOAA HMS nor synthetic data substitutes for missing NASA globe data. A fresh checkout must import the recent NASA CSVs or receive the local database to reproduce this global overlay. [Globe implementation and verification](docs/GLOBE_OBSERVATIONS.md) records the supported behavior and interpretation.
+The globe window includes the latest imported NASA observation date and seven preceding UTC dates. It follows the imported database rather than calling NASA APIs. Date/source filters and cluster details are cached briefly, with database changes invalidating the cache. Empty sources and failed requests are shown explicitly; NOAA HMS does not substitute for missing NASA globe data. A fresh checkout must import the recent NASA CSVs or receive the local database to reproduce this global overlay. [Globe implementation and verification](docs/GLOBE_OBSERVATIONS.md) records the supported behavior and interpretation.
 
 The atlas and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
 
-The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. In authentic mode, the Fire weather layer says no GFWED data are loaded. In demo mode, local synthetic context illustrations are available for the 2023–2026 Northern California scenario; the weather illustration uses arbitrary units, not computed FWI. To run the synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations remain in separate databases.
+The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. The Fire weather layer reports that no GFWED data are loaded. Synthetic context illustrations are no longer part of the website.
 
-The atlas also provides a **historical responder brief** for the selected month. It ranks up to five observed active dates from the existing calendar, reports complete versus unknown export days, and links each date to its source observations. It is labelled synthetic or imported and is explicitly non-operational: it does not select an observation sector, issue a flight plan, dispatch a UAS, forecast spread, issue an alert, or recommend containment.
+The atlas also provides a **historical responder brief** for the selected month. It ranks up to five observed active dates from the existing calendar, reports complete versus unknown export days, and links each date to its source observations. It is explicitly non-operational: it does not select an observation sector, issue a flight plan, dispatch a UAS, forecast spread, issue an alert, or recommend containment.
 
 ### Authentic NASA MODIS + VIIRS historical calendar
 
@@ -80,23 +80,13 @@ Verify a downloaded bundle without querying the database:
 uv run python -m fireatlas.study ~/Downloads/fireatlas_study_joint_2015.zip
 ```
 
-The verifier checks SHA-256 integrity and reproduces daily/monthly cell-day counts, completeness, baseline medians and differences using the included normalized grid assignments. It does not independently validate satellite observations or the grid transform. Bundles omit full original import files, map imagery and research masks; file hashes are not authenticity signatures. Synthetic data remain labelled throughout the bundle.
+The verifier checks SHA-256 integrity and reproduces daily/monthly cell-day counts, completeness, baseline medians and differences using the included normalized grid assignments. It does not independently validate satellite observations or the grid transform. Bundles omit full original import files, map imagery and research masks; file hashes are not authenticity signatures. Older test bundles preserve labels for synthetic rows.
 
 Version 2 bundles also include `harmonization.json`, a selected-month audit of raw source pixels, common-grid cell-days, co-detected cells, product versions and complete export windows. The verifier recomputes those fields from the frozen rows; it still accepts older version 1 bundles without an audit. For a walkthrough without the network-dependent 3D terrain preview, use `/?lite=1#study-workspace` to open the same atlas data controls directly. Other data requests still require the server.
 
-## Run the synthetic example
+## Synthetic fixtures
 
-Python 3.10+ and `pyproj` are required. Install with `uv sync` and run the commands below. Alternatively, use `python3 -m pip install -e .` and replace `uv run python` with `python3`.
-
-```bash
-uv run python -m fireatlas.demo
-uv run python -m fireatlas.cli --db data/demo.sqlite3 calendar \
-  --bbox -122 39 -120 41 --year 2015 --series joint \
-  --output data/demo-calendar.json
-uv run python -m unittest discover -s tests -v
-```
-
-Everything in `data/demo/` is **synthetic** and labelled as such in JSON output. The July 2015 example has repeated pixels from two sensors in the same cell: joint cell-days remain deduplicated, while raw sensor pixel counts remain separate. The baseline uses only prior 2012–2014 July windows. This demonstrates behavior, not real fire history.
+Synthetic generators are called only from automated tests. They have no command-line entry point and cannot be selected by the website. Run `uv run python -m unittest discover -s tests -v` to exercise them. Never use test fixtures as fire history or as scientific evidence.
 
 ## Use authentic NASA FIRMS data
 
@@ -210,49 +200,27 @@ The fictional Training Lab and its crew-response simulation have been moved off 
 Open **http://127.0.0.1:8000/research.html**, or select **Research** on the homepage. The research entry below the atlas carries the selected AOI, year and month into the lab.
 
 - Compare daily MODIS and VIIRS common-cell overlap, raw pixel counts and descriptive ratios. Inspect the exact counts and source versions in the expandable table.
-- Set the acquisition cutoff, distance threshold and date gap to explore candidate detection groups. The default September 2026 synthetic study has three spatial groups and 26 active days. The older guided-tour July 2015 scenario remains available with one four-day group; choosing **Same day only** splits that group into four.
-- Import a prepared observation-mask JSON file to calculate rates within supplied observed exposure. **Load synthetic example** demonstrates the calculation within generated cells. The Data Sources research link opens with this fabricated mask already selected. Changing the period or AOI clears it; all denominators are explicitly labelled synthetic.
+- Set the acquisition cutoff, distance threshold and date gap to explore candidate detection groups.
+- Import a prepared observation-mask JSON file to calculate rates within supplied observed exposure. No generated mask is supplied by the website. Changing the period or AOI clears the uploaded mask.
 - Export the study, input mask, parameters, source hashes, candidate membership and report identifier as JSON. Uploaded masks are evaluated for the request and are not saved to the database. Download them before leaving the page if needed.
 
-The exploratory ratio band requires at least ten active days, complete source exports and one product version per source. The richer September 2026 demonstration meets these requirements; the older July 2015 guided tour still correctly withholds that band. Calibrated sensitivity, verified masks, SAR change evidence and regional spread ensembles require external datasets and scientific validation; the lab exposes their status without fabricating results.
+The exploratory ratio band requires at least ten active days, complete source exports and one product version per source. Calibrated sensitivity, verified masks, SAR change evidence and regional spread ensembles require external datasets and scientific validation; the lab exposes their status without fabricating results.
 
 The same study is reproducible from the CLI:
 
 ```bash
-uv run python -m fireatlas.cli --db data/demo.sqlite3 research \
-  --year 2015 --month 7 --bbox -122 39 -120 41 \
+uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 research \
+  --year 2025 --month 7 --bbox -122.2 38.8 -120 41 \
   --distance-km 2 --gap-days 1 --output data/research-study.json
 ```
 
 Add `--as-of 2015-07-02` to limit acquisition dates, or `--mask path/to/coverage.json` to use a prepared coverage mask. [Research methods and mask format](docs/RESEARCH_METHODS.md) describe the calculations, limits, data requirements and reference documentation.
 
 
-## Presentation dataset and data readiness
+## Data and demo status
 
-Open [Data Sources](http://127.0.0.1:8000/data.html) for the authentic imports and three demonstration entry points. No further NASA download is required to work on navigation and interactivity.
+Open [Data Sources](http://127.0.0.1:8000/data.html) for authentic imports, provenance, and source status. The bundled historical NASA archive is regional; the larger local imports and `NASA_data/` files remain outside Git.
 
-- **Authentic database:** 866,956 accepted detections from the three downloaded September 2026 CSVs, plus 49,420 NOAA HMS historical records. A polar row remains preserved in the exclusion ledger. Rolling NASA exports remain partial; missing days are never filled in authentic mode.
-- **Separate synthetic database:** 11,322 presentation detections across 96 source-months, covering every month in 2023–2026. Three prior years support each 2026 monthly baseline. The old guided tour remains available, with its scenario excluded from the new baseline.
-- **Traceable generation:** the small bundled `fireatlas/samples/presentation_seeds.json` contains sampled measured attributes, original CSV line numbers and SHA-256 hashes. All dates, positions, seasonality and paired satellite scenarios are invented; synthetic S-NPP-shaped records are not real NOAA-to-S-NPP conversions. The fixture includes hypothetical months after the current date.
-- **Local context:** NDVI-style values, land-cover classes and an arbitrary weather index illustrate the controls. They are not inferred from the CSVs or presented as actual imagery, weather observations or forecasts. Synthetic context is restricted to the showcase region and explicitly gated by `demo=1`.
-- **Portable evidence:** synthetic study ZIPs include generation provenance and selected context GeoJSON; Research Lab JSON includes seed provenance and any supplied exposure mask. CSV rows retain their synthetic flag, source URI and seed references.
+The website has no synthetic showcase or guided synthetic tour. Synthetic generators remain for automated tests; the server rejects `demo` query parameters and refuses to start against a database containing generated demonstration batches. Do not present test fixtures as satellite observations.
 
-The server creates fixtures on the first demo request, resumes interrupted generation and refuses to add them to a database containing authentic batches. To prebuild them before a presentation:
-
-```bash
-uv run python -m fireatlas.presentation --db data/demo.sqlite3
-```
-
-The original files in `NASA_data/` and the populated databases remain ignored by Git. The bundled seed sample and NOAA historical slice work from a fresh checkout; deploying the full recent authentic snapshot requires copying the database or importing those original CSVs. Synthetic presentation data is reproducible without those full files or a NASA API connection.
-
-See [Data readiness and verification](docs/DATA_READINESS.md) for the tested scope and remaining scientific limits.
-
-### Judge-ready demonstration
-
-For a deterministic presentation from a fresh checkout, run:
-
-```powershell
-.\scripts\launch_judge_demo.ps1
-```
-
-This creates `data/judge-demo.sqlite3` locally from the versioned synthetic generator and serves the complete guided study at `http://127.0.0.1:8000/?demo=1`. Open the page once while connected so the app shell and explicitly selected synthetic example API responses are cached; the atlas and insight card can then be rehearsed if the network drops. Authentic imports and current feeds are never replayed from the app cache after disconnection. Synthetic data are labelled throughout and are never mixed into the authentic database.
+See [Data readiness and verification](docs/DATA_READINESS.md) for current checks and scientific limitations. The older presentation guide under `docs/presentation/` is a historical artifact and does not describe the current site.

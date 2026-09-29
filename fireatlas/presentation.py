@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import contextlib
 import csv
 import hashlib
@@ -110,12 +109,3 @@ def context_fixture(*, year, month, bbox, layer):
             "year": year, "month": month, "layer": layer, "time_resolution": "illustrative monthly snapshot",
             "note": "SYNTHETIC illustration · Northern California only · not satellite imagery or a weather forecast",
             "features": features}
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--db", type=Path, default=Path("data/demo.sqlite3"))
-    parser.add_argument("--directory", type=Path, default=Path("data/presentation"))
-    args = parser.parse_args()
-    ensure_presentation(args.directory, args.db)
-    print(json.dumps(provenance(), indent=2))

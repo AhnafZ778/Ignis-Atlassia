@@ -1,6 +1,6 @@
 # FireAtlas research methods, version 1
 
-The Research Lab is a reproducible exploratory workspace. It does not yet supply calibrated sensor sensitivity, validated fire-event identities or a regional spread model. The supplied demonstration uses synthetic FIRMS-shaped records and explicitly synthetic observation exposure.
+The Research Lab is a reproducible exploratory workspace. It does not yet supply calibrated sensor sensitivity, validated fire-event identities or a regional spread model. Synthetic FIRMS-shaped records and generated observation exposure are test fixtures only; the website has no generated-data mode.
 
 ## Study scope and provenance
 
@@ -52,7 +52,7 @@ The mask adapter accepts a prepared JSON object. It does not read or classify sa
 }
 ```
 
-This one-row example describes the schema, not complete AOI coverage. Use **Load synthetic example → Download current mask** for an example matching the active demo study.
+This one-row example describes the schema, not complete AOI coverage. The website no longer generates a mask; provide a prepared upstream mask file if you have one.
 
 Rules:
 
@@ -64,13 +64,13 @@ Rules:
 
 For each source, let **O** be supplied observed cell-days and **D** be detected cell-days. The displayed rate is `100 × |D ∩ O| / |O|`. Empty exposure or an incomplete FIRMS source export produces a null rate. This is a rate within supplied observed exposure, not an estimate for the full AOI. No joint-sensor exposure is inferred. Source-specific masks can cover different locations; their rates are not automatically comparable.
 
-The synthetic mask generator assumes daily observation of every selected detection cell by both sources, including non-detection days. This is invented exposure for testing, not a satellite mask. Its `synthetic` flag and method description are retained in exports.
+The test-only synthetic mask fixture assumes daily observation of every selected detection cell by both sources, including non-detection days. This is invented exposure for tests, not a satellite mask. Its `synthetic` flag and method description are retained in test exports.
 
 ## API and reproduction
 
 - `GET /api/research?year=2015&month=7&bbox=-122,39,-120,41&distance_km=2&gap_days=1` returns the unmasked study.
 - `POST /api/research` accepts `{"config": {...}, "mask": {...}}`; omit or use null for the mask to leave coverage unknown.
-- `GET /api/research/coverage-example` accepts the same query settings and only generates an example when all selected observations are synthetic.
+- Observation masks must be supplied as a prepared JSON file. The former generated-mask route was retired; a mask upload is validated for scope and consistency but not scientifically certified.
 - `fireatlas research` supports the same settings plus a local `--mask` file and `--output` report file.
 
 ## Remaining research gates

@@ -24,14 +24,12 @@ from urllib.parse import parse_qs, urlsplit
 
 from .core import SERIES, _complete_month, calendar, connect, ingest, validate_bbox
 from .fetch import FIRMS_SOURCES
-from .demo import make_demo
-from .research import report as research_report, coverage_example
+from .research import report as research_report
 from .study import build_bundle
 from .pilots import PilotSync, PILOTS
 from .events import latest as latest_events
 from .bootstrap import populate_showcase
 from .archive import BBOX as NASA_ARCHIVE_BBOX, SAMPLE as NASA_ARCHIVE_SAMPLE, import_bundle as import_nasa_archive
-from .presentation import ensure_presentation, provenance as presentation_provenance, context_fixture, DEFAULT_VIEW
 from .globe import snapshot as globe_snapshot, detail as globe_detail
 from .briefing import responder_briefing
 from .harmonization import month_audit
@@ -68,7 +66,6 @@ ASSETS = {
     "/fonts/space-grotesk.ttf": ("fonts/space-grotesk.ttf", "font/ttf"),
     "/study-ui.js": ("study-ui.js", "text/javascript; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
-    "/story.js": ("story.js", "text/javascript; charset=utf-8"),
     "/events.js": ("events.js", "text/javascript; charset=utf-8"),
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
     "/terrain-earth.html": ("terrain-earth.html", "text/html; charset=utf-8"),
@@ -127,9 +124,6 @@ def _records(db, sources, bbox, start, end, limit):
 
 def handler_factory(database: Path):
     database = Path(database)
-    demo_database = database.with_name("demo.sqlite3")
-    demo_lock = threading.Lock()
-    demo_ready = False
     globe_lock = threading.Lock()
     globe_cache = {}
     event_lock = threading.Lock()
@@ -143,22 +137,6 @@ def handler_factory(database: Path):
                     and hostname in ("localhost", "127.0.0.1", "::1")
                     and self.headers.get("Origin") == f"http://{host}"
                     and self.headers.get("Content-Type") == content_type)
-
-        def _database_for(self, params):
-            nonlocal demo_ready
-            choice = params.get("demo", ["0"])[0]
-            if choice not in ("0", "1"):
-                raise ValueError("demo must be 0 or 1")
-            if choice == "0":
-                return database
-            with demo_lock:
-                if not demo_ready:
-                    with contextlib.redirect_stdout(io.StringIO()):
-                        # Legacy tour and richer seasonal fixtures coexist in separate years.
-                        ensure_presentation(demo_database.parent / "presentation", demo_database)
-                        make_demo(demo_database.parent / "demo", demo_database)
-                    demo_ready = True
-            return demo_database
 
         def _respond(self, content: bytes, content_type: str, status: HTTPStatus = HTTPStatus.OK, filename=None):
             self.send_response(status)
@@ -237,7 +215,9 @@ def handler_factory(database: Path):
                 if set(payload["config"]) - allowed:
                     raise ValueError("unknown research configuration field")
                 params = parse_qs(urlsplit(self.path).query)
-                with connect(self._database_for(params)) as db:
+                if "demo" in params:
+                    raise ValueError("The synthetic showcase has been retired; remove the demo parameter.")
+                with connect(database) as db:
                     self._json(research_report(db, **payload["config"], mask=payload.get("mask")))
             except (ValueError, TypeError, OverflowError) as exc:
                 self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
@@ -261,9 +241,9 @@ def handler_factory(database: Path):
                 return
             try:
                 params = parse_qs(url.query)
+                if "demo" in params:
+                    raise ValueError("The synthetic showcase has been retired; remove the demo parameter.")
                 if url.path in ("/api/globe", "/api/globe/detail"):
-                    if params.get("demo", ["0"])[0] != "0":
-                        raise ValueError("The landing globe displays authentic NASA imports only")
                     source, day = params.get("source", ["all"])[0], params.get("date", ["all"])[0]
                     # Bound both cache size and age; database/WAL changes invalidate the snapshot.
                     stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
@@ -292,17 +272,11 @@ def handler_factory(database: Path):
                     except ValueError as exc:
                         self._json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
                     return
-                with connect(self._database_for(params)) as db:
-                    if url.path == "/api/presentation":
-                        self._json(presentation_provenance())
-                    elif url.path == "/api/validity":
-                        if params.get("demo", ["0"])[0] != "0":
-                            raise ValueError("historical validity cases require authentic data")
+                with connect(database) as db:
+                    if url.path == "/api/validity":
                         self._json(validity_report(db, case_id=params.get("case", ["park-2024"])[0],
                                                    selected_date=params.get("date", [None])[0]))
                     elif url.path == "/api/validity/check":
-                        if params.get("demo", ["0"])[0] != "0":
-                            raise ValueError("historical recount requires authentic data")
                         from .validation_check import check as analytical_check
                         case_id = params.get("case", ["park-2024"])[0]
                         evidence = build_validity_evidence(db, case_id)
@@ -312,20 +286,11 @@ def handler_factory(database: Path):
                             checked["manifest_sha256"] = hashlib.sha256(archive.read("manifest.json")).hexdigest()
                         self._json(checked)
                     elif url.path == "/api/validity/export":
-                        if params.get("demo", ["0"])[0] != "0":
-                            raise ValueError("historical validity cases require authentic data")
                         case_id = params.get("case", ["park-2024"])[0]
                         self._respond(build_validity_evidence(db, case_id), "application/zip",
                                       filename=f"fireatlas_validity_{case_id}.zip")
-                    elif url.path == "/api/context":
-                        if params.get("demo", ["0"])[0] != "1":
-                            raise ValueError("Synthetic context requires explicit demo=1; authentic data are never filled with synthetic values")
-                        year, month, _, bbox = _request_context(params)
-                        self._json(context_fixture(year=year, month=month, bbox=bbox, layer=params.get("layer", ["none"])[0]))
                     elif url.path == "/api/research":
                         self._json(research_report(db, **_research_context(params)))
-                    elif url.path == "/api/research/coverage-example":
-                        self._json(coverage_example(db, **_research_context(params)))
                     elif url.path == "/api/meta":
                         rows = db.execute("""
                             SELECT DISTINCT year FROM (
@@ -342,9 +307,6 @@ def handler_factory(database: Path):
                         standard_pair_ready = _complete_month(db, "2025-07", SERIES["joint"], NASA_ARCHIVE_BBOX)
                         if standard_pair_ready:
                             default_view = {"year": 2024, "month": 7, "bbox": VALIDITY_CASES["park-2024"]["bbox"]}
-                            default_series = "joint"
-                        if params.get("demo", ["0"])[0] == "1":
-                            default_view = DEFAULT_VIEW
                             default_series = "joint"
                         self._json({"years": [row["year"] for row in rows], "series": list(SERIES),
                                     "default_view": default_view, "pilots": PILOTS,
@@ -504,14 +466,7 @@ def main():
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--no-showcase", action="store_true", help="leave the default authentic database empty on first launch")
-    parser.add_argument("--judge-demo", action="store_true", help="launch the deterministic synthetic judge demonstration")
     args = parser.parse_args()
-    if args.judge_demo:
-        args.db = Path("data/judge-demo.sqlite3")
-        if not args.db.exists():
-            make_demo(Path("data/judge-demo"), args.db)
-    if not args.db.exists() and args.db == Path("data/demo.sqlite3"):
-        make_demo(Path("data/demo"), args.db)
     if args.db == Path("data/fireatlas.sqlite3") and not args.no_showcase:
         result = populate_showcase(args.db)
         if result["loaded"]:
@@ -521,6 +476,10 @@ def main():
             if nasa_result["imported_rows"]:
                 PilotSync(args.db).reconcile_imports()
                 print(f"Loaded {nasa_result['imported_rows']} regional NASA FIRMS archive detections.", flush=True)
+    if args.db.exists():
+        with connect(args.db) as db:
+            if db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone():
+                raise SystemExit("Refusing to serve a database containing synthetic demonstration records.")
     server = ThreadingHTTPServer((args.host, args.port), handler_factory(args.db))
     print(f"FireAtlas web MVP: http://{args.host}:{args.port}", flush=True)
     try:

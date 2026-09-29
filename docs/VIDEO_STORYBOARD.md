@@ -18,7 +18,7 @@ For a timeline-only 16:9 frame, use `/method.html?frame=1&case=park-2024`. The o
 ## Recording controls
 
 - Top case and UTC controls update the workflow, the actual-cell example, the union equation and the migrated case scenes together.
-- The source inspector receives the exact AOI, series, date and synthetic/imported mode from a calendar link. Its monthly audit is explicitly **whole-month**, while the example workflow uses the **fixed case window**.
+- The source inspector receives the exact AOI, series and date from an authentic calendar link. Its monthly audit is explicitly **whole-month**, while the historical example workflow uses the **fixed case window**.
 - Incident photos appear only with the evidence section expanded; they are context, not calculation inputs.
 - Recount success is shown only after the current server calculation. Capture errors and missing states honestly.
 - Keep unavailable pass/cloud coverage in view; do not invent perimeters, forecast spread, sensor equivalence or a judging score.

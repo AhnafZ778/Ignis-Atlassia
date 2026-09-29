@@ -20,7 +20,7 @@
     } catch (error) { $("eonet-state").textContent = error.message; }
   }
   function pilotLink(pilot) {
-    return `/?${new URLSearchParams({year:2025,month:7,series:"joint",bbox:pilot.bbox.join(","),demo:0})}#calendar-section`;
+    return `/?${new URLSearchParams({year:2025,month:7,series:"joint",bbox:pilot.bbox.join(",")})}#calendar-section`;
   }
   async function refresh() {
     if (busy) return;
@@ -39,7 +39,7 @@
         $("recent-dates").textContent = `${first.slice(0,10)} → ${last.slice(0,10)} · UTC acquisition dates`;
         $("recent-links").replaceChildren(...recent.map(source => {
           const link = node("a", source.source_id.replace("VIIRS_", "VIIRS ").replace("_NRT", "") + " ↗");
-          link.href = `/?${new URLSearchParams({demo:0,series:source.series,year:source.last_observation.slice(0,4),month:Number(source.last_observation.slice(5,7)),bbox:"-180,-86,180,86"})}#atlas-section`;
+          link.href = `/?${new URLSearchParams({series:source.series,year:source.last_observation.slice(0,4),month:Number(source.last_observation.slice(5,7)),bbox:"-180,-86,180,86"})}#atlas-section`;
           return link;
         }));
         const excluded = recent.reduce((sum,source) => sum + (source.excluded_rows || 0), 0);
@@ -105,7 +105,7 @@
             const window = source.latest_window;
             const bbox = window ? [window.west,window.south,window.east,window.north] : [Math.max(-180,source.west-.05),Math.max(-86,source.south-.05),Math.min(180,source.east+.05),Math.min(86,source.north+.05)];
             const date = window?.month || source.last_observation;
-            link.href = `/?${new URLSearchParams({demo:source.demo ? 1 : 0, series:source.series, year:date.slice(0,4), month:Number(date.slice(5,7)), bbox:bbox.join(",")})}#atlas-section`;
+            link.href = `/?${new URLSearchParams({series:source.series, year:date.slice(0,4), month:Number(date.slice(5,7)), bbox:bbox.join(",")})}#atlas-section`;
             card.append(link);
           }
         }

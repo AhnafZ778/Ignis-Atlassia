@@ -15,6 +15,7 @@ from urllib.request import urlopen, Request
 
 from fireatlas.demo import make_demo
 from fireatlas.core import connect
+from fireatlas.research import coverage_example
 from fireatlas.web import handler_factory
 
 
@@ -24,6 +25,7 @@ class WebMvpTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         root = Path(self.temp.name)
         database = root / "demo.sqlite3"
+        self.database = database
         with contextlib.redirect_stdout(io.StringIO()):
             make_demo(root / "demo", database)
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), handler_factory(database))
@@ -73,7 +75,7 @@ class WebMvpTests(unittest.TestCase):
         self.assertEqual(body.count(b"2015-07-01T12:34:00Z"), 4)
 
     def test_historical_responder_brief_is_bounded_and_evidence_linked(self):
-        _, body = self.get("/api/briefing?demo=1&year=2015&month=7&series=joint&bbox=-122,39,-120,41")
+        _, body = self.get("/api/briefing?year=2015&month=7&series=joint&bbox=-122,39,-120,41")
         brief = json.loads(body)
         self.assertEqual(brief["schema"], "fireatlas-responder-briefing-v1")
         self.assertEqual(brief["classification"], "synthetic")
@@ -88,7 +90,7 @@ class WebMvpTests(unittest.TestCase):
         self.assertTrue(any("perimeter" in item for item in brief["limitations"]))
 
     def test_harmonization_audit_exposes_common_grid_and_source_limits(self):
-        _, body = self.get("/api/harmonization?demo=1&year=2015&month=7&series=joint&bbox=-122,39,-120,41")
+        _, body = self.get("/api/harmonization?year=2015&month=7&series=joint&bbox=-122,39,-120,41")
         audit = json.loads(body)
         self.assertEqual(audit["schema"], "fireatlas-harmonization-audit-v1")
         self.assertEqual(audit["status"], "descriptive-pair-available")
@@ -126,7 +128,7 @@ class WebMvpTests(unittest.TestCase):
         _, body = self.get("/api/calendar?year=2015&series=joint&bbox=-122,39,-120,41")
         self.assertEqual(json.loads(body)["monthly"][6]["detected_cell_days"], 4)
 
-    def test_demo_mode_is_explicit_and_separate_from_authentic_dataset(self):
+    def test_synthetic_mode_and_showcase_routes_are_retired(self):
         real = Path(self.temp.name) / "authentic.sqlite3"
         with connect(real):
             pass
@@ -139,28 +141,28 @@ class WebMvpTests(unittest.TestCase):
         def read(path):
             with urlopen(base + path) as response:
                 return json.load(response)
-        self.assertEqual(read("/api/meta?demo=0")["years"], [])
-        self.assertIn(2015, read("/api/meta?demo=1")["years"])
+        self.assertEqual(read("/api/meta")["years"], [])
         query = "year=2015&series=joint&bbox=-122,39,-120,41"
-        real_calendar = read(f"/api/calendar?demo=0&{query}")
-        demo_calendar = read(f"/api/calendar?demo=1&{query}")
+        real_calendar = read(f"/api/calendar?{query}")
         self.assertIsNone(real_calendar["monthly"][6]["detected_cell_days"])
-        self.assertEqual(demo_calendar["monthly"][6]["detected_cell_days"], 4)
-        authentic_brief = read(f"/api/briefing?demo=0&{query}&month=7")
+        authentic_brief = read(f"/api/briefing?{query}&month=7")
         self.assertEqual(authentic_brief["classification"], "authentic-imported")
         self.assertEqual(authentic_brief["status"], "insufficient-evidence")
         self.assertTrue(authentic_brief["historical_only"])
-        authentic_audit = read(f"/api/harmonization?demo=0&{query}&month=7")
+        authentic_audit = read(f"/api/harmonization?{query}&month=7")
         self.assertEqual(authentic_audit["status"], "missing-complete-source-export")
         self.assertEqual(authentic_audit["data_class"], "authentic-imported")
-        self.assertEqual(read(f"/api/observations?demo=0&date=2015-07-01&series=joint&bbox=-122,39,-120,41")["observations"], [])
-        self.assertEqual(len(read(f"/api/observations?demo=1&date=2015-07-01&series=joint&bbox=-122,39,-120,41")["observations"]), 4)
-        self.assertEqual(read("/api/research?demo=0")["raw_pixels"], 0)
-        self.assertEqual(read("/api/research?demo=1")["raw_pixels"], 16)
+        self.assertEqual(read("/api/observations?date=2015-07-01&series=joint&bbox=-122,39,-120,41")["observations"], [])
+        self.assertEqual(read("/api/research")["raw_pixels"], 0)
         self.assertEqual(read("/api/data/status")["synthetic"], False)
-        with self.assertRaises(HTTPError) as caught:
-            read("/api/meta?demo=maybe")
-        self.assertEqual(caught.exception.code, 400)
+        for path in ("/api/meta?demo=1", "/api/calendar?demo=0", "/api/research?demo=1"):
+            with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
+                read(path)
+            self.assertEqual(caught.exception.code, 400)
+        for path in ("/api/presentation", "/api/context?year=2026", "/api/research/coverage-example"):
+            with self.subTest(path=path), self.assertRaises(HTTPError) as caught:
+                read(path)
+            self.assertEqual(caught.exception.code, 404)
 
     def test_study_download_and_invalid_day(self):
         headers, body = self.get("/api/study?year=2015&month=7&day=2015-07-01")
@@ -191,12 +193,19 @@ class WebMvpTests(unittest.TestCase):
         report = json.loads(body)
         self.assertEqual(report["raw_pixels"], 16)
         self.assertEqual(report["coverage"]["status"], "unavailable")
-        _, body = self.get("/api/research/coverage-example")
-        mask = json.loads(body)
+        with connect(self.database) as db:
+            mask = coverage_example(db, year=2015, month=7, bbox=[-122,39,-120,41])
+        with self.assertRaises(HTTPError) as caught:
+            self.get("/api/research/coverage-example")
+        self.assertEqual(caught.exception.code, 404)
         request = Request(self.base + "/api/research", data=json.dumps({"config": report["config"], "mask": mask}).encode(), headers={"Content-Type": "application/json"})
         with urlopen(request) as response:
             imported = json.load(response)
         self.assertEqual(imported["coverage"]["sources"][0]["observed_cell_days"], 31)
+        request = Request(self.base + "/api/research?demo=1", data=json.dumps({"config": report["config"], "mask": mask}).encode(), headers={"Content-Type": "application/json"})
+        with self.assertRaises(HTTPError) as caught:
+            urlopen(request)
+        self.assertEqual(caught.exception.code, 400)
         for payload in [[], {"config": {"month": 50}}, {"config": {}, "mask": {}}]:
             request = Request(self.base + "/api/research", data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
             with self.assertRaises(HTTPError) as caught:

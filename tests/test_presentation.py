@@ -5,6 +5,7 @@ from pathlib import Path
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import urlopen
@@ -14,7 +15,7 @@ from fireatlas.core import calendar, connect, ingest
 from fireatlas.presentation import BBOX, PREFIX, SEEDS, context_fixture, ensure_presentation
 from fireatlas.research import coverage_example, report
 from fireatlas.study import build_bundle, verify_bundle
-from fireatlas.web import handler_factory
+from fireatlas.web import handler_factory, main
 
 
 class PresentationTests(unittest.TestCase):
@@ -106,7 +107,7 @@ class PresentationTests(unittest.TestCase):
             ensure_presentation(self.root / "guard", real)
         self.assertEqual(hashlib.sha256(real.read_bytes()).hexdigest(), before)
 
-    def test_http_modes_defaults_and_context_gate(self):
+    def test_synthetic_http_mode_and_showcase_routes_are_retired(self):
         # Isolated path avoids mutating the shared fixture or any user database.
         real = self.root / "http" / "real.sqlite3"
         with connect(real): pass
@@ -114,20 +115,30 @@ class PresentationTests(unittest.TestCase):
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:
+            with urlopen(f"http://127.0.0.1:{server.server_port}/") as response:
+                home = response.read()
+            self.assertNotIn(b"data-demo", home)
+            self.assertNotIn(b"story.js", home)
+            with urlopen(f"http://127.0.0.1:{server.server_port}/data.html") as response:
+                self.assertNotIn(b"presentation-data", response.read())
+            with urlopen(f"http://127.0.0.1:{server.server_port}/research.html") as response:
+                self.assertNotIn(b"example-mask", response.read())
             def read(path):
                 with urlopen(f"http://127.0.0.1:{server.server_port}{path}") as response:
                     return json.load(response)
-            meta = read("/api/meta?demo=1")
-            self.assertEqual(meta["default_view"]["year"], 2026)
-            self.assertEqual(meta["default_series"], "joint")
-            for month in read("/api/calendar?demo=1&year=2026&series=joint")["monthly"]:
-                self.assertEqual(month["baseline_years"], [2023, 2024, 2025])
-            self.assertEqual(read("/api/calendar?demo=1&year=2015&series=joint")["monthly"][6]["detected_cell_days"], 4)
-            self.assertEqual(read("/api/meta?demo=0")["years"], [])
-            self.assertTrue(read("/api/context?demo=1&year=2026&month=9&layer=ndvi")["synthetic"])
-            with self.assertRaises(HTTPError) as error:
-                read("/api/context?demo=0&year=2026&month=9&layer=ndvi")
-            self.assertEqual(error.exception.code, 400)
+            self.assertEqual(read("/api/meta")["years"], [])
+            self.assertIsNone(read("/api/calendar?year=2015&series=joint")["monthly"][6]["detected_cell_days"])
+            for path in ("/api/meta?demo=1", "/api/calendar?demo=0"):
+                with self.subTest(path=path), self.assertRaises(HTTPError) as error:
+                    read(path)
+                self.assertEqual(error.exception.code, 400)
+            for path in ("/api/presentation", "/api/context?year=2026&month=9&layer=ndvi", "/api/research/coverage-example"):
+                with self.subTest(path=path), self.assertRaises(HTTPError) as error:
+                    read(path)
+                self.assertEqual(error.exception.code, 404)
+            with patch("sys.argv", ["fireatlas.web", "--db", str(self.database), "--no-showcase"]):
+                with self.assertRaisesRegex(SystemExit, "Refusing to serve a database containing synthetic"):
+                    main()
         finally:
             server.shutdown()
             server.server_close()

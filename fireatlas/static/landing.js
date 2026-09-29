@@ -2,8 +2,8 @@
 document.addEventListener("DOMContentLoaded",()=>{
   const icon='<svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#info"></use></svg>';
   const explanations={
-    '[data-layer="ndvi"]':'NDVI describes vegetation greenness. Synthetic mode uses generated context; imported mode requests dated NASA imagery when available. It does not establish fuel moisture or fire risk.',
-    '[data-layer="landcover"]':'Land cover describes surface categories such as forest or cropland. Check the layer status for its source and date; synthetic context is illustrative.',
+    '[data-layer="ndvi"]':'NDVI describes vegetation greenness. The map requests dated NASA imagery when available. It does not establish fuel moisture or fire risk.',
+    '[data-layer="landcover"]':'Land cover describes surface categories such as forest or cropland. Check the layer status for its source and date.',
     '[data-series="joint"]':'The joint series counts each 1 km cell once per UTC day across the historic MODIS and VIIRS S-NPP records. It requires both source products.',
     '#use-map-aoi':'Uses the current map bounds as your study area for the calendar and evidence. It does not change the global snapshot.',
     '[data-event-layer="reported"]':'NASA EONET curates reported events. Its sample may be dominated by US sources and can include prescribed fires; it is not global satellite coverage.',

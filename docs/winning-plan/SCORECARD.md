@@ -81,7 +81,7 @@
 | R1 | Delete disaster casebook | DONE (evidence: JSON asset/route, 3D toggle and animated fire effects removed; landing/browser check confirms no casebook controls, satellite details and EONET layer work with 0 page errors; 82 tests pass; `/`, `/method.html`, `/data.html` return 200 and retired JSON returns 404) | local checks, 2026-09-29 | 2026-09-29 |
 | R2 | Archive + remove training lab | DONE (evidence: preserved on `origin/archive/training-lab`; page, API routes, assets, imports, service-worker, styles, navigation, and feature-only tests removed from `main`; retired page/API paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
 | R3 | Remove PWA | DONE (evidence: PWA routes/assets/metadata removed; legacy root-worker registrations and `fireatlas-app-shell-*` caches are cleared on the next secure visit; retired paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
-| R4 | Remove synthetic demo UI | NOT STARTED | | |
+| R4 | Remove synthetic demo UI | DONE (evidence: removed data selector, synthetic tour, generated context/exposure controls and judge launcher; server returns 400 for `demo` query parameters, 404 for retired generator endpoints, and refuses synthetic databases; 78 tests pass; edited JavaScript syntax checks pass) | local checks, 2026-09-29 | 2026-09-29 |
 | R5 | Replace synthetic tour | NOT STARTED | | |
 | R6 | Remove EONET from home | NOT STARTED | | |
 | R7 | Demote NRT globe | NOT STARTED | | |
@@ -168,7 +168,7 @@
 
 | Measure | Value | Command | Date |
 |---|---|---|---|
-| Test suite | 82 tests OK | `uv run python -m unittest discover -s tests` | 2026-09-29 |
+| Test suite | 78 tests OK after R4 removal | `uv run python -m unittest discover -s tests -v` | 2026-09-29 |
 | Park 2024-07-25 MODIS | 603 pixels → 415 cells; S-NPP 0 rows | `/api/harmonization` | 2026-09-29 |
 | Smoke test calendar value (C12-T2) | 1,668 joint detected cell-days; authentic MODIS/S-NPP provenance; HTTP 200 | `bash scripts/smoke_test.sh "$PWD"` | 2026-09-29 |
 | Calibration results (C2-T5): region · r_all · LOYO median abs log error (MoY / single / none) · coverage · beats baselines | — | `python -m fireatlas.calibration --region …` | |
@@ -190,3 +190,4 @@
 | 2026-09-29 | Lead engineer | Completed R1: removed the global historical disaster casebook and its map/3D presentation code | 82 tests OK; targeted local Playwright interaction check; required-page HTTP checks |
 | 2026-09-29 | Lead engineer | Completed R2: archived the fictional Training Lab and removed it from the active application | `origin/archive/training-lab`; 78 tests OK; retired page/API paths return 404; PWA browser check passes |
 | 2026-09-29 | Lead engineer | Completed R3: removed installable PWA metadata, routes and offline shell, including cleanup for existing browser registrations | 78 tests OK; browser page checks report no manifest, worker or JS exceptions; retired PWA paths return 404 |
+| 2026-09-29 | Lead engineer | Completed R4: removed the user-facing synthetic showcase, generated context/mask endpoints, and demo launcher; left generators as test fixtures only | 78 tests OK; demo queries return 400, removed routes return 404, CLI refuses synthetic databases; edited JavaScript syntax checks pass |

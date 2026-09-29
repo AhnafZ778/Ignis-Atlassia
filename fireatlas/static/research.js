@@ -1,8 +1,5 @@
 (() => {
   "use strict";
-  const initialParams = new URLSearchParams(location.search);
-  const demo = initialParams.has("demo") ? initialParams.get("demo") !== "0"
-    : !(initialParams.has("year") || initialParams.has("bbox"));
   const $ = id => document.getElementById(id);
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const colors = ["#e9ad80", "#8cc5c9", "#bbc6a0", "#b5a2ca", "#d8c287", "#93b3d4"];
@@ -19,7 +16,6 @@
   }
   async function json(path, options) {
     const url = new URL(path, location.origin);
-    if (url.pathname === "/api/meta" || url.pathname.startsWith("/api/research")) url.searchParams.set("demo", demo ? "1" : "0");
     const response = await fetch(url, {...options, signal: AbortSignal.timeout(30000)});
     const body = await response.json(); if (!response.ok) throw new Error(body.error || "The study could not be loaded.");
     return body;
@@ -38,7 +34,6 @@
     $("export-study").disabled = value || !state.report;
     $("run-study").textContent = value ? "Analyzing…" : "Run analysis ↗";
     if (!value) {
-      $("example-mask").disabled = !state.report?.demo_data || !state.report.raw_pixels;
       $("clear-mask").disabled = !state.mask;
       $("download-mask").disabled = !state.mask;
     }
@@ -209,14 +204,6 @@
         const mask = JSON.parse(await file.text()); await run(mask, true);
       } catch (error) { showError(error instanceof SyntaxError ? "This file is not valid JSON." : error.message); }
     });
-    $("example-mask").addEventListener("click", async () => {
-      if (state.busy) return;
-      setBusy(true);
-      try {
-        const mask = await json(`/api/research/coverage-example?${query(config())}`);
-        setBusy(false); await run(mask, true);
-      } catch (error) { setBusy(false); showError(error.message); }
-    });
     try {
       const meta = await json("/api/meta");
       const defaults = meta.default_view || {year:2015,month:7,bbox:[-122,39,-120,41]};
@@ -230,11 +217,6 @@
       if (Number(params.get("month")) >= 1 && Number(params.get("month")) <= 12) $("research-month").value = params.get("month");
       if (params.has("bbox")) $("research-bbox").value = params.get("bbox");
       dateRange(); initMap(); await run();
-      // Populate the optional exposure demonstration only on an explicit showcase link.
-      if (demo && params.get("exposure") === "synthetic" && state.report?.raw_pixels) {
-        const mask = await json(`/api/research/coverage-example?${query(config())}`);
-        await run(mask, true);
-      }
     } catch (error) { showError(error.message); $("study-results").hidden = true; }
   });
 })();

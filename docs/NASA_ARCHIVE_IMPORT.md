@@ -55,7 +55,7 @@ uv run python -m fireatlas.web --db data/fireatlas.sqlite3 --port 8000
 
 The import is idempotent. A fresh default server loads this compact NASA
 bundle and the separate NOAA HMS sample without a FIRMS MAP_KEY. Open
-`/method.html?context=calendar&demo=0&series=joint&year=2025&month=7&bbox=-122.2,38.8,-120,41#harmonization-audit`
+`/method.html?context=calendar&series=joint&year=2025&month=7&bbox=-122.2,38.8,-120,41#harmonization-audit`
 to inspect the authentic paired month; use **Download study** to verify its
 calendar and source audit from frozen input rows.
 

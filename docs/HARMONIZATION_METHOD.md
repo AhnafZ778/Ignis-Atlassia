@@ -54,9 +54,9 @@ remain available as separate, explicitly labelled series for recent browsing.
 ## Reproduce an audit
 
 ```bash
-curl 'http://127.0.0.1:8000/api/harmonization?demo=1&year=2015&month=7&series=joint&bbox=-122,39,-120,41'
+curl 'http://127.0.0.1:8000/api/harmonization?year=2025&month=7&series=joint&bbox=-122.2,38.8,-120,41'
 ```
 
 The UI’s **Method audit JSON** button downloads the same response used to render
-the panel. Synthetic output is labelled and remains separate from authentic
-imports.
+the panel. The browser now queries the configured import database only; the
+retired synthetic showcase cannot be selected from a page or API parameter.

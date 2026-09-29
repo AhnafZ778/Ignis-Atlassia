@@ -12,13 +12,11 @@ function validateView(input) {
   if (!["none", "ndvi", "landcover", "fwi"].includes(layer)) throw new Error("Unknown context layer in this view.");
   if (day && (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number(day.slice(0,4)) !== year || Number(day.slice(5,7)) !== month ||
       Number(day.slice(8)) < 1 || Number(day.slice(8)) > new Date(Date.UTC(year,month,0)).getUTCDate())) throw new Error("The selected day does not belong to this month.");
-  if (input.demo != null && !["0", "1"].includes(String(input.demo))) throw new Error("Unknown data mode in this view.");
-  return {year, month: month - 1, series: input.series, bbox: bbox.join(","), day, layer,
-    demo: input.demo == null ? false : String(input.demo) === "1"};
+  return {year, month: month - 1, series: input.series, bbox: bbox.join(","), day, layer};
 }
 
 function viewConfig() {
-  return {year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, day: state.day || "", layer: contextChoice, demo: state.demo ? "1" : "0"};
+  return {year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, day: state.day || "", layer: contextChoice};
 }
 
 function viewUrl() {
@@ -56,7 +54,7 @@ function renderStudySources() {
   if (!sources.length) { container.textContent = "No imported sources match this view."; return; }
   for (const source of sources) {
     const row = document.createElement("article");
-    const title = document.createElement("strong"); title.textContent = `${source.source_id} · ${source.demo ? "Synthetic" : "Imported"}`;
+    const title = document.createElement("strong"); title.textContent = `${source.source_id} · Imported`;
     const origin = document.createElement("p"); origin.textContent = source.source_uri;
     const retrieved = document.createElement("p"); retrieved.textContent = `Retrieved ${source.retrieved_utc}`;
     const hash = document.createElement("code"); hash.textContent = `SHA-256 ${source.file_sha256}`;

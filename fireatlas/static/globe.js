@@ -633,7 +633,7 @@
         const name = state.data.sources.find(s => s.source_id === src.source_id)?.label || src.source_id;
         const link = element("a", `${name} ↗`);
         const bbox = [data.bbox[0], Math.max(-86, data.bbox[1]), data.bbox[2], Math.min(86, data.bbox[3])];
-        link.href = `/?${new URLSearchParams({demo: 0, series: series[src.source_id], year: src.last.slice(0, 4), month: Number(src.last.slice(5, 7)), bbox: bbox.join(",")})}#atlas-section`;
+        link.href = `/?${new URLSearchParams({series: series[src.source_id], year: src.last.slice(0, 4), month: Number(src.last.slice(5, 7)), bbox: bbox.join(",")})}#atlas-section`;
         link.title = "Inspect this satellite and area in the atlas";
         links.append(link);
       }

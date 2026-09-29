@@ -1,11 +1,10 @@
-const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null, demo: true };
+const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null };
 let map, markers, aoiOutline, contextLayer, contextChoice = "ndvi", mapRequest = 0, contextRequest = 0, briefingRequest = 0, auditRequest = 0, replayFeatures = [], replayMode = "";
 let mapDay = null, mapPlayback = null, mapInputTimer = null, focusMapOnDay = false;
 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const shortMonths = monthNames.map(name => name.slice(0, 3).toUpperCase());
 const $ = selector => document.querySelector(selector);
 const jointCache = new Map();
-let offlineExampleNotified = false;
 
 function toast(message) {
   const el = $("#toast"); el.textContent = message; el.classList.add("visible");
@@ -16,17 +15,13 @@ async function getJson(path) {
   const response = await fetch(path);
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Could not load data");
-  if (response.headers.get("X-FireAtlas-Offline-Example") === "1" && !offlineExampleNotified) {
-    offlineExampleNotified = true;
-    toast("Offline: showing a cached synthetic example. Reconnect for current data.");
-  }
   return data;
 }
 
 function showValue(value) { return value === null || value === undefined ? "—" : String(value); }
 
 async function loadMeta() {
-  const meta = await getJson(`/api/meta?demo=${state.demo ? 1 : 0}`);
+  const meta = await getJson("/api/meta");
   const yearSelect = $("#year"); yearSelect.replaceChildren();
   const defaultView = meta.default_view || {year:2015,month:7,bbox:[-122,39,-120,41]};
   const years = [...new Set([...meta.years, defaultView.year])].sort((a,b) => a-b);
@@ -38,17 +33,9 @@ async function loadMeta() {
   state.series = meta.default_series || "joint";
   yearSelect.value = String(state.year);
   const status = $("#dataset-status");
-  status.textContent = meta.synthetic ? "Guided demo · generated example data" : meta.standard_pair_ready ? "NASA FIRMS MODIS + VIIRS · authentic archive ↗" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
-  const showRealProof = !state.demo && (meta.standard_pair_ready || meta.available_sources?.includes("NOAA_HMS_VIIRS"));
-  $("#demo-source-note").hidden = showRealProof;
+  status.textContent = meta.standard_pair_ready ? "NASA FIRMS MODIS + VIIRS · authentic archive ↗" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
+  const showRealProof = meta.standard_pair_ready || meta.available_sources?.includes("NOAA_HMS_VIIRS");
   $("#real-source-note").hidden = !showRealProof;
-  if (!showRealProof) {
-    const note = $("#demo-source-note");
-    note.querySelector(".orbital-kicker").textContent = state.demo ? "SYNTHETIC WORKSPACE EXAMPLE" : "HISTORICAL SENSOR PAIR";
-    note.querySelector("p").textContent = state.demo
-      ? "Generated MODIS + VIIRS examples below. The globe uses separate NASA NRT imports."
-      : "The standard MODIS + VIIRS pair has not been imported here.";
-  }
   if (showRealProof) {
     const note = $("#real-source-note");
     note.querySelector(".orbital-kicker").textContent = meta.standard_pair_ready ? "NASA FIRMS / REGIONAL ARCHIVE" : "VERIFIED ARCHIVE / NOAA";
@@ -58,12 +45,7 @@ async function loadMeta() {
     note.querySelector(".real-source-unit").textContent = meta.standard_pair_ready ? "IMPORTED DETECTIONS" : "VIIRS FIRE POINTS";
     note.querySelector("p").textContent = meta.standard_pair_ready ? "July 2022–June 2026 regional archive. 2026 imports are partial." : "Four complete July archives. One Northern California window.";
   }
-  document.querySelectorAll("[data-demo]").forEach(button => {
-    const active = button.dataset.demo === String(Number(state.demo));
-    button.classList.toggle("selected", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-  document.querySelectorAll('[data-series="hms-viirs"]').forEach(button => { button.hidden = state.demo || !meta.available_sources?.includes("NOAA_HMS_VIIRS"); });
+  document.querySelectorAll('[data-series="hms-viirs"]').forEach(button => { button.hidden = !meta.available_sources?.includes("NOAA_HMS_VIIRS"); });
   const extraSources = {"viirs-noaa20": ["VIIRS_NOAA20_SP", "VIIRS NOAA-20 · standard"], "viirs-noaa20-nrt": ["VIIRS_NOAA20_NRT", "VIIRS NOAA-20 · near real time"], "viirs-noaa21-nrt": ["VIIRS_NOAA21_NRT", "VIIRS NOAA-21 · near real time"], "viirs-snpp-nrt": ["VIIRS_SNPP_NRT", "VIIRS S-NPP · near real time"], "modis-nrt": ["MODIS_NRT", "MODIS · near real time"]};
   const extraSelect = $("#additional-source");
   extraSelect.replaceChildren(new Option("Choose product…", ""));
@@ -82,52 +64,25 @@ async function loadMeta() {
       button.title = hint;
     });
   }
-  $(".series-row p").textContent = state.demo ? "Separate series preserve the sensor transition." : "Select an imported product to inspect its observations.";
+  $(".series-row p").textContent = "Select an imported product to inspect its observations.";
   const weatherButton = $('[data-layer="fwi"]');
-  weatherButton.setAttribute("aria-disabled", String(!state.demo));
-  weatherButton.textContent = state.demo ? "Fire weather" : "Fire weather · unavailable";
-  weatherButton.dataset.tooltip = state.demo
-    ? "Synthetic weather illustration for the example study; not measured weather or a forecast."
-    : "Measured fire-weather data have not been imported. A synthetic illustration is available in example mode.";
-  $("#mode-description").textContent = state.demo
-    ? "Generated seasonal examples and context layers. Dates and locations are synthetic; these controls apply to the study tools below."
-    : meta.standard_pair_ready ? "Study authentic NASA MODIS and VIIRS standard records by year, product and region. The calendar, audit and original evidence below use the same selection."
-    : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Study imported satellite archives by year, product and region. This selection applies to the atlas, calendar and evidence below."
-    : meta.years.length ? "Browsing imported source records. Check the source ledger for retrieval and coverage details."
-      : "NASA imports have not arrived on this server. Try the guided demo while the connection is restored.";
-}
-
-async function selectDataset(demo) {
-  if (state.demo === demo && state.data) return;
-  const previous = state.demo;
-  stopMapPlayback(); mapDay = null;
-  state.demo = demo;
-  state.data = null;
-  state.comparison = null;
-  try {
-    await loadMeta();
-    state.day = null; contextChoice = "ndvi";
-    await loadCalendar();
-    drawAoi(true);
-  } catch (error) {
-    state.demo = previous;
-    await loadMeta(); await loadCalendar();
-    toast(error.message);
-  }
+  weatherButton.setAttribute("aria-disabled", "true");
+  weatherButton.textContent = "Fire weather · unavailable";
+  weatherButton.dataset.tooltip = "Measured fire-weather data have not been imported.";
 }
 
 async function loadCalendar(next = {}) {
   const request = ++calendarRequest;
   const config = {...state, ...next};
-  if (state.data && (config.year !== state.year || config.month !== state.month || config.series !== state.series || config.bbox !== state.bbox || config.demo !== state.demo)) {
+  if (state.data && (config.year !== state.year || config.month !== state.month || config.series !== state.series || config.bbox !== state.bbox)) {
     stopMapPlayback(); mapDay = null;
   }
-  const params = new URLSearchParams({ year: config.year, series: config.series, bbox: config.bbox, demo: config.demo ? 1 : 0 });
+  const params = new URLSearchParams({ year: config.year, series: config.series, bbox: config.bbox });
   const data = await getJson(`/api/calendar?${params}`);
-  const key = `${Number(config.demo)}:${config.year}:${config.bbox}`;
+  const key = `${config.year}:${config.bbox}`;
   let comparison = !["joint", "modis", "viirs-snpp"].includes(config.series) ? data : jointCache.get(key);
   if (!comparison && config.series !== "hms-viirs") {
-    comparison = config.series === "joint" ? data : await getJson(`/api/calendar?${new URLSearchParams({year:config.year,series:"joint",bbox:config.bbox,demo:config.demo ? 1 : 0})}`);
+    comparison = config.series === "joint" ? data : await getJson(`/api/calendar?${new URLSearchParams({year:config.year,series:"joint",bbox:config.bbox})}`);
     jointCache.set(key, comparison);
   }
   if (request !== calendarRequest) return;
@@ -136,17 +91,13 @@ async function loadCalendar(next = {}) {
   clearDay();
   const complete = data.monthly.some(item => item.export_window_complete);
   const banner = $("#data-alert");
-  banner.style.display = data.demo_data || !complete ? "flex" : "none";
-  banner.querySelector("strong").textContent = data.demo_data ? "● SYNTHETIC DEMO DATA" : "● DATA GAP";
-  banner.querySelector("span").textContent = data.demo_data
-    ? "This preview shows generated FIRMS-shaped records. It is not a live fire map or a safety tool."
-    : "No complete source export covers this AOI, year and sensor series. Open Data sources to check the import status. Empty cells remain unknown.";
+  banner.style.display = !complete ? "flex" : "none";
+  banner.querySelector("strong").textContent = "● DATA GAP";
+  banner.querySelector("span").textContent = "No complete source export covers this AOI, year and sensor series. Open Data sources to check the import status. Empty cells remain unknown.";
   $("#aoi-status").textContent = `Selected AOI: ${state.bbox}${complete ? "" : " · no complete export"}`;
   render();
   loadBriefing();
   loadHarmonizationAudit();
-  $("#start-tour").disabled = false;
-  if ($("#hero-start-tour")) $("#hero-start-tour").disabled = false;
   if (state.day) await loadDay(state.day);
 }
 
@@ -174,7 +125,7 @@ function renderInsight(month) {
     const ratio = rawViirs / rawModis;
     title.textContent = `${monthName} shows why FireAtlas compares sensors.`;
     body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many raw pixels as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}). Grouping their detection centroids by UTC day and shared 1 km cell yields ${comparison.detected_cell_days.toLocaleString()} joint cell-days. This removes repeat counts in a cell; it does not equalize sensor sensitivity.`;
-    source.textContent = `${state.demo ? "Synthetic teaching example" : "Imported source records"} · ${monthName} ${state.year} · same AOI and UTC window`;
+    source.textContent = `Imported source records · ${monthName} ${state.year} · same AOI and UTC window`;
   } else if (month.anomaly_cell_days !== null && month.baseline_median !== null) {
     const direction = month.anomaly_cell_days >= 0 ? "above" : "below";
     title.textContent = `${monthName} sits ${Math.abs(month.anomaly_cell_days).toLocaleString()} cell-days ${direction} its prior-year median.`;
@@ -183,7 +134,7 @@ function renderInsight(month) {
   } else {
     title.textContent = "Start with a complete observation window.";
     body.textContent = "Choose a loaded month to compare sensors and trace a finding to its original records. Gray means the source export is incomplete, not that burning was absent.";
-    source.textContent = `${state.demo ? "Synthetic teaching example" : "Imported observations"} · source completeness is shown in the calendar`;
+    source.textContent = "Imported observations · source completeness is shown in the calendar";
   }
   card.hidden = false;
 }
@@ -193,7 +144,7 @@ function renderBriefing(data) {
   if (!card || !data) return;
   const selected = data.selected_month || {};
   $("#briefing-title").textContent = data.headline || "Historical review brief";
-  $("#briefing-status").textContent = data.classification === "synthetic" ? "Synthetic example" : "Historical only";
+  $("#briefing-status").textContent = "Historical only";
   $("#briefing-action").textContent = data.action || "Use the evidence panel for review.";
   $("#briefing-active-days").textContent = String(data.active_days_count ?? data.active_days?.length ?? "—");
   $("#briefing-unknown-days").textContent = String(data.unknown_days ?? "—");
@@ -229,7 +180,7 @@ function renderHarmonizationAudit(data) {
     "complete-export-with-zero-detections-in-one-source": "Both source exports are complete, but one source has zero detections in this area and month. Satellite pass and cloud coverage remain unknown.",
     "descriptive-pair-available": "Both standard-product exports cover this area and month. The shared-grid comparison is descriptive; it is not a calibrated sensitivity estimate."
   };
-  $("#audit-status").textContent = `${data.data_class === "synthetic" ? "SYNTHETIC EXAMPLE · " : "IMPORTED RECORDS · "}${messages[data.status] || data.status}`;
+  $("#audit-status").textContent = `IMPORTED RECORDS · ${messages[data.status] || data.status}`;
   $("#audit-raw").textContent = Number(data.raw_pixels_total).toLocaleString();
   $("#audit-cells").textContent = data.detected_cell_days == null ? "Unknown" : Number(data.detected_cell_days).toLocaleString();
   $("#audit-overlap").textContent = pair ? Number(data.co_detected_cell_days || 0).toLocaleString() : "Not a pair";
@@ -260,7 +211,7 @@ async function loadHarmonizationAudit() {
   if ($("#download-audit")) $("#download-audit").disabled = true;
   if ($("#audit-status")) $("#audit-status").textContent = "Checking the selected month and source exports…";
   if ($("#audit-baseline-versions")) $("#audit-baseline-versions").textContent = "Checking baseline product versions…";
-  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox});
   try {
     const data = await getJson(`/api/harmonization?${params}`);
     if (request === auditRequest) renderHarmonizationAudit(data);
@@ -271,7 +222,7 @@ async function loadHarmonizationAudit() {
 
 async function loadBriefing() {
   const request = ++briefingRequest;
-  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox});
   try {
     const data = await getJson(`/api/briefing?${params}`);
     if (request === briefingRequest) renderBriefing(data);
@@ -380,7 +331,7 @@ function calendarHeat(value, maximum) {
 
 function renderDays() {
   const data = state.data, month = data.monthly[state.month];
-  const snppGapMonth = !state.demo && state.year === 2024 && state.month === 6 && data.sources.includes("VIIRS_SNPP_SP");
+  const snppGapMonth = state.year === 2024 && state.month === 6 && data.sources.includes("VIIRS_SNPP_SP");
   const days = new Date(Date.UTC(state.year, state.month + 1, 0)).getUTCDate();
   const rows = data.daily.filter(row => Number(row.date_utc.slice(5, 7)) === state.month + 1);
   const byDate = new Map(rows.map(row => [row.date_utc, row]));
@@ -389,7 +340,7 @@ function renderDays() {
   const scaleMaximum = Math.max(0, ...data.daily.map(row => row.detected_cell_days || 0));
   $("#days-title").textContent = `${monthNames[state.month]} ${state.year}`;
   $("#calendar-prev").disabled = state.month === 0; $("#calendar-next").disabled = state.month === 11;
-  $("#calendar-context").textContent = `${state.demo || data.demo_data ? "SYNTHETIC EXAMPLE" : "IMPORTED OBSERVATIONS"} · ${data.sources.join(" + ").replaceAll("_", " ")} · AOI ${data.bbox.map((value, i) => ["W", "S", "E", "N"][i] + " " + value + "°").join(", ")} · UTC`;
+  $("#calendar-context").textContent = `IMPORTED OBSERVATIONS · ${data.sources.join(" + ").replaceAll("_", " ")} · AOI ${data.bbox.map((value, i) => ["W", "S", "E", "N"][i] + " " + value + "°").join(", ")} · UTC`;
   if ($("#calendar-grid-version")) $("#calendar-grid-version").textContent = `Method: ${data.grid}`;
   const peakDates = positive.filter(row => row.detected_cell_days === maximum).map(row => Number(row.date_utc.slice(8)));
   $("#calendar-month-summary").textContent = month.export_window_complete
@@ -474,7 +425,7 @@ function clearDay() {
 async function loadDay(stamp) {
   if (!$("#evidence-section")) return;
   const request = ++dayRequest;
-  const params = new URLSearchParams({date: stamp, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+  const params = new URLSearchParams({date: stamp, series: state.series, bbox: state.bbox});
   try {
     const data = await getJson(`/api/observations?${params}`);
     if (request !== dayRequest) return;
@@ -554,12 +505,12 @@ function renderMapLegend() {
   if (!legend) return;
   const context = {
     none: {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."},
-    ndvi: {title: "Vegetation condition (NDVI)", range: "lower signal → higher signal", note: state.demo ? "Synthetic monthly illustration; it is not measured fuel moisture or fire risk." : "NASA MODIS 16-day composite; vegetation context only."},
-    landcover: {title: "Broad land-cover class", range: "forest · shrubland · grassland · cropland", note: state.demo ? "Synthetic class illustration for the Northern California showcase." : "NASA MODIS annual class context; it does not identify current fuels."},
-    fwi: {title: "Fire-weather index illustration", range: "lower index → higher index", note: state.demo ? "Synthetic monthly illustration in arbitrary units; it is not measured weather or a forecast." : "Measured fire-weather data have not been imported. No weather risk is shown."},
+    ndvi: {title: "Vegetation condition (NDVI)", range: "lower signal → higher signal", note: "NASA MODIS 16-day composite; vegetation context only."},
+    landcover: {title: "Broad land-cover class", range: "forest · shrubland · grassland · cropland", note: "NASA MODIS annual class context; it does not identify current fuels."},
+    fwi: {title: "Fire weather unavailable", range: "No measured layer", note: "Measured fire-weather data have not been imported. No weather risk is shown."},
   }[contextChoice] || {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."};
   const badge = $("#map-legend-badge");
-  badge.textContent = state.demo ? "SYNTHETIC" : "IMPORTED";
+  badge.textContent = "NASA / FIRMS";
   const title = $("#map-legend-context-title");
   title.textContent = context.title;
   const swatch = $("#map-legend-context-swatch");
@@ -568,9 +519,7 @@ function renderMapLegend() {
   scale.className = `map-legend-context-range ${contextChoice}`;
   scale.querySelector("span").textContent = context.range;
   const observationNote = $("#map-legend-observation-note");
-  if (observationNote) observationNote.textContent = state.demo
-    ? "Synthetic FIRMS-shaped example points; positions are illustrative."
-    : "Imported NASA FIRMS standard-product detection records.";
+  if (observationNote) observationNote.textContent = "Imported NASA FIRMS standard-product detection records.";
   $("#map-legend-note").textContent = context.note;
 }
 
@@ -579,30 +528,6 @@ async function updateContextLayer() {
   if (!map) return;
   renderMapLegend();
   if (contextLayer) { map.removeLayer(contextLayer); contextLayer = null; }
-  if (state.demo && contextChoice !== "none") {
-    if (state.year < 2023 || state.year > 2026) {
-      $("#layer-status").textContent = "Synthetic context is available only for the 2023–2026 showcase years; the selected 2015 study remains satellite evidence only.";
-      return;
-    }
-    $("#layer-status").textContent = "Loading synthetic context…";
-    try {
-      const fixture = await getJson(`/api/context?${new URLSearchParams({demo:1,year:state.year,month:state.month+1,bbox:state.bbox,layer:contextChoice})}`);
-      if (request !== contextRequest) return;
-      contextLayer = L.geoJSON(fixture, {
-        style: feature => ({color:feature.properties.color,weight:.5,fillColor:feature.properties.color,fillOpacity:.4}),
-        onEachFeature: (feature, layer) => {
-          const label = document.createElement("span");
-          label.textContent = `SYNTHETIC · ${feature.properties.label} · ${fixture.year}-${String(fixture.month).padStart(2,"0")} monthly illustration`;
-          layer.bindTooltip(label);
-        }
-      }).addTo(map);
-      contextLayer.bringToBack();
-      $("#layer-status").textContent = fixture.features.length ? fixture.note : "No synthetic context outside the Northern California showcase AOI.";
-    } catch (error) {
-      if (request === contextRequest) $("#layer-status").textContent = `Context unavailable: ${error.message}`;
-    }
-    return;
-  }
   if (contextChoice === "ndvi" || contextChoice === "landcover") {
     const ndvi = contextChoice === "ndvi";
     const time = ndvi ? compositeDate() : `${Math.min(state.year, 2024)}-01-01`;
@@ -747,7 +672,6 @@ async function updateMap() {
   const params = new URLSearchParams({
     year: state.year, month: state.month + 1, series: state.series,
     bbox: mapViewport(), zoom: map.getZoom(),
-    demo: state.demo ? 1 : 0,
   });
   if (mapDay !== null) params.set("day", String(mapDay));
   try {
@@ -799,15 +723,10 @@ function render() {
   renderStudySources();
   renderStats(); renderSourceComparison(); renderMonths(); renderDays(); renderTimeline(); renderProvenance(); drawAoi(false); updateContextLayer(); updateMap();
   const research = $("#open-research-study");
-  const researchUsesDemo = !["joint", "modis", "viirs-snpp"].includes(state.series);
-  const researchContext = researchUsesDemo
-    ? {year: 2026, month: 9, bbox: "-122,39,-120,41", demo: 1}
-    : {year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0};
+  const researchContext = {year: state.year, month: state.month + 1, bbox: state.bbox};
   const researchUrl = `/research.html?${new URLSearchParams(researchContext)}`;
   if (research) research.href = researchUrl;
-  if ($("#research-entry-copy")) $("#research-entry-copy").textContent = researchUsesDemo
-    ? "Explore source overlap and candidate groups in a clearly labelled synthetic MODIS/VIIRS example. Your selected satellite product stays in the atlas."
-    : "Compare source overlap, test candidate groups, and inspect observation-mask denominators.";
+  if ($("#research-entry-copy")) $("#research-entry-copy").textContent = "Compare source overlap, test candidate groups, and inspect observation-mask denominators.";
   document.querySelectorAll('a[href^="/research.html"]:not(#open-research-study)').forEach(link => { link.href = researchUrl; });
 }
 
@@ -829,7 +748,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     stopMapPlayback(); mapDay = Number(event.target.value); renderTimeline();
     clearTimeout(mapInputTimer); mapInputTimer = setTimeout(updateMap, 120);
   });
-  document.querySelectorAll("[data-demo]").forEach(button => button.addEventListener("click", () => selectDataset(button.dataset.demo === "1")));
   initStudyTools();
   $("#download-audit")?.addEventListener("click", () => {
     if (!state.audit) return;
@@ -850,14 +768,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("#analyze").click();
   });
   document.querySelectorAll("[data-layer]").forEach(button => button.addEventListener("click", () => {
-    if (button.getAttribute("aria-disabled") === "true") return toast("Measured fire-weather data have not been imported. Select the synthetic example to explore an illustration.");
+    if (button.getAttribute("aria-disabled") === "true") return toast("Measured fire-weather data have not been imported.");
     contextChoice = button.dataset.layer;
     document.querySelectorAll("[data-layer]").forEach(other => other.classList.toggle("selected", other === button));
     updateContextLayer(); syncView();
   }));
   for (const kind of ["calendar", "observations"]) {
     $(`#export-${kind}`).addEventListener("click", () => {
-      const params = new URLSearchParams({kind, year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+      const params = new URLSearchParams({kind, year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox});
       window.location.href = `/api/export?${params}`;
     });
   }
@@ -873,10 +791,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const {date: stamp, bbox, year, month} = detail || {};
     if (!/^\d{4}-\d{2}-\d{2}$/.test(stamp || "") || !Array.isArray(bbox)) return;
     try {
-      if (state.demo) { state.demo = false; await loadMeta(); }
       const area = bbox.join(","), index = month - 1;
       if (!state.data || state.year !== year || state.month !== index || state.bbox !== area || state.series !== "joint") {
-        await loadCalendar({year, month:index, bbox:area, series:"joint", demo:false, day:stamp});
+        await loadCalendar({year, month:index, bbox:area, series:"joint", day:stamp});
         drawAoi(true);
       } else {
         state.day = stamp; mapDay = Number(stamp.slice(8));
@@ -890,16 +807,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     applyValidityDay(event.detail);
   });
   try {
-    const initialParams = new URLSearchParams(location.search);
-    const realMeta = !initialParams.has("demo") && !initialParams.has("year") && !initialParams.has("bbox") && !initialParams.has("series")
-      ? await getJson("/api/meta?demo=0") : null;
-    state.demo = initialParams.has("demo") ? initialParams.get("demo") !== "0"
-      : initialParams.has("year") || initialParams.has("bbox") || initialParams.has("series") ? false
-      : !realMeta?.available_sources?.includes("NOAA_HMS_VIIRS");
     await loadMeta();
     let next = {};
     if (location.search) {
-      try { next = validateView({...viewConfig(), ...Object.fromEntries(new URLSearchParams(location.search))}); }
+      try {
+        const params = new URLSearchParams(location.search);
+        params.delete("demo");
+        next = validateView({...viewConfig(), ...Object.fromEntries(params)});
+        if (new URLSearchParams(location.search).has("demo")) history.replaceState(null, "", `${location.pathname}?${params}${location.hash}`);
+      }
       catch (error) { toast(`${error.message} Showing the default view.`); }
     }
     await loadCalendar(next); drawAoi(true);
