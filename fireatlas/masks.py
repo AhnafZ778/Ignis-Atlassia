@@ -81,9 +81,22 @@ def connect_store(path=STORE):
 
 
 def native_layer(path, names):
-    from osgeo import gdal
+    try:
+        from osgeo import gdal
+    except ImportError as error:
+        raise RuntimeError(
+            'Native mask processing needs GDAL with HDF4/netCDF support; '
+            'see docs/NATIVE_MASK_VALIDATION.md'
+        ) from error
+
     gdal.UseExceptions()
     gdal.SetConfigOption('GDAL_NETCDF_BOTTOMUP', 'NO')
+    driver = 'HDF4' if Path(path).suffix.lower() == '.hdf' else 'netCDF'
+    if gdal.GetDriverByName(driver) is None:
+        raise RuntimeError(
+            f'Native mask processing needs GDAL with the {driver} driver; '
+            'see docs/NATIVE_MASK_VALIDATION.md'
+        )
     root = gdal.Open(str(path))
     if root is None:
         raise ValueError('Native product could not be opened by GDAL')
@@ -102,7 +115,13 @@ def native_layer(path, names):
 
 def decode_file(mask_path, geo_path, bbox):
     """Yield clipped native samples in bounded strips; shape mismatch is fatal."""
-    import numpy as np
+    try:
+        import numpy as np
+    except ImportError as error:
+        raise RuntimeError(
+            'Native mask processing needs NumPy; run `uv sync --extra masks` '
+            'and see docs/NATIVE_MASK_VALIDATION.md'
+        ) from error
     mask_uri, mask = native_layer(mask_path, ('fire mask', 'fire_mask', 'FireMask'))
     lat_uri, latitude = native_layer(geo_path, ('Latitude', 'latitude'))
     lon_uri, longitude = native_layer(geo_path, ('Longitude', 'longitude'))

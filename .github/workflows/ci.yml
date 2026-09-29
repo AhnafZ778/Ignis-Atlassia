@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: 0.10.7
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install locked dependencies
+        run: uv sync --frozen
+
+      - name: Run Python tests
+        run: uv run python -m unittest discover -s tests
+
+      - name: Check JavaScript syntax
+        run: find fireatlas/static -maxdepth 1 -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+
+      - name: Smoke test a fresh clone
+        run: bash scripts/smoke_test.sh "$GITHUB_WORKSPACE"

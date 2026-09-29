@@ -1,5 +1,7 @@
 # FireAtlas — atlas, training and research labs
 
+[![CI](https://github.com/AhnafZ778/NASA-Spaceapps/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AhnafZ778/NASA-Spaceapps/actions/workflows/ci.yml)
+
 The **[Data & Method page](http://127.0.0.1:8000/method.html)** traces the existing NASA archive into the calendar with a connected visual workflow, actual cell examples, original source records and an on-demand analytical recount. The implementation plan is in [docs/DATA_METHOD_PAGE_PLAN.md](docs/DATA_METHOD_PAGE_PLAN.md).
 
 ## Presentation guide and mobile app
@@ -17,9 +19,10 @@ The [PRD](PRD.md) defines the full NASA Space Apps project. The local web MVP ru
 ## Launch the website
 
 ```bash
-uv sync
-uv run python -m fireatlas.web --db data/fireatlas.sqlite3 --port 8000
+bash scripts/launch_demo.sh
 ```
+
+The launcher installs the locked core dependencies and starts the local demo. To process native MODIS/VIIRS mask files, install the optional NumPy extra with `uv sync --extra masks` and a system GDAL build with the required HDF4/netCDF drivers; see [native-mask setup](docs/NATIVE_MASK_VALIDATION.md).
 
 Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
 

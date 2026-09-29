@@ -1,6 +1,7 @@
 """Scientific boundary tests. Tiny samples are fabricated and never used by the site."""
 import copy
 import io
+import sys
 import tempfile
 import unittest
 from datetime import timedelta
@@ -9,7 +10,7 @@ from unittest.mock import patch
 from urllib.parse import urlsplit
 
 from fireatlas.granules import load
-from fireatlas.masks import (METHOD, SCHEMA, pass_state, paired_observations, timestamp,
+from fireatlas.masks import (METHOD, SCHEMA, native_layer, pass_state, paired_observations, timestamp,
                             expected_pairs, process, read_evidence, summarize, reconcile)
 from fireatlas.mask_download import checklist
 from fireatlas.core import TO_GRID
@@ -33,6 +34,11 @@ class MaskBoundaryTests(unittest.TestCase):
         for codes in ({0: 1}, {1: 1}, {2: 1}, {6: 1}, {3: 1, 4: 1}, {5: 1, 6: 1}, {}):
             self.assertEqual(pass_state(codes), 'unknown')
         self.assertEqual(pass_state({7: 1, 4: 20}), 'detected')
+
+    def test_missing_gdal_reports_native_install_guidance(self):
+        with patch.dict(sys.modules, {'osgeo': None}):
+            with self.assertRaisesRegex(RuntimeError, 'GDAL with HDF4/netCDF support'):
+                native_layer('sample.hdf', ('fire mask',))
 
     def test_pairing_crosses_utc_midnight_and_requires_all_endpoints_within_90_minutes(self):
         modis = self.granule()
