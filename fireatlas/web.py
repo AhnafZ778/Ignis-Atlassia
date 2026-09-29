@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import csv
 import io
+import hashlib
+import zipfile
 import json
 import math
 import ipaddress
@@ -14,13 +16,13 @@ import contextlib
 import tempfile
 import time
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from .core import SERIES, calendar, connect, ingest, validate_bbox
+from .core import SERIES, _complete_month, calendar, connect, ingest, validate_bbox
 from .fetch import FIRMS_SOURCES
 from .demo import make_demo
 from .training import public_scenario, snapshot
@@ -29,8 +31,12 @@ from .study import build_bundle
 from .pilots import PilotSync, PILOTS
 from .events import latest as latest_events
 from .bootstrap import populate_showcase
+from .archive import BBOX as NASA_ARCHIVE_BBOX, SAMPLE as NASA_ARCHIVE_SAMPLE, import_bundle as import_nasa_archive
 from .presentation import ensure_presentation, provenance as presentation_provenance, context_fixture, DEFAULT_VIEW
 from .globe import snapshot as globe_snapshot, detail as globe_detail
+from .briefing import responder_briefing
+from .harmonization import month_audit
+from .validity import CASES as VALIDITY_CASES, report as validity_report, build_evidence as build_validity_evidence
 
 STATIC = Path(__file__).with_name("static")
 EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
@@ -48,6 +54,17 @@ ASSETS = {
     "/ui.js": ("ui.js", "text/javascript; charset=utf-8"),
     "/landing.css": ("landing.css", "text/css; charset=utf-8"),
     "/landing.js": ("landing.js", "text/javascript; charset=utf-8"),
+    "/validity.css": ("validity.css", "text/css; charset=utf-8"),
+    "/validity.js": ("validity.js", "text/javascript; charset=utf-8"),
+    "/method.html": ("method.html", "text/html; charset=utf-8"),
+    "/method.css": ("method.css", "text/css; charset=utf-8"),
+    "/method.js": ("method.js", "text/javascript; charset=utf-8"),
+    "/incident-media/park-fire-flames.jpg": ("incident-media/park-fire-flames.jpg", "image/jpeg"),
+    "/incident-media/park-fire-02.jpg": ("incident-media/park-fire-02.jpg", "image/jpeg"),
+    "/incident-media/park-fire-04.jpg": ("incident-media/park-fire-04.jpg", "image/jpeg"),
+    "/incident-media/park-fire-05.jpg": ("incident-media/park-fire-05.jpg", "image/jpeg"),
+    "/incident-media/park-fire-06.jpg": ("incident-media/park-fire-06.jpg", "image/jpeg"),
+    "/incident-media/park-fire.jpg": ("incident-media/park-fire.jpg", "image/jpeg"),
     "/vendor/lucide-icons.svg": ("vendor/lucide-icons.svg", "image/svg+xml"),
     "/vendor/ui-primitives.css": ("vendor/ui-primitives.css", "text/css; charset=utf-8"),
     "/vendor/LUCIDE_LICENSE.txt": ("vendor/LUCIDE_LICENSE.txt", "text/plain; charset=utf-8"),
@@ -300,6 +317,28 @@ def handler_factory(database: Path):
                 with connect(self._database_for(params)) as db:
                     if url.path == "/api/presentation":
                         self._json(presentation_provenance())
+                    elif url.path == "/api/validity":
+                        if params.get("demo", ["0"])[0] != "0":
+                            raise ValueError("historical validity cases require authentic data")
+                        self._json(validity_report(db, case_id=params.get("case", ["park-2024"])[0],
+                                                   selected_date=params.get("date", [None])[0]))
+                    elif url.path == "/api/validity/check":
+                        if params.get("demo", ["0"])[0] != "0":
+                            raise ValueError("historical recount requires authentic data")
+                        from .validation_check import check as analytical_check
+                        case_id = params.get("case", ["park-2024"])[0]
+                        evidence = build_validity_evidence(db, case_id)
+                        checked = analytical_check(io.BytesIO(evidence))
+                        checked["checked_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+                        with zipfile.ZipFile(io.BytesIO(evidence)) as archive:
+                            checked["manifest_sha256"] = hashlib.sha256(archive.read("manifest.json")).hexdigest()
+                        self._json(checked)
+                    elif url.path == "/api/validity/export":
+                        if params.get("demo", ["0"])[0] != "0":
+                            raise ValueError("historical validity cases require authentic data")
+                        case_id = params.get("case", ["park-2024"])[0]
+                        self._respond(build_validity_evidence(db, case_id), "application/zip",
+                                      filename=f"fireatlas_validity_{case_id}.zip")
                     elif url.path == "/api/context":
                         if params.get("demo", ["0"])[0] != "1":
                             raise ValueError("Synthetic context requires explicit demo=1; authentic data are never filled with synthetic values")
@@ -322,12 +361,17 @@ def handler_factory(database: Path):
                                         "bbox": [latest[k] for k in ("west", "south", "east", "north")] if latest else PILOTS[0]["bbox"]}
                         default_series = next((name for name, sources in SERIES.items()
                                                if latest and sources == (latest["source_id"],)), "joint")
+                        standard_pair_ready = _complete_month(db, "2025-07", SERIES["joint"], NASA_ARCHIVE_BBOX)
+                        if standard_pair_ready:
+                            default_view = {"year": 2024, "month": 7, "bbox": VALIDITY_CASES["park-2024"]["bbox"]}
+                            default_series = "joint"
                         if params.get("demo", ["0"])[0] == "1":
                             default_view = DEFAULT_VIEW
                             default_series = "joint"
                         self._json({"years": [row["year"] for row in rows], "series": list(SERIES),
                                     "default_view": default_view, "pilots": PILOTS,
                                     "default_series": default_series,
+                                    "standard_pair_ready": standard_pair_ready,
                                     "available_sources": [row[0] for row in db.execute("SELECT DISTINCT source_id FROM batches ORDER BY source_id")],
                                     "source_counts": {row[0]: row[1] for row in db.execute("SELECT source_id,COUNT(*) FROM observations GROUP BY source_id")},
                                     "synthetic": bool(db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone())})
@@ -335,6 +379,14 @@ def handler_factory(database: Path):
                         year = int(params.get("year", ["2015"])[0])
                         series = params.get("series", ["joint"])[0]
                         self._json(calendar(db, bbox=_bbox(params), year=year, series=series))
+                    elif url.path == "/api/briefing":
+                        year, month, series, bbox = _request_context(params)
+                        self._json(responder_briefing(db, year=year, month=month,
+                                                      series=series, bbox=bbox))
+                    elif url.path == "/api/harmonization":
+                        year, month, series, bbox = _request_context(params)
+                        self._json(month_audit(db, year=year, month=month,
+                                               series=series, bbox=bbox))
                     elif url.path == "/api/study":
                         year, month, series, bbox = _request_context(params)
                         db.execute("BEGIN")
@@ -486,6 +538,11 @@ def main():
         result = populate_showcase(args.db)
         if result["loaded"]:
             print("Loaded verified NOAA HMS historical showcase into the authentic database.", flush=True)
+        if NASA_ARCHIVE_SAMPLE.exists():
+            nasa_result = import_nasa_archive(args.db)
+            if nasa_result["imported_rows"]:
+                PilotSync(args.db).reconcile_imports()
+                print(f"Loaded {nasa_result['imported_rows']} regional NASA FIRMS archive detections.", flush=True)
     server = ThreadingHTTPServer((args.host, args.port), handler_factory(args.db))
     print(f"FireAtlas web MVP: http://{args.host}:{args.port}", flush=True)
     try:

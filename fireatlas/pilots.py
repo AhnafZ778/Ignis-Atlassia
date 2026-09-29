@@ -20,7 +20,9 @@ PILOTS = [
     {"id": "sacramento-valley", "name": "Sacramento Valley", "bbox": [-122.2, 38.8, -121.5, 39.5],
      "description": "Contrasting geographic pilot. Agricultural-burning classification requires a validated land-cover mask."},
 ]
-YEARS = [2021, 2022, 2023, 2024]
+YEARS = [2022, 2023, 2024, 2025]
+TARGET_YEAR = YEARS[-1]
+HMS_YEARS = [2021, 2022, 2023, 2024]
 
 
 def now():
@@ -37,18 +39,18 @@ def write_json(path, value):
 def validate_pilots(db):
     results = []
     for pilot in PILOTS:
-        summary = calendar(db, bbox=tuple(pilot["bbox"]), year=2024)
+        summary = calendar(db, bbox=tuple(pilot["bbox"]), year=TARGET_YEAR)
         month = summary["monthly"][6]
         if summary["demo_data"]:
             raise ValueError("Authentic-data validation cannot include synthetic records")
         if not month["export_window_complete"] or month["baseline_years"] != YEARS[:-1]:
             # Extra qualifying years can be present in an existing real-data database.
             if not month["export_window_complete"] or not set(YEARS[:-1]).issubset(month["baseline_years"]):
-                raise ValueError("Pilot validation requires both sources for July 2021–2024")
-        bundle = build_bundle(db, year=2024, month=7, series="joint", bbox=tuple(pilot["bbox"]))
+                raise ValueError(f"Pilot validation requires both sources for July {YEARS[0]}–{TARGET_YEAR}")
+        bundle = build_bundle(db, year=TARGET_YEAR, month=7, series="joint", bbox=tuple(pilot["bbox"]))
         verification = verify_bundle(io.BytesIO(bundle))
         results.append({"id": pilot["id"], "name": pilot["name"], "bbox": pilot["bbox"],
-                        "month": "2024-07", "cell_days": month["detected_cell_days"],
+                        "month": f"{TARGET_YEAR}-07", "cell_days": month["detected_cell_days"],
                         "baseline_median": month["baseline_median"], "baseline_years": month["baseline_years"],
                         "anomaly_cell_days": month["anomaly_cell_days"], "product_versions": summary["product_versions"],
                         "bundle_verification": verification,
@@ -70,6 +72,13 @@ class PilotSync:
             self.state = json.loads(self.status_path.read_text())
         except (OSError, ValueError):
             self.state = {"status": "idle", "message": "Ready to check NASA FIRMS and import pilot records.", "completed": 0, "total": 16}
+        if self.state.get("pilot_years") not in (None, YEARS):
+            self.state.update(status="partial", validation=None,
+                              message="Pilot years changed. Existing imports are retained; check the new July 2022–2025 matrix.")
+        elif self.state.get("status") == "complete" and self.state.get("pilot_years") is None:
+            self.state.update(status="partial", validation=None,
+                              message="Pilot years changed. Existing imports are retained; check the new July 2022–2025 matrix.")
+        self.state["pilot_years"] = YEARS
         if self.state.get("status") in ("checking", "downloading", "validating"):
             self.state.update(status="interrupted", message="The previous sync was interrupted. Retry to resume completed imports.")
 
@@ -102,8 +111,12 @@ class PilotSync:
                            for year in YEARS for source in SERIES["joint"]]
                 pilots.append({**pilot, "windows": windows})
             state["completed"] = sum(window["complete"] for pilot in pilots for window in pilot["windows"])
+            state["total"] = len(PILOTS) * len(YEARS) * len(SERIES["joint"])
+            if state["status"] == "complete" and state["completed"] != state["total"]:
+                state.update(status="partial", validation=None,
+                             message="The current pilot still needs complete July 2022–2025 source exports.")
             hms_windows = [{"year": year, "complete": _complete_month(db, f"{year}-07", ("NOAA_HMS_VIIRS",), tuple(PILOTS[0]["bbox"]))}
-                           for year in YEARS]
+                           for year in HMS_YEARS]
             hms_batch = db.execute("SELECT MAX(id) FROM batches WHERE source_id='NOAA_HMS_VIIRS'").fetchone()[0]
             if hms_batch != self.hms_validation_batch:
                 self.hms_validation_batch = hms_batch
@@ -162,7 +175,7 @@ class PilotSync:
                 available = availability()
                 for source in SERIES["joint"]:
                     row = next((r for r in available if r["data_id"] == source), None)
-                    if not row or row["min_date"] > "2021-07-01" or row["max_date"] < "2024-07-31":
+                    if not row or row["min_date"] > f"{YEARS[0]}-07-01" or row["max_date"] < f"{TARGET_YEAR}-07-31":
                         raise ValueError(f"{source} does not currently offer the entire pilot period")
                 self.update(availability=available, connection_verified_utc=now())
                 completed = 0

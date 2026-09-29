@@ -1,6 +1,5 @@
 // A shared view carries a selection; a study bundle freezes its evidence.
-const savedViewsKey = "fireatlas.views.v1";
-let calendarRequest = 0, dayRequest = 0;
+let calendarRequest = 0, dayRequest = 0, studyToolsInitialized = false;
 
 function validateView(input) {
   const year = Number(input.year), month = Number(input.month);
@@ -24,7 +23,14 @@ function viewConfig() {
 
 function viewUrl() {
   const url = new URL("/", location.origin);
-  url.search = new URLSearchParams(viewConfig()); url.hash = state.day ? "evidence-section" : "calendar-section";
+  url.search = new URLSearchParams(viewConfig()); url.hash = "calendar-section";
+  return url.href;
+}
+
+function methodUrl() {
+  const url = new URL("/method.html", location.origin);
+  url.search = new URLSearchParams({...viewConfig(), context: "calendar"});
+  url.hash = "source-records";
   return url.href;
 }
 
@@ -32,7 +38,8 @@ function syncView() {
   if (!state.data) return;
   const url = new URL(viewUrl()); url.hash = location.hash;
   history.replaceState(null, "", url);
-  if (!$("#share-fallback").hidden) $("#share-url").value = viewUrl();
+  document.querySelectorAll("[data-method-link]").forEach(link => link.href = methodUrl());
+  if ($("#share-fallback") && !$("#share-fallback").hidden) $("#share-url").value = viewUrl();
   document.querySelectorAll("[data-series]").forEach(el => el.classList.toggle("selected", el.dataset.series === state.series));
   document.querySelectorAll("[data-layer]").forEach(el => el.classList.toggle("selected", el.dataset.layer === contextChoice));
   $("#bbox").value = state.bbox;
@@ -43,7 +50,7 @@ function syncView() {
 }
 
 function renderStudySources() {
-  const container = $("#study-sources"); container.replaceChildren();
+  const container = $("#study-sources"); if (!container) return; container.replaceChildren();
   const sources = state.data.provenance;
   $("#study-source-count").textContent = `${sources.length} source imports · ${state.data.monthly.filter(m => m.export_window_complete).length}/12 complete months`;
   if (!sources.length) { container.textContent = "No imported sources match this view."; return; }
@@ -57,51 +64,9 @@ function renderStudySources() {
   }
 }
 
-function readSavedViews() {
-  const views = JSON.parse(localStorage.getItem(savedViewsKey) || "[]");
-  if (!Array.isArray(views)) throw new Error("Saved views could not be read.");
-  return views.filter(view => { try { validateView(view.config); return typeof view.name === "string" && typeof view.id === "string"; } catch { return false; } }).slice(0, 20);
-}
-
-function renderSavedViews() {
-  const select = $("#saved-views"); select.replaceChildren(new Option("Choose a saved view", ""));
-  try {
-    for (const view of readSavedViews()) select.add(new Option(view.name, view.id));
-    $("#saved-note").textContent = "Saved on this browser only. Links use the receiving server’s current data.";
-  } catch { $("#saved-note").textContent = "Browser storage is unavailable. You can still copy links and download studies."; }
-  $("#restore-view").disabled = true; $("#delete-view").disabled = true;
-}
-
 function initStudyTools() {
-  renderSavedViews();
-  $("#saved-views").addEventListener("change", () => {
-    $("#restore-view").disabled = !$("#saved-views").value; $("#delete-view").disabled = !$("#saved-views").value;
-  });
-  $("#save-view").addEventListener("click", () => {
-    if (!state.data) return toast("Wait for the atlas to load.");
-    const name = $("#view-name").value.trim();
-    if (!name) { $("#view-name").focus(); return toast("Give this view a name first."); }
-    try {
-      const views = readSavedViews();
-      if (views.length >= 20) return toast("You have 20 saved views. Remove one before saving another.");
-      views.push({id: crypto.randomUUID(), name: name.slice(0,80), config: viewConfig()});
-      localStorage.setItem(savedViewsKey, JSON.stringify(views)); renderSavedViews(); $("#view-name").value = ""; toast("View saved on this browser.");
-    } catch { toast("Could not save in this browser. Copy a link or download the study instead."); }
-  });
-  $("#restore-view").addEventListener("click", async () => {
-    try {
-      const view = readSavedViews().find(v => v.id === $("#saved-views").value);
-      if (view) {
-        const next = validateView(view.config);
-        if (state.demo !== next.demo) await selectDataset(next.demo);
-        await loadCalendar(next); drawAoi(true); toast(`Opened ${view.name}`);
-      }
-    } catch (error) { toast(error.message); }
-  });
-  $("#delete-view").addEventListener("click", () => {
-    try { localStorage.setItem(savedViewsKey, JSON.stringify(readSavedViews().filter(v => v.id !== $("#saved-views").value))); renderSavedViews(); toast("Saved view removed."); }
-    catch { toast("Could not update browser storage."); }
-  });
+  if (studyToolsInitialized) return;
+  studyToolsInitialized = true;
   $("#copy-view").addEventListener("click", async () => {
     if (!state.data) return toast("Wait for the atlas to load.");
     const url = viewUrl();

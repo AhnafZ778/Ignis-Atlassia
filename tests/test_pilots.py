@@ -80,6 +80,8 @@ class PilotTests(unittest.TestCase):
             first = sync.status()
             self.assertEqual(first["sync"]["status"], "complete")
             self.assertEqual(first["sync"]["completed"], 16)
+            self.assertEqual(first["sync"]["validation"]["pilots"][0]["month"], "2025-07")
+            self.assertEqual(first["sync"]["validation"]["pilots"][0]["baseline_years"], [2022, 2023, 2024])
             self.assertEqual(first["sync"]["validation"]["pilots"][0]["baseline_median"], 0)
             self.assertNotIn("test-secret", json.dumps(first))
             download.reset_mock()

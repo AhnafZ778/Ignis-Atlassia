@@ -1,0 +1,2015 @@
+{
+  "cases": {
+    "grove-2025": {
+      "bbox": [
+        -121.55,
+        39.25,
+        -121.28,
+        39.48
+      ],
+      "end_utc": "2025-07-06",
+      "products": [
+        {
+          "cmr_hits": 9,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD14&version=061&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3591049623-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025185.0510.061.2025185091953/MOD14.A2025185.0510.061.2025185091953.hdf",
+              "end_utc": "2025-07-04T05:15:00.000Z",
+              "producer_id": "MOD14.A2025185.0510.061.2025185091953",
+              "start_utc": "2025-07-04T05:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3593439517-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025185.1710.061.2025185213426/MOD14.A2025185.1710.061.2025185213426.hdf",
+              "end_utc": "2025-07-04T17:15:00.000Z",
+              "producer_id": "MOD14.A2025185.1710.061.2025185213426",
+              "start_utc": "2025-07-04T17:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3593690234-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025185.1845.061.2025186033403/MOD14.A2025185.1845.061.2025186033403.hdf",
+              "end_utc": "2025-07-04T18:50:00.000Z",
+              "producer_id": "MOD14.A2025185.1845.061.2025186033403",
+              "start_utc": "2025-07-04T18:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3593690319-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025186.0410.061.2025186092640/MOD14.A2025186.0410.061.2025186092640.hdf",
+              "end_utc": "2025-07-05T04:15:00.000Z",
+              "producer_id": "MOD14.A2025186.0410.061.2025186092640",
+              "start_utc": "2025-07-05T04:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3593688708-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025186.0550.061.2025186092641/MOD14.A2025186.0550.061.2025186092641.hdf",
+              "end_utc": "2025-07-05T05:55:00.000Z",
+              "producer_id": "MOD14.A2025186.0550.061.2025186092641",
+              "start_utc": "2025-07-05T05:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3593690303-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025186.1750.061.2025186213740/MOD14.A2025186.1750.061.2025186213740.hdf",
+              "end_utc": "2025-07-05T17:55:00.000Z",
+              "producer_id": "MOD14.A2025186.1750.061.2025186213740",
+              "start_utc": "2025-07-05T17:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3595753645-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025187.0450.061.2025187093148/MOD14.A2025187.0450.061.2025187093148.hdf",
+              "end_utc": "2025-07-06T04:55:00.000Z",
+              "producer_id": "MOD14.A2025187.0450.061.2025187093148",
+              "start_utc": "2025-07-06T04:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3595510874-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025187.1825.061.2025188034401/MOD14.A2025187.1825.061.2025188034401.hdf",
+              "end_utc": "2025-07-06T18:30:00.000Z",
+              "producer_id": "MOD14.A2025187.1825.061.2025188034401",
+              "start_utc": "2025-07-06T18:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3595510919-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2025187.1830.061.2025188034313/MOD14.A2025187.1830.061.2025188034313.hdf",
+              "end_utc": "2025-07-06T18:35:00.000Z",
+              "producer_id": "MOD14.A2025187.1830.061.2025188034313",
+              "start_utc": "2025-07-06T18:30:00.000Z"
+            }
+          ],
+          "product": "MOD14",
+          "role": "fire-mask",
+          "version": "061"
+        },
+        {
+          "cmr_hits": 8,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MYD14&version=061&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3593683276-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025185.1125.061.2025186110950/MYD14.A2025185.1125.061.2025186110950.hdf",
+              "end_utc": "2025-07-04T11:30:00.000Z",
+              "producer_id": "MYD14.A2025185.1125.061.2025186110950",
+              "start_utc": "2025-07-04T11:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3593681613-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025185.2225.061.2025186112123/MYD14.A2025185.2225.061.2025186112123.hdf",
+              "end_utc": "2025-07-04T22:30:00.000Z",
+              "producer_id": "MYD14.A2025185.2225.061.2025186112123",
+              "start_utc": "2025-07-04T22:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3595773019-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025186.1025.061.2025187105722/MYD14.A2025186.1025.061.2025187105722.hdf",
+              "end_utc": "2025-07-05T10:30:00.000Z",
+              "producer_id": "MYD14.A2025186.1025.061.2025187105722",
+              "start_utc": "2025-07-05T10:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3595780400-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025186.1205.061.2025187105713/MYD14.A2025186.1205.061.2025187105713.hdf",
+              "end_utc": "2025-07-05T12:10:00.000Z",
+              "producer_id": "MYD14.A2025186.1205.061.2025187105713",
+              "start_utc": "2025-07-05T12:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3593880757-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025186.2130.061.2025187111702/MYD14.A2025186.2130.061.2025187111702.hdf",
+              "end_utc": "2025-07-05T21:35:00.000Z",
+              "producer_id": "MYD14.A2025186.2130.061.2025187111702",
+              "start_utc": "2025-07-05T21:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3593880730-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025186.2305.061.2025187111705/MYD14.A2025186.2305.061.2025187111705.hdf",
+              "end_utc": "2025-07-05T23:10:00.000Z",
+              "producer_id": "MYD14.A2025186.2305.061.2025187111705",
+              "start_utc": "2025-07-05T23:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3595373553-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025187.1105.061.2025188105907/MYD14.A2025187.1105.061.2025188105907.hdf",
+              "end_utc": "2025-07-06T11:10:00.000Z",
+              "producer_id": "MYD14.A2025187.1105.061.2025188105907",
+              "start_utc": "2025-07-06T11:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3595402975-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2025187.2205.061.2025188152825/MYD14.A2025187.2205.061.2025188152825.hdf",
+              "end_utc": "2025-07-06T22:10:00.000Z",
+              "producer_id": "MYD14.A2025187.2205.061.2025188152825",
+              "start_utc": "2025-07-06T22:05:00.000Z"
+            }
+          ],
+          "product": "MYD14",
+          "role": "fire-mask",
+          "version": "061"
+        },
+        {
+          "cmr_hits": 3,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP14IMG&version=002&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3606052086-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2025185.0906.002.2025196172829/VNP14IMG.A2025185.0906.002.2025196172829.nc",
+              "end_utc": "2025-07-04T09:12:00.000Z",
+              "producer_id": "VNP14IMG.A2025185.0906.002.2025196172829",
+              "start_utc": "2025-07-04T09:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3606053102-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2025185.1042.002.2025196172833/VNP14IMG.A2025185.1042.002.2025196172833.nc",
+              "end_utc": "2025-07-04T10:48:00.000Z",
+              "producer_id": "VNP14IMG.A2025185.1042.002.2025196172833",
+              "start_utc": "2025-07-04T10:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3606059549-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2025185.2206.002.2025196172829/VNP14IMG.A2025185.2206.002.2025196172829.nc",
+              "end_utc": "2025-07-04T22:12:00.000Z",
+              "producer_id": "VNP14IMG.A2025185.2206.002.2025196172829",
+              "start_utc": "2025-07-04T22:06:00.000Z"
+            }
+          ],
+          "product": "VNP14IMG",
+          "role": "fire-mask",
+          "version": "002"
+        },
+        {
+          "cmr_hits": 9,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD03&version=6.1&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3590754008-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025185.0510.061.2025185103616.hdf",
+              "end_utc": "2025-07-04T05:15:00.000Z",
+              "producer_id": "MOD03.A2025185.0510.061.2025185103616.hdf",
+              "start_utc": "2025-07-04T05:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3591480066-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025185.1710.061.2025185230223.hdf",
+              "end_utc": "2025-07-04T17:15:00.000Z",
+              "producer_id": "MOD03.A2025185.1710.061.2025185230223.hdf",
+              "start_utc": "2025-07-04T17:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3591481212-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025185.1845.061.2025186012218.hdf",
+              "end_utc": "2025-07-04T18:50:00.000Z",
+              "producer_id": "MOD03.A2025185.1845.061.2025186012218.hdf",
+              "start_utc": "2025-07-04T18:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3591853579-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025186.0410.061.2025186111933.hdf",
+              "end_utc": "2025-07-05T04:15:00.000Z",
+              "producer_id": "MOD03.A2025186.0410.061.2025186111933.hdf",
+              "start_utc": "2025-07-05T04:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3591853581-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025186.0550.061.2025186111918.hdf",
+              "end_utc": "2025-07-05T05:55:00.000Z",
+              "producer_id": "MOD03.A2025186.0550.061.2025186111918.hdf",
+              "start_utc": "2025-07-05T05:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3592253272-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025186.1750.061.2025186233229.hdf",
+              "end_utc": "2025-07-05T17:55:00.000Z",
+              "producer_id": "MOD03.A2025186.1750.061.2025186233229.hdf",
+              "start_utc": "2025-07-05T17:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3592732559-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025187.0450.061.2025187105648.hdf",
+              "end_utc": "2025-07-06T04:55:00.000Z",
+              "producer_id": "MOD03.A2025187.0450.061.2025187105648.hdf",
+              "start_utc": "2025-07-06T04:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3593063521-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025187.1825.061.2025188010525.hdf",
+              "end_utc": "2025-07-06T18:30:00.000Z",
+              "producer_id": "MOD03.A2025187.1825.061.2025188010525.hdf",
+              "start_utc": "2025-07-06T18:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3593066332-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2025187.1830.061.2025188010730.hdf",
+              "end_utc": "2025-07-06T18:35:00.000Z",
+              "producer_id": "MOD03.A2025187.1830.061.2025188010730.hdf",
+              "start_utc": "2025-07-06T18:30:00.000Z"
+            }
+          ],
+          "product": "MOD03",
+          "role": "geolocation",
+          "version": "6.1"
+        },
+        {
+          "cmr_hits": 8,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MYD03&version=6.1&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3591974661-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025185.1125.061.2025186150026.hdf",
+              "end_utc": "2025-07-04T11:30:00.000Z",
+              "producer_id": "MYD03.A2025185.1125.061.2025186150026.hdf",
+              "start_utc": "2025-07-04T11:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3591977838-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025185.2225.061.2025186150958.hdf",
+              "end_utc": "2025-07-04T22:30:00.000Z",
+              "producer_id": "MYD03.A2025185.2225.061.2025186150958.hdf",
+              "start_utc": "2025-07-04T22:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3592826574-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025186.1025.061.2025187145146.hdf",
+              "end_utc": "2025-07-05T10:30:00.000Z",
+              "producer_id": "MYD03.A2025186.1025.061.2025187145146.hdf",
+              "start_utc": "2025-07-05T10:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3592826582-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025186.1205.061.2025187145223.hdf",
+              "end_utc": "2025-07-05T12:10:00.000Z",
+              "producer_id": "MYD03.A2025186.1205.061.2025187145223.hdf",
+              "start_utc": "2025-07-05T12:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3592830683-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025186.2130.061.2025187150301.hdf",
+              "end_utc": "2025-07-05T21:35:00.000Z",
+              "producer_id": "MYD03.A2025186.2130.061.2025187150301.hdf",
+              "start_utc": "2025-07-05T21:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3592830695-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025186.2305.061.2025187150313.hdf",
+              "end_utc": "2025-07-05T23:10:00.000Z",
+              "producer_id": "MYD03.A2025186.2305.061.2025187150313.hdf",
+              "start_utc": "2025-07-05T23:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3593486390-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025187.1105.061.2025188145355.hdf",
+              "end_utc": "2025-07-06T11:10:00.000Z",
+              "producer_id": "MYD03.A2025187.1105.061.2025188145355.hdf",
+              "start_utc": "2025-07-06T11:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3593731728-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2025187.2205.061.2025188191332.hdf",
+              "end_utc": "2025-07-06T22:10:00.000Z",
+              "producer_id": "MYD03.A2025187.2205.061.2025188191332.hdf",
+              "start_utc": "2025-07-06T22:05:00.000Z"
+            }
+          ],
+          "product": "MYD03",
+          "role": "geolocation",
+          "version": "6.1"
+        },
+        {
+          "cmr_hits": 3,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP03IMG&version=2&temporal=2025-07-04T00%3A00%3A00Z%2C2025-07-07T00%3A00%3A00Z&bounding_box=-121.55%2C39.25%2C-121.28%2C39.48&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3590945963-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2025185.0906.002.2025185154212.nc",
+              "end_utc": "2025-07-04T09:12:00.000Z",
+              "producer_id": "VNP03IMG.A2025185.0906.002.2025185154212.nc",
+              "start_utc": "2025-07-04T09:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3591778912-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2025185.1042.002.2025185212046.nc",
+              "end_utc": "2025-07-04T10:48:00.000Z",
+              "producer_id": "VNP03IMG.A2025185.1042.002.2025185212046.nc",
+              "start_utc": "2025-07-04T10:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3600186387-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2025185.2206.002.2025192173602.nc",
+              "end_utc": "2025-07-04T22:12:00.000Z",
+              "producer_id": "VNP03IMG.A2025185.2206.002.2025192173602.nc",
+              "start_utc": "2025-07-04T22:06:00.000Z"
+            }
+          ],
+          "product": "VNP03IMG",
+          "role": "geolocation",
+          "version": "2"
+        }
+      ],
+      "start_utc": "2025-07-04"
+    },
+    "park-2024": {
+      "bbox": [
+        -122.0,
+        39.5,
+        -121.3,
+        40.5
+      ],
+      "end_utc": "2024-07-31",
+      "products": [
+        {
+          "cmr_hits": 42,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD14&version=061&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3166670765-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024199.0545.061.2024199093530/MOD14.A2024199.0545.061.2024199093530.hdf",
+              "end_utc": "2024-07-17T05:50:00.000Z",
+              "producer_id": "MOD14.A2024199.0545.061.2024199093530",
+              "start_utc": "2024-07-17T05:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3163958789-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024199.1745.061.2024199214321/MOD14.A2024199.1745.061.2024199214321.hdf",
+              "end_utc": "2024-07-17T17:50:00.000Z",
+              "producer_id": "MOD14.A2024199.1745.061.2024199214321",
+              "start_utc": "2024-07-17T17:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3165169612-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024200.0450.061.2024200091458/MOD14.A2024200.0450.061.2024200091458.hdf",
+              "end_utc": "2024-07-18T04:55:00.000Z",
+              "producer_id": "MOD14.A2024200.0450.061.2024200091458",
+              "start_utc": "2024-07-18T04:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3166514940-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024200.1825.061.2024201033518/MOD14.A2024200.1825.061.2024201033518.hdf",
+              "end_utc": "2024-07-18T18:30:00.000Z",
+              "producer_id": "MOD14.A2024200.1825.061.2024201033518",
+              "start_utc": "2024-07-18T18:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3166952102-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024201.0530.061.2024201092114/MOD14.A2024201.0530.061.2024201092114.hdf",
+              "end_utc": "2024-07-19T05:35:00.000Z",
+              "producer_id": "MOD14.A2024201.0530.061.2024201092114",
+              "start_utc": "2024-07-19T05:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3167680757-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024201.1725.061.2024201213354/MOD14.A2024201.1725.061.2024201213354.hdf",
+              "end_utc": "2024-07-19T17:30:00.000Z",
+              "producer_id": "MOD14.A2024201.1725.061.2024201213354",
+              "start_utc": "2024-07-19T17:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3167680773-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024201.1730.061.2024201213342/MOD14.A2024201.1730.061.2024201213342.hdf",
+              "end_utc": "2024-07-19T17:35:00.000Z",
+              "producer_id": "MOD14.A2024201.1730.061.2024201213342",
+              "start_utc": "2024-07-19T17:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3168142877-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024201.1905.061.2024202033345/MOD14.A2024201.1905.061.2024202033345.hdf",
+              "end_utc": "2024-07-19T19:10:00.000Z",
+              "producer_id": "MOD14.A2024201.1905.061.2024202033345",
+              "start_utc": "2024-07-19T19:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3168426574-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024202.0430.061.2024202092351/MOD14.A2024202.0430.061.2024202092351.hdf",
+              "end_utc": "2024-07-20T04:35:00.000Z",
+              "producer_id": "MOD14.A2024202.0430.061.2024202092351",
+              "start_utc": "2024-07-20T04:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3168720340-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024202.0610.061.2024202152240/MOD14.A2024202.0610.061.2024202152240.hdf",
+              "end_utc": "2024-07-20T06:15:00.000Z",
+              "producer_id": "MOD14.A2024202.0610.061.2024202152240",
+              "start_utc": "2024-07-20T06:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3169440285-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024202.1805.061.2024203035142/MOD14.A2024202.1805.061.2024203035142.hdf",
+              "end_utc": "2024-07-20T18:10:00.000Z",
+              "producer_id": "MOD14.A2024202.1805.061.2024203035142",
+              "start_utc": "2024-07-20T18:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3169432807-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024202.1810.061.2024203034415/MOD14.A2024202.1810.061.2024203034415.hdf",
+              "end_utc": "2024-07-20T18:15:00.000Z",
+              "producer_id": "MOD14.A2024202.1810.061.2024203034415",
+              "start_utc": "2024-07-20T18:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3169693737-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024203.0510.061.2024203091959/MOD14.A2024203.0510.061.2024203091959.hdf",
+              "end_utc": "2024-07-21T05:15:00.000Z",
+              "producer_id": "MOD14.A2024203.0510.061.2024203091959",
+              "start_utc": "2024-07-21T05:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3170606243-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024203.1845.061.2024204034200/MOD14.A2024203.1845.061.2024204034200.hdf",
+              "end_utc": "2024-07-21T18:50:00.000Z",
+              "producer_id": "MOD14.A2024203.1845.061.2024204034200",
+              "start_utc": "2024-07-21T18:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3170606261-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024203.1850.061.2024204034025/MOD14.A2024203.1850.061.2024204034025.hdf",
+              "end_utc": "2024-07-21T18:55:00.000Z",
+              "producer_id": "MOD14.A2024203.1850.061.2024204034025",
+              "start_utc": "2024-07-21T18:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3170885668-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024204.0550.061.2024204113918/MOD14.A2024204.0550.061.2024204113918.hdf",
+              "end_utc": "2024-07-22T05:55:00.000Z",
+              "producer_id": "MOD14.A2024204.0550.061.2024204113918",
+              "start_utc": "2024-07-22T05:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3171141001-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024204.1750.061.2024204213818/MOD14.A2024204.1750.061.2024204213818.hdf",
+              "end_utc": "2024-07-22T17:55:00.000Z",
+              "producer_id": "MOD14.A2024204.1750.061.2024204213818",
+              "start_utc": "2024-07-22T17:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3171679924-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024205.0455.061.2024205091801/MOD14.A2024205.0455.061.2024205091801.hdf",
+              "end_utc": "2024-07-23T05:00:00.000Z",
+              "producer_id": "MOD14.A2024205.0455.061.2024205091801",
+              "start_utc": "2024-07-23T04:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3173136048-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024205.1830.061.2024206033854/MOD14.A2024205.1830.061.2024206033854.hdf",
+              "end_utc": "2024-07-23T18:35:00.000Z",
+              "producer_id": "MOD14.A2024205.1830.061.2024206033854",
+              "start_utc": "2024-07-23T18:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3175258562-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024206.0535.061.2024208235928/MOD14.A2024206.0535.061.2024208235928.hdf",
+              "end_utc": "2024-07-24T05:40:00.000Z",
+              "producer_id": "MOD14.A2024206.0535.061.2024208235928",
+              "start_utc": "2024-07-24T05:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3175277865-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024206.1730.061.2024209002414/MOD14.A2024206.1730.061.2024209002414.hdf",
+              "end_utc": "2024-07-24T17:35:00.000Z",
+              "producer_id": "MOD14.A2024206.1730.061.2024209002414",
+              "start_utc": "2024-07-24T17:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3175265512-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024206.1910.061.2024209000945/MOD14.A2024206.1910.061.2024209000945.hdf",
+              "end_utc": "2024-07-24T19:15:00.000Z",
+              "producer_id": "MOD14.A2024206.1910.061.2024209000945",
+              "start_utc": "2024-07-24T19:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3174625652-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024207.0435.061.2024207091518/MOD14.A2024207.0435.061.2024207091518.hdf",
+              "end_utc": "2024-07-25T04:40:00.000Z",
+              "producer_id": "MOD14.A2024207.0435.061.2024207091518",
+              "start_utc": "2024-07-25T04:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3174661357-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024207.0615.061.2024207160204/MOD14.A2024207.0615.061.2024207160204.hdf",
+              "end_utc": "2024-07-25T06:20:00.000Z",
+              "producer_id": "MOD14.A2024207.0615.061.2024207160204",
+              "start_utc": "2024-07-25T06:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3174660446-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024207.1810.061.2024208034129/MOD14.A2024207.1810.061.2024208034129.hdf",
+              "end_utc": "2024-07-25T18:15:00.000Z",
+              "producer_id": "MOD14.A2024207.1810.061.2024208034129",
+              "start_utc": "2024-07-25T18:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3174661304-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024207.1815.061.2024208034142/MOD14.A2024207.1815.061.2024208034142.hdf",
+              "end_utc": "2024-07-25T18:20:00.000Z",
+              "producer_id": "MOD14.A2024207.1815.061.2024208034142",
+              "start_utc": "2024-07-25T18:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3174660750-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024208.0515.061.2024208091820/MOD14.A2024208.0515.061.2024208091820.hdf",
+              "end_utc": "2024-07-26T05:20:00.000Z",
+              "producer_id": "MOD14.A2024208.0515.061.2024208091820",
+              "start_utc": "2024-07-26T05:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3175548007-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024208.1850.061.2024209034825/MOD14.A2024208.1850.061.2024209034825.hdf",
+              "end_utc": "2024-07-26T18:55:00.000Z",
+              "producer_id": "MOD14.A2024208.1850.061.2024209034825",
+              "start_utc": "2024-07-26T18:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3175562971-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024208.1855.061.2024209040817/MOD14.A2024208.1855.061.2024209040817.hdf",
+              "end_utc": "2024-07-26T19:00:00.000Z",
+              "producer_id": "MOD14.A2024208.1855.061.2024209040817",
+              "start_utc": "2024-07-26T18:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3175935122-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024209.0555.061.2024209130651/MOD14.A2024209.0555.061.2024209130651.hdf",
+              "end_utc": "2024-07-27T06:00:00.000Z",
+              "producer_id": "MOD14.A2024209.0555.061.2024209130651",
+              "start_utc": "2024-07-27T05:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3176312498-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024209.1755.061.2024209215744/MOD14.A2024209.1755.061.2024209215744.hdf",
+              "end_utc": "2024-07-27T18:00:00.000Z",
+              "producer_id": "MOD14.A2024209.1755.061.2024209215744",
+              "start_utc": "2024-07-27T17:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3176855812-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024210.0500.061.2024210091847/MOD14.A2024210.0500.061.2024210091847.hdf",
+              "end_utc": "2024-07-28T05:05:00.000Z",
+              "producer_id": "MOD14.A2024210.0500.061.2024210091847",
+              "start_utc": "2024-07-28T05:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3177613516-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024210.1835.061.2024211034538/MOD14.A2024210.1835.061.2024211034538.hdf",
+              "end_utc": "2024-07-28T18:40:00.000Z",
+              "producer_id": "MOD14.A2024210.1835.061.2024211034538",
+              "start_utc": "2024-07-28T18:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3177866008-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024211.0540.061.2024211092618/MOD14.A2024211.0540.061.2024211092618.hdf",
+              "end_utc": "2024-07-29T05:45:00.000Z",
+              "producer_id": "MOD14.A2024211.0540.061.2024211092618",
+              "start_utc": "2024-07-29T05:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3178361351-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024211.1735.061.2024211212307/MOD14.A2024211.1735.061.2024211212307.hdf",
+              "end_utc": "2024-07-29T17:40:00.000Z",
+              "producer_id": "MOD14.A2024211.1735.061.2024211212307",
+              "start_utc": "2024-07-29T17:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3178765718-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024211.1915.061.2024212040254/MOD14.A2024211.1915.061.2024212040254.hdf",
+              "end_utc": "2024-07-29T19:20:00.000Z",
+              "producer_id": "MOD14.A2024211.1915.061.2024212040254",
+              "start_utc": "2024-07-29T19:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3178969213-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024212.0440.061.2024212092157/MOD14.A2024212.0440.061.2024212092157.hdf",
+              "end_utc": "2024-07-30T04:45:00.000Z",
+              "producer_id": "MOD14.A2024212.0440.061.2024212092157",
+              "start_utc": "2024-07-30T04:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3179116398-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024212.0620.061.2024212152109/MOD14.A2024212.0620.061.2024212152109.hdf",
+              "end_utc": "2024-07-30T06:25:00.000Z",
+              "producer_id": "MOD14.A2024212.0620.061.2024212152109",
+              "start_utc": "2024-07-30T06:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3179967937-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024212.1815.061.2024213033605/MOD14.A2024212.1815.061.2024213033605.hdf",
+              "end_utc": "2024-07-30T18:20:00.000Z",
+              "producer_id": "MOD14.A2024212.1815.061.2024213033605",
+              "start_utc": "2024-07-30T18:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3180296572-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024213.0520.061.2024213091346/MOD14.A2024213.0520.061.2024213091346.hdf",
+              "end_utc": "2024-07-31T05:25:00.000Z",
+              "producer_id": "MOD14.A2024213.0520.061.2024213091346",
+              "start_utc": "2024-07-31T05:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3180577583-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024213.1720.061.2024213214041/MOD14.A2024213.1720.061.2024213214041.hdf",
+              "end_utc": "2024-07-31T17:25:00.000Z",
+              "producer_id": "MOD14.A2024213.1720.061.2024213214041",
+              "start_utc": "2024-07-31T17:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3180920578-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MOD14.061/MOD14.A2024213.1855.061.2024214034051/MOD14.A2024213.1855.061.2024214034051.hdf",
+              "end_utc": "2024-07-31T19:00:00.000Z",
+              "producer_id": "MOD14.A2024213.1855.061.2024214034051",
+              "start_utc": "2024-07-31T18:55:00.000Z"
+            }
+          ],
+          "product": "MOD14",
+          "role": "fire-mask",
+          "version": "061"
+        },
+        {
+          "cmr_hits": 40,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MYD14&version=061&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3165350381-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024199.1000.061.2024200121137/MYD14.A2024199.1000.061.2024200121137.hdf",
+              "end_utc": "2024-07-17T10:05:00.000Z",
+              "producer_id": "MYD14.A2024199.1000.061.2024200121137",
+              "start_utc": "2024-07-17T10:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3165350505-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024199.1135.061.2024200121209/MYD14.A2024199.1135.061.2024200121209.hdf",
+              "end_utc": "2024-07-17T11:40:00.000Z",
+              "producer_id": "MYD14.A2024199.1135.061.2024200121209",
+              "start_utc": "2024-07-17T11:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3165365590-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024199.2105.061.2024200123021/MYD14.A2024199.2105.061.2024200123021.hdf",
+              "end_utc": "2024-07-17T21:10:00.000Z",
+              "producer_id": "MYD14.A2024199.2105.061.2024200123021",
+              "start_utc": "2024-07-17T21:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3165366789-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024199.2240.061.2024200122755/MYD14.A2024199.2240.061.2024200122755.hdf",
+              "end_utc": "2024-07-17T22:45:00.000Z",
+              "producer_id": "MYD14.A2024199.2240.061.2024200122755",
+              "start_utc": "2024-07-17T22:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3167074042-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024200.1040.061.2024201110836/MYD14.A2024200.1040.061.2024201110836.hdf",
+              "end_utc": "2024-07-18T10:45:00.000Z",
+              "producer_id": "MYD14.A2024200.1040.061.2024201110836",
+              "start_utc": "2024-07-18T10:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3167119115-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024200.2145.061.2024201114534/MYD14.A2024200.2145.061.2024201114534.hdf",
+              "end_utc": "2024-07-18T21:50:00.000Z",
+              "producer_id": "MYD14.A2024200.2145.061.2024201114534",
+              "start_utc": "2024-07-18T21:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3168496021-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024201.1120.061.2024202105851/MYD14.A2024201.1120.061.2024202105851.hdf",
+              "end_utc": "2024-07-19T11:25:00.000Z",
+              "producer_id": "MYD14.A2024201.1120.061.2024202105851",
+              "start_utc": "2024-07-19T11:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3168514056-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024201.2225.061.2024202112245/MYD14.A2024201.2225.061.2024202112245.hdf",
+              "end_utc": "2024-07-19T22:30:00.000Z",
+              "producer_id": "MYD14.A2024201.2225.061.2024202112245",
+              "start_utc": "2024-07-19T22:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3169773249-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024202.1025.061.2024203110637/MYD14.A2024202.1025.061.2024203110637.hdf",
+              "end_utc": "2024-07-20T10:30:00.000Z",
+              "producer_id": "MYD14.A2024202.1025.061.2024203110637",
+              "start_utc": "2024-07-20T10:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3169787436-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024202.2125.061.2024203112342/MYD14.A2024202.2125.061.2024203112342.hdf",
+              "end_utc": "2024-07-20T21:30:00.000Z",
+              "producer_id": "MYD14.A2024202.2125.061.2024203112342",
+              "start_utc": "2024-07-20T21:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3170886922-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024203.1105.061.2024204111337/MYD14.A2024203.1105.061.2024204111337.hdf",
+              "end_utc": "2024-07-21T11:10:00.000Z",
+              "producer_id": "MYD14.A2024203.1105.061.2024204111337",
+              "start_utc": "2024-07-21T11:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3170886201-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024203.2205.061.2024204113127/MYD14.A2024203.2205.061.2024204113127.hdf",
+              "end_utc": "2024-07-21T22:10:00.000Z",
+              "producer_id": "MYD14.A2024203.2205.061.2024204113127",
+              "start_utc": "2024-07-21T22:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3170890009-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024203.2210.061.2024204113352/MYD14.A2024203.2210.061.2024204113352.hdf",
+              "end_utc": "2024-07-21T22:15:00.000Z",
+              "producer_id": "MYD14.A2024203.2210.061.2024204113352",
+              "start_utc": "2024-07-21T22:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3171771841-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024204.1005.061.2024205110901/MYD14.A2024204.1005.061.2024205110901.hdf",
+              "end_utc": "2024-07-22T10:10:00.000Z",
+              "producer_id": "MYD14.A2024204.1005.061.2024205110901",
+              "start_utc": "2024-07-22T10:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3171771842-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024204.1145.061.2024205110901/MYD14.A2024204.1145.061.2024205110901.hdf",
+              "end_utc": "2024-07-22T11:50:00.000Z",
+              "producer_id": "MYD14.A2024204.1145.061.2024205110901",
+              "start_utc": "2024-07-22T11:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3171782591-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024204.2110.061.2024205112052/MYD14.A2024204.2110.061.2024205112052.hdf",
+              "end_utc": "2024-07-22T21:15:00.000Z",
+              "producer_id": "MYD14.A2024204.2110.061.2024205112052",
+              "start_utc": "2024-07-22T21:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3173341445-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024205.1045.061.2024206110158/MYD14.A2024205.1045.061.2024206110158.hdf",
+              "end_utc": "2024-07-23T10:50:00.000Z",
+              "producer_id": "MYD14.A2024205.1045.061.2024206110158",
+              "start_utc": "2024-07-23T10:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3173346035-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024205.2150.061.2024206112756/MYD14.A2024205.2150.061.2024206112756.hdf",
+              "end_utc": "2024-07-23T21:55:00.000Z",
+              "producer_id": "MYD14.A2024205.2150.061.2024206112756",
+              "start_utc": "2024-07-23T21:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3174631517-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024206.0950.061.2024207110555/MYD14.A2024206.0950.061.2024207110555.hdf",
+              "end_utc": "2024-07-24T09:55:00.000Z",
+              "producer_id": "MYD14.A2024206.0950.061.2024207110555",
+              "start_utc": "2024-07-24T09:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3174630039-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024206.1125.061.2024207110552/MYD14.A2024206.1125.061.2024207110552.hdf",
+              "end_utc": "2024-07-24T11:30:00.000Z",
+              "producer_id": "MYD14.A2024206.1125.061.2024207110552",
+              "start_utc": "2024-07-24T11:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3174631635-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024206.2055.061.2024207112418/MYD14.A2024206.2055.061.2024207112418.hdf",
+              "end_utc": "2024-07-24T21:00:00.000Z",
+              "producer_id": "MYD14.A2024206.2055.061.2024207112418",
+              "start_utc": "2024-07-24T20:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3174629061-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024206.2230.061.2024207112656/MYD14.A2024206.2230.061.2024207112656.hdf",
+              "end_utc": "2024-07-24T22:35:00.000Z",
+              "producer_id": "MYD14.A2024206.2230.061.2024207112656",
+              "start_utc": "2024-07-24T22:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3174706592-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024207.1030.061.2024208110608/MYD14.A2024207.1030.061.2024208110608.hdf",
+              "end_utc": "2024-07-25T10:35:00.000Z",
+              "producer_id": "MYD14.A2024207.1030.061.2024208110608",
+              "start_utc": "2024-07-25T10:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3174701977-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024207.2135.061.2024208112713/MYD14.A2024207.2135.061.2024208112713.hdf",
+              "end_utc": "2024-07-25T21:40:00.000Z",
+              "producer_id": "MYD14.A2024207.2135.061.2024208112713",
+              "start_utc": "2024-07-25T21:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3175880643-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024208.1110.061.2024209115155/MYD14.A2024208.1110.061.2024209115155.hdf",
+              "end_utc": "2024-07-26T11:15:00.000Z",
+              "producer_id": "MYD14.A2024208.1110.061.2024209115155",
+              "start_utc": "2024-07-26T11:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3175899756-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024208.2215.061.2024209122225/MYD14.A2024208.2215.061.2024209122225.hdf",
+              "end_utc": "2024-07-26T22:20:00.000Z",
+              "producer_id": "MYD14.A2024208.2215.061.2024209122225",
+              "start_utc": "2024-07-26T22:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3176921360-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024209.1010.061.2024210111034/MYD14.A2024209.1010.061.2024210111034.hdf",
+              "end_utc": "2024-07-27T10:15:00.000Z",
+              "producer_id": "MYD14.A2024209.1010.061.2024210111034",
+              "start_utc": "2024-07-27T10:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3176921357-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024209.1015.061.2024210110753/MYD14.A2024209.1015.061.2024210110753.hdf",
+              "end_utc": "2024-07-27T10:20:00.000Z",
+              "producer_id": "MYD14.A2024209.1015.061.2024210110753",
+              "start_utc": "2024-07-27T10:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3176932083-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024209.2115.061.2024210112810/MYD14.A2024209.2115.061.2024210112810.hdf",
+              "end_utc": "2024-07-27T21:20:00.000Z",
+              "producer_id": "MYD14.A2024209.2115.061.2024210112810",
+              "start_utc": "2024-07-27T21:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3177940818-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024210.1055.061.2024211110909/MYD14.A2024210.1055.061.2024211110909.hdf",
+              "end_utc": "2024-07-28T11:00:00.000Z",
+              "producer_id": "MYD14.A2024210.1055.061.2024211110909",
+              "start_utc": "2024-07-28T10:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3177952013-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024210.2155.061.2024211112343/MYD14.A2024210.2155.061.2024211112343.hdf",
+              "end_utc": "2024-07-28T22:00:00.000Z",
+              "producer_id": "MYD14.A2024210.2155.061.2024211112343",
+              "start_utc": "2024-07-28T21:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3179000702-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024211.0955.061.2024212110753/MYD14.A2024211.0955.061.2024212110753.hdf",
+              "end_utc": "2024-07-29T10:00:00.000Z",
+              "producer_id": "MYD14.A2024211.0955.061.2024212110753",
+              "start_utc": "2024-07-29T09:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3179000703-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024211.1135.061.2024212111020/MYD14.A2024211.1135.061.2024212111020.hdf",
+              "end_utc": "2024-07-29T11:40:00.000Z",
+              "producer_id": "MYD14.A2024211.1135.061.2024212111020",
+              "start_utc": "2024-07-29T11:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3179009457-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024211.2100.061.2024212112645/MYD14.A2024211.2100.061.2024212112645.hdf",
+              "end_utc": "2024-07-29T21:05:00.000Z",
+              "producer_id": "MYD14.A2024211.2100.061.2024212112645",
+              "start_utc": "2024-07-29T21:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3179015510-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024211.2235.061.2024212113447/MYD14.A2024211.2235.061.2024212113447.hdf",
+              "end_utc": "2024-07-29T22:40:00.000Z",
+              "producer_id": "MYD14.A2024211.2235.061.2024212113447",
+              "start_utc": "2024-07-29T22:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3179013075-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024211.2240.061.2024212113216/MYD14.A2024211.2240.061.2024212113216.hdf",
+              "end_utc": "2024-07-29T22:45:00.000Z",
+              "producer_id": "MYD14.A2024211.2240.061.2024212113216",
+              "start_utc": "2024-07-29T22:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3180295546-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024212.1035.061.2024213115430/MYD14.A2024212.1035.061.2024213115430.hdf",
+              "end_utc": "2024-07-30T10:40:00.000Z",
+              "producer_id": "MYD14.A2024212.1035.061.2024213115430",
+              "start_utc": "2024-07-30T10:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3180295410-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024212.2140.061.2024213122037/MYD14.A2024212.2140.061.2024213122037.hdf",
+              "end_utc": "2024-07-30T21:45:00.000Z",
+              "producer_id": "MYD14.A2024212.2140.061.2024213122037",
+              "start_utc": "2024-07-30T21:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3188642839-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024213.1115.061.2024221113936/MYD14.A2024213.1115.061.2024221113936.hdf",
+              "end_utc": "2024-07-31T11:20:00.000Z",
+              "producer_id": "MYD14.A2024213.1115.061.2024221113936",
+              "start_utc": "2024-07-31T11:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3188657276-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/MYD14.061/MYD14.A2024213.2220.061.2024221115551/MYD14.A2024213.2220.061.2024221115551.hdf",
+              "end_utc": "2024-07-31T22:25:00.000Z",
+              "producer_id": "MYD14.A2024213.2220.061.2024221115551",
+              "start_utc": "2024-07-31T22:20:00.000Z"
+            }
+          ],
+          "product": "MYD14",
+          "role": "fire-mask",
+          "version": "061"
+        },
+        {
+          "cmr_hits": 32,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP14IMG&version=002&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3171852266-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024199.0900.002.2024205173858/VNP14IMG.A2024199.0900.002.2024205173858.nc",
+              "end_utc": "2024-07-17T09:06:00.000Z",
+              "producer_id": "VNP14IMG.A2024199.0900.002.2024205173858",
+              "start_utc": "2024-07-17T09:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3171852253-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024199.1042.002.2024205173858/VNP14IMG.A2024199.1042.002.2024205173858.nc",
+              "end_utc": "2024-07-17T10:48:00.000Z",
+              "producer_id": "VNP14IMG.A2024199.1042.002.2024205173858",
+              "start_utc": "2024-07-17T10:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3171854332-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024199.2024.002.2024205173900/VNP14IMG.A2024199.2024.002.2024205173900.nc",
+              "end_utc": "2024-07-17T20:30:00.000Z",
+              "producer_id": "VNP14IMG.A2024199.2024.002.2024205173900",
+              "start_utc": "2024-07-17T20:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3171854535-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024199.2206.002.2024205173935/VNP14IMG.A2024199.2206.002.2024205173935.nc",
+              "end_utc": "2024-07-17T22:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024199.2206.002.2024205173935",
+              "start_utc": "2024-07-17T22:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3171863368-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024200.0842.002.2024205180033/VNP14IMG.A2024200.0842.002.2024205180033.nc",
+              "end_utc": "2024-07-18T08:48:00.000Z",
+              "producer_id": "VNP14IMG.A2024200.0842.002.2024205180033",
+              "start_utc": "2024-07-18T08:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3171863320-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024200.1024.002.2024205180028/VNP14IMG.A2024200.1024.002.2024205180028.nc",
+              "end_utc": "2024-07-18T10:30:00.000Z",
+              "producer_id": "VNP14IMG.A2024200.1024.002.2024205180028",
+              "start_utc": "2024-07-18T10:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3171863398-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024200.2006.002.2024205180028/VNP14IMG.A2024200.2006.002.2024205180028.nc",
+              "end_utc": "2024-07-18T20:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024200.2006.002.2024205180028",
+              "start_utc": "2024-07-18T20:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3171863397-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024200.2148.002.2024205180028/VNP14IMG.A2024200.2148.002.2024205180028.nc",
+              "end_utc": "2024-07-18T21:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024200.2148.002.2024205180028",
+              "start_utc": "2024-07-18T21:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180308869-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024201.1006.002.2024213171859/VNP14IMG.A2024201.1006.002.2024213171859.nc",
+              "end_utc": "2024-07-19T10:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024201.1006.002.2024213171859",
+              "start_utc": "2024-07-19T10:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3180309064-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024201.1948.002.2024213171927/VNP14IMG.A2024201.1948.002.2024213171927.nc",
+              "end_utc": "2024-07-19T19:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024201.1948.002.2024213171927",
+              "start_utc": "2024-07-19T19:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180309168-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024201.2130.002.2024213171931/VNP14IMG.A2024201.2130.002.2024213171931.nc",
+              "end_utc": "2024-07-19T21:36:00.000Z",
+              "producer_id": "VNP14IMG.A2024201.2130.002.2024213171931",
+              "start_utc": "2024-07-19T21:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3180311841-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024202.0948.002.2024213180147/VNP14IMG.A2024202.0948.002.2024213180147.nc",
+              "end_utc": "2024-07-20T09:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024202.0948.002.2024213180147",
+              "start_utc": "2024-07-20T09:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180311855-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024202.2106.002.2024213180131/VNP14IMG.A2024202.2106.002.2024213180131.nc",
+              "end_utc": "2024-07-20T21:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024202.2106.002.2024213180131",
+              "start_utc": "2024-07-20T21:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3180313643-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024202.2112.002.2024213180216/VNP14IMG.A2024202.2112.002.2024213180216.nc",
+              "end_utc": "2024-07-20T21:18:00.000Z",
+              "producer_id": "VNP14IMG.A2024202.2112.002.2024213180216",
+              "start_utc": "2024-07-20T21:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3180325938-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024203.0930.002.2024213183534/VNP14IMG.A2024203.0930.002.2024213183534.nc",
+              "end_utc": "2024-07-21T09:36:00.000Z",
+              "producer_id": "VNP14IMG.A2024203.0930.002.2024213183534",
+              "start_utc": "2024-07-21T09:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3180322133-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024203.1106.002.2024213183536/VNP14IMG.A2024203.1106.002.2024213183536.nc",
+              "end_utc": "2024-07-21T11:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024203.1106.002.2024213183536",
+              "start_utc": "2024-07-21T11:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3180322002-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024203.2048.002.2024213183541/VNP14IMG.A2024203.2048.002.2024213183541.nc",
+              "end_utc": "2024-07-21T20:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024203.2048.002.2024213183541",
+              "start_utc": "2024-07-21T20:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180330936-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024204.0906.002.2024213190438/VNP14IMG.A2024204.0906.002.2024213190438.nc",
+              "end_utc": "2024-07-22T09:12:00.000Z",
+              "producer_id": "VNP14IMG.A2024204.0906.002.2024213190438",
+              "start_utc": "2024-07-22T09:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3180330886-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024204.1048.002.2024213190542/VNP14IMG.A2024204.1048.002.2024213190542.nc",
+              "end_utc": "2024-07-22T10:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024204.1048.002.2024213190542",
+              "start_utc": "2024-07-22T10:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180330853-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024204.2030.002.2024213190355/VNP14IMG.A2024204.2030.002.2024213190355.nc",
+              "end_utc": "2024-07-22T20:36:00.000Z",
+              "producer_id": "VNP14IMG.A2024204.2030.002.2024213190355",
+              "start_utc": "2024-07-22T20:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3180330477-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024204.2212.002.2024213190550/VNP14IMG.A2024204.2212.002.2024213190550.nc",
+              "end_utc": "2024-07-22T22:18:00.000Z",
+              "producer_id": "VNP14IMG.A2024204.2212.002.2024213190550",
+              "start_utc": "2024-07-22T22:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3180342980-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024205.0848.002.2024213194811/VNP14IMG.A2024205.0848.002.2024213194811.nc",
+              "end_utc": "2024-07-23T08:54:00.000Z",
+              "producer_id": "VNP14IMG.A2024205.0848.002.2024213194811",
+              "start_utc": "2024-07-23T08:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3180343083-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024205.1030.002.2024213194817/VNP14IMG.A2024205.1030.002.2024213194817.nc",
+              "end_utc": "2024-07-23T10:36:00.000Z",
+              "producer_id": "VNP14IMG.A2024205.1030.002.2024213194817",
+              "start_utc": "2024-07-23T10:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3180347270-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024205.2012.002.2024213194813/VNP14IMG.A2024205.2012.002.2024213194813.nc",
+              "end_utc": "2024-07-23T20:18:00.000Z",
+              "producer_id": "VNP14IMG.A2024205.2012.002.2024213194813",
+              "start_utc": "2024-07-23T20:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3180349162-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024205.2154.002.2024213194809/VNP14IMG.A2024205.2154.002.2024213194809.nc",
+              "end_utc": "2024-07-23T22:00:00.000Z",
+              "producer_id": "VNP14IMG.A2024205.2154.002.2024213194809",
+              "start_utc": "2024-07-23T21:54:00.000Z"
+            },
+            {
+              "cmr_id": "G3187738875-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024211.2000.002.2024220233916/VNP14IMG.A2024211.2000.002.2024220233916.nc",
+              "end_utc": "2024-07-29T20:06:00.000Z",
+              "producer_id": "VNP14IMG.A2024211.2000.002.2024220233916",
+              "start_utc": "2024-07-29T20:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3187738985-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024211.2142.002.2024220233916/VNP14IMG.A2024211.2142.002.2024220233916.nc",
+              "end_utc": "2024-07-29T21:48:00.000Z",
+              "producer_id": "VNP14IMG.A2024211.2142.002.2024220233916",
+              "start_utc": "2024-07-29T21:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3187759809-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024212.1000.002.2024221000656/VNP14IMG.A2024212.1000.002.2024221000656.nc",
+              "end_utc": "2024-07-30T10:06:00.000Z",
+              "producer_id": "VNP14IMG.A2024212.1000.002.2024221000656",
+              "start_utc": "2024-07-30T10:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3187762032-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024212.1942.002.2024221000652/VNP14IMG.A2024212.1942.002.2024221000652.nc",
+              "end_utc": "2024-07-30T19:48:00.000Z",
+              "producer_id": "VNP14IMG.A2024212.1942.002.2024221000652",
+              "start_utc": "2024-07-30T19:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3187759677-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024212.2124.002.2024221000659/VNP14IMG.A2024212.2124.002.2024221000659.nc",
+              "end_utc": "2024-07-30T21:30:00.000Z",
+              "producer_id": "VNP14IMG.A2024212.2124.002.2024221000659",
+              "start_utc": "2024-07-30T21:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3187782002-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024213.0942.002.2024221003856/VNP14IMG.A2024213.0942.002.2024221003856.nc",
+              "end_utc": "2024-07-31T09:48:00.000Z",
+              "producer_id": "VNP14IMG.A2024213.0942.002.2024221003856",
+              "start_utc": "2024-07-31T09:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3187781425-LPCLOUD",
+              "download_url": "https://data.lpdaac.earthdatacloud.nasa.gov/lp-prod-protected/VNP14IMG.002/VNP14IMG.A2024213.2100.002.2024221003845/VNP14IMG.A2024213.2100.002.2024221003845.nc",
+              "end_utc": "2024-07-31T21:06:00.000Z",
+              "producer_id": "VNP14IMG.A2024213.2100.002.2024221003845",
+              "start_utc": "2024-07-31T21:00:00.000Z"
+            }
+          ],
+          "product": "VNP14IMG",
+          "role": "fire-mask",
+          "version": "002"
+        },
+        {
+          "cmr_hits": 42,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD03&version=6.1&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3162173391-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024199.0545.061.2024199131608.hdf",
+              "end_utc": "2024-07-17T05:50:00.000Z",
+              "producer_id": "MOD03.A2024199.0545.061.2024199131608.hdf",
+              "start_utc": "2024-07-17T05:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3162998313-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024199.1745.061.2024199232356.hdf",
+              "end_utc": "2024-07-17T17:50:00.000Z",
+              "producer_id": "MOD03.A2024199.1745.061.2024199232356.hdf",
+              "start_utc": "2024-07-17T17:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3164526312-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024200.0450.061.2024200105732.hdf",
+              "end_utc": "2024-07-18T04:55:00.000Z",
+              "producer_id": "MOD03.A2024200.0450.061.2024200105732.hdf",
+              "start_utc": "2024-07-18T04:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3165557123-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024200.1825.061.2024201010322.hdf",
+              "end_utc": "2024-07-18T18:30:00.000Z",
+              "producer_id": "MOD03.A2024200.1825.061.2024201010322.hdf",
+              "start_utc": "2024-07-18T18:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3166338171-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024201.0530.061.2024201111624.hdf",
+              "end_utc": "2024-07-19T05:35:00.000Z",
+              "producer_id": "MOD03.A2024201.0530.061.2024201111624.hdf",
+              "start_utc": "2024-07-19T05:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3167232022-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024201.1725.061.2024201232034.hdf",
+              "end_utc": "2024-07-19T17:30:00.000Z",
+              "producer_id": "MOD03.A2024201.1725.061.2024201232034.hdf",
+              "start_utc": "2024-07-19T17:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3167241012-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024201.1730.061.2024201232022.hdf",
+              "end_utc": "2024-07-19T17:35:00.000Z",
+              "producer_id": "MOD03.A2024201.1730.061.2024201232022.hdf",
+              "start_utc": "2024-07-19T17:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3167323422-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024201.1905.061.2024202005051.hdf",
+              "end_utc": "2024-07-19T19:10:00.000Z",
+              "producer_id": "MOD03.A2024201.1905.061.2024202005051.hdf",
+              "start_utc": "2024-07-19T19:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3167972661-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024202.0430.061.2024202104958.hdf",
+              "end_utc": "2024-07-20T04:35:00.000Z",
+              "producer_id": "MOD03.A2024202.0430.061.2024202104958.hdf",
+              "start_utc": "2024-07-20T04:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3168168809-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024202.0610.061.2024202131214.hdf",
+              "end_utc": "2024-07-20T06:15:00.000Z",
+              "producer_id": "MOD03.A2024202.0610.061.2024202131214.hdf",
+              "start_utc": "2024-07-20T06:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3168713243-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024202.1805.061.2024203004021.hdf",
+              "end_utc": "2024-07-20T18:10:00.000Z",
+              "producer_id": "MOD03.A2024202.1805.061.2024203004021.hdf",
+              "start_utc": "2024-07-20T18:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3168713248-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024202.1810.061.2024203004023.hdf",
+              "end_utc": "2024-07-20T18:15:00.000Z",
+              "producer_id": "MOD03.A2024202.1810.061.2024203004023.hdf",
+              "start_utc": "2024-07-20T18:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3169253644-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024203.0510.061.2024203103807.hdf",
+              "end_utc": "2024-07-21T05:15:00.000Z",
+              "producer_id": "MOD03.A2024203.0510.061.2024203103807.hdf",
+              "start_utc": "2024-07-21T05:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3169962313-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024203.1845.061.2024204004939.hdf",
+              "end_utc": "2024-07-21T18:50:00.000Z",
+              "producer_id": "MOD03.A2024203.1845.061.2024204004939.hdf",
+              "start_utc": "2024-07-21T18:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3169962316-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024203.1850.061.2024204004949.hdf",
+              "end_utc": "2024-07-21T18:55:00.000Z",
+              "producer_id": "MOD03.A2024203.1850.061.2024204004949.hdf",
+              "start_utc": "2024-07-21T18:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3170628278-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024204.0550.061.2024204132001.hdf",
+              "end_utc": "2024-07-22T05:55:00.000Z",
+              "producer_id": "MOD03.A2024204.0550.061.2024204132001.hdf",
+              "start_utc": "2024-07-22T05:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3170894114-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024204.1750.061.2024204233334.hdf",
+              "end_utc": "2024-07-22T17:55:00.000Z",
+              "producer_id": "MOD03.A2024204.1750.061.2024204233334.hdf",
+              "start_utc": "2024-07-22T17:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3171359601-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024205.0455.061.2024205110638.hdf",
+              "end_utc": "2024-07-23T05:00:00.000Z",
+              "producer_id": "MOD03.A2024205.0455.061.2024205110638.hdf",
+              "start_utc": "2024-07-23T04:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3171919979-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024205.1830.061.2024206011412.hdf",
+              "end_utc": "2024-07-23T18:35:00.000Z",
+              "producer_id": "MOD03.A2024205.1830.061.2024206011412.hdf",
+              "start_utc": "2024-07-23T18:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3175001163-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024206.0535.061.2024209034611.hdf",
+              "end_utc": "2024-07-24T05:40:00.000Z",
+              "producer_id": "MOD03.A2024206.0535.061.2024209034611.hdf",
+              "start_utc": "2024-07-24T05:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3175013069-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024206.1730.061.2024209035540.hdf",
+              "end_utc": "2024-07-24T17:35:00.000Z",
+              "producer_id": "MOD03.A2024206.1730.061.2024209035540.hdf",
+              "start_utc": "2024-07-24T17:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3175013491-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024206.1910.061.2024209035754.hdf",
+              "end_utc": "2024-07-24T19:15:00.000Z",
+              "producer_id": "MOD03.A2024206.1910.061.2024209035754.hdf",
+              "start_utc": "2024-07-24T19:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3172955759-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024207.0435.061.2024207104847.hdf",
+              "end_utc": "2024-07-25T04:40:00.000Z",
+              "producer_id": "MOD03.A2024207.0435.061.2024207104847.hdf",
+              "start_utc": "2024-07-25T04:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3173129834-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024207.0615.061.2024207130722.hdf",
+              "end_utc": "2024-07-25T06:20:00.000Z",
+              "producer_id": "MOD03.A2024207.0615.061.2024207130722.hdf",
+              "start_utc": "2024-07-25T06:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3173647971-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024207.1810.061.2024208005227.hdf",
+              "end_utc": "2024-07-25T18:15:00.000Z",
+              "producer_id": "MOD03.A2024207.1810.061.2024208005227.hdf",
+              "start_utc": "2024-07-25T18:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3173647972-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024207.1815.061.2024208005230.hdf",
+              "end_utc": "2024-07-25T18:20:00.000Z",
+              "producer_id": "MOD03.A2024207.1815.061.2024208005230.hdf",
+              "start_utc": "2024-07-25T18:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3174104724-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024208.0515.061.2024208104408.hdf",
+              "end_utc": "2024-07-26T05:20:00.000Z",
+              "producer_id": "MOD03.A2024208.0515.061.2024208104408.hdf",
+              "start_utc": "2024-07-26T05:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3174854005-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024208.1850.061.2024209003657.hdf",
+              "end_utc": "2024-07-26T18:55:00.000Z",
+              "producer_id": "MOD03.A2024208.1850.061.2024209003657.hdf",
+              "start_utc": "2024-07-26T18:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3174854003-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024208.1855.061.2024209003627.hdf",
+              "end_utc": "2024-07-26T19:00:00.000Z",
+              "producer_id": "MOD03.A2024208.1855.061.2024209003627.hdf",
+              "start_utc": "2024-07-26T18:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3175719011-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024209.0555.061.2024209164655.hdf",
+              "end_utc": "2024-07-27T06:00:00.000Z",
+              "producer_id": "MOD03.A2024209.0555.061.2024209164655.hdf",
+              "start_utc": "2024-07-27T05:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3176041619-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024209.1755.061.2024210005303.hdf",
+              "end_utc": "2024-07-27T18:00:00.000Z",
+              "producer_id": "MOD03.A2024209.1755.061.2024210005303.hdf",
+              "start_utc": "2024-07-27T17:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3176547282-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024210.0500.061.2024210110312.hdf",
+              "end_utc": "2024-07-28T05:05:00.000Z",
+              "producer_id": "MOD03.A2024210.0500.061.2024210110312.hdf",
+              "start_utc": "2024-07-28T05:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3177081745-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024210.1835.061.2024211011847.hdf",
+              "end_utc": "2024-07-28T18:40:00.000Z",
+              "producer_id": "MOD03.A2024210.1835.061.2024211011847.hdf",
+              "start_utc": "2024-07-28T18:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3177482716-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024211.0540.061.2024211110127.hdf",
+              "end_utc": "2024-07-29T05:45:00.000Z",
+              "producer_id": "MOD03.A2024211.0540.061.2024211110127.hdf",
+              "start_utc": "2024-07-29T05:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3178084059-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024211.1735.061.2024211233353.hdf",
+              "end_utc": "2024-07-29T17:40:00.000Z",
+              "producer_id": "MOD03.A2024211.1735.061.2024211233353.hdf",
+              "start_utc": "2024-07-29T17:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3178137276-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024211.1915.061.2024212005746.hdf",
+              "end_utc": "2024-07-29T19:20:00.000Z",
+              "producer_id": "MOD03.A2024211.1915.061.2024212005746.hdf",
+              "start_utc": "2024-07-29T19:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3178580096-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024212.0440.061.2024212104855.hdf",
+              "end_utc": "2024-07-30T04:45:00.000Z",
+              "producer_id": "MOD03.A2024212.0440.061.2024212104855.hdf",
+              "start_utc": "2024-07-30T04:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3178781921-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024212.0620.061.2024212133331.hdf",
+              "end_utc": "2024-07-30T06:25:00.000Z",
+              "producer_id": "MOD03.A2024212.0620.061.2024212133331.hdf",
+              "start_utc": "2024-07-30T06:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3179144173-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024212.1815.061.2024213010552.hdf",
+              "end_utc": "2024-07-30T18:20:00.000Z",
+              "producer_id": "MOD03.A2024212.1815.061.2024213010552.hdf",
+              "start_utc": "2024-07-30T18:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3179602723-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024213.0520.061.2024213110130.hdf",
+              "end_utc": "2024-07-31T05:25:00.000Z",
+              "producer_id": "MOD03.A2024213.0520.061.2024213110130.hdf",
+              "start_utc": "2024-07-31T05:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3180268467-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MOD03/MOD03.A2024213.1720.061.2024213230300.hdf",
+              "end_utc": "2024-07-31T17:25:00.000Z",
+              "producer_id": "MOD03.A2024213.1720.061.2024213230300.hdf",
+              "start_utc": "2024-07-31T17:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3180332927-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/61/MOD03/2024/213/MOD03.A2024213.1855.061.2024214004231.hdf",
+              "end_utc": "2024-07-31T19:00:00.000Z",
+              "producer_id": "MOD03.A2024213.1855.061.2024214004231.hdf",
+              "start_utc": "2024-07-31T18:55:00.000Z"
+            }
+          ],
+          "product": "MOD03",
+          "role": "geolocation",
+          "version": "6.1"
+        },
+        {
+          "cmr_hits": 40,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MYD03&version=6.1&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3165039171-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024199.1000.061.2024200160158.hdf",
+              "end_utc": "2024-07-17T10:05:00.000Z",
+              "producer_id": "MYD03.A2024199.1000.061.2024200160158.hdf",
+              "start_utc": "2024-07-17T10:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3165035364-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024199.1135.061.2024200160143.hdf",
+              "end_utc": "2024-07-17T11:40:00.000Z",
+              "producer_id": "MYD03.A2024199.1135.061.2024200160143.hdf",
+              "start_utc": "2024-07-17T11:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3165052922-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024199.2105.061.2024200161538.hdf",
+              "end_utc": "2024-07-17T21:10:00.000Z",
+              "producer_id": "MYD03.A2024199.2105.061.2024200161538.hdf",
+              "start_utc": "2024-07-17T21:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3165052687-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024199.2240.061.2024200161401.hdf",
+              "end_utc": "2024-07-17T22:45:00.000Z",
+              "producer_id": "MYD03.A2024199.2240.061.2024200161401.hdf",
+              "start_utc": "2024-07-17T22:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3166667552-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024200.1040.061.2024201145803.hdf",
+              "end_utc": "2024-07-18T10:45:00.000Z",
+              "producer_id": "MYD03.A2024200.1040.061.2024201145803.hdf",
+              "start_utc": "2024-07-18T10:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3166685213-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024200.2145.061.2024201151347.hdf",
+              "end_utc": "2024-07-18T21:50:00.000Z",
+              "producer_id": "MYD03.A2024200.2145.061.2024201151347.hdf",
+              "start_utc": "2024-07-18T21:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3168258754-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024201.1120.061.2024202145114.hdf",
+              "end_utc": "2024-07-19T11:25:00.000Z",
+              "producer_id": "MYD03.A2024201.1120.061.2024202145114.hdf",
+              "start_utc": "2024-07-19T11:20:00.000Z"
+            },
+            {
+              "cmr_id": "G3168272759-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024201.2225.061.2024202150739.hdf",
+              "end_utc": "2024-07-19T22:30:00.000Z",
+              "producer_id": "MYD03.A2024201.2225.061.2024202150739.hdf",
+              "start_utc": "2024-07-19T22:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3169536340-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024202.1025.061.2024203145847.hdf",
+              "end_utc": "2024-07-20T10:30:00.000Z",
+              "producer_id": "MYD03.A2024202.1025.061.2024203145847.hdf",
+              "start_utc": "2024-07-20T10:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3169548322-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024202.2125.061.2024203151032.hdf",
+              "end_utc": "2024-07-20T21:30:00.000Z",
+              "producer_id": "MYD03.A2024202.2125.061.2024203151032.hdf",
+              "start_utc": "2024-07-20T21:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3170701002-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024203.1105.061.2024204150636.hdf",
+              "end_utc": "2024-07-21T11:10:00.000Z",
+              "producer_id": "MYD03.A2024203.1105.061.2024204150636.hdf",
+              "start_utc": "2024-07-21T11:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3170713032-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024203.2205.061.2024204151921.hdf",
+              "end_utc": "2024-07-21T22:10:00.000Z",
+              "producer_id": "MYD03.A2024203.2205.061.2024204151921.hdf",
+              "start_utc": "2024-07-21T22:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3170712802-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024203.2210.061.2024204151833.hdf",
+              "end_utc": "2024-07-21T22:15:00.000Z",
+              "producer_id": "MYD03.A2024203.2210.061.2024204151833.hdf",
+              "start_utc": "2024-07-21T22:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3171554533-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024204.1005.061.2024205150108.hdf",
+              "end_utc": "2024-07-22T10:10:00.000Z",
+              "producer_id": "MYD03.A2024204.1005.061.2024205150108.hdf",
+              "start_utc": "2024-07-22T10:05:00.000Z"
+            },
+            {
+              "cmr_id": "G3171554583-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024204.1145.061.2024205150142.hdf",
+              "end_utc": "2024-07-22T11:50:00.000Z",
+              "producer_id": "MYD03.A2024204.1145.061.2024205150142.hdf",
+              "start_utc": "2024-07-22T11:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3171556997-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024204.2110.061.2024205150839.hdf",
+              "end_utc": "2024-07-22T21:15:00.000Z",
+              "producer_id": "MYD03.A2024204.2110.061.2024205150839.hdf",
+              "start_utc": "2024-07-22T21:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3172385334-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024205.1045.061.2024206145348.hdf",
+              "end_utc": "2024-07-23T10:50:00.000Z",
+              "producer_id": "MYD03.A2024205.1045.061.2024206145348.hdf",
+              "start_utc": "2024-07-23T10:45:00.000Z"
+            },
+            {
+              "cmr_id": "G3172387698-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024205.2150.061.2024206151159.hdf",
+              "end_utc": "2024-07-23T21:55:00.000Z",
+              "producer_id": "MYD03.A2024205.2150.061.2024206151159.hdf",
+              "start_utc": "2024-07-23T21:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3172401397-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024206.0950.061.2024206165855.hdf",
+              "end_utc": "2024-07-24T09:55:00.000Z",
+              "producer_id": "MYD03.A2024206.0950.061.2024206165855.hdf",
+              "start_utc": "2024-07-24T09:50:00.000Z"
+            },
+            {
+              "cmr_id": "G3173233046-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024206.1125.061.2024207145751.hdf",
+              "end_utc": "2024-07-24T11:30:00.000Z",
+              "producer_id": "MYD03.A2024206.1125.061.2024207145751.hdf",
+              "start_utc": "2024-07-24T11:25:00.000Z"
+            },
+            {
+              "cmr_id": "G3173246066-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024206.2055.061.2024207151253.hdf",
+              "end_utc": "2024-07-24T21:00:00.000Z",
+              "producer_id": "MYD03.A2024206.2055.061.2024207151253.hdf",
+              "start_utc": "2024-07-24T20:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3173246117-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024206.2230.061.2024207151415.hdf",
+              "end_utc": "2024-07-24T22:35:00.000Z",
+              "producer_id": "MYD03.A2024206.2230.061.2024207151415.hdf",
+              "start_utc": "2024-07-24T22:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3174372759-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024207.1030.061.2024208145843.hdf",
+              "end_utc": "2024-07-25T10:35:00.000Z",
+              "producer_id": "MYD03.A2024207.1030.061.2024208145843.hdf",
+              "start_utc": "2024-07-25T10:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3174386632-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024207.2135.061.2024208151626.hdf",
+              "end_utc": "2024-07-25T21:40:00.000Z",
+              "producer_id": "MYD03.A2024207.2135.061.2024208151626.hdf",
+              "start_utc": "2024-07-25T21:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3175658824-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024208.1110.061.2024209152141.hdf",
+              "end_utc": "2024-07-26T11:15:00.000Z",
+              "producer_id": "MYD03.A2024208.1110.061.2024209152141.hdf",
+              "start_utc": "2024-07-26T11:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3175677390-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024208.2215.061.2024209154506.hdf",
+              "end_utc": "2024-07-26T22:20:00.000Z",
+              "producer_id": "MYD03.A2024208.2215.061.2024209154506.hdf",
+              "start_utc": "2024-07-26T22:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3176753551-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024209.1010.061.2024210150153.hdf",
+              "end_utc": "2024-07-27T10:15:00.000Z",
+              "producer_id": "MYD03.A2024209.1010.061.2024210150153.hdf",
+              "start_utc": "2024-07-27T10:10:00.000Z"
+            },
+            {
+              "cmr_id": "G3176753550-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024209.1015.061.2024210150136.hdf",
+              "end_utc": "2024-07-27T10:20:00.000Z",
+              "producer_id": "MYD03.A2024209.1015.061.2024210150136.hdf",
+              "start_utc": "2024-07-27T10:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3176761375-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024209.2115.061.2024210151541.hdf",
+              "end_utc": "2024-07-27T21:20:00.000Z",
+              "producer_id": "MYD03.A2024209.2115.061.2024210151541.hdf",
+              "start_utc": "2024-07-27T21:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3177711226-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024210.1055.061.2024211145831.hdf",
+              "end_utc": "2024-07-28T11:00:00.000Z",
+              "producer_id": "MYD03.A2024210.1055.061.2024211145831.hdf",
+              "start_utc": "2024-07-28T10:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3177721490-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024210.2155.061.2024211151402.hdf",
+              "end_utc": "2024-07-28T22:00:00.000Z",
+              "producer_id": "MYD03.A2024210.2155.061.2024211151402.hdf",
+              "start_utc": "2024-07-28T21:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3178834167-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024211.0955.061.2024212150112.hdf",
+              "end_utc": "2024-07-29T10:00:00.000Z",
+              "producer_id": "MYD03.A2024211.0955.061.2024212150112.hdf",
+              "start_utc": "2024-07-29T09:55:00.000Z"
+            },
+            {
+              "cmr_id": "G3178834163-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024211.1135.061.2024212150100.hdf",
+              "end_utc": "2024-07-29T11:40:00.000Z",
+              "producer_id": "MYD03.A2024211.1135.061.2024212150100.hdf",
+              "start_utc": "2024-07-29T11:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3178839460-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024211.2100.061.2024212151310.hdf",
+              "end_utc": "2024-07-29T21:05:00.000Z",
+              "producer_id": "MYD03.A2024211.2100.061.2024212151310.hdf",
+              "start_utc": "2024-07-29T21:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3178839850-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024211.2235.061.2024212151531.hdf",
+              "end_utc": "2024-07-29T22:40:00.000Z",
+              "producer_id": "MYD03.A2024211.2235.061.2024212151531.hdf",
+              "start_utc": "2024-07-29T22:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3178839883-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024211.2240.061.2024212151529.hdf",
+              "end_utc": "2024-07-29T22:45:00.000Z",
+              "producer_id": "MYD03.A2024211.2240.061.2024212151529.hdf",
+              "start_utc": "2024-07-29T22:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3179882759-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024212.1035.061.2024213154532.hdf",
+              "end_utc": "2024-07-30T10:40:00.000Z",
+              "producer_id": "MYD03.A2024212.1035.061.2024213154532.hdf",
+              "start_utc": "2024-07-30T10:35:00.000Z"
+            },
+            {
+              "cmr_id": "G3179886552-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024212.2140.061.2024213160118.hdf",
+              "end_utc": "2024-07-30T21:45:00.000Z",
+              "producer_id": "MYD03.A2024212.2140.061.2024213160118.hdf",
+              "start_utc": "2024-07-30T21:40:00.000Z"
+            },
+            {
+              "cmr_id": "G3188365351-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024213.1115.061.2024221152550.hdf",
+              "end_utc": "2024-07-31T11:20:00.000Z",
+              "producer_id": "MYD03.A2024213.1115.061.2024221152550.hdf",
+              "start_utc": "2024-07-31T11:15:00.000Z"
+            },
+            {
+              "cmr_id": "G3188369694-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/MYD03/MYD03.A2024213.2220.061.2024221152936.hdf",
+              "end_utc": "2024-07-31T22:25:00.000Z",
+              "producer_id": "MYD03.A2024213.2220.061.2024221152936.hdf",
+              "start_utc": "2024-07-31T22:20:00.000Z"
+            }
+          ],
+          "product": "MYD03",
+          "role": "geolocation",
+          "version": "6.1"
+        },
+        {
+          "cmr_hits": 32,
+          "cmr_query": "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP03IMG&version=2&temporal=2024-07-17T00%3A00%3A00Z%2C2024-08-01T00%3A00%3A00Z&bounding_box=-122.0%2C39.5%2C-121.3%2C40.5&page_size=2000",
+          "granules": [
+            {
+              "cmr_id": "G3166517620-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024199.0900.002.2024201115948.nc",
+              "end_utc": "2024-07-17T09:06:00.000Z",
+              "producer_id": "VNP03IMG.A2024199.0900.002.2024201115948.nc",
+              "start_utc": "2024-07-17T09:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3166493215-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024199.1042.002.2024201115939.nc",
+              "end_utc": "2024-07-17T10:48:00.000Z",
+              "producer_id": "VNP03IMG.A2024199.1042.002.2024201115939.nc",
+              "start_utc": "2024-07-17T10:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3166517626-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024199.2024.002.2024201120512.nc",
+              "end_utc": "2024-07-17T20:30:00.000Z",
+              "producer_id": "VNP03IMG.A2024199.2024.002.2024201120512.nc",
+              "start_utc": "2024-07-17T20:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3166501925-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024199.2206.002.2024201120306.nc",
+              "end_utc": "2024-07-17T22:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024199.2206.002.2024201120306.nc",
+              "start_utc": "2024-07-17T22:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3166517744-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024200.0842.002.2024201120900.nc",
+              "end_utc": "2024-07-18T08:48:00.000Z",
+              "producer_id": "VNP03IMG.A2024200.0842.002.2024201120900.nc",
+              "start_utc": "2024-07-18T08:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3166518054-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024200.1024.002.2024201120948.nc",
+              "end_utc": "2024-07-18T10:30:00.000Z",
+              "producer_id": "VNP03IMG.A2024200.1024.002.2024201120948.nc",
+              "start_utc": "2024-07-18T10:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3166539029-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024200.2006.002.2024201122321.nc",
+              "end_utc": "2024-07-18T20:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024200.2006.002.2024201122321.nc",
+              "start_utc": "2024-07-18T20:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3166525650-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024200.2148.002.2024201122501.nc",
+              "end_utc": "2024-07-18T21:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024200.2148.002.2024201122501.nc",
+              "start_utc": "2024-07-18T21:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3179881764-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024201.1006.002.2024213150533.nc",
+              "end_utc": "2024-07-19T10:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024201.1006.002.2024213150533.nc",
+              "start_utc": "2024-07-19T10:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3179882727-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024201.1948.002.2024213151334.nc",
+              "end_utc": "2024-07-19T19:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024201.1948.002.2024213151334.nc",
+              "start_utc": "2024-07-19T19:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3179882748-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024201.2130.002.2024213151448.nc",
+              "end_utc": "2024-07-19T21:36:00.000Z",
+              "producer_id": "VNP03IMG.A2024201.2130.002.2024213151448.nc",
+              "start_utc": "2024-07-19T21:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3179886788-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024202.0948.002.2024213152159.nc",
+              "end_utc": "2024-07-20T09:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024202.0948.002.2024213152159.nc",
+              "start_utc": "2024-07-20T09:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3179887912-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024202.2106.002.2024213153146.nc",
+              "end_utc": "2024-07-20T21:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024202.2106.002.2024213153146.nc",
+              "start_utc": "2024-07-20T21:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3179886608-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024202.2112.002.2024213153155.nc",
+              "end_utc": "2024-07-20T21:18:00.000Z",
+              "producer_id": "VNP03IMG.A2024202.2112.002.2024213153155.nc",
+              "start_utc": "2024-07-20T21:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3169595588-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024203.0930.002.2024203155805.nc",
+              "end_utc": "2024-07-21T09:36:00.000Z",
+              "producer_id": "VNP03IMG.A2024203.0930.002.2024203155805.nc",
+              "start_utc": "2024-07-21T09:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3169661726-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024203.1106.002.2024203173238.nc",
+              "end_utc": "2024-07-21T11:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024203.1106.002.2024203173238.nc",
+              "start_utc": "2024-07-21T11:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3170106002-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024203.2048.002.2024204032837.nc",
+              "end_utc": "2024-07-21T20:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024203.2048.002.2024204032837.nc",
+              "start_utc": "2024-07-21T20:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3170780479-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024204.0906.002.2024204161404.nc",
+              "end_utc": "2024-07-22T09:12:00.000Z",
+              "producer_id": "VNP03IMG.A2024204.0906.002.2024204161404.nc",
+              "start_utc": "2024-07-22T09:06:00.000Z"
+            },
+            {
+              "cmr_id": "G3170801194-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024204.1048.002.2024204173408.nc",
+              "end_utc": "2024-07-22T10:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024204.1048.002.2024204173408.nc",
+              "start_utc": "2024-07-22T10:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3171093574-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024204.2030.002.2024205050403.nc",
+              "end_utc": "2024-07-22T20:36:00.000Z",
+              "producer_id": "VNP03IMG.A2024204.2030.002.2024205050403.nc",
+              "start_utc": "2024-07-22T20:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3171163601-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024204.2212.002.2024205070407.nc",
+              "end_utc": "2024-07-22T22:18:00.000Z",
+              "producer_id": "VNP03IMG.A2024204.2212.002.2024205070407.nc",
+              "start_utc": "2024-07-22T22:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3171573950-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024205.0848.002.2024205152132.nc",
+              "end_utc": "2024-07-23T08:54:00.000Z",
+              "producer_id": "VNP03IMG.A2024205.0848.002.2024205152132.nc",
+              "start_utc": "2024-07-23T08:48:00.000Z"
+            },
+            {
+              "cmr_id": "G3171766410-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024205.1030.002.2024205190806.nc",
+              "end_utc": "2024-07-23T10:36:00.000Z",
+              "producer_id": "VNP03IMG.A2024205.1030.002.2024205190806.nc",
+              "start_utc": "2024-07-23T10:30:00.000Z"
+            },
+            {
+              "cmr_id": "G3172055684-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024205.2012.002.2024206050139.nc",
+              "end_utc": "2024-07-23T20:18:00.000Z",
+              "producer_id": "VNP03IMG.A2024205.2012.002.2024206050139.nc",
+              "start_utc": "2024-07-23T20:12:00.000Z"
+            },
+            {
+              "cmr_id": "G3172097604-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024205.2154.002.2024206063453.nc",
+              "end_utc": "2024-07-23T22:00:00.000Z",
+              "producer_id": "VNP03IMG.A2024205.2154.002.2024206063453.nc",
+              "start_utc": "2024-07-23T21:54:00.000Z"
+            },
+            {
+              "cmr_id": "G3181134635-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP03IMG/2024/211/VNP03IMG.A2024211.2000.002.2024214173959.nc",
+              "end_utc": "2024-07-29T20:06:00.000Z",
+              "producer_id": "VNP03IMG.A2024211.2000.002.2024214173959.nc",
+              "start_utc": "2024-07-29T20:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3181137906-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP03IMG/2024/211/VNP03IMG.A2024211.2142.002.2024214174208.nc",
+              "end_utc": "2024-07-29T21:48:00.000Z",
+              "producer_id": "VNP03IMG.A2024211.2142.002.2024214174208.nc",
+              "start_utc": "2024-07-29T21:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3181146673-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP03IMG/2024/212/VNP03IMG.A2024212.1000.002.2024214175134.nc",
+              "end_utc": "2024-07-30T10:06:00.000Z",
+              "producer_id": "VNP03IMG.A2024212.1000.002.2024214175134.nc",
+              "start_utc": "2024-07-30T10:00:00.000Z"
+            },
+            {
+              "cmr_id": "G3181235358-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024212.1942.002.2024214180253.nc",
+              "end_utc": "2024-07-30T19:48:00.000Z",
+              "producer_id": "VNP03IMG.A2024212.1942.002.2024214180253.nc",
+              "start_utc": "2024-07-30T19:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3181235926-LAADS",
+              "download_url": "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP03IMG/VNP03IMG.A2024212.2124.002.2024214180334.nc",
+              "end_utc": "2024-07-30T21:30:00.000Z",
+              "producer_id": "VNP03IMG.A2024212.2124.002.2024214180334.nc",
+              "start_utc": "2024-07-30T21:24:00.000Z"
+            },
+            {
+              "cmr_id": "G3181125457-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP03IMG/2024/213/VNP03IMG.A2024213.0942.002.2024214172836.nc",
+              "end_utc": "2024-07-31T09:48:00.000Z",
+              "producer_id": "VNP03IMG.A2024213.0942.002.2024214172836.nc",
+              "start_utc": "2024-07-31T09:42:00.000Z"
+            },
+            {
+              "cmr_id": "G3181133277-LAADS",
+              "download_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP03IMG/2024/213/VNP03IMG.A2024213.2100.002.2024214173228.nc",
+              "end_utc": "2024-07-31T21:06:00.000Z",
+              "producer_id": "VNP03IMG.A2024213.2100.002.2024214173228.nc",
+              "start_utc": "2024-07-31T21:00:00.000Z"
+            }
+          ],
+          "product": "VNP03IMG",
+          "role": "geolocation",
+          "version": "2"
+        }
+      ],
+      "start_utc": "2024-07-17"
+    }
+  },
+  "interpretation": "Public CMR candidate granule metadata only; raw files and geolocation have not been downloaded, matched, or decoded. No ground-cell pass/cloud state follows from this list.",
+  "retrieved_utc": "2026-09-28T21:51:54.799307Z",
+  "schema": "fireatlas-cmr-inventory-v1"
+}

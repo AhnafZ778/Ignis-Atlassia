@@ -1,12 +1,18 @@
 # FireAtlas — atlas, training and research labs
 
+The **[Data & Method page](http://127.0.0.1:8000/method.html)** traces the existing NASA archive into the calendar with a connected visual workflow, actual cell examples, original source records and an on-demand analytical recount. The implementation plan is in [docs/DATA_METHOD_PAGE_PLAN.md](docs/DATA_METHOD_PAGE_PLAN.md).
+
 ## Presentation guide and mobile app
 
 [Download the 22-page feature polish guide](docs/presentation/FireAtlas_Feature_Polish_Guide.pdf) for 16 prioritized features, exact pages, actual screenshots and presentation checks.
 
+The landing page now leads with a five-scene **Park Fire 2024 historical evidence story** using authentic imported MODIS and VIIRS records. Scrubbing a UTC day updates the detection map, source counts, daily grid diagram, and calendar selection. A Grove Fire 2025 case uses the same controls. The Park timeline explicitly marks NASA's July 2024 S-NPP processing gap and leaves pass/cloud coverage unknown. The proof scene also shows the fixed 25-incident CAL FIRE context check (7 nearby points, 18 without a nearby point) without turning it into a sensitivity claim. See the [fixed case protocol, results, and open validation gates](docs/VALIDITY_CASES.md) and [video storyboard](docs/VIDEO_STORYBOARD.md).
+
 FireAtlas now includes an installable mobile web app. Open `/install.html` for installation instructions; see [mobile setup and verification](docs/MOBILE_APP.md). The prepared Training Lab works offline. There is no native APK/iOS build, and the globe and analysis tools still require the server. A physical-phone rehearsal and reachable HTTPS host remain necessary.
 
-The [PRD](PRD.md) defines the full NASA Space Apps project. The local web MVP runs on the Phase 1 data pipeline: NASA FIRMS CSV import, original-row provenance, 1 km common-cell assignment, and a UTC burning activity calendar with comparable prior-year monthly baselines.
+Native-mask downloads, processing, and separate analytical recount: [Native mask validation](docs/NATIVE_MASK_VALIDATION.md).
+
+The [PRD](PRD.md) defines the full NASA Space Apps project. The local web MVP runs on the Phase 1 data pipeline: NASA FIRMS CSV import, original-row provenance, 1 km common-cell assignment, and a UTC burning activity calendar with descriptive prior-year monthly baselines. The method audit identifies differing product versions across years.
 
 ## Launch the website
 
@@ -15,7 +21,7 @@ uv sync
 uv run python -m fireatlas.web --db data/fireatlas.sqlite3 --port 8000
 ```
 
-Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact, verified NOAA HMS VIIRS pilot slice from July 2021–2024 in Northern California. The landing page opens on its real July 2024 atlas and calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect both authentic source paths and FIRMS connectivity. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
+Open **http://127.0.0.1:8000/**. On first launch, the default authentic database loads a compact NASA FIRMS MODIS/VIIRS archive sample and the separate verified NOAA HMS VIIRS pilot slice. The study workspace opens on the authentic **July 2024 Park area** NASA calendar. Switch to **Explore demo** for the separately labelled synthetic MODIS/VIIRS comparison. A separate NASA EONET map shows recent reported fire events. Open **http://127.0.0.1:8000/data.html** to inspect source provenance and import status. The maps, source switch, daily calendar, dated NASA GIBS NDVI/land-cover overlays, evidence records, and CSV exports are interactive. The site binds to localhost by default. It uses OpenStreetMap tiles and NASA GIBS imagery over the network; the event feed, calendar and imported points still work if those external tiles fail.
 
 **Guided tour:** Use **Start the guided tour** on the landing page. Five interactive stops move through the AOI map, monthly activity, sensor switch, original evidence, and the Training Lab. The example shows four MODIS raw pixels, twelve VIIRS raw pixels, and four joint cell-days in July 2015; the measures and synthetic source are labelled. This tour uses the normal controls and queries. Shared atlas links, CSV exports and study bundles retain the selected demo/authentic context. The Research Lab also opens the same mode from the atlas.
 
@@ -27,7 +33,15 @@ The globe window includes the latest imported NASA observation date and seven pr
 
 The atlas, Training Lab, and Research Lab share the visual system in `fireatlas/static/design.css`: graphite surfaces, ember accents, responsive layouts, and locally served DM Sans and Space Grotesk fonts. Font licenses are included in `fireatlas/static/fonts/`. Shared navigation behavior lives in `fireatlas/static/ui.js`, including the mobile menu and keyboard dismissal. Reduced-motion preferences are supported by the interface transitions.
 
-The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NOAA pilot covers one Northern California bounding box and four July months, not global satellite coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. In authentic mode, the Fire weather layer says no GFWED data are loaded. In demo mode, local synthetic context illustrations are available for the 2023–2026 Northern California scenario; the weather illustration uses arbitrary units, not computed FWI. To run the synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations remain in separate databases.
+The sensor atlas map only shows **imported** records; the independent EONET map shows reported events. Empty or incomplete source exports remain unknown. The bundled NASA historical sample covers a Northern California bounding box, not global historical coverage. The app does not provide live hotspot monitoring, measured fire-weather risk, a verified vegetation mask, or a safety service. In authentic mode, the Fire weather layer says no GFWED data are loaded. In demo mode, local synthetic context illustrations are available for the 2023–2026 Northern California scenario; the weather illustration uses arbitrary units, not computed FWI. To run the synthetic demonstration separately, use `uv run python -m fireatlas.web --db data/demo.sqlite3 --port 8001`; it creates the demo database if needed. Synthetic and authentic observations remain in separate databases.
+
+The atlas also provides a **historical responder brief** for the selected month. It ranks up to five observed active dates from the existing calendar, reports complete versus unknown export days, and links each date to its source observations. It is labelled synthetic or imported and is explicitly non-operational: it does not select an observation sector, issue a flight plan, dispatch a UAS, forecast spread, issue an alert, or recommend containment.
+
+### Authentic NASA MODIS + VIIRS historical calendar
+
+Eight user-supplied FIRMS world-year archives were reduced to a compact Northern California sample containing **30,823 authentic MODIS and Suomi NPP detections**. The bundle includes **84 complete standard-product source-month slices** from July 2022 through December 2025. Both products are present for the July 2022–2025 pilot; 2026 detections are retained only as partial evidence, and S-NPP has no May 2026 rows in the supplied archive. The original source file hashes, request IDs and slice checksums are in the bundle manifest. The original worldwide downloads remain local and ignored by Git. See [archive import method and limits](docs/NASA_ARCHIVE_IMPORT.md).
+
+The July 2025 enclosing region has 474 detected 1 km cell-days from 1,467 raw pixels, with 138 same-cell same-day co-detections. Its prior July median is 152 cell-days. These are **descriptive satellite sampling counts**, not a calibrated wildfire trend: MODIS version `6.03` appears in the 2022 baseline, while July 2025 uses `61.03`; pass and cloud coverage remain unknown. The method audit exposes this difference and the original per-source counts.
 
 ### Authentic NOAA satellite showcase
 
@@ -55,6 +69,7 @@ The calendar includes a **Keep the evidence** panel:
 - **Copy view link** creates a URL restoring the same selection. The recipient needs access to the same running server and dataset; a localhost link only works on your computer. Links use the server's current data.
 - **Download study** freezes the selected-year calendar and its supporting observations, including prior-year baseline inputs, in a ZIP. It also contains complete export windows, original source rows, batch provenance and file checksums. More than 50,000 observations requires a smaller AOI.
 - **Source ledger** shows selected-year import sources, retrieval times and original file hashes.
+- **Historical responder brief** summarizes the selected calendar month and links active dates back to source evidence. It is a review aid only; it does not replace incident command or produce operational instructions.
 
 Verify a downloaded bundle without querying the database:
 
@@ -63,6 +78,8 @@ uv run python -m fireatlas.study ~/Downloads/fireatlas_study_joint_2015.zip
 ```
 
 The verifier checks SHA-256 integrity and reproduces daily/monthly cell-day counts, completeness, baseline medians and differences using the included normalized grid assignments. It does not independently validate satellite observations or the grid transform. Bundles omit full original import files, map imagery and research masks; file hashes are not authenticity signatures. Synthetic data remain labelled throughout the bundle.
+
+Version 2 bundles also include `harmonization.json`, a selected-month audit of raw source pixels, common-grid cell-days, co-detected cells, product versions and complete export windows. The verifier recomputes those fields from the frozen rows; it still accepts older version 1 bundles without an audit. For a walkthrough without the network-dependent 3D terrain preview, use `/?lite=1#study-workspace` to open the same atlas data controls directly. Other data requests still require the server.
 
 ## Run the synthetic example
 
@@ -80,13 +97,13 @@ Everything in `data/demo/` is **synthetic** and labelled as such in JSON output.
 
 ## Use authentic NASA FIRMS data
 
-Request a free [FIRMS MAP_KEY](https://firms.modaps.eosdis.nasa.gov/api/map_key). Keep it in your shell environment or in `~/.config/fireatlas/firms.key` with owner-only permissions (`chmod 600`). `FIRMS_MAP_KEY` overrides the key file; `FIRMS_KEY_FILE` can select a different file. Do not commit credentials. The key is never returned by the website or included in downloaded studies. Select a modest AOI and a month offered by the chosen standard-processing source; verify availability with [NASA's availability endpoint](https://firms.modaps.eosdis.nasa.gov/api/data_availability/).
+The bundled historical study runs **without a FIRMS MAP_KEY**. For future automatic Area API imports, request a free [FIRMS MAP_KEY](https://firms.modaps.eosdis.nasa.gov/api/map_key). Keep it in your shell environment or in `~/.config/fireatlas/firms.key` with owner-only permissions (`chmod 600`). `FIRMS_MAP_KEY` overrides the key file; `FIRMS_KEY_FILE` can select a different file. Do not commit credentials. The key is never returned by the website or included in downloaded studies. Select a modest AOI and a month offered by the chosen standard-processing source; verify availability with [NASA's availability endpoint](https://firms.modaps.eosdis.nasa.gov/api/data_availability/).
 
 ### Imported NASA snapshot: September 20–27, 2026
 
-The three CSVs supplied in `NASA_data/` contain 866,957 rows. The local authentic database now holds 866,956 of these detections: MODIS NRT **72,776**, NOAA-20 VIIRS NRT **394,527**, and NOAA-21 VIIRS NRT **399,653**. One NOAA-21 row at latitude -86.2141 is outside the supported EPSG:6933 region; its original row, CSV line number and reason are retained in `excluded_rows`. Original files are unchanged and ignored by Git; their exact hashes and official download URLs are recorded in the database. These downloads are local and are not included in the bundled NOAA showcase or repository.
+The three September rolling snapshot CSVs supplied in `NASA_data/` contain 866,957 rows. The local authentic database holds 866,956 of these detections: MODIS NRT **72,776**, NOAA-20 VIIRS NRT **394,527**, and NOAA-21 VIIRS NRT **399,653**. One NOAA-21 row at latitude -86.2141 is outside the supported EPSG:6933 region; its original row, CSV line number and reason are retained in `excluded_rows`. Original files are unchanged and ignored by Git; their exact hashes and official download URLs are recorded in the database. These downloads are local and are not included in the bundled archives or repository. The separate July 1, 2026 MODIS and Suomi NPP NRT archive files add **68,864** local detections in distinct, partial NRT series; see [archive import details](docs/NASA_ARCHIVE_IMPORT.md).
 
-Open `/data.html` and use the NASA snapshot links to view each source globally, then select an acquisition day or zoom in. Low-zoom bins count all imported points in the viewport. High-zoom display samples at most 1,000 points across the entire selected period, with the full imported count reported. Sampling does not affect calendar counts or evidence. The files are rolling seven-day near-real-time snapshots touching eight UTC dates; they do not establish complete September exports or replace the historical 2021–2024 standard-product comparison.
+Open `/data.html` and use the NASA snapshot links to view each source globally, then select an acquisition day or zoom in. Low-zoom bins count all imported points in the viewport. High-zoom display samples at most 1,000 points across the entire selected period, with the full imported count reported. Sampling does not affect calendar counts or evidence. The files are rolling seven-day near-real-time snapshots touching eight UTC dates; they do not establish complete September exports or replace the historical 2022–2025 standard-product comparison.
 
 The importer accepts NASA public CSVs without an `instrument` column, deriving the normalized sensor from the selected source and validating its satellite identifier. Original row JSON stays unchanged. Large CSVs stream through one transaction instead of being held in memory. To repeat an import (duplicates are ignored):
 
@@ -104,13 +121,20 @@ The Data Sources page includes the FIRMS2 maintenance advisory captured on Septe
 
 FIRMS downloads try the primary host, then the official secondary host for connection failures and HTTP 5xx responses. Authentication errors, malformed responses and rate limits are reported without trying to bypass them. Availability checks still gate full-month downloads. Neither host nor the nrt3/nrt4 daily archive could be reached from this machine during the September 27 checks; a configured key is not a verified key.
 
-**Nothing must be downloaded to explore the bundled NOAA showcase.** To finish the real FIRMS historical comparison while the API is unreachable, request eight CSV exports from [NASA Archive Download](https://firms2.modaps.eosdis.nasa.gov/download/):
+**No download is needed to explore the bundled NASA and NOAA historical samples.** The paired FIRMS pilot was prepared from eight user-supplied world-year CSV archives from [NASA Archive Download](https://firms2.modaps.eosdis.nasa.gov/download/), without using the Area API. To reproduce the compact regional derivative from the original `NASA_data/DL_FIRE_*` directories:
+
+```bash
+uv run python -m fireatlas.archive build NASA_data
+uv run python -m fireatlas.archive import --db data/fireatlas.sqlite3
+```
+
+Each original archive covers a requested year; the builder retains the July 2022–December 2025 regional standard-product months and treats 2026 slices as partial. For a new manual request, the core source pair and area are:
 
 - Products: **MODIS Collection 6.1 standard** and **VIIRS Suomi NPP 375 m standard**.
-- Dates: **July 1–31 in 2021, 2022, 2023 and 2024**, one file per product and month.
+- Dates: **July in 2022, 2023, 2024 and 2025** for the pilot, one source export per product and period. An extra 2021 archive can be an additional baseline if its product and completeness are verified.
 - Bounding box: **west -122.2, south 38.8, east -120, north 41**, covering both pilot areas.
 
-On `/data.html`, select the downloaded CSV and exact product. Assert a complete month only for a verified full export and enter its month and exact bounding box. Eight full exports over this enclosing area satisfy the 16 individual pilot windows. The importer checks row dates, coordinates, instrument and satellite, preserves row provenance and file hashes, rejects NRT-labelled records under a standard product, and prevents duplicate detections. The full-export declaration comes from the user: CSV rows alone cannot prove missing days were observed. Partial files never establish complete export windows.
+For small new downloads, `/data.html` imports a CSV with its exact product. Assert a complete month only for a verified full export and enter its month and exact bounding box. The archive builder above handles the supplied oversized world-year files, retaining original hashes and deriving one small CSV per source/month. The importer checks row dates, coordinates, instrument and satellite, preserves raw rows, rejects NRT-labelled records under a standard product, and prevents duplicate detections. The full-export declaration comes from the supplied request context: CSV rows alone cannot prove missing days were observed. Partial files never establish complete export windows.
 
 Recent 24-hour/48-hour/7-day CSVs can also be imported with the full-month checkbox unchecked. The source ledger links to their atlas view. NOAA-20 standard and NOAA-20/21 NRT, S-NPP NRT and MODIS NRT have separate series; they do not silently replace the historical MODIS/S-NPP comparison. The current CLI can fetch complete months for these sources when the availability API offers them; it does not yet harvest rolling recent windows automatically.
 
@@ -122,7 +146,7 @@ Browser imports are limited to 25 MB, same-origin requests and the local app. La
 
 The **Data sources** page shows credential configuration separately from successful NASA verification, import progress, a per-source/year completeness matrix, and reproducibility results. **Sync pilot data** runs a background import; **Retry pilot sync** resumes completed source-months after a failure. The action is limited to same-origin requests on the local app. Remote/public deployment needs a separately authenticated administrative workflow.
 
-The pilot plan imports MODIS SP and VIIRS S-NPP SP for July 2021, 2022, 2023 and 2024 in Northern California and Sacramento Valley. These are geographic comparison areas, not validated forest/agricultural masks or incident boundaries. The last year is compared against the three prior years. Successful completion checks study checksums, daily/monthly cell-day totals, missingness and baseline medians. This is reproducibility verification, not scientific calibration.
+The pilot plan imports MODIS SP and VIIRS S-NPP SP for July 2022, 2023, 2024 and 2025 in Northern California and Sacramento Valley. These are geographic comparison areas, not validated forest/agricultural masks or incident boundaries. The last year is compared against the three prior years. Successful completion checks study checksums, daily/monthly cell-day totals, missingness and baseline medians. This is reproducibility verification, not scientific calibration.
 
 The same workflow is available from the terminal:
 
@@ -133,7 +157,7 @@ uv run python -m fireatlas.cli --db data/fireatlas.sqlite3 sync-pilots
 
 The sync exits nonzero on failure. Status is retained in `data/fireatlas.sync.json`, and successful checks in `data/fireatlas.validation.json`. CSV downloads are cached under `data/downloads/`. Completed imports are retained and reused; incomplete monthly requests never receive a complete-export marker. A demo database is rejected before authentic imports can begin.
 
-**Development environment note (27 September 2026):** FIRMS connections timed out during local checks, including a check against NASA's documented secondary host. A key's presence does not verify its validity or source availability. The recent user-downloaded FIRMS snapshots are imported, but the complete historical FIRMS pilot and scientific calibration remain pending; the independent NOAA HMS pilot above is also real satellite data. Retry FIRMS from the Data sources page when connectivity is restored. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
+**Development environment note (29 September 2026):** FIRMS API connections timed out during earlier local checks, including the documented secondary host. A key's presence does not verify its validity or source availability. The user-supplied Archive Download files now complete the local historical MODIS/S-NPP export pilot without an API request. Scientific calibration and independent validation remain pending; the independent NOAA HMS pilot is also real satellite data. NASA documents its secondary service in the [FIRMS system update](https://firms.modaps.eosdis.nasa.gov/notifications/firms/update.html).
 
 ### Reachable NASA event-feed workaround
 
@@ -151,19 +175,19 @@ For historical sensor records while the area API is inaccessible, use the [NASA 
 
 ```bash
 export FIRMS_MAP_KEY='your-private-key'
-uv run python -m fireatlas.cli fetch-month --source MODIS_SP --month 2024-07 \
+uv run python -m fireatlas.cli fetch-month --source MODIS_SP --month 2025-07 \
   --bbox -122 39 -120 41
-uv run python -m fireatlas.cli fetch-month --source VIIRS_SNPP_SP --month 2024-07 \
+uv run python -m fireatlas.cli fetch-month --source VIIRS_SNPP_SP --month 2025-07 \
   --bbox -122 39 -120 41
-uv run python -m fireatlas.cli calendar --year 2024 --series joint \
-  --bbox -122 39 -120 41 --output data/2024-calendar.json
+uv run python -m fireatlas.cli calendar --year 2025 --series joint \
+  --bbox -122 39 -120 41 --output data/2025-calendar.json
 ```
 
 `fetch-month` requests the NASA area API in at most five-day windows, writes one CSV in ignored `data/downloads/`, and imports it only when every window succeeds. It stores a source URL with `[MAP_KEY]` placeholder rather than the private key. For a local CSV export:
 
 ```bash
 uv run python -m fireatlas.cli ingest path/to/MODIS.csv --source MODIS_SP \
-  --complete-month 2024-07 --bbox -122 39 -120 41
+  --complete-month 2025-07 --bbox -122.2 38.8 -120 41
 ```
 
 Declare `--complete-month` only when the file contains the entire requested AOI/month export, including the possibility of an empty detection list. Without that declaration the file is ingested as partial and official daily/monthly counts remain null. A complete CSV export still does **not** establish cloud-free satellite coverage: the JSON reports that separately as `unknown`.
@@ -254,4 +278,4 @@ For a deterministic presentation from a fresh checkout, run:
 .\scripts\launch_judge_demo.ps1
 ```
 
-This creates `data/judge-demo.sqlite3` locally from the versioned synthetic generator and serves the complete guided study at `http://127.0.0.1:8000/?demo=1`. Open the page once while connected so the app shell and successful API responses are cached; the atlas and insight card can then be rehearsed if the network drops. Synthetic data are labelled throughout and are never mixed into the authentic database.
+This creates `data/judge-demo.sqlite3` locally from the versioned synthetic generator and serves the complete guided study at `http://127.0.0.1:8000/?demo=1`. Open the page once while connected so the app shell and explicitly selected synthetic example API responses are cached; the atlas and insight card can then be rehearsed if the network drops. Authentic imports and current feeds are never replayed from the app cache after disconnection. Synthetic data are labelled throughout and are never mixed into the authentic database.

@@ -13,6 +13,7 @@
     selected: null,
     details: null,
     bridge: null,
+    frame: null,
     canvas: null,
     context: null,
     request: 0,
@@ -329,9 +330,85 @@
     document.documentElement.classList.add("earth-details-visible");
   }
 
+  function selectedLocation() {
+    return state.selectedFire
+      ? state.fires?.find(fire => fire.id === state.selectedFire)
+      : state.points.find(point => point.id === state.selected);
+  }
+
+  function showPointCallout(record, wildfire) {
+    closeEarthDetails();
+    $("point-callout-kind").textContent = wildfire ? "Historical wildfire" : "NASA satellite group";
+    $("point-callout-title").textContent = wildfire ? record.name : `${format(record.count)} detections`;
+    $("point-callout-meta").textContent = wildfire
+      ? `${record.place} · ${record.period}`
+      : `${coords(record.lon, record.lat)} · Last observed ${observationDate(record.last, true)}`;
+    $("point-callout-zoom").disabled = state.failedEarth;
+    positionPointCallout(state.bridge?.view);
+  }
+
+  function positionPointCallout(view) {
+    const callout = $("globe-point-callout"), record = selectedLocation();
+    const point = record && view && FireGlobeMath.project(record.vector, view);
+    if (!point || !state.frame || (state.selectedFire ? !state.documented : !$("globe-markers").checked || !state.revealed)) {
+      callout.hidden = true;
+      return;
+    }
+    const hero = document.querySelector(".globe-hero").getBoundingClientRect();
+    const frame = state.frame.getBoundingClientRect();
+    const scene = state.frame.contentWindow.fireAtlasTerrain;
+    const x = frame.left - hero.left + point.x * frame.width / (scene?.width || view.width);
+    const y = frame.top - hero.top + point.y * frame.height / (scene?.height || view.height);
+    callout.hidden = false;
+    const card = callout.querySelector(".point-callout-card");
+    const width = card.offsetWidth, height = card.offsetHeight;
+    const top = Math.max(12, frame.top - hero.top + 12);
+    const bottom = Math.min(hero.height - 12, frame.bottom - hero.top - 12);
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    let left, cardY, path;
+    if (hero.width <= 600) {
+      left = clamp(x - width / 2, 12, hero.width - width - 12);
+      cardY = clamp(y + 58, top, Math.max(top, bottom - height));
+      if (cardY < y + 8) cardY = clamp(y - height - 58, top, Math.max(top, bottom - height));
+      const startX = clamp(x, left + 18, left + width - 18);
+      const startY = cardY > y ? cardY : cardY + height;
+      const elbowY = (startY + y) / 2;
+      path = `M${startX},${startY} L${startX},${elbowY} L${x},${elbowY} L${x},${y}`;
+    } else {
+      const right = x + 64 + width <= hero.width - 16;
+      left = clamp(right ? x + 64 : x - width - 64, 16, hero.width - width - 16);
+      cardY = clamp(y - height / 2 - 35, top, Math.max(top, bottom - height));
+      const startX = right ? left : left + width;
+      const startY = cardY + Math.min(height - 22, 52);
+      const elbowX = (startX + x) / 2;
+      path = `M${startX},${startY} L${elbowX},${startY} L${elbowX},${y} L${x},${y}`;
+    }
+    card.style.setProperty("--point-callout-left", `${left}px`);
+    card.style.setProperty("--point-callout-top", `${cardY}px`);
+    $("point-callout-line").setAttribute("d", path);
+    callout.dataset.anchorX = String(x);
+    callout.dataset.anchorY = String(y);
+  }
+
   function closeEarthDetails() {
     const dialog = $("earth-details-dialog");
     if (dialog.open) dialog.close();
+  }
+
+  function returnToFullEarth() {
+    state.pendingZoom = null;
+    state.bridge?.reset();
+    setRotationUI(false);
+    closeEarthDetails();
+  }
+
+  function updateZoomUI(view) {
+    const zoomed = Boolean(view.zoomed), reset = $("globe-reset");
+    $("point-callout-back").hidden = !zoomed;
+    reset.classList.toggle("is-zoomed", zoomed);
+    const label = zoomed ? "← Full Earth" : "↺";
+    if (reset.textContent !== label) reset.textContent = label;
+    reset.setAttribute("aria-label", zoomed ? "Back to full Earth" : "Return to full Earth");
   }
 
   function locationActions(lon, lat, altitude) {
@@ -346,7 +423,7 @@
     const reset = element("button", "Full Earth", "globe-location-reset");
     reset.type = "button";
     reset.disabled = state.failedEarth;
-    reset.addEventListener("click", () => {state.pendingZoom = null;state.bridge?.reset();setRotationUI(false);closeEarthDetails();});
+    reset.addEventListener("click", returnToFullEarth);
     actions.append(zoom, reset);
     return actions;
   }
@@ -365,6 +442,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     state.visible = [];
     setRotationUI(view.playing);
+    updateZoomUI(view);
     const showDetections = $("globe-markers").checked && state.revealed;
     const markerScale = Math.min(1, Math.max(0.58, view.width / 1000));
     const latest = state.data?.daily.at(-1)?.date;
@@ -426,12 +504,14 @@
     canvas.dataset.documentedVisible = String(fireCount);
     canvas.dataset.wildfireEffects = state.documented ? "historical" : "off";
     canvas.dataset.effectMotion = motionPreference.matches ? "static" : "animated";
+    positionPointCallout(view);
   }
 
   function attach(frame) {
     const doc = frame.contentDocument, bridge = frame.contentWindow.fireAtlasEarth;
     if (!doc || !bridge || state.bridge === bridge) return;
     state.bridge = bridge;
+    state.frame = frame;
     const overlay = doc.createElement("canvas");
     overlay.id = "fire-observations";
     overlay.setAttribute("aria-hidden", "true");
@@ -505,6 +585,7 @@
     state.selected = null;
     state.details = null;
     state.selectedFire = null;
+    $("globe-point-callout").hidden = true;
     $("documented-detail").hidden = true;
     $("documented-list").hidden = false;
     if (state.fires) $("documented-status").textContent = `${state.fires.length} sourced case files · select one to explore`;
@@ -617,19 +698,13 @@
     const fire = state.fires?.find(item => item.id === id);
     if (!fire) return;
     clearSelection();state.selectedFire=id;
+    $("globe-console-title").textContent="Wildfire case";
     document.querySelector(".globe-console").classList.add("documented-reading");
     focus(fire.lon,fire.lat);
     $("documented-list").hidden=true;
     $("documented-status").textContent="";
     const detail=$("documented-detail");detail.hidden=false;detail.replaceChildren();
-    const back=element("button","← Layer details","documented-back");back.type="button";
-    back.addEventListener("click",()=>{
-      document.querySelector(".globe-console").classList.remove("documented-reading");
-      state.selectedFire=null;detail.hidden=true;$("documented-list").hidden=false;
-      renderCasePage();
-      $("earth-details-close").focus({preventScroll: true});
-    });
-    detail.append(back,element("span",`${fire.period} · ${fire.unit||"Wildfire"}`,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
+    detail.append(element("span",`${fire.period} · ${fire.unit||"Wildfire"}`,"globe-kicker"),element("h3",fire.name),element("p",fire.place,"documented-place"),element("p",fire.summary,"documented-summary"));
     detail.insertBefore(locationActions(fire.lon, fire.lat), detail.querySelector(".documented-summary"));
     const fatalityGrid=element("div",undefined,"documented-fatalities");
     const deathRows=[
@@ -640,12 +715,15 @@
     for(const [label,death] of deathRows){
       if(!death)continue;
       const card=element("section",undefined,"documented-fatality");
-      card.append(element("span",label),element("strong",death.label),element("small",death.detail));
+      card.append(element("span",label),element("strong",death.label));
       fatalityGrid.append(card);
     }
     detail.append(fatalityGrid);
     const scope=element("p","Counts follow the linked source and may use different definitions. ‘Not separately reported’ does not mean zero. Smoke estimates are modeled indirect impacts, separate from direct deaths.","documented-death-note");
-    detail.append(scope);
+    const countingNotes=element("details",undefined,"documented-counting-notes");
+    countingNotes.append(element("summary","Counting notes"),scope);
+    for(const [label,death] of deathRows)if(death)countingNotes.append(element("p",`${label}: ${death.detail}`));
+    detail.append(countingNotes);
     const links=element("div",undefined,"documented-sources");
     for(const source of fire.sources){
       const link=element("a");link.href=source.url;link.target="_blank";link.rel="noopener noreferrer";
@@ -653,19 +731,9 @@
       link.append(element("strong",`${source.publisher} ↗`),element("span",source.label),element("small",`Published ${source.published}`));
       links.append(link);
     }
-    const navigation=element("nav",undefined,"documented-navigation");
-    navigation.setAttribute("aria-label","Browse wildfire stories");
-    const index=state.fires.indexOf(fire);
-    const previous=element("button","← Previous");previous.type="button";
-    const next=element("button","Next case →");next.type="button";
-    previous.disabled=index===0;next.disabled=index===state.fires.length-1;
-    previous.addEventListener("click",()=>selectFire(state.fires[index-1].id));
-    next.addEventListener("click",()=>selectFire(state.fires[index+1].id));
-    navigation.append(previous,element("span",`${index+1} / ${state.fires.length}`),next);
-    detail.append(element("h4","News coverage & supporting sources"),links,navigation);
+    detail.append(element("h4","Sources"),links);
     document.querySelector(".globe-console-body").scrollTop=0;
-    openEarthDetails();
-    back.focus({preventScroll:true});
+    showPointCallout(fire, true);
   }
 
   function renderObservationImprint(data, currentDay) {
@@ -868,17 +936,13 @@
     document.querySelector(".globe-console").classList.remove("documented-view", "documented-reading");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
-    const close = element("button", "← Back to satellite data", "globe-close");
-    close.type = "button";
-    close.addEventListener("click", () => { clearSelection(); $("globe-location").focus(); });
-    panel.prepend(close);
-    openEarthDetails();
+    showPointCallout(item, false);
     try {
       const data = await json(`/api/globe/detail?${new URLSearchParams({cell: id, source: state.data.source, date: state.data.date})}`, AbortSignal.any([state.detailController.signal, AbortSignal.timeout(30000)]));
       if (request !== state.detailRequest) return;
       state.details = data;
       panel.replaceChildren();
-      panel.append(close, element("span", "1° GEOGRAPHIC GROUP", "globe-kicker"), element("h3", coords(item.lon, item.lat)));
+      panel.append(element("span", "1° GEOGRAPHIC GROUP", "globe-kicker"), element("h3", coords(item.lon, item.lat)));
       panel.append(locationActions(item.lon, item.lat, 350000));
       const facts = element("div", undefined, "globe-facts");
       for (const [key, value] of [["Detections", format(data.total)], ["Peak pixel FRP", item.max_frp_mw == null ? "Unknown" : `${format(item.max_frp_mw)} MW`]]) {
@@ -901,23 +965,24 @@
       const atlas = element("details");
       atlas.append(element("summary", "Explore this area in the atlas"), links);
       panel.append(atlas);
-      const details = element("details"), list = element("ol");
-      details.append(element("summary", `${data.observations.length} latest source records`));
+      const list = element("ol");
       for (const row of data.observations) {
         const li = element("li");
         li.append(element("strong", coords(row.lon, row.lat)), element("div", stamp(row.acquisition_utc)), element("div", `${row.source_id} · ${row.frp_mw == null ? "FRP unknown" : format(row.frp_mw) + " MW"} · confidence ${row.confidence_raw}`));
         list.append(li);
       }
-      details.append(list);
-      panel.append(details, interpretation);
+      const provenance=element("details",undefined,"selection-source-records");
+      provenance.append(element("summary",`${data.observations.length} latest source records`),list,interpretation.querySelector("p"));
+      panel.append(provenance);
     } catch (error) {
-      if (request === state.detailRequest) panel.replaceChildren(close, element("p", `Evidence unavailable: ${error.message}. Return to the overview to retry.`));
+      if (request === state.detailRequest) panel.replaceChildren(element("p", `Evidence unavailable: ${error.message}. Close this view and select the group again to retry.`));
     }
   }
 
   window.addEventListener("earth-ready", event => attach(event.detail.frame));
   window.addEventListener("earth-unavailable", () => {
     state.failedEarth = true;
+    $("globe-point-callout").hidden = true;
     state.bridge?.cancelOrbit();state.bridge = null;
     updateLayerStamp();
     $("globe-status").textContent = "3D unavailable · browse locations below.";
@@ -984,6 +1049,12 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    $("point-callout-details").addEventListener("click", openEarthDetails);
+    $("point-callout-zoom").addEventListener("click", () => {const record=selectedLocation();if(record)zoomToLocation(record.lon, record.lat, state.selectedFire ? 180000 : 350000);});
+    $("point-callout-back").addEventListener("click", returnToFullEarth);
+    $("point-callout-close").addEventListener("click", () => {clearSelection();$("earth-details-open").focus({preventScroll:true});});
+    window.addEventListener("scroll", () => positionPointCallout(state.bridge?.view), {passive:true});
+    window.addEventListener("resize", () => positionPointCallout(state.bridge?.view));
     const dialog = $("earth-details-dialog");
     $("earth-details-open").addEventListener("click", () => {
       if (!state.selectedFire && !state.selected) setPanelView(state.documented ? "cases" : $("globe-markers").checked ? "satellite" : state.panelView);
@@ -1011,7 +1082,7 @@
     });
     $("globe-zoom-in").addEventListener("click", () => state.bridge?.zoom(-0.3));
     $("globe-zoom-out").addEventListener("click", () => state.bridge?.zoom(0.3));
-    $("globe-reset").addEventListener("click", () => {state.pendingZoom=null;state.bridge?.reset();setRotationUI(false);});
+    $("globe-reset").addEventListener("click", returnToFullEarth);
     document.querySelectorAll("[data-globe-region]").forEach(button => button.addEventListener("click", () => {
       clearSelection();
       state.region=button.dataset.regionKey;updateLocations();

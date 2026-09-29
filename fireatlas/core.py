@@ -154,7 +154,14 @@ def _normalized_row(row: dict[str, str], source_id: str, retrieved: str, uri: st
     lon, lat = float(row["longitude"]), float(row["latitude"])
     if not (-180 <= lon <= 180 and -86 <= lat <= 86):
         raise ValueError("coordinates outside supported EPSG:6933 region")
-    if row.get("instrument", sensor).strip().upper() != sensor:
+    instrument = row.get("instrument", sensor).strip().upper()
+    # FIRMS Archive Download labels its Suomi-NPP Collection 2 files with
+    # instrument=SNPP; recent area CSVs use instrument=VIIRS. Preserve the
+    # original field in raw_json while normalizing both to the VIIRS sensor.
+    accepted_instruments = {sensor}
+    if source_id in ("VIIRS_SNPP_SP", "VIIRS_SNPP_NRT"):
+        accepted_instruments.add("SNPP")
+    if instrument not in accepted_instruments:
         raise ValueError(f"instrument does not match {source_id}")
     if source_id != "NOAA_HMS_VIIRS":
         platforms = {"MODIS": {"T", "A", "TERRA", "AQUA"}, "SNPP": {"N", "SNPP", "SUOMI NPP", "S-NPP"},

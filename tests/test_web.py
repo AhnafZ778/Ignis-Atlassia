@@ -72,6 +72,32 @@ class WebMvpTests(unittest.TestCase):
         _, body = self.get("/api/export?kind=observations&" + query)
         self.assertEqual(body.count(b"2015-07-01T12:34:00Z"), 4)
 
+    def test_historical_responder_brief_is_bounded_and_evidence_linked(self):
+        _, body = self.get("/api/briefing?demo=1&year=2015&month=7&series=joint&bbox=-122,39,-120,41")
+        brief = json.loads(body)
+        self.assertEqual(brief["schema"], "fireatlas-responder-briefing-v1")
+        self.assertEqual(brief["classification"], "synthetic")
+        self.assertTrue(brief["historical_only"])
+        self.assertFalse(brief["operational"])
+        self.assertEqual(brief["selected_month"]["detected_cell_days"], 4)
+        self.assertEqual(brief["active_days_count"], 4)
+        self.assertEqual(brief["observed_days"], 31)
+        self.assertEqual(brief["unknown_days"], 0)
+        self.assertEqual(len(brief["active_days"]), 4)
+        self.assertIn("not integrated", brief["context"]["terrain"])
+        self.assertTrue(any("perimeter" in item for item in brief["limitations"]))
+
+    def test_harmonization_audit_exposes_common_grid_and_source_limits(self):
+        _, body = self.get("/api/harmonization?demo=1&year=2015&month=7&series=joint&bbox=-122,39,-120,41")
+        audit = json.loads(body)
+        self.assertEqual(audit["schema"], "fireatlas-harmonization-audit-v1")
+        self.assertEqual(audit["status"], "descriptive-pair-available")
+        self.assertEqual(audit["raw_pixels_total"], 16)
+        self.assertEqual(audit["detected_cell_days"], 4)
+        self.assertEqual(audit["co_detected_cell_days"], 4)
+        self.assertEqual([item["raw_pixels"] for item in audit["sources"]], [4, 12])
+        self.assertTrue(all("unknown" in item for item in audit["limits"] if "coverage" in item))
+
     def test_invalid_aoi_returns_error(self):
         with self.assertRaises(HTTPError) as caught:
             self.get("/api/calendar?year=2015&bbox=bad")
@@ -120,6 +146,13 @@ class WebMvpTests(unittest.TestCase):
         demo_calendar = read(f"/api/calendar?demo=1&{query}")
         self.assertIsNone(real_calendar["monthly"][6]["detected_cell_days"])
         self.assertEqual(demo_calendar["monthly"][6]["detected_cell_days"], 4)
+        authentic_brief = read(f"/api/briefing?demo=0&{query}&month=7")
+        self.assertEqual(authentic_brief["classification"], "authentic-imported")
+        self.assertEqual(authentic_brief["status"], "insufficient-evidence")
+        self.assertTrue(authentic_brief["historical_only"])
+        authentic_audit = read(f"/api/harmonization?demo=0&{query}&month=7")
+        self.assertEqual(authentic_audit["status"], "missing-complete-source-export")
+        self.assertEqual(authentic_audit["data_class"], "authentic-imported")
         self.assertEqual(read(f"/api/observations?demo=0&date=2015-07-01&series=joint&bbox=-122,39,-120,41")["observations"], [])
         self.assertEqual(len(read(f"/api/observations?demo=1&date=2015-07-01&series=joint&bbox=-122,39,-120,41")["observations"]), 4)
         self.assertEqual(read("/api/research?demo=0")["raw_pixels"], 0)

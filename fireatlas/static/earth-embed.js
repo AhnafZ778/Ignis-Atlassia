@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const caption = document.getElementById("earth-caption");
   if (!host || !hero) return;
 
+  if (new URLSearchParams(window.location.search).get("lite") === "1") {
+    caption.textContent = "DATA VIEW · 3D PREVIEW PAUSED";
+    window.dispatchEvent(new CustomEvent("earth-unavailable"));
+    return;
+  }
+
   const frame = document.createElement("iframe");
   frame.src = "/terrain-earth.html?embed=landing";
   frame.title = "FireAtlas Terrain Earth with satellite imagery and World Elevation. Drag to rotate; use the globe controls to explore.";
@@ -17,6 +23,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let documentInFrame;
     try { documentInFrame = frame.contentDocument; } catch { return; }
     if (!documentInFrame) return;
+
+    // The iframe fills the hero; only the visible Earth should capture zoom.
+    // Native terrain picking also follows the surface in close-up views.
+    frame.contentWindow.addEventListener("wheel", event => {
+      const sceneWindow = frame.contentWindow;
+      const overEarth = sceneWindow.fireAtlasEarth?.view &&
+        sceneWindow.fireAtlasTerrain?.toMap({x: event.clientX, y: event.clientY});
+      if (overEarth) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+      window.scrollBy({left: event.deltaX * unit, top: event.deltaY * unit, behavior: "instant"});
+    }, {capture: true, passive: false});
 
     // The full-page version retains its controls, credits, and loading interface.
     // The compact homepage version shows just the same WebGL model.

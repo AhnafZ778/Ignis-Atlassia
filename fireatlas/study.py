@@ -7,13 +7,15 @@ import hashlib
 import io
 import json
 import zipfile
-from collections import defaultdict
-from datetime import datetime, timezone
+from collections import Counter, defaultdict
+from datetime import date, datetime, timedelta, timezone
 from statistics import median
 
-from .core import SERIES, calendar
+from .core import GRID_VERSION, SERIES, SOURCES, calendar
+from .harmonization import month_audit
 
-SCHEMA = "fireatlas-study-v1"
+SCHEMA = "fireatlas-study-v2"
+LEGACY_SCHEMA = "fireatlas-study-v1"
 MAX_ROWS = 50_000
 
 
@@ -65,6 +67,7 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
     payloads = {
         "selection.json": config,
         "calendar.json": summary,
+        "harmonization.json": month_audit(db, year=year, month=month, series=series, bbox=bbox),
         "observations.json": observations,
         "export-windows.json": windows,
         "batches.json": batches,
@@ -76,9 +79,10 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
             payloads["synthetic-context.geojson"] = context_fixture(year=year, month=month, bbox=bbox, layer=layer)
     files = {name: json.dumps(value, sort_keys=True, indent=2, allow_nan=False).encode() for name, value in payloads.items()}
     files["README.txt"] = (
-        "FireAtlas study bundle v1\n\n"
+        "FireAtlas study bundle v2\n\n"
         "selection.json restores the AOI, year, month, sensor series, day and context layer.\n"
-        "calendar.json contains the full selected-year UTC calendar. observations.json includes\n"
+        "calendar.json contains the full selected-year UTC calendar. harmonization.json records\n"
+        "the selected month raw-pixel, common-grid and overlap audit. observations.json includes\n"
         "the selected year and all qualifying prior same-month baseline inputs, with untouched\n"
         "source rows, normalized fields and assigned grid cells. export-windows.json records\n"
         "complete source exports covering this AOI. batches.json retains file hashes and provenance.\n\n"
@@ -108,6 +112,102 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
     return buffer.getvalue()
 
 
+def _verify_harmonization(audit, selection, summary, rows, windows):
+    """Recompute the month audit from the frozen rows, independent of its hash."""
+    year, month = selection["year"], selection["month"]
+    sources = SERIES[selection["series"]]
+    bbox = selection["bbox"]
+    stamp = f"{year}-{month:02d}"
+    start = date(year, month, 1)
+    end = date(year + (month == 12), month % 12 + 1, 1)
+    selected = summary["monthly"][month - 1]
+    raw = Counter()
+    raw_by_day = Counter()
+    marks = {source: defaultdict(set) for source in sources}
+    versions = {source: set() for source in sources}
+    for row in rows:
+        day = row["acquisition_utc"][:10]
+        if not day.startswith(stamp):
+            continue
+        source = row["source_id"]
+        if source not in sources:
+            raise ValueError("harmonization audit contains an unexpected source")
+        raw[source] += 1
+        raw_by_day[(source, day)] += 1
+        marks[source][day].add((row["grid_x"], row["grid_y"]))
+        versions[source].add(row["product_version"])
+
+    by_source = [{"source_id": source, "sensor": SOURCES[source][0],
+                  "processing_level": SOURCES[source][1], "raw_pixels": raw[source],
+                  "detected_cell_days": sum(len(cells) for cells in marks[source].values()),
+                  "product_versions": sorted(versions[source]),
+                  "full_month_export": any(w["source_id"] == source and w["month"] == stamp
+                       and w["west"] <= bbox[0] and w["south"] <= bbox[1]
+                       and w["east"] >= bbox[2] and w["north"] >= bbox[3] for w in windows)}
+                 for source in sources]
+    baseline_versions = {}
+    for prior in selected["baseline_years"]:
+        prior_versions = {source: set() for source in sources}
+        prior_stamp = f"{prior}-{month:02d}"
+        for row in rows:
+            if row["acquisition_utc"].startswith(prior_stamp) and row["source_id"] in sources:
+                prior_versions[row["source_id"]].add(row["product_version"])
+        baseline_versions[str(prior)] = {source: sorted(prior_versions[source]) for source in sources}
+    if not baseline_versions:
+        baseline_version_status = "no-qualifying-baseline-years"
+    elif any(not values[source] for values in baseline_versions.values() for source in sources):
+        baseline_version_status = "unknown-where-source-has-no-detections"
+    elif all(values[source] == sorted(versions[source])
+             for values in baseline_versions.values() for source in sources):
+        baseline_version_status = "same-observed-product-versions"
+    else:
+        baseline_version_status = "mixed-product-versions-across-years"
+    complete = all(item["full_month_export"] for item in by_source)
+    expected_days = []
+    day = start
+    while day < end:
+        key = day.isoformat()
+        cells = {source: marks[source][key] for source in sources}
+        union = set().union(*cells.values())
+        overlap = len(set.intersection(*cells.values())) if len(sources) == 2 else None
+        expected_days.append({"date_utc": key,
+                              "raw_pixels_by_source": {source: raw_by_day[(source, key)] for source in sources},
+                              "cell_days_by_source": {source: len(cells[source]) for source in sources},
+                              "joint_cell_days": len(union) if complete else None,
+                              "partial_joint_cell_days": None if complete else len(union),
+                              "co_detected_cell_days": overlap,
+                              "export_window_complete": complete,
+                              "satellite_observation_coverage": "unknown"})
+        day += timedelta(days=1)
+    standard_pair = sources == SERIES["joint"]
+    if not standard_pair:
+        status = "outside-standard-modis-viirs-pair"
+    elif not complete:
+        status = "missing-complete-source-export"
+    elif any(len(item["product_versions"]) > 1 for item in by_source):
+        status = "mixed-product-versions"
+    elif not all(item["raw_pixels"] for item in by_source):
+        status = "complete-export-with-zero-detections-in-one-source"
+    else:
+        status = "descriptive-pair-available"
+    expected = {
+        "status": status,
+        "data_class": "synthetic" if summary["demo_data"] else "authentic-imported",
+        "calendar_timezone": "UTC", "grid": GRID_VERSION,
+        "sources": by_source, "raw_pixels_total": sum(raw.values()),
+        "detected_cell_days": sum(item["joint_cell_days"] for item in expected_days) if complete else None,
+        "partial_detected_cell_days": None if complete else sum(item["partial_joint_cell_days"] for item in expected_days),
+        "co_detected_cell_days": sum(item["co_detected_cell_days"] for item in expected_days) if len(sources) == 2 else None,
+        "days": expected_days, "baseline_median": selected["baseline_median"],
+        "baseline_years": selected["baseline_years"],
+        "baseline_product_versions": baseline_versions,
+        "baseline_version_status": baseline_version_status,
+        "provenance": summary["provenance"],
+    }
+    if any(audit.get(key) != value for key, value in expected.items()):
+        raise ValueError("harmonization audit does not reproduce from bundled observations")
+
+
 def verify_bundle(path):
     """Verify hashes and recompute the calendar from bundled normalized inputs."""
     with zipfile.ZipFile(path) as archive:
@@ -116,10 +216,13 @@ def verify_bundle(path):
         if len(archive.namelist()) != len(set(archive.namelist())):
             raise ValueError("duplicate bundle entries")
         manifest = json.loads(archive.read("manifest.json"))
+        schema = manifest.get("schema")
         required = {"selection.json", "calendar.json", "observations.json", "export-windows.json", "batches.json", "README.txt"}
+        if schema == SCHEMA:
+            required.add("harmonization.json")
         optional = {"presentation-provenance.json", "synthetic-context.geojson"}
         included = set(manifest.get("files", {}))
-        if manifest.get("schema") != SCHEMA or not required <= included or included - required - optional:
+        if schema not in (SCHEMA, LEGACY_SCHEMA) or not required <= included or included - required - optional:
             raise ValueError("unsupported or incomplete study bundle")
         if included & optional and manifest.get("data_class") != "synthetic":
             raise ValueError("synthetic presentation inputs require a synthetic study")
@@ -127,6 +230,14 @@ def verify_bundle(path):
             if hashlib.sha256(archive.read(name)).hexdigest() != checksum:
                 raise ValueError(f"checksum mismatch: {name}")
         summary = json.loads(archive.read("calendar.json"))
+        audit = json.loads(archive.read("harmonization.json")) if schema == SCHEMA else None
+        selection = json.loads(archive.read("selection.json"))
+        if (audit is not None and (audit.get("schema") != "fireatlas-harmonization-audit-v1"
+                or audit.get("year") != selection.get("year")
+                or audit.get("month") != selection.get("month")
+                or audit.get("series") != selection.get("series")
+                or audit.get("bbox") != selection.get("bbox"))):
+            raise ValueError("harmonization audit does not match selection")
         rows = json.loads(archive.read("observations.json"))
         windows = json.loads(archive.read("export-windows.json"))
     cells = defaultdict(set)
@@ -157,7 +268,9 @@ def verify_bundle(path):
         if (item["detected_cell_days"] != expected or item["export_window_complete"] != complete
                 or item["partial_import_detected_cell_days"] != (None if complete else count)):
             raise ValueError(f"daily count does not reproduce: {item['date_utc']}")
-    return {"schema": SCHEMA, "data_class": manifest["data_class"], "observations": len(rows), "verified": True}
+    if audit is not None:
+        _verify_harmonization(audit, selection, summary, rows, windows)
+    return {"schema": schema, "data_class": manifest["data_class"], "observations": len(rows), "verified": True}
 
 
 if __name__ == "__main__":

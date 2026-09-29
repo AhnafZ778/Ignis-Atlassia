@@ -1,0 +1,2678 @@
+{
+  "archive_bbox": [
+    -122.2,
+    38.8,
+    -120.0,
+    41.0
+  ],
+  "failed_pages": 0,
+  "incidents": [
+    {
+      "archive_path": "/incidents/2024/7/1/high-desert-fire",
+      "lat": 40.408993,
+      "lon": -120.52602,
+      "name": "High Desert Fire",
+      "page_sha256": "01da99e34bc9c51199c0cc45aed48410f4410e9e347fa46f04cde0ad53fb8ec6",
+      "published_start_local": "07/01/2024 6:59 PM",
+      "start_utc_interpreted": "2024-07-02T01:59:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/1/high-desert-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/1/kern-fire",
+      "lat": 35.434012,
+      "lon": -117.977028,
+      "name": "Kern Fire",
+      "page_sha256": "6171871b317ddf50494faa48e9c639bd863f92cd647e577748bb705e7c28088a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/1/kern-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/1/kitchen-fire",
+      "lat": 32.717444,
+      "lon": -116.47191,
+      "name": "Kitchen Fire",
+      "page_sha256": "663cf798eccbbdbb736efc4f1d70da8c8e2ae1788eb1102a07dc9a558f7bf2fe",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/1/kitchen-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/1/mccain-fire",
+      "lat": 32.660837,
+      "lon": -116.231794,
+      "name": "Mccain Fire",
+      "page_sha256": "f31693a9a4026f30024f578d133e13829987f32fc6cd5fcfd7a902b31b9f8058",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/1/mccain-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/1/sunrise-fire",
+      "lat": 34.432003,
+      "lon": -117.834801,
+      "name": "Sunrise Fire",
+      "page_sha256": "f7963b903b3bd0736dec14e6bad14d2486e508b750ac993c15c1b5caeb256fe5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/1/sunrise-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/10/point-fire",
+      "lat": 40.11416,
+      "lon": -123.7729,
+      "name": "Point Fire",
+      "page_sha256": "d0e211732deb421c92757d2b11648700325df59c716249dc2065f83d1e81afff",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/10/point-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/10/poppy-fire",
+      "lat": 34.43725,
+      "lon": -118.3404,
+      "name": "Poppy Fire",
+      "page_sha256": "88d4344425171f4b19d9164b4a376c715bdb61410f1d9d0ecdc63153bae94279",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/10/poppy-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/10/ranch-fire",
+      "lat": 39.803617,
+      "lon": -120.03505,
+      "name": "Ranch Fire",
+      "page_sha256": "8b3b5d923c7539af33d4ae416b8d360a0ef5e82bc63b10135574f111eab9f6e5",
+      "published_start_local": "07/10/2024 6:20 PM",
+      "start_utc_interpreted": "2024-07-11T01:20:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/10/ranch-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/10/woodland-fire",
+      "lat": 34.60698,
+      "lon": -118.3211,
+      "name": "Woodland Fire",
+      "page_sha256": "2b5f2b514fb3d9111f02d22008870b2cea8cf7b1055576661bd62ad44dc4a95f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/10/woodland-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/11/carrizo-5-fire",
+      "lat": 32.636552,
+      "lon": -116.165773,
+      "name": "Carrizo 5 Fire",
+      "page_sha256": "26e60fdb5ebec1ef4133823624cbd335a6a09f3a17450a5e216fc91d4662edae",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/11/carrizo-5-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/11/railbridge-fire",
+      "lat": 39.40436,
+      "lon": -121.49395,
+      "name": "Railbridge Fire",
+      "page_sha256": "dec5724356f650dfde30243ae80ad1215f7371fb8cde06a2ed16c299ca0924d7",
+      "published_start_local": "07/11/2024 3:44 PM",
+      "start_utc_interpreted": "2024-07-11T22:44:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/11/railbridge-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/athens-fire",
+      "lat": 38.8364594,
+      "lon": -121.332377,
+      "name": "Athens Fire",
+      "page_sha256": "9c62703a819d618d0dd1929b4ddab78109cf74f15a8f671b45fe5b75208e55c0",
+      "published_start_local": "07/12/2024 1:49 PM",
+      "start_utc_interpreted": "2024-07-12T20:49:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/athens-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/bluff-fire",
+      "lat": 33.95319,
+      "lon": -116.87638,
+      "name": "Bluff Fire",
+      "page_sha256": "bb39e85c74628126161e65d983fe17f0857c02b3aeeafcb8fd439076962076c0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/bluff-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/indiana-fire",
+      "lat": 37.112938,
+      "lon": -120.595644,
+      "name": "Indiana Fire",
+      "page_sha256": "39d90f17551d030a0b35e8a26952fd3181bd95e5d175bebb54a5ac9230cb3d3e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/indiana-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/pauba-fire",
+      "lat": 33.485557,
+      "lon": -117.02173,
+      "name": "Pauba Fire",
+      "page_sha256": "fe9e077c468254bc6f637e14e9c75ac9c376375fcaf585eb9bec39ab4c9b761d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/pauba-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/pilot-fire",
+      "lat": 35.2928626,
+      "lon": -119.242617,
+      "name": "Pilot Fire",
+      "page_sha256": "6e4b5530755724f5ce469c61ab0108065a47254f821b48a68e38da08ad853b04",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/pilot-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/12/ranch-fire",
+      "lat": 35.9001968,
+      "lon": -120.433304,
+      "name": "Ranch Fire",
+      "page_sha256": "3d357bc26db3ea37691679e046015f838b3e726d6868163fb3ba15038673e271",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/12/ranch-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/2024-sqf-lightning-complex",
+      "lat": 35.986772,
+      "lon": -118.311422,
+      "name": "2024 SQF Lightning Complex",
+      "page_sha256": "34cc163cfa061b4bc57ea53069d298c29862b72812549f0d53fb074633ab62b5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/2024-sqf-lightning-complex"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/horse-fire-previously-3-7",
+      "lat": 40.9067636,
+      "lon": -121.179979,
+      "name": "Horse Fire (Previously 3-7)",
+      "page_sha256": "b68afcf5b7613581a4c390352cf2b911cfa3f6dded6bf1b06f499094a1a24faf",
+      "published_start_local": "07/13/2024 6:21 PM",
+      "start_utc_interpreted": "2024-07-14T01:21:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/horse-fire-previously-3-7"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/hurricane-fire",
+      "lat": 35.199333,
+      "lon": -119.695667,
+      "name": "Hurricane Fire",
+      "page_sha256": "cd12db3ccc0311f60ad2bf5c8b268f753e2e6c5ccef08563f0352d5ebd5834d3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/hurricane-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/minor-fire",
+      "lat": 34.67478,
+      "lon": -118.253976,
+      "name": "Minor Fire",
+      "page_sha256": "08da6520adc892427c340421c09230ab7bd611fdaebb6b09059bb5f03197352b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/minor-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/packsaddle-fire",
+      "lat": 35.9273945,
+      "lon": -118.429923,
+      "name": "Packsaddle Fire",
+      "page_sha256": "3d39c2dc4211f9e86e2504c28ff1b981bb63af8f16312eab5ae1468e628ddca2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/packsaddle-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/quality-fire",
+      "lat": 36.576457,
+      "lon": -118.057587,
+      "name": "Quality Fire",
+      "page_sha256": "7704963538ecc83971738d08f0e20e580db50b5a31b60dd46b1d69f3c33c9583",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/quality-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/rancho-fire",
+      "lat": 35.10343,
+      "lon": -118.746636,
+      "name": "Rancho Fire",
+      "page_sha256": "d68330e1d2e768bef40968a696e6316a604ca756d9ba2b16bf895fecc415b104",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/rancho-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/rim-fire",
+      "lat": 40.90368,
+      "lon": -121.160755,
+      "name": "Rim Fire",
+      "page_sha256": "693403f1bb70a001b4d4743e85fc0d3b46049de5c116745549b932231b0fdaf2",
+      "published_start_local": "07/13/2024 3:31 PM",
+      "start_utc_interpreted": "2024-07-13T22:31:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/rim-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/soda-fire",
+      "lat": 35.009077,
+      "lon": -119.531779,
+      "name": "Soda Fire",
+      "page_sha256": "6accb22b3e0a13ee0474711df79869999b89561bd08817a7a08619ba855d25fc",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/soda-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/13/white-fire",
+      "lat": 34.963024,
+      "lon": -118.533425,
+      "name": "White Fire",
+      "page_sha256": "a07e6fcc9fb6f929d44750e3ebaf2f6284db5da87d68c5ec1431c7c614ac9a4e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/13/white-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/dewey-fire",
+      "lat": 41.765149,
+      "lon": -122.353169,
+      "name": "Dewey Fire",
+      "page_sha256": "ebccb9792fd3bc3f2e40ebfb9a82ba4fc92dc114c9f4f215a40e91acf09048f6",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/dewey-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/five-fire",
+      "lat": 35.3858693,
+      "lon": -119.367525,
+      "name": "Five Fire",
+      "page_sha256": "4b5869bb20d0406b46b645624dfec9bd24c92906a2c8670b27ef941c9ee8b952",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/five-fire/"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/holloway-fire",
+      "lat": 35.6453,
+      "lon": -119.76107,
+      "name": "Holloway Fire",
+      "page_sha256": "564349ec9f32281fa97eaa30c0b4e401f353b773c5d5aa0d99347b0afcd46f5f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/holloway-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/laura-fire",
+      "lat": 35.56702,
+      "lon": -118.40739,
+      "name": "Laura Fire",
+      "page_sha256": "cf661fe3ba783cc59270c1ebf0de8f79ca9d7bc989721027df86d4252eac11c3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/laura-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/lost-hills-fire",
+      "lat": 35.636093,
+      "lon": -119.669093,
+      "name": "Lost Hills Fire",
+      "page_sha256": "cf6436ca0dc4729f0424af12c5705278da882d6eb7665119fb79be2e0fea598d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/lost-hills-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/mcnab-fire",
+      "lat": 39.041985,
+      "lon": -123.15297,
+      "name": "Mcnab Fire",
+      "page_sha256": "c23a5f3e3ff0daa440440989bcf1efa1efe7a34f2e56ba0fab3e478c721663a9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/mcnab-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/pickett-fire",
+      "lat": 40.3464,
+      "lon": -123.362,
+      "name": "Pickett Fire",
+      "page_sha256": "b29d819ddd39834d6d7d04a3c8c7c0560efbfe121c301f8e27401b88fdd0b49b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/pickett-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/sentinel-fire",
+      "lat": 36.759833,
+      "lon": -118.663333,
+      "name": "Sentinel Fire",
+      "page_sha256": "4aaa39f36c76c8592400bc51eb866611d7e15287dc52d9b51dc9b510628d73fa",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/sentinel-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/14/solar-fire",
+      "lat": 35.856649,
+      "lon": -120.278024,
+      "name": "Solar Fire",
+      "page_sha256": "c770e6a2803c59a711b792ba18f81f4a0f8d86a5347d1f965474ac9d9b1b87ad",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/14/solar-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/5-fire",
+      "lat": 35.784624,
+      "lon": -119.779871,
+      "name": "5 Fire",
+      "page_sha256": "9cc6ecf90a87e0f75fe1b7780562eba963cd9a8e1aa8f62d5ca052ab065bf936",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/5-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/five-2-fire",
+      "lat": 35.5879546,
+      "lon": -119.624655,
+      "name": "Five 2 Fire",
+      "page_sha256": "3b021faa47001abcbbedc6da35f4a12117425ac4a3074444e9e8923dacce3609",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/five-2-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/hill-fire",
+      "lat": 40.7721611,
+      "lon": -123.63975,
+      "name": "Hill Fire",
+      "page_sha256": "01176214199ffc67a6dbe1980c93f0c3a9e017da75ff0b9d72a30cf79f54bc0b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/hill-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/paradise-fire",
+      "lat": 41.787938,
+      "lon": -122.516407,
+      "name": "Paradise Fire",
+      "page_sha256": "9336ca4cfe6888b4cd8149324b265049e4c7777886370e310341457b9334effd",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/paradise-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/point-fire",
+      "lat": 41.7975,
+      "lon": -121.369,
+      "name": "Point Fire",
+      "page_sha256": "bfa25088e782e12124f052b6d0f6efeaac73899f8b1d887d7e308c29d1d02d43",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/point-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/15/san-joaquin-fire",
+      "lat": 38.979194,
+      "lon": -122.684661,
+      "name": "San Joaquin Fire",
+      "page_sha256": "bbbf711852d94a782374f427b5b0377d09ca9e3d52aa69c20bdd81fcef13a0cf",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/15/san-joaquin-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/16/donomore-fire",
+      "lat": 42.0083,
+      "lon": -122.90457,
+      "name": "Donomore Fire",
+      "page_sha256": "4c4d3f62e018e21970d96cf5c628c32d14204bd6adc46e49988c1c71829d4930",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/16/donomore-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/16/happy-fire",
+      "lat": 36.850037,
+      "lon": -118.738174,
+      "name": "Happy Fire",
+      "page_sha256": "6e512e71b6af9b64cd08d7011b43978152208296906342c12709d9505d573683",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/16/happy-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/16/willow-fire",
+      "lat": 34.92221,
+      "lon": -118.257558,
+      "name": "Willow Fire",
+      "page_sha256": "98c893210ea7d8ef6d974bf5e3ce895dc5c0772ce714869be11c9941051a4a86",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/16/willow-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/17/plantation-fire",
+      "lat": 41.842269,
+      "lon": -120.341894,
+      "name": "Plantation Fire",
+      "page_sha256": "360d504dd705aafb50102263a4bccae8d5c442ca585c4473994564618d8c625a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/17/plantation-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/17/sloane-fire",
+      "lat": 32.773489,
+      "lon": -116.803223,
+      "name": "Sloane Fire",
+      "page_sha256": "4325023b5823c6b720acbb0bbe8b02485ca1f20d8a7dc86c336b5bfa09df429d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/17/sloane-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/18/dorado-fire",
+      "lat": 36.29802,
+      "lon": -120.211458,
+      "name": "Dorado Fire",
+      "page_sha256": "a6a83de34475efa42baeb3952aaf4c5df1257560cc593356344cbbf44e33553f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/18/dorado-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/18/ducor-2-fire",
+      "lat": 35.96289,
+      "lon": -119.0507,
+      "name": "Ducor 2 Fire",
+      "page_sha256": "c94547124dfc3288797b7cdfa59a853f9f135110c70c9cd8e1592e61868838dc",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/18/ducor-2-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/18/tire-fire",
+      "lat": 36.29538,
+      "lon": -120.267799,
+      "name": "Tire Fire",
+      "page_sha256": "5663ee36bdf322f5c8456b8cbadc23b72578aa80f9de517203df9ce6584c58e3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/18/tire-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/abbey-fire",
+      "lat": 34.083439,
+      "lon": -117.139626,
+      "name": "Abbey Fire",
+      "page_sha256": "a17dcc4f88824d09d2cbcfa7cfa4c19ff43a4ff9d2f82faa5fb7b0d1ec296f33",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/abbey-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/deer-fire",
+      "lat": 34.5938959,
+      "lon": -118.063529,
+      "name": "Deer Fire",
+      "page_sha256": "8b3a88e80ab73f54861d87df7bcd3e4efac94d7b1f14e7d59f4026fd9e27f8ab",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/deer-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/fork-fire",
+      "lat": 34.239686,
+      "lon": -117.76113,
+      "name": "Fork Fire",
+      "page_sha256": "6ede582b0bff131025a4788d083d21b8b8b14f5c63fac27007caf72a01a2fa26",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/fork-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/la-tuna-fire",
+      "lat": 34.23514,
+      "lon": -118.30239,
+      "name": "La Tuna Fire",
+      "page_sha256": "27d2d19ffe542f961c53b6ae9bea3f3fb7b6f3b3b362125eb0f75347f49cee19",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/la-tuna-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/lehi-fire",
+      "lat": 38.8807773,
+      "lon": -121.156605,
+      "name": "Lehi Fire",
+      "page_sha256": "276091e5ef5e3a5347ab9f9d0628a191be4784c757732a5edffee04a81577f28",
+      "published_start_local": "07/19/2024 6:18 PM",
+      "start_utc_interpreted": "2024-07-20T01:18:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/lehi-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/liberty-fire",
+      "lat": 38.2391935,
+      "lon": -121.0869519,
+      "name": "Liberty Fire",
+      "page_sha256": "74ce874b2d7f694458303434a09cedf7bc29e5df291f451d172bd0468029cc3d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/liberty-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/lookout-fire",
+      "lat": 37.3137,
+      "lon": -119.6859,
+      "name": "Lookout Fire",
+      "page_sha256": "e32bd1a57a2b1f89f8b0f291fa01e3535a414791a948e2ae9ba273029fb34354",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/lookout-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/19/panoche-fire",
+      "lat": 36.606754,
+      "lon": -120.876583,
+      "name": "Panoche Fire",
+      "page_sha256": "3e87ec27be90c5709a737bb08ba4b951bff44f7c2e668ea6a35a9201ac61a8a6",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/19/panoche-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/airline-fire",
+      "lat": 36.65921,
+      "lon": -121.22114,
+      "name": "Airline Fire",
+      "page_sha256": "42d03ac4d17852f810412e3a74053028da5a51adb144de6d87c255bc0e2dbb40",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/airline-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/border-60-fire",
+      "lat": 32.582559,
+      "lon": -116.616755,
+      "name": "Border 60 Fire",
+      "page_sha256": "f9d870f31f36e05e6bbe3dae42f87c8a1602b748e11f19084848942636f9295c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/border-60-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/bowman-fire",
+      "lat": 35.608374,
+      "lon": -117.899544,
+      "name": "Bowman Fire",
+      "page_sha256": "f51aece8c75dd1e955ce9a2d595e21d1dee01642133b20657073d3d85d59ada8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/bowman-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/denverton-fire",
+      "lat": 38.242509,
+      "lon": -121.91466,
+      "name": "Denverton Fire",
+      "page_sha256": "72ce9e2ab867603e296572db5d94b16464ddd2f8a2db01ead7c7266f837f9474",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/denverton-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/luken-fire",
+      "lat": 33.79682,
+      "lon": -117.264072,
+      "name": "Luken Fire",
+      "page_sha256": "84bd46a8ccbe6cbca50b969b989009f1574628301ddd8fbdc08db6737505e98d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/luken-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/moccasin-fire",
+      "lat": 38.63826,
+      "lon": -120.774929,
+      "name": "Moccasin Fire",
+      "page_sha256": "d216bd4111781caf7727da6a78c3428fbba8d6c1bba570675f9c99df70f430ce",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/moccasin-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/power-fire",
+      "lat": 35.470889,
+      "lon": -118.750959,
+      "name": "Power Fire",
+      "page_sha256": "2112aea05267b1908f8185406f060012174a6692d9fd1722d1cd91529439aeb3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/power-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/thompson-fire",
+      "lat": 39.53793,
+      "lon": -121.5467,
+      "name": "Thompson Fire",
+      "page_sha256": "b752099aa92c73af953150c5407fe1d88808452ed4b4021f298ab5d0e6d8de9c",
+      "published_start_local": "07/02/2024 10:51 AM",
+      "start_utc_interpreted": "2024-07-02T17:51:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/thompson-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/toll-fire",
+      "lat": 38.63744,
+      "lon": -122.585297,
+      "name": "Toll Fire",
+      "page_sha256": "afb3036b26d8eb4d86819976e095964658192dd642e4a47927ec53b717e8eb9f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/toll-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/2/yolla-fire",
+      "lat": 40.386141,
+      "lon": -122.760479,
+      "name": "Yolla Fire",
+      "page_sha256": "09f3b70604195387120456d80f76a8236885b509f931ff65d7ebe6d64a226138",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/2/yolla-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/20/coyote-fire",
+      "lat": 38.031044,
+      "lon": -120.852597,
+      "name": "Coyote Fire",
+      "page_sha256": "a51836c98788087643d518c0d923bdffea844553a8c6b39f5cef17189cf08a84",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/20/coyote-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/20/peach-fire",
+      "lat": 36.1933173,
+      "lon": -120.777302,
+      "name": "Peach Fire",
+      "page_sha256": "68779871bf45f15c2529925a0e543f49d012d881ab907519e15b2a220b2fcb4a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/20/peach-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/20/ridge-fire",
+      "lat": 39.0329124,
+      "lon": -122.457217,
+      "name": "Ridge Fire",
+      "page_sha256": "ea454861a6299cb4538d2dcb4375a37b56c7ed30a2a55317362a50346268230e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/20/ridge-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/20/rios-fire",
+      "lat": 39.635533,
+      "lon": -123.344954,
+      "name": "Rios Fire",
+      "page_sha256": "02c60ea28f4cdf319593deaf1f17066b47baa58b89e7e72ab98f81f262737e2b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/20/rios-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/20/tin-fire",
+      "lat": 33.847742,
+      "lon": -117.461546,
+      "name": "Tin Fire",
+      "page_sha256": "b95c940e46fcbf862b2d1e21c06029053a5b61b2990b64e4345b71ee632401cd",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/20/tin-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/21/canyon-fire",
+      "lat": 37.47012,
+      "lon": -121.24303,
+      "name": "Canyon Fire",
+      "page_sha256": "9407a6853986c39cdce557c1b06b40611796aca53f1a24eddafb15e9abd2c596",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/21/canyon-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/21/eagle-fire",
+      "lat": 33.824352,
+      "lon": -117.502905,
+      "name": "Eagle Fire",
+      "page_sha256": "dd24e807683735d6790f6241c5eafcdc5f918c451963b7757e713dbae48d1912",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/21/eagle-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/21/hawarden-fire",
+      "lat": 33.9278521,
+      "lon": -117.3727011,
+      "name": "Hawarden Fire",
+      "page_sha256": "4a8029827affda3a463c027c72b797d7da06215ae308eb778ccab99088ea0aba",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/21/hawarden-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/21/wasioja-fire",
+      "lat": 34.9842984,
+      "lon": -119.782853,
+      "name": "Wasioja Fire",
+      "page_sha256": "6db4ee14fb9da6ed679c962006ab65bd6c55b293f8dde140866c311f6c155697",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/21/wasioja-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/22/columbia-fire",
+      "lat": 33.999524,
+      "lon": -117.32122,
+      "name": "Columbia Fire",
+      "page_sha256": "644c146fdb6b92bbfdd2c57fc7fb6ba36a8ef3062816465bee43ef8365eb92b9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/22/columbia-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/22/gold-complex",
+      "lat": 39.726014,
+      "lon": -120.535158,
+      "name": "Gold Complex",
+      "page_sha256": "e7a1dc4c3a724ec5dc3ca422ef50fef0bc92c4306075c78486624ca107646375",
+      "published_start_local": "07/22/2024 2:34 PM",
+      "start_utc_interpreted": "2024-07-22T21:34:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/22/gold-complex"
+    },
+    {
+      "archive_path": "/incidents/2024/7/22/juniper-fire",
+      "lat": 33.757839,
+      "lon": -117.112942,
+      "name": "Juniper Fire",
+      "page_sha256": "2f769ebff8ca73c3d7b24aff00833ed958cea95acbadd890e7a3395c58f8cdca",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/22/juniper-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/22/pencil-fire",
+      "lat": 41.80078,
+      "lon": -120.519727,
+      "name": "Pencil Fire",
+      "page_sha256": "5579f14633e89e903d9bf65a4e5b6a5594c8de8a0113ba05b74057885ef7fb66",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/22/pencil-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/22/tar-fire",
+      "lat": 35.960403,
+      "lon": -120.154889,
+      "name": "Tar Fire",
+      "page_sha256": "3ad87cc905bbfa588b9b23c269f31e71908fe0e23c0183ac4c468337de7fe99c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/22/tar-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/acres-fire",
+      "lat": 37.081853,
+      "lon": -120.074549,
+      "name": "Acres Fire",
+      "page_sha256": "200a00fa43931a6b5948c7d17b035d0a987f72c0ee49af64cf5325796df99b97",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/acres-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/beaver-fire",
+      "lat": 36.362544,
+      "lon": -120.802733,
+      "name": "Beaver Fire",
+      "page_sha256": "86c73c55eee992334d2e8bfcc4b63e439d77c31c469fd13ef5a2291a232e5efd",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/beaver-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/border-63-fire",
+      "lat": 32.59738,
+      "lon": -116.568589,
+      "name": "Border 63 Fire",
+      "page_sha256": "6e15ee0ef62a064c91374b9f9500f37e87daedb25ce40487d827ca17e0bbbc41",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/border-63-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/circle-fire",
+      "lat": 37.152487,
+      "lon": -119.65963,
+      "name": "Circle Fire",
+      "page_sha256": "f2217e62e41cd37e2fd335749b661a3cd026ac55b2a18d6dacb1a7c49efc9638",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/circle-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/cow-camp-fire",
+      "lat": 38.300167,
+      "lon": -119.074167,
+      "name": "Cow Camp Fire",
+      "page_sha256": "1b2a04c8f742f5820741c42b3d62958757fcd8f0ddf7d16aae7935612579579f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/cow-camp-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/harry-fire",
+      "lat": 41.673939,
+      "lon": -122.369802,
+      "name": "Harry Fire",
+      "page_sha256": "6b470a5cec7bb4ab682b4ce631dc51d20a1ce39b1468c92be2abf4a930611787",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/harry-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/maria-fire",
+      "lat": 38.2856696,
+      "lon": -120.656662,
+      "name": "Maria Fire",
+      "page_sha256": "56d6e8d913ca984fb069a957fa9d7332a8a117cdf5742d4c4ccc55f0ec32c2a1",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/maria-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/metz-fire",
+      "lat": 36.3404047,
+      "lon": -121.199629,
+      "name": "Metz Fire",
+      "page_sha256": "30af9f53a9a371d84169a17fe2dd5dc7fc23bb40b4f34e0372a1cfbe2cbf1253",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/metz-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/oakdale-fire",
+      "lat": 37.430142,
+      "lon": -120.541611,
+      "name": "Oakdale Fire",
+      "page_sha256": "84412b3b9b40bb9efa7dc26c41272a6514f9a315b2b8ff023ab0952bd7a6eaa0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/oakdale-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/23/r-6-fire",
+      "lat": 40.914833,
+      "lon": -120.0485,
+      "name": "R-6 Fire",
+      "page_sha256": "5d3e9ed56e40962f49a3fda80a95645709f51d78294140ff818039823ae35073",
+      "published_start_local": "07/23/2024 8:18 PM",
+      "start_utc_interpreted": "2024-07-24T03:18:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/23/r-6-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/borel-fire",
+      "lat": 35.515,
+      "lon": -118.6836,
+      "name": "Borel Fire",
+      "page_sha256": "611ef5607658417c32dcedb8ba8a9b923d0f29dd7cb9b55e563680b07c61bb6b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/borel-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/bullion-fire",
+      "lat": 37.51019,
+      "lon": -120.046081,
+      "name": "Bullion Fire",
+      "page_sha256": "79edb1aa757ab41ee767a79d4d770d79dc2a7d03f7d9666741ac034a0ffd6b30",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/bullion-fire/"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/flora-fire",
+      "lat": 38.590922,
+      "lon": -122.768983,
+      "name": "Flora Fire",
+      "page_sha256": "f0bd99db71e15b8626114ba50ada8d6b4967e0ca51e1a954c202554dd478a308",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/flora-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/grove-2-fire",
+      "lat": 33.409448,
+      "lon": -116.741601,
+      "name": "Grove 2 Fire",
+      "page_sha256": "c7edeb215b5413c871d8838f29d94e01adfa7f2eb50bc55adbc13361b1aaa644",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/grove-2-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/horse-fire",
+      "lat": 41.742143,
+      "lon": -121.304529,
+      "name": "Horse Fire",
+      "page_sha256": "6a32f2a11be31b19bd3dedb9c28b29394cef4665c51bddf380d5321495c2c9b5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/horse-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/park-fire",
+      "lat": 39.7789,
+      "lon": -121.76168,
+      "name": "Park Fire",
+      "page_sha256": "77f902f04af9d6749518ade36b79c4be485cea962768b48d4089aa04b326fef0",
+      "published_start_local": "07/24/2024 2:52 PM",
+      "start_utc_interpreted": "2024-07-24T21:52:00Z",
+      "status": "selected-illustration-excluded-from-evaluation",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/park-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/pentz-fire",
+      "lat": 39.638817,
+      "lon": -121.680996,
+      "name": "Pentz Fire",
+      "page_sha256": "5c44d3a7b675731331fa17576015a0aeb94a715737e98102db0877d7c3ca9a9e",
+      "published_start_local": "07/24/2024 7:33 PM",
+      "start_utc_interpreted": "2024-07-25T02:33:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/pentz-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/24/scales-fire",
+      "lat": 40.356228,
+      "lon": -122.283667,
+      "name": "Scales Fire",
+      "page_sha256": "5f8a1922a38d2b0be8c4dac04801996304ccf2d7fbc2393e4069b587a965a004",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/24/scales-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/acorn-fire",
+      "lat": 39.140133,
+      "lon": -122.87667,
+      "name": "Acorn Fire",
+      "page_sha256": "41aff04bed471f9cd22fcc5f8acb47223642459446d6922445f8c4aa9dc2947d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/acorn-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/flynn-fire",
+      "lat": 37.724532,
+      "lon": -121.69605,
+      "name": "Flynn Fire",
+      "page_sha256": "0df89edc3f7a45cdb1632261c17a336462bc3b66d931f0644ce76b33b976df9a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/flynn-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/hatchett-fire",
+      "lat": 35.99271,
+      "lon": -118.934596,
+      "name": "Hatchett Fire",
+      "page_sha256": "2b2e1e193f2c75777dce7ccaa024a80b2cab26808ab841ac271791396ea4bc8a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/hatchett-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/lawton-fire",
+      "lat": 34.042687,
+      "lon": -117.26745,
+      "name": "Lawton Fire",
+      "page_sha256": "73857af38763949bb4caac777fdc599108db29a187ff24d70028bef2fb938a62",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/lawton-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/macy-fire",
+      "lat": 33.656742,
+      "lon": -117.383235,
+      "name": "Macy Fire",
+      "page_sha256": "df06452051572809b3367047953e123cc97aff47bada2a423f5f2700479d5cb5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/macy-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/25/simpson-fire",
+      "lat": 36.98268,
+      "lon": -118.61484,
+      "name": "Simpson Fire",
+      "page_sha256": "afc593a70e290852622c4573ce418251f8b962fad36e0e7a80c81a895d534a35",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/25/simpson-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/26/creek-fire",
+      "lat": 37.515462,
+      "lon": -121.830534,
+      "name": "Creek Fire",
+      "page_sha256": "900585eebf61669ff18016e8bf0e237718ed0f4c5911af5e81618ebcd33fb07e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/26/creek-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/26/dockery-fire",
+      "lat": 36.573716,
+      "lon": -119.601794,
+      "name": "Dockery Fire",
+      "page_sha256": "aed457dab67b7b144463caa24cc617ff2d28caa65d38cb9280b4c97ea11bae4c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/26/dockery-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/26/lammers-fire",
+      "lat": 37.7146,
+      "lon": -121.4764,
+      "name": "Lammers Fire",
+      "page_sha256": "ff76d35270d067c3980c37967aad89469bfcda57392acdfe521573b9fc554354",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/26/lammers-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/26/point-fire",
+      "lat": 38.02175,
+      "lon": -121.99056,
+      "name": "Point Fire",
+      "page_sha256": "ea6264ed42aabe8fb47fc09442436b3ce211a06bf6ab4519f204d007b3ac874a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/26/point-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/26/victoria-fire",
+      "lat": 34.50523,
+      "lon": -118.245656,
+      "name": "Victoria Fire",
+      "page_sha256": "4437043c20e55297792e81d32460e0dc0b89253a200f5c74fef368b6a7beeb58",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/26/victoria-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/27/cosgrove-fire",
+      "lat": 38.222987,
+      "lon": -120.802822,
+      "name": "Cosgrove Fire",
+      "page_sha256": "8af8cfce000fffce8e7a2376cd8e7b0ea63907662f3ca5d9a7bcde1f547793c4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/27/cosgrove-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/27/museum-fire",
+      "lat": 33.856642,
+      "lon": -117.204108,
+      "name": "Museum Fire",
+      "page_sha256": "5f8c1b87a8ab809d68028e3158544df554fe182768388d7d60029c296b4601ec",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/27/museum-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/27/riley-fire",
+      "lat": 39.418982,
+      "lon": -123.590238,
+      "name": "Riley Fire",
+      "page_sha256": "3ee4ab7d1ba0d92577a51c58de62ccf78a4fc80e3830a4b585a8ce34a2312e52",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/27/riley-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/27/walnut-fire",
+      "lat": 33.826534,
+      "lon": -117.257982,
+      "name": "Walnut Fire",
+      "page_sha256": "9f0538b507c3a6ea74d7e44825aebedf2bf2c7f15faacc0f9f565b8dc3f1be19",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/27/walnut-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/28/border-65-fire",
+      "lat": 32.576716,
+      "lon": -116.699961,
+      "name": "Border 65 Fire",
+      "page_sha256": "949f219a9acbd45a64f0dc4cf44995e2363cc1b08150d96903dcaebb4c707a39",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/28/border-65-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/28/sunset-fire",
+      "lat": 40.368506,
+      "lon": -124.362017,
+      "name": "Sunset Fire",
+      "page_sha256": "f48bcbf4b55a14a9e65e8a3955ac1e6bbaf116a081bbec447dd469d33835c899",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/28/sunset-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/28/walker-fire",
+      "lat": 33.731572,
+      "lon": -117.393766,
+      "name": "Walker Fire",
+      "page_sha256": "ff156288b6ae7fc0c126ec1fac11f6bf10f084525f67262d480f5176be85d68a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/28/walker-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/29/carmen-fire",
+      "lat": 33.910649,
+      "lon": -116.782856,
+      "name": "Carmen Fire",
+      "page_sha256": "c4ba4fcf5f73cde71ecd15cc77860e5bfbd25ef5d4994acc84b01a0261ab1d5d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/29/carmen-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/29/cougar-fire",
+      "lat": 40.002008,
+      "lon": -122.404759,
+      "name": "Cougar Fire",
+      "page_sha256": "79e02b8d07587ce7fc3b776d487b02a0e2dec35788e8b1a2756fa623a1b19736",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/29/cougar-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/29/italian-fire",
+      "lat": 37.1336,
+      "lon": -119.394,
+      "name": "Italian Fire",
+      "page_sha256": "40740368a3e81815370b62864961e762556dfd0110a9b29f1c508c7fdce4fb1c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/29/italian-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/29/nixon-fire",
+      "lat": 33.4773,
+      "lon": -116.7805,
+      "name": "Nixon Fire",
+      "page_sha256": "dcbc485d0eae5b54236bb5e1e808d248f1331ab8ca8172ba2267d3dbdd001db3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/29/nixon-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/adams-fire",
+      "lat": 38.91033,
+      "lon": -122.607362,
+      "name": "Adams Fire",
+      "page_sha256": "2f1a72ee2f2fa2297231034f7e7a4cc637d4abc9eaf644d6013998a08dc89e42",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/adams-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/adrian-fire",
+      "lat": 34.573279,
+      "lon": -118.1935,
+      "name": "Adrian Fire",
+      "page_sha256": "a84e2268928377d04ae14ed1a15201c9e65bca6136ddd20f806d489205ea6a80",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/adrian-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/berry-fire",
+      "lat": 35.633333,
+      "lon": -118.816667,
+      "name": "Berry Fire",
+      "page_sha256": "7c7cf869e8ce00eec48d3e28579cb9df86b33bd8fb64a8a6f62f46bc6d939ca3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/berry-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/grubbs-fire",
+      "lat": 39.43511,
+      "lon": -121.507399,
+      "name": "Grubbs Fire",
+      "page_sha256": "5e0df90c526563fea3d3d6e1d5fab64a249d8503d88631abe7f2c2a5c9320fd9",
+      "published_start_local": "07/03/2024 5:17 PM",
+      "start_utc_interpreted": "2024-07-04T00:17:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/grubbs-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/little-fire",
+      "lat": 36.786172,
+      "lon": -120.757128,
+      "name": "Little Fire",
+      "page_sha256": "76b6495803c4fb37fa1e6938481335b55cbfb117413115cd805f117afb43144f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/little-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/olinda-fire",
+      "lat": 40.439362,
+      "lon": -122.415486,
+      "name": "Olinda Fire",
+      "page_sha256": "e31beba95f092bb86ce88d155eee0a0941601221351db22b45211e3e6d0bd734",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/olinda-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/olive-fire",
+      "lat": 35.612809,
+      "lon": -119.9569496,
+      "name": "Olive Fire",
+      "page_sha256": "c316435413db18d944542f68d754c078782cf21a6d630d598ce95729d1f212c5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/olive-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/orchard-fire",
+      "lat": 35.10995,
+      "lon": -118.3970832,
+      "name": "Orchard Fire",
+      "page_sha256": "7610fe8191b042cba6f73debe236fe36d27759da54c85f67c9a3ca2d9402dfd9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/orchard-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/sharp-fire",
+      "lat": 34.294625,
+      "lon": -118.742209,
+      "name": "Sharp Fire",
+      "page_sha256": "6ad177d9e2ad1f4a38312fbc4ed203916721c57fe591407b9761d506ed006ab7",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/sharp-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/shelly-fire",
+      "lat": 41.465297,
+      "lon": -123.057551,
+      "name": "Shelly Fire",
+      "page_sha256": "f6682b0affdd262107111ff482badb22e26c3b87d4b47fa7987b5fd224b88978",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/shelly-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/slough-fire",
+      "lat": 38.493205,
+      "lon": -121.161253,
+      "name": "Slough Fire",
+      "page_sha256": "2cbf42c4e78cf183dc60191529efe6a1d6071093b5583e0aacf8b891e5c7b231",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/slough-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/3/watt-fire",
+      "lat": 38.736113,
+      "lon": -121.392532,
+      "name": "Watt Fire",
+      "page_sha256": "9aeb9596fe20ccb588017d292c2e8903d4d11cbf0003d6459d46a525647b54ad",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/3/watt-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/30/border-66-fire",
+      "lat": 32.5736,
+      "lon": -116.6961,
+      "name": "Border 66 Fire",
+      "page_sha256": "621589a126b063cc33368a057150156b83202f97d387865359c9efc892b1ac66",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/30/border-66-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/30/eagle-fire",
+      "lat": 35.7205881,
+      "lon": -120.561774,
+      "name": "Eagle Fire",
+      "page_sha256": "349a33d931b6f8111dd341bc590ef8c131a1312ee7db796687cab0cc61a7f8c9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/30/eagle-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/30/pedro-fire",
+      "lat": 37.689773,
+      "lon": -120.31848,
+      "name": "Pedro Fire",
+      "page_sha256": "e65e4ad9049f09511eb38cb47758c1468950e5148f66e00cc1eab9dadcfeee7a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/30/pedro-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/30/pole-fire",
+      "lat": 34.413261,
+      "lon": -117.172494,
+      "name": "Pole Fire",
+      "page_sha256": "e74c48e3b40172d7817030207f11df7457e16afb81fdd8138e44b2c7dac104fb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/30/pole-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/31/dino-fire",
+      "lat": 37.068124,
+      "lon": -121.213195,
+      "name": "Dino Fire",
+      "page_sha256": "ba6688ba7ce7e70ee3d0f662c0f828eb63c498313dfe79226096a5263b01d663",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/31/dino-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/deer-fire",
+      "lat": 40.2003,
+      "lon": -122.30328,
+      "name": "Deer Fire",
+      "page_sha256": "73a04eb94164007a9ddbfe91b8d68822f90ae46021686680397b8c50776d2213",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/deer-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/french-fire",
+      "lat": 37.50959,
+      "lon": -119.9771,
+      "name": "French Fire",
+      "page_sha256": "a517cfc57faf800f8858c5ba614d1f042f5100a5603aeffdb3513a8eb6835b5a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/french-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/grande-fire",
+      "lat": 37.46973,
+      "lon": -121.23728,
+      "name": "Grande Fire",
+      "page_sha256": "f86727fbcd621c382b34b46261c7d67dabc28f4788419b79e1c22c45c6aa26e0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/grande-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/highway-fire",
+      "lat": 35.25322,
+      "lon": -119.2071,
+      "name": "Highway Fire",
+      "page_sha256": "f80693c8ccd7615c240bc54b21dad62536cbfb1a16eefbe7902e01608a5ca5aa",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/highway-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/lumpkin-fire",
+      "lat": 39.54992,
+      "lon": -121.35037,
+      "name": "Lumpkin Fire",
+      "page_sha256": "3891f1f0897845183e7f3e2c1667d3cec1789f236e13f0d56c91643d3b09b83e",
+      "published_start_local": "07/04/2024 9:15 PM",
+      "start_utc_interpreted": "2024-07-05T04:15:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/lumpkin-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/meiss-fire",
+      "lat": 38.483838,
+      "lon": -121.074404,
+      "name": "Meiss Fire",
+      "page_sha256": "725438ad230f32005fd46a28f1b78a89676e78a012f6f381e9516c378b52024b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/meiss-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/nason-fire",
+      "lat": 33.928252,
+      "lon": -117.191529,
+      "name": "Nason Fire",
+      "page_sha256": "a11d16824953ca6382d99045c3ca9480cdfc7ccefb9c79cfe134f802bf72cc98",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/nason-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/rd-18-75-ave-24-fire",
+      "lat": 37.09824,
+      "lon": -120.206748,
+      "name": "Rd 18.75 / Ave 24 Fire",
+      "page_sha256": "9fb1be5fdab5e824770cc1e92f51938437cb675625c93eb972f5c85e71ae82b4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/rd-18-75-ave-24-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/sonora-fire",
+      "lat": 34.50711,
+      "lon": -117.5124,
+      "name": "Sonora Fire",
+      "page_sha256": "afdd7c954cda96caff3f67f1327d420b09da03c997e427c77223fb2e23e7f9c8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/sonora-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/sotelo-fire",
+      "lat": 33.72325,
+      "lon": -117.23049,
+      "name": "Sotelo Fire",
+      "page_sha256": "6d63b4cdc81009bbe705017374f181e66e3fb92b22e9f949ebf37d9e75f463bb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/sotelo-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/4/storey-fire",
+      "lat": 36.974414,
+      "lon": -120.032252,
+      "name": "Storey Fire",
+      "page_sha256": "8cfd89390b29369aab9658c76cf09c4815d3c7c9cae7eb61bffd996ff761ebe0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/4/storey-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/dersch-fire",
+      "lat": 40.494374,
+      "lon": -122.04948,
+      "name": "Dersch Fire",
+      "page_sha256": "7e73e0ff23ea9710b030e58b316984065e1d148a806083e035e567a2f696fd40",
+      "published_start_local": "07/05/2024 10:52 AM",
+      "start_utc_interpreted": "2024-07-05T17:52:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/dersch-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/hills-fire",
+      "lat": 33.757944,
+      "lon": -117.113903,
+      "name": "Hills Fire",
+      "page_sha256": "67977adc6119bcd4bda81533b98918dc45ac8f1ab015f1a8d0f775d8601e7b94",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/hills-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/lake-fire",
+      "lat": 34.785,
+      "lon": -120.044833,
+      "name": "Lake Fire",
+      "page_sha256": "bf2741b33d5de285b2b4223977c380fc420ea24a4f62c36e632c9c73fecf1947",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/lake-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/paloma-fire",
+      "lat": 37.396908,
+      "lon": -120.460411,
+      "name": "Paloma Fire",
+      "page_sha256": "6b0709994edf57f67593a3d8b5f512af9bfbf9606f490eca746b510baee18741",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/paloma-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/plenty-fire",
+      "lat": 34.4792756,
+      "lon": -118.506107,
+      "name": "Plenty Fire",
+      "page_sha256": "d57f186aa947a32e1ec7d95ecefc6ff3f2cb66ee70f29bbaea47218b6216d26c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/plenty-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/rancho-fire",
+      "lat": 34.173631,
+      "lon": -118.853661,
+      "name": "Rancho Fire",
+      "page_sha256": "d8c9d02072897a2b84e830de7643b08099f7a407c751894b400623e239dcf160",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/rancho-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/vestal-fire",
+      "lat": 40.200879,
+      "lon": -122.539089,
+      "name": "Vestal Fire",
+      "page_sha256": "213ee53d9c8ed74e3ced663591ed81f35422359b6e91f79c460e7a00f9e872fb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/vestal-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/5/york-fire",
+      "lat": 35.82553,
+      "lon": -120.05765,
+      "name": "York Fire",
+      "page_sha256": "af1290adb606654eca450f5166e534712c095d23ce23cb9667c32a01f4d1f684",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/5/york-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/blue-water-fire",
+      "lat": 34.169517,
+      "lon": -114.276308,
+      "name": "Blue Water Fire",
+      "page_sha256": "0348e7564d9e388f7f505ab34075cc7b5ec60b2a911fd738b7e761ad8ddd7074",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/blue-water-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/cahuilla-fire",
+      "lat": 34.5444065,
+      "lon": -117.131163,
+      "name": "Cahuilla Fire",
+      "page_sha256": "f407eca8b91ea2fe2b4d6ca5132d53c9cd7e55addce5453dfc75207366a7a089",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/cahuilla-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/granite-fire",
+      "lat": 37.7133123,
+      "lon": -120.325444,
+      "name": "Granite Fire",
+      "page_sha256": "f77785f43875fdbd293b505db059d0d3cd36800af41df2bed634825f45faecdf",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/granite-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/lucern-fire",
+      "lat": 34.45196,
+      "lon": -117.03341,
+      "name": "Lucern Fire",
+      "page_sha256": "24d0ea76d1f5b14d656989b999573de38748366cffe84a664709efd5e3d01509",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/lucern-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/pay-fire",
+      "lat": 38.7231,
+      "lon": -120.7549,
+      "name": "Pay Fire",
+      "page_sha256": "28d3fc8f64e14ebf568484e3da9a9dc0566bdd49790a89c14e4e991965630735",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/pay-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/pocket-fire",
+      "lat": 38.742834,
+      "lon": -122.907373,
+      "name": "Pocket Fire",
+      "page_sha256": "78266738b5e9a023f491cdffbc5ebe3bd2b1a74cf58de35a0cfbd1324ffc94de",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/pocket-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/top-fire",
+      "lat": 33.964275,
+      "lon": -117.3048,
+      "name": "Top Fire",
+      "page_sha256": "0aa31be3a953c5bcd304410d73429129ff5b91bad7fcfd52b2a6cd75e85699c1",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/top-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/6/view-fire",
+      "lat": 34.19518,
+      "lon": -118.90918,
+      "name": "View Fire",
+      "page_sha256": "1da74243577e6613db5de3b2783c1b77cb9c0c0a8459f339d5e736971f0602f0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/6/view-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/7/hilldale-fire",
+      "lat": 37.081199,
+      "lon": -120.998125,
+      "name": "Hilldale Fire",
+      "page_sha256": "1851f3745366ba3a51d0f168fef58b5ca67b17817808f0c82a4d34332c093c81",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/7/hilldale-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/7/north-fire",
+      "lat": 41.256864,
+      "lon": -120.503588,
+      "name": "North Fire",
+      "page_sha256": "3e0829caf2bf38394e19d2fac01fefb20ad3e966ec057e2b525ab66112e7660d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/7/north-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/7/post-fire",
+      "lat": 33.788907,
+      "lon": -117.293584,
+      "name": "Post Fire",
+      "page_sha256": "6e59493b08a55820f9ae94482ade00f4642628ca03e8f0b4f943e0d6ff526bfd",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/7/post-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/7/royal-fire",
+      "lat": 39.2393,
+      "lon": -120.4168,
+      "name": "Royal Fire",
+      "page_sha256": "87adb7c17da631b2ed2becc01203f56ac6025f1f7e655746b3595f8e3cb0c547",
+      "published_start_local": "07/07/2024 4:09 PM",
+      "start_utc_interpreted": "2024-07-07T23:09:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/7/royal-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/7/vista-fire",
+      "lat": 34.292101,
+      "lon": -117.606101,
+      "name": "Vista Fire",
+      "page_sha256": "eee112190b46967cf7f4a2178735f91354aa61cee0e251ad9022e345fe552283",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/7/vista-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/bogus-fire",
+      "lat": 41.884429,
+      "lon": -122.392257,
+      "name": "Bogus Fire",
+      "page_sha256": "17554ac30a6b580ea4897cce13f3351d4e3c46fe4b151ff35f8ff270b87df811",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/bogus-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/caliente-fire",
+      "lat": 35.273067,
+      "lon": -118.651434,
+      "name": "Caliente Fire",
+      "page_sha256": "4b3959d723ed26b1133a489e02bd9da6fce31e30eda8edb21aad825dd7097498",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/caliente-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/franklin-fire",
+      "lat": 35.591462,
+      "lon": -120.645939,
+      "name": "Franklin Fire",
+      "page_sha256": "ccd1ce4b83913c5134d95fd176fb0a8842c2710ec322a64bdbf3a4d2df28d308",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/franklin-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/mina-fire",
+      "lat": 39.970543,
+      "lon": -123.38746,
+      "name": "Mina Fire",
+      "page_sha256": "c2fe89b93c01b0ad62aada54a1934313380d8dd571ddfe5bd930c8f160413ceb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/mina-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/sand-fire",
+      "lat": 36.640352,
+      "lon": -119.242623,
+      "name": "Sand Fire",
+      "page_sha256": "b547e644389ce30bfebd2a8af5259d4c9bca99b6bc00c1fef71b19e7d636d2d3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/sand-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/8/tesla-fire",
+      "lat": 37.66504,
+      "lon": -121.696665,
+      "name": "Tesla Fire",
+      "page_sha256": "96c2a04e6ff1350a80e62bff652bf754339c728fc9b95114f5d6324909304608",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/8/tesla-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/9/breckenridge-fire",
+      "lat": 34.400099,
+      "lon": -118.783698,
+      "name": "Breckenridge Fire",
+      "page_sha256": "e7a66928ff7e65d2caa009027e2b08c6e4f992fc1154cb0779fe335b9cb14d4b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/9/breckenridge-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/9/cow-2-fire",
+      "lat": 36.026333,
+      "lon": -118.801528,
+      "name": "Cow 2 Fire",
+      "page_sha256": "917cb1a8e2ca1c4cd7d09ebe390917cf238baf6662860cb644f899474ec84abe",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/9/cow-2-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/9/panoche-fire",
+      "lat": 36.6067,
+      "lon": -120.8765,
+      "name": "Panoche Fire",
+      "page_sha256": "2d9f026e0b4edb532577bb7d464f457fe582fea455cebba8b9d190d8aa35871f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/9/panoche-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/9/teresa-fire",
+      "lat": 37.201128,
+      "lon": -121.736403,
+      "name": "Teresa Fire",
+      "page_sha256": "e4d9ee74ee6ebb2b1f2b079ee0facd5874b9fabacdb5e9846e3b986b1be90d77",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/9/teresa-fire"
+    },
+    {
+      "archive_path": "/incidents/2024/7/9/todd-fire",
+      "lat": 34.7192091,
+      "lon": -118.023431,
+      "name": "Todd Fire",
+      "page_sha256": "c12a8966adf1505eb3048fc089ed42d6ae6f6755f9351b703f500eb03fe5062c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2024/7/9/todd-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/1/brown-fire",
+      "lat": 38.430903,
+      "lon": -122.045526,
+      "name": "Brown Fire",
+      "page_sha256": "81ef2ba3521fc13da7c167baabeb3b61b8294e3b25fd47863c99f21aa80a6266",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/1/brown-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/1/green-fire",
+      "lat": 40.834939,
+      "lon": -122.094146,
+      "name": "Green Fire",
+      "page_sha256": "1d83a9ebd70e0b02ad0c7d1413d9fc38faf42ea25ed420f70fa4608e01c6b857",
+      "published_start_local": "07/01/2025 9:37 PM",
+      "start_utc_interpreted": "2025-07-02T04:37:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/1/green-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/1/no-name-fire",
+      "lat": 41.7585,
+      "lon": -123.2135,
+      "name": "No Name Fire",
+      "page_sha256": "ad7c71863bfcf7c8f191f1f40850fba1f8f479c0078916ede2b0d6f88becee88",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/1/no-name-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/1/oakdale-fire",
+      "lat": 38.673273,
+      "lon": -122.017383,
+      "name": "Oakdale Fire",
+      "page_sha256": "b48b8411b5eaca98571c2116b6a5b2a394974883f15c10b45314f526b93160ea",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/1/oakdale-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/1/peak-fire",
+      "lat": 36.523445,
+      "lon": -118.894072,
+      "name": "Peak Fire",
+      "page_sha256": "3077903a3bf4b265170e86f78de5895d9570a121ceebae73dbdb0024568497eb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/1/peak-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/10/kirker-fire",
+      "lat": 37.982895,
+      "lon": -121.898942,
+      "name": "Kirker Fire",
+      "page_sha256": "896e7414f78fe4a5cda6b0601a1bf261dfb39428b249f2173f859d66741c145e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/10/kirker-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/10/madera-fire",
+      "lat": 33.50064,
+      "lon": -117.01089,
+      "name": "Madera Fire",
+      "page_sha256": "7bd1916900b4c32c59a553a8be2767a6676d0a78eba6ef685f9c9a7b535a41c4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/10/madera-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/10/moore-fire",
+      "lat": 38.873631,
+      "lon": -121.322879,
+      "name": "Moore Fire",
+      "page_sha256": "9bc3230db5a22ad90630dba509a5420d8fc248bbea4e93f0ad412453d83271d4",
+      "published_start_local": "07/10/2025 12:39 PM",
+      "start_utc_interpreted": "2025-07-10T19:39:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/10/moore-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/10/reche-fire",
+      "lat": 33.95918,
+      "lon": -117.191827,
+      "name": "Reche Fire",
+      "page_sha256": "d783551908f1335383257af1c0629a1e526e3ca0f4d69bf81d99f033abb2548c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/10/reche-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/10/springs-fire",
+      "lat": 32.7145184,
+      "lon": -116.7478188,
+      "name": "Springs Fire",
+      "page_sha256": "bfcfd1fd6eea860c8bb6dc3037b13a07f1c3bad5a595921a0a4769899600b0c2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/10/springs-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/11/parkway-fire",
+      "lat": 38.493586,
+      "lon": -121.09374,
+      "name": "Parkway Fire",
+      "page_sha256": "2d65426fa3d2a68a452cd627b983b11d3aca0d8ef7a07352edf2f7b7337fd8e6",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/11/parkway-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/12/canon-fire",
+      "lat": 38.2986878,
+      "lon": -121.933483,
+      "name": "Canon Fire",
+      "page_sha256": "82d6e1727748ecbe966cff3c139f2816cdab2a4481b3c57acfe67485c36912fb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/12/canon-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/12/island-fire",
+      "lat": 36.864545,
+      "lon": -119.315821,
+      "name": "Island Fire",
+      "page_sha256": "2608604b222ac85f95f1f953a0b748c58b10756b35878b7c4519658e0fc1a613",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/12/island-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/12/scavenger-fire",
+      "lat": 36.226722,
+      "lon": -120.193833,
+      "name": "Scavenger Fire",
+      "page_sha256": "92ccea686380ee93db2442e59474a60144b191397d1475bff8199ea937452dc5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/12/scavenger-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/12/stardust-fire",
+      "lat": 38.882558,
+      "lon": -121.247136,
+      "name": "Stardust Fire",
+      "page_sha256": "8f4ccccf9fdca8d95fb5b60d909665ba934b8139240f4c82c15ce726fa3f500c",
+      "published_start_local": "07/12/2025 1:08 PM",
+      "start_utc_interpreted": "2025-07-12T20:08:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/12/stardust-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/13/chowchilla-fire",
+      "lat": 37.098778,
+      "lon": -120.265957,
+      "name": "Chowchilla Fire",
+      "page_sha256": "9d447d7fccb81c752437d1831d108951ea935a6b318697c74ab2ed643dfc8893",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/13/chowchilla-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/13/ivory-fire",
+      "lat": 39.574,
+      "lon": -122.707,
+      "name": "Ivory Fire",
+      "page_sha256": "6f0ad9495b2871341decf1f05f4e64646523623f9175f46f5c3063dd2f092db3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/13/ivory-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/13/marie-fire",
+      "lat": 36.748969,
+      "lon": -120.369387,
+      "name": "Marie Fire",
+      "page_sha256": "80f69a086824921121590ec3ee2c84823eea7a9e5b14f4f38ac7c7d5bd2363d9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/13/marie-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/13/max-fire",
+      "lat": 36.9646836,
+      "lon": -119.2280383,
+      "name": "Max Fire",
+      "page_sha256": "33a1f70f52dfaddd42d5a8668b209591054f35044e3cd9083372495fde82f6c3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/13/max-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/14/fandango-fire",
+      "lat": 41.79792,
+      "lon": -120.19432,
+      "name": "Fandango Fire",
+      "page_sha256": "3ff69d16b53ddeb0395389367d3e79f1dc2c58ce29df30e80a74a9b09ffbb85c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/14/fandango-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/14/jefferson-fire",
+      "lat": 36.654009,
+      "lon": -120.315699,
+      "name": "Jefferson Fire",
+      "page_sha256": "ba08f75b5c33104de26106751344a47f7bde40727895d6b2722d9452b842d19e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/14/jefferson-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/15/fay-fire",
+      "lat": 35.7349929,
+      "lon": -118.3068082,
+      "name": "Fay Fire",
+      "page_sha256": "c424ada5e284f8b7cc1d99efa9ef9ffeca0b671b574b38e824552f893fed9453",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/15/fay-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/15/fobes-fire",
+      "lat": 33.636667,
+      "lon": -116.634361,
+      "name": "Fobes Fire",
+      "page_sha256": "79b731450597940f03a4acafdabe902fb6c575c63ce9aa675e6a9e72bdc903e4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/15/fobes-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/15/high-fire",
+      "lat": 36.66331,
+      "lon": -119.786,
+      "name": "High Fire",
+      "page_sha256": "53584fe49a4c29beb34aa2a0f1a7b8a2955491605487526596c502f2fcfdbfac",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/15/high-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/15/piedra-fire",
+      "lat": 36.745812,
+      "lon": -119.450866,
+      "name": "Piedra Fire",
+      "page_sha256": "70d2984060f12f6c8ed1508560c0d3a018af315efc48c95f5d839f673e04c0ec",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/15/piedra-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/16/baker-fire",
+      "lat": 40.3125,
+      "lon": -122.578667,
+      "name": "Baker Fire",
+      "page_sha256": "21893753d7fc1376b950d55ac8e39f3bcb317ac512568cda5362b4448b25453c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/16/baker-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/16/dale-fire",
+      "lat": 33.51744,
+      "lon": -116.78672,
+      "name": "Dale Fire",
+      "page_sha256": "5684ff70346eb5d4cd919129218b87cd842c3d3a25f9b74230465a7153fa3786",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/16/dale-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/16/debbie-fire",
+      "lat": 40.092913,
+      "lon": -120.111242,
+      "name": "Debbie Fire",
+      "page_sha256": "59df79a74f89666cd12bc2333c310ddc8dff5e3b54f6bbc6216427413eaf671f",
+      "published_start_local": "07/16/2025 4:20 PM",
+      "start_utc_interpreted": "2025-07-16T23:20:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/16/debbie-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/16/foster-fire",
+      "lat": 40.388446,
+      "lon": -122.541885,
+      "name": "Foster Fire",
+      "page_sha256": "49fe8394ceddecbe4b1484ba238674f52deddc0f16ff858b7dc1f57258e810f9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/16/foster-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/16/grain-fire",
+      "lat": 35.91106,
+      "lon": -119.03899,
+      "name": "Grain Fire",
+      "page_sha256": "cb9ed2f5206047326f7255a12bbed2eb874845671447ccfac584f81b7774b021",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/16/grain-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/17/little-fire",
+      "lat": 41.12607,
+      "lon": -120.932333,
+      "name": "Little Fire",
+      "page_sha256": "7c335e39589e99862bf6a6ade0ce901fe1c882b6ff1d17d3147e1899e80a984d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/17/little-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/18/blue-fire",
+      "lat": 35.8649,
+      "lon": -118.8175,
+      "name": "Blue Fire",
+      "page_sha256": "229f2b0895c8e47951bc96edce85a759f0c3b2e554ee5876826ba83ffc50e897",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/18/blue-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/18/stetson-fire",
+      "lat": 33.729228,
+      "lon": -117.076401,
+      "name": "Stetson Fire",
+      "page_sha256": "592648185ded635823698a27748feaa69bc32afa2ddd92186fc67d4379ced4f0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/18/stetson-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/19/coulter-fire",
+      "lat": 38.55184,
+      "lon": -121.004153,
+      "name": "Coulter Fire",
+      "page_sha256": "8dbbb8a418326c9883c042826ff039fcdf038459238b5a66480832fe5026a4b4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/19/coulter-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/19/jury-fire",
+      "lat": 37.916947,
+      "lon": -120.356289,
+      "name": "Jury Fire",
+      "page_sha256": "fed05d289b39e91addb0d4b5c679bd1a560d022326135ba33324eae24fb937e2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/19/jury-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/19/pala-fire",
+      "lat": 33.342918,
+      "lon": -117.114678,
+      "name": "Pala Fire",
+      "page_sha256": "648c7edd338f38e0a47e71add4f598d5062fbb2a1985fe5406a2ae490a067e8a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/19/pala-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/19/willow-fire",
+      "lat": 37.118,
+      "lon": -119.932289,
+      "name": "Willow Fire",
+      "page_sha256": "384eb02b671e90ee10b72e5671dd31d8c8055ce3d8684fe65b2efbb1efe3b668",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/19/willow-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/2/heart-fire",
+      "lat": 36.210429,
+      "lon": -120.085599,
+      "name": "Heart Fire",
+      "page_sha256": "52b7d4a1d312fb5332399ca5a2f7f81b24914e3ecc397118ef8e22ddba3ec4a7",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/2/heart-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/2/helena-fire",
+      "lat": 40.794628,
+      "lon": -123.132571,
+      "name": "Helena Fire",
+      "page_sha256": "7c574b1516a9cbf93b697ded966e7f65e7265ba732cc1e88f83e5f681771e724",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/2/helena-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/2/horse-fire",
+      "lat": 40.87206,
+      "lon": -122.55849,
+      "name": "Horse Fire",
+      "page_sha256": "0cef2158a1a614d851e1ee8d28291edbe8dbc421737dde3f3eb61142fd4e786a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/2/horse-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/2/madre-fire",
+      "lat": 35.099242,
+      "lon": -119.982548,
+      "name": "Madre Fire",
+      "page_sha256": "2bc97fc6fdd55e46922f1c2690e8ff08afab17187777914f97b1b185fa80d631",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/2/madre-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/20/alta-fire",
+      "lat": 39.422347,
+      "lon": -121.470538,
+      "name": "Alta Fire",
+      "page_sha256": "5811cf095a39df6b5bb81d1db7dd7a3ac7c8888ab6bf47868fcccd3b9416c097",
+      "published_start_local": "07/20/2025 12:51 PM",
+      "start_utc_interpreted": "2025-07-20T19:51:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/20/alta-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/20/frontage-fire",
+      "lat": 34.548782,
+      "lon": -117.296674,
+      "name": "Frontage Fire",
+      "page_sha256": "f9234bced656ac6f2a0e68ed767aa88f9b0a406f60c977818fa0125350958e96",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/20/frontage-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/20/trap-fire",
+      "lat": 37.514275,
+      "lon": -120.012292,
+      "name": "Trap Fire",
+      "page_sha256": "4c4f77195f37d366a827657e00df7060f115ecacf45fc533a4d7ff27a96dd7f8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/20/trap-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/21/wolfsen-fire",
+      "lat": 37.211668,
+      "lon": -120.788745,
+      "name": "Wolfsen Fire",
+      "page_sha256": "af79f539b03204c09e15d7304200c2b2a505e77b24ee53aa6e570564ad6388d2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/21/wolfsen-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/22/orange-fire",
+      "lat": 37.789557,
+      "lon": -120.744427,
+      "name": "Orange Fire",
+      "page_sha256": "189d7cc516f7970a9cf7db94528ed7585098c4cbfbf5d699a608814d0a84f71c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/22/orange-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/22/stokes-fire",
+      "lat": 36.518055,
+      "lon": -119.196666,
+      "name": "Stokes Fire",
+      "page_sha256": "f7b1c9c0af913fd1f6621ef36328b0ec65954bad5b14877c54f4514affab0354",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/22/stokes-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/23/euclid-fire",
+      "lat": 33.922339,
+      "lon": -117.64923,
+      "name": "Euclid Fire",
+      "page_sha256": "51a8dddc178b464070a43fc0b0b6982252900bc9c2fea73d3e2c910d469e3889",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/23/euclid-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/23/mitchell-fire",
+      "lat": 33.563156,
+      "lon": -116.695847,
+      "name": "Mitchell Fire",
+      "page_sha256": "df8af9f0965134794e458b6d232686379760d15b67a18114cac9792dcbc7dc7b",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/23/mitchell-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/24/4-1-fire",
+      "lat": 41.459967,
+      "lon": -120.924262,
+      "name": "4-1 Fire",
+      "page_sha256": "514f8fdaf72461aac7d536c62fa949e229bf142529b3443f193fdab6ec7ba3ca",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/24/4-1-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/24/mammoth-fire",
+      "lat": 41.684141,
+      "lon": -121.323879,
+      "name": "Mammoth Fire",
+      "page_sha256": "922f158ceeb86202d3dbafebdd4a45edb5210d5a0ed31ba1b661e3c7997325cb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/24/mammoth-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/24/posta-fire",
+      "lat": 32.667663,
+      "lon": -116.430132,
+      "name": "Posta Fire",
+      "page_sha256": "b962a099f2b75c805b0f67a42f62e7f8a3ce806b0b5868ab304973b8c93f9602",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/24/posta-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/24/sliger-fire",
+      "lat": 38.943781,
+      "lon": -120.926046,
+      "name": "Sliger Fire",
+      "page_sha256": "5881ccee01439acc78adc7da76ad20883c79d25e04b9f566c22e8551afe37b8c",
+      "published_start_local": "07/24/2025 9:25 PM",
+      "start_utc_interpreted": "2025-07-25T04:25:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/24/sliger-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/25/3-5-fire",
+      "lat": 40.9814,
+      "lon": -121.280552,
+      "name": "3-5 Fire",
+      "page_sha256": "b0d2b34220a054f2e591311d5f93c8490fb433fed571a63e3f17e93f7c17189f",
+      "published_start_local": "07/25/2025 5:03 PM",
+      "start_utc_interpreted": "2025-07-26T00:03:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/25/3-5-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/25/green-fire-rru",
+      "lat": 33.882719,
+      "lon": -117.641517,
+      "name": "Green Fire-RRU",
+      "page_sha256": "557ba2a9e8997d40e9a7713d8077c5ae09a62811cb32de58b5d669b9d8a874a0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/25/green-fire-rru"
+    },
+    {
+      "archive_path": "/incidents/2025/7/25/pearl-fire",
+      "lat": 35.6182,
+      "lon": -118.48813,
+      "name": "Pearl Fire",
+      "page_sha256": "ded0bc521d8d877c9938497af6d35fa0d47512aecf2d82f463e02b207665e6e7",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/25/pearl-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/25/shady-fire",
+      "lat": 33.656632,
+      "lon": -116.172565,
+      "name": "Shady Fire",
+      "page_sha256": "207f169cd22930510e73a7151223cd28ddde2d131bb54e193fe8f8f118613afb",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/25/shady-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/25/w-2-fire",
+      "lat": 41.392519,
+      "lon": -120.43839,
+      "name": "W-2 Fire",
+      "page_sha256": "f1f95698164efd4ff4c6d30f66ea1c158c283ee8884a578a2db91b3718ef57f7",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/25/w-2-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/26/boneyard-fire",
+      "lat": 37.773371,
+      "lon": -120.214807,
+      "name": "Boneyard Fire",
+      "page_sha256": "263c7b1c80423b309b48c3b86fb4f10399495c439e8bf8904e4f8f79c2850fe9",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/26/boneyard-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/26/hoffman-fire",
+      "lat": 35.300512,
+      "lon": -118.000889,
+      "name": "Hoffman Fire",
+      "page_sha256": "38c8886b88dfecdd455677c09b144d76794a61b0b3d1d22779b5dc697d248e50",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/26/hoffman-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/27/medicine-fire",
+      "lat": 39.831628,
+      "lon": -123.267618,
+      "name": "Medicine Fire",
+      "page_sha256": "0fa743c0c48666d89fee964424f34226110354cebb70a25fbbbcfb6e25e2b108",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/27/medicine-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/27/needles-fires",
+      "lat": 34.828072,
+      "lon": -114.583454,
+      "name": "Needles Fires",
+      "page_sha256": "bfdd6f747b80cd32fffe4065a36d67b9441e2cc23fc3c298cd3986427227162a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/27/needles-fires"
+    },
+    {
+      "archive_path": "/incidents/2025/7/29/19-fire",
+      "lat": 37.07642,
+      "lon": -120.202377,
+      "name": "19 Fire",
+      "page_sha256": "13fd51f915828f61650a62f6b122c3d5b7f496b345aee8ee05b81a4ee26e2e94",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/29/19-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/3/elwood-fire",
+      "lat": 36.811475,
+      "lon": -119.383467,
+      "name": "Elwood Fire",
+      "page_sha256": "b8ec5eb1035ab9b1d7c5082dcc1722d1e18a2fd75a0ede2059373d700007199d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/3/elwood-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/3/fairmont-fire",
+      "lat": 37.714766,
+      "lon": -122.104671,
+      "name": "Fairmont Fire",
+      "page_sha256": "81fa1d38dbe1dfe5782a1c13de6c45d95193622da92f5cd93f8033414f44567a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/3/fairmont-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/3/marble-complex-fire",
+      "lat": 41.52404,
+      "lon": -123.13222,
+      "name": "Marble Complex Fire",
+      "page_sha256": "f66fd9dd306df04a77a0a0eae33f598aa527319a68520ee0bb6f99dfe0aa2d0f",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/3/marble-complex-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/3/ravine-fire",
+      "lat": 39.064532,
+      "lon": -121.267354,
+      "name": "Ravine Fire",
+      "page_sha256": "4ff9b07d7996b44b5fd0ff20e748995d18a2118d2cfb3ad16106c3430a652ffa",
+      "published_start_local": "07/03/2025 12:40 PM",
+      "start_utc_interpreted": "2025-07-03T19:40:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/3/ravine-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/3/snelling-fire",
+      "lat": 37.471435,
+      "lon": -120.501308,
+      "name": "Snelling Fire",
+      "page_sha256": "9311e861607c41bd5713e4ac46954fab0b60eb98ca3f1e53454d1153a1133fd6",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/3/snelling-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/30/rd-15-madera_acres-fire",
+      "lat": 36.995304,
+      "lon": -120.274202,
+      "name": "Rd 15  Madera_acres Fire",
+      "page_sha256": "6b5554ba2a7aa54ab336699e47c7fdce31c302bca04d9c2d05445cf44304b66c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/30/rd-15-madera_acres-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/31/1-4-fire",
+      "lat": 40.445172,
+      "lon": -120.656672,
+      "name": "1-4 Fire",
+      "page_sha256": "cea794e66d8b413b1bcea1d2fe73ef91a51cf7e09f1e9b78e4927e2ae7cb2fbf",
+      "published_start_local": "07/31/2025 4:15 PM",
+      "start_utc_interpreted": "2025-07-31T23:15:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/31/1-4-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/31/howards-fire",
+      "lat": 41.48008,
+      "lon": -120.957447,
+      "name": "Howards Fire",
+      "page_sha256": "aa53d3db88b17cddfe7fe4116479dd4c159d6100874f5b76a74b0c4cd87d0e77",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/31/howards-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/31/orion-fire",
+      "lat": 34.80493,
+      "lon": -120.53608,
+      "name": "Orion Fire",
+      "page_sha256": "41ac6cf7bbde91a7fe39ff5cb9e54c27db9f2443fdfba9a41e367919e70bc810",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/31/orion-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/chow1-fire",
+      "lat": 37.136643,
+      "lon": -120.226007,
+      "name": "Chow1 Fire",
+      "page_sha256": "0f20557f27f480570ca84960658b4a93bdd270ff1cd4912024ad9345234e4d8d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/chow1-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/cowden-fire",
+      "lat": 36.809334,
+      "lon": -121.390959,
+      "name": "Cowden Fire",
+      "page_sha256": "b328d88b59af7257cad2a807755cfda797eea741ad5d11015e68c7aaade1134e",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/cowden-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/district-fire",
+      "lat": 39.4464985,
+      "lon": -121.4836105,
+      "name": "District Fire",
+      "page_sha256": "0356a295167b072926618c5a7c6a267a98fda1d5245ad6f4f76059122aec7424",
+      "published_start_local": "07/04/2025 12:50 PM",
+      "start_utc_interpreted": "2025-07-04T19:50:00Z",
+      "status": "eligible",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/district-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/grove-fire",
+      "lat": 39.3742124,
+      "lon": -121.4139814,
+      "name": "Grove Fire",
+      "page_sha256": "e39a0f5f84a84ae0475c457b4f929104695317e2c6e1a90ddf5a46d526178fe8",
+      "published_start_local": "07/04/2025 2:50 PM",
+      "start_utc_interpreted": "2025-07-04T21:50:00Z",
+      "status": "selected-illustration-excluded-from-evaluation",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/grove-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/sabe-fire",
+      "lat": 36.801216,
+      "lon": -121.271644,
+      "name": "Sabe Fire",
+      "page_sha256": "4c83634714dbd981dbec9d1d07ee33fcd7ea9d7106692a22e4f1dc55da1f95c0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/sabe-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/sanderson-fire",
+      "lat": 33.787296,
+      "lon": -117.006785,
+      "name": "Sanderson Fire",
+      "page_sha256": "aabf855701f97279193b1859de3158c64c368cc883b3b7e6a38aec98ab11cb9a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/sanderson-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/springs-fire",
+      "lat": 33.919507,
+      "lon": -117.103765,
+      "name": "Springs Fire",
+      "page_sha256": "38f758d2e7f40ef3250dc166968e6ce0354e17f2ccc5f2e3f374cf9b2de6dd7a",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/springs-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/4/walnut-fire",
+      "lat": 36.70169,
+      "lon": -119.808899,
+      "name": "Walnut Fire",
+      "page_sha256": "4fbf37f74fcb9dadf8cd04e28eda0d9174ee28c591b0f647e02713949fcaeed8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/4/walnut-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/cactus-fire",
+      "lat": 33.908497,
+      "lon": -117.287235,
+      "name": "Cactus Fire",
+      "page_sha256": "1a8628bf576fc9e5129c03f9e67dab177f7492ff1b1de38c295855bc4c2024c2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/cactus-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/hunter-fire",
+      "lat": 37.565899,
+      "lon": -120.152833,
+      "name": "Hunter Fire",
+      "page_sha256": "9eb889490788dc29f9fce12658dd45c4123b3c4ee64051ff31108f43537aaa00",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/hunter-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/ignacio-fire",
+      "lat": 33.543824,
+      "lon": -116.918051,
+      "name": "Ignacio Fire",
+      "page_sha256": "a4c3830698766f89347f714c8c61976f4459ce658601b20434a645ef836ce687",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/ignacio-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/morgan-fire",
+      "lat": 37.773964,
+      "lon": -121.778644,
+      "name": "Morgan Fire",
+      "page_sha256": "9f2885a9141dcd07f6f750d4370fd81267b08f8073bcf2423b76e85a7d2141e8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/morgan-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/pomo-fire",
+      "lat": 39.139455,
+      "lon": -122.881426,
+      "name": "Pomo Fire",
+      "page_sha256": "1ddb97a630ce8c7b3a010557cdc8e549ffba784910a7905c39166aa8a46d9399",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/pomo-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/rancho-fire",
+      "lat": 35.532939,
+      "lon": -120.622981,
+      "name": "Rancho Fire",
+      "page_sha256": "188e0f6ff60f5b0965a76b00d69721d8357bc08cdcacf22fbc24e6c35e7dc086",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/rancho-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/sage-fire",
+      "lat": 33.929799,
+      "lon": -117.186627,
+      "name": "Sage Fire",
+      "page_sha256": "ad452fd9e8b26e175d7b20e08f826c6eb7e2b736ff11407fa34a6b75c9138af5",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/sage-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/soboba-fire",
+      "lat": 33.786094,
+      "lon": -116.923214,
+      "name": "Soboba Fire",
+      "page_sha256": "86cb604c303ab5fa470e17ce93195b5d927e8d9a3cc5d80f1f80bb8798c4d3ae",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/soboba-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/van-clief-rd-stevenson-fire",
+      "lat": 37.288251,
+      "lon": -120.833366,
+      "name": "Van Clief Rd Stevenson Fire",
+      "page_sha256": "647ccad344d580f80312a477c042a52c95bf9df1aee062ee0a02c95167f8feee",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/van-clief-rd-stevenson-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/5/zediker-fire",
+      "lat": 36.611938,
+      "lon": -119.520899,
+      "name": "Zediker Fire",
+      "page_sha256": "9c66a3acc4edf1645e731e40cd53d0e6a595af3202f319a2360c7e165aeac6b4",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/5/zediker-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/6/bartlett-fire",
+      "lat": 39.165061,
+      "lon": -122.613599,
+      "name": "Bartlett Fire",
+      "page_sha256": "6d1832a1ded1d4f349af4bfd99fe227b067626e6046f548d35eea47e72000359",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/6/bartlett-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/6/bridge-3-fire",
+      "lat": 40.172678,
+      "lon": -123.60102,
+      "name": "Bridge 3 Fire",
+      "page_sha256": "2b1185ce505407e763d7e8c5c166d93cc8cbd7ac7b080c5f64bccd4a834b0029",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/6/bridge-3-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/6/flume-fire",
+      "lat": 36.161296,
+      "lon": -118.706452,
+      "name": "Flume Fire",
+      "page_sha256": "913ebe330ee79ed734d0bfae2758628070e4282ad2742f6f4cf75d11a462ced8",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/6/flume-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/birds-fire",
+      "lat": 38.1303671,
+      "lon": -121.79616,
+      "name": "Birds Fire",
+      "page_sha256": "141c5b24226105097148fae6c3c403114cfa52bad799a5e47f470f3971ab8964",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/birds-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/bluff-fire",
+      "lat": 33.950365,
+      "lon": -116.880684,
+      "name": "Bluff Fire",
+      "page_sha256": "209bc5c47edf2934f118e39d36e333844e4c19d9fa955b3a6776afebf4f5a2b3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/bluff-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/corning-fire",
+      "lat": 39.928283,
+      "lon": -122.2985996,
+      "name": "Corning Fire",
+      "page_sha256": "3a1fde15ffb5bbc22b8e4b50e25df01bed82aebcdbeacc18b123c0ea876888c2",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/corning-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/fish-fire",
+      "lat": 36.794181,
+      "lon": -119.411635,
+      "name": "Fish Fire",
+      "page_sha256": "1b541894d16e9bb28422eceb9ee2147aeca0d87e6f20d828601f32423261d6f6",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/fish-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/nichols-fire",
+      "lat": 33.7198782,
+      "lon": -117.36247,
+      "name": "Nichols Fire",
+      "page_sha256": "130b7cd21715f24ff58b51bc971cd68d4def21d71cef28a3d454111f5f67c799",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/nichols-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/pyrite-fire",
+      "lat": 34.017805,
+      "lon": -117.462368,
+      "name": "Pyrite Fire",
+      "page_sha256": "3b3f1fc3cee590f004c66072ff947c359f91378fa379fe92ae72900c6fd462a0",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/pyrite-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/7/tractor-fire",
+      "lat": 36.224616,
+      "lon": -118.832595,
+      "name": "Tractor Fire",
+      "page_sha256": "3cbc3c12c9a224160105a62c8bd870436185838d3d476f614485199f7fa2c526",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/7/tractor-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/8/bert-fire",
+      "lat": 34.449864,
+      "lon": -118.611317,
+      "name": "Bert Fire",
+      "page_sha256": "7e496fb12ce1ba6e75876070294fb034f75a5c6c79e6866f476fab21a9684b5d",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/8/bert-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/8/orleans-complex",
+      "lat": 41.3255556,
+      "lon": -123.4177777,
+      "name": "Orleans Complex",
+      "page_sha256": "f6f21ff78a5877c7fb8ad4abff0ef5627c4a58ff7309e78a0a0bfe63b6c98dd3",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/8/orleans-complex"
+    },
+    {
+      "archive_path": "/incidents/2025/7/8/victoria-fire",
+      "lat": 37.655501,
+      "lon": -121.659503,
+      "name": "Victoria Fire",
+      "page_sha256": "3abacc0e376b00fd029693adc02bff56ef9d3246c11725822e6dba4637ed71dc",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/8/victoria-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/9/button-fire",
+      "lat": 36.654779,
+      "lon": -119.435896,
+      "name": "Button Fire",
+      "page_sha256": "a2095d5ca7034f32bc12729e8fbe7fe3b89707d36f6152d3db49fb8933aa95bc",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/9/button-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/9/pickup-fire",
+      "lat": 37.244233,
+      "lon": -119.731216,
+      "name": "Pickup Fire",
+      "page_sha256": "cc6467731c905e649d8951648c850125d81d44939c20b5a4a8c36b65ff7fea0c",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/9/pickup-fire"
+    },
+    {
+      "archive_path": "/incidents/2025/7/9/steele-fire",
+      "lat": 32.733209,
+      "lon": -116.914968,
+      "name": "Steele Fire",
+      "page_sha256": "df09061ca964a02fe388e05eacee700d2c6f3277136c109f3070f049473ff9bd",
+      "status": "excluded-outside-archive-area",
+      "url": "https://www.fire.ca.gov/incidents/2025/7/9/steele-fire"
+    }
+  ],
+  "official_page_index_fallbacks": 0,
+  "pages_complete": true,
+  "retrieved_utc": "2026-09-28T22:12:15.218837Z",
+  "rule": "Every July link on CAL FIRE's 2024 and 2025 year archive pages; published start coordinate inside archive_bbox; Park and Grove selected cases excluded; first standard FIRMS detection within 5 km and 48 hours after published start.",
+  "schema": "fireatlas-calfire-july-cohort-v1",
+  "year_indexes": [
+    {
+      "july_incident_links": 182,
+      "sha256": "55c760d47e5a76c04749c49cc70a240d7e1d44549505577082991dd16f6593d3",
+      "url": "https://www.fire.ca.gov/incidents/2024"
+    },
+    {
+      "july_incident_links": 106,
+      "sha256": "63508cf15b1dd23a833fae321a0182fa4051416cc61cc242887d37a1c6aae010",
+      "url": "https://www.fire.ca.gov/incidents/2025"
+    }
+  ],
+  "years": [
+    2024,
+    2025
+  ]
+}

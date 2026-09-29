@@ -1,10 +1,11 @@
 const state = { year: 2015, series: "joint", bbox: "-122,39,-120,41", month: 6, day: null, data: null, demo: true };
-let map, markers, aoiOutline, contextLayer, contextChoice = "ndvi", mapRequest = 0, contextRequest = 0;
+let map, markers, aoiOutline, contextLayer, contextChoice = "ndvi", mapRequest = 0, contextRequest = 0, briefingRequest = 0, auditRequest = 0, replayFeatures = [], replayMode = "";
 let mapDay = null, mapPlayback = null, mapInputTimer = null, focusMapOnDay = false;
 const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const shortMonths = monthNames.map(name => name.slice(0, 3).toUpperCase());
 const $ = selector => document.querySelector(selector);
 const jointCache = new Map();
+let offlineExampleNotified = false;
 
 function toast(message) {
   const el = $("#toast"); el.textContent = message; el.classList.add("visible");
@@ -15,6 +16,10 @@ async function getJson(path) {
   const response = await fetch(path);
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Could not load data");
+  if (response.headers.get("X-FireAtlas-Offline-Example") === "1" && !offlineExampleNotified) {
+    offlineExampleNotified = true;
+    toast("Offline: showing a cached synthetic example. Reconnect for current data.");
+  }
   return data;
 }
 
@@ -33,11 +38,26 @@ async function loadMeta() {
   state.series = meta.default_series || "joint";
   yearSelect.value = String(state.year);
   const status = $("#dataset-status");
-  status.textContent = meta.synthetic ? "Guided demo · generated example data" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
-  const showRealProof = !state.demo && meta.available_sources?.includes("NOAA_HMS_VIIRS");
+  status.textContent = meta.synthetic ? "Guided demo · generated example data" : meta.standard_pair_ready ? "NASA FIRMS MODIS + VIIRS · authentic archive ↗" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
+  const showRealProof = !state.demo && (meta.standard_pair_ready || meta.available_sources?.includes("NOAA_HMS_VIIRS"));
   $("#demo-source-note").hidden = showRealProof;
   $("#real-source-note").hidden = !showRealProof;
-  if (showRealProof) $("#hero-real-count").textContent = (meta.source_counts?.NOAA_HMS_VIIRS || 0).toLocaleString();
+  if (!showRealProof) {
+    const note = $("#demo-source-note");
+    note.querySelector(".orbital-kicker").textContent = state.demo ? "SYNTHETIC WORKSPACE EXAMPLE" : "HISTORICAL SENSOR PAIR";
+    note.querySelector("p").textContent = state.demo
+      ? "Generated MODIS + VIIRS examples below. The globe uses separate NASA NRT imports."
+      : "The standard MODIS + VIIRS pair has not been imported here.";
+  }
+  if (showRealProof) {
+    const note = $("#real-source-note");
+    note.querySelector(".orbital-kicker").textContent = meta.standard_pair_ready ? "NASA FIRMS / REGIONAL ARCHIVE" : "VERIFIED ARCHIVE / NOAA";
+    $("#hero-real-count").textContent = meta.standard_pair_ready
+      ? ((meta.source_counts?.MODIS_SP || 0) + (meta.source_counts?.VIIRS_SNPP_SP || 0)).toLocaleString()
+      : (meta.source_counts?.NOAA_HMS_VIIRS || 0).toLocaleString();
+    note.querySelector(".real-source-unit").textContent = meta.standard_pair_ready ? "IMPORTED DETECTIONS" : "VIIRS FIRE POINTS";
+    note.querySelector("p").textContent = meta.standard_pair_ready ? "July 2022–June 2026 regional archive. 2026 imports are partial." : "Four complete July archives. One Northern California window.";
+  }
   document.querySelectorAll("[data-demo]").forEach(button => {
     const active = button.dataset.demo === String(Number(state.demo));
     button.classList.toggle("selected", active);
@@ -54,8 +74,13 @@ async function loadMeta() {
   const historicalSources = {modis: ["MODIS_SP"], "viirs-snpp": ["VIIRS_SNPP_SP"], joint: ["MODIS_SP", "VIIRS_SNPP_SP"]};
   for (const [series, sources] of Object.entries(historicalSources)) {
     const available = sources.every(source => meta.available_sources?.includes(source));
-    document.querySelectorAll(`[data-series="${series}"]`).forEach(button => { button.hidden = !available; });
-    document.querySelectorAll(`[data-source-target="${series}"]`).forEach(button => { button.disabled = !available; });
+    const hint = available ? "Imported product available. Check month and area export completeness below."
+      : "Standard product not imported. Select to inspect its missing-data state and source requirements.";
+    document.querySelectorAll(`[data-series="${series}"], [data-source-target="${series}"]`).forEach(button => {
+      button.hidden = false;
+      button.disabled = false;
+      button.title = hint;
+    });
   }
   $(".series-row p").textContent = state.demo ? "Separate series preserve the sensor transition." : "Select an imported product to inspect its observations.";
   const weatherButton = $('[data-layer="fwi"]');
@@ -66,6 +91,7 @@ async function loadMeta() {
     : "Measured fire-weather data have not been imported. A synthetic illustration is available in example mode.";
   $("#mode-description").textContent = state.demo
     ? "Generated seasonal examples and context layers. Dates and locations are synthetic; these controls apply to the study tools below."
+    : meta.standard_pair_ready ? "Study authentic NASA MODIS and VIIRS standard records by year, product and region. The calendar, audit and original evidence below use the same selection."
     : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "Study imported satellite archives by year, product and region. This selection applies to the atlas, calendar and evidence below."
     : meta.years.length ? "Browsing imported source records. Check the source ledger for retrieval and coverage details."
       : "NASA imports have not arrived on this server. Try the guided demo while the connection is restored.";
@@ -117,6 +143,8 @@ async function loadCalendar(next = {}) {
     : "No complete source export covers this AOI, year and sensor series. Open Data sources to check the import status. Empty cells remain unknown.";
   $("#aoi-status").textContent = `Selected AOI: ${state.bbox}${complete ? "" : " · no complete export"}`;
   render();
+  loadBriefing();
+  loadHarmonizationAudit();
   $("#start-tour").disabled = false;
   if ($("#hero-start-tour")) $("#hero-start-tour").disabled = false;
   if (state.day) await loadDay(state.day);
@@ -145,7 +173,7 @@ function renderInsight(month) {
   if (month.export_window_complete && rawModis && rawViirs && comparison?.detected_cell_days) {
     const ratio = rawViirs / rawModis;
     title.textContent = `${monthName} shows why FireAtlas compares sensors.`;
-    body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many raw pixels as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}), while the shared grid reduces them to ${comparison.detected_cell_days.toLocaleString()} detected cell-days. The signal becomes comparable without treating pixels as individual fires.`;
+    body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many raw pixels as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}). Grouping their detection centroids by UTC day and shared 1 km cell yields ${comparison.detected_cell_days.toLocaleString()} joint cell-days. This removes repeat counts in a cell; it does not equalize sensor sensitivity.`;
     source.textContent = `${state.demo ? "Synthetic teaching example" : "Imported source records"} · ${monthName} ${state.year} · same AOI and UTC window`;
   } else if (month.anomaly_cell_days !== null && month.baseline_median !== null) {
     const direction = month.anomaly_cell_days >= 0 ? "above" : "below";
@@ -160,6 +188,101 @@ function renderInsight(month) {
   card.hidden = false;
 }
 
+function renderBriefing(data) {
+  const card = $("#responder-briefing");
+  if (!card || !data) return;
+  const selected = data.selected_month || {};
+  $("#briefing-title").textContent = data.headline || "Historical review brief";
+  $("#briefing-status").textContent = data.classification === "synthetic" ? "Synthetic example" : "Historical only";
+  $("#briefing-action").textContent = data.action || "Use the evidence panel for review.";
+  $("#briefing-active-days").textContent = String(data.active_days_count ?? data.active_days?.length ?? "—");
+  $("#briefing-unknown-days").textContent = String(data.unknown_days ?? "—");
+  $("#briefing-baseline").textContent = selected.baseline_median == null ? "—" : Number(selected.baseline_median).toLocaleString();
+  const dates = $("#briefing-dates"); dates.replaceChildren();
+  for (const item of data.active_days || []) {
+    const button = document.createElement("button"); button.type = "button";
+    button.textContent = `${item.date_utc} · ${Number(item.detected_cell_days).toLocaleString()} cells`;
+    button.addEventListener("click", async () => {
+      state.day = item.date_utc; mapDay = Number(item.date_utc.slice(8));
+      renderDays(); renderTimeline(); syncView(); updateMap();
+      await loadDay(item.date_utc);
+      $("#evidence-section")?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+    dates.append(button);
+  }
+  card.hidden = false;
+}
+
+function renderHarmonizationAudit(data) {
+  state.audit = data;
+  if (!$("#audit-status")) {
+    if (data.baseline_version_status === "mixed-product-versions-across-years") {
+      $("#baseline-years").textContent = `Based on ${data.baseline_years.join(", ")} · versions differ`;
+    }
+    return;
+  }
+  const pair = data.series === "joint";
+  const messages = {
+    "outside-standard-modis-viirs-pair": "This is one source or a different product cohort. Select Joint to assess the standard MODIS and VIIRS S-NPP pair.",
+    "missing-complete-source-export": "A full-month standard export is missing for MODIS, VIIRS S-NPP, or both. Partial detections are visible, but full-month activity is unknown.",
+    "mixed-product-versions": "Both exports cover this month, but multiple product versions occur within a source. Review version changes before interpreting a comparison.",
+    "complete-export-with-zero-detections-in-one-source": "Both source exports are complete, but one source has zero detections in this area and month. Satellite pass and cloud coverage remain unknown.",
+    "descriptive-pair-available": "Both standard-product exports cover this area and month. The shared-grid comparison is descriptive; it is not a calibrated sensitivity estimate."
+  };
+  $("#audit-status").textContent = `${data.data_class === "synthetic" ? "SYNTHETIC EXAMPLE · " : "IMPORTED RECORDS · "}${messages[data.status] || data.status}`;
+  $("#audit-raw").textContent = Number(data.raw_pixels_total).toLocaleString();
+  $("#audit-cells").textContent = data.detected_cell_days == null ? "Unknown" : Number(data.detected_cell_days).toLocaleString();
+  $("#audit-overlap").textContent = pair ? Number(data.co_detected_cell_days || 0).toLocaleString() : "Not a pair";
+  const container = $("#audit-sources"); container.replaceChildren();
+  for (const source of data.sources) {
+    const row = document.createElement("article");
+    const title = document.createElement("strong"); title.textContent = source.source_id.replaceAll("_", " ");
+    const details = document.createElement("span");
+    details.textContent = `${source.processing_level} · ${Number(source.raw_pixels).toLocaleString()} raw pixels · ${Number(source.detected_cell_days).toLocaleString()} source cell-days · ${source.full_month_export ? "complete export" : "incomplete export"} · version ${source.product_versions.join(", ") || "unknown"}`;
+    row.append(title, details); container.append(row);
+  }
+  const versionReading = {
+    "mixed-product-versions-across-years": "Baseline caution: one or more source product versions differ across the selected month and its prior years. The cell-day difference is descriptive, not a calibrated change in burning.",
+    "same-observed-product-versions": "The selected month and qualifying baseline months use the same observed product versions. Sensor availability and sensitivity still need separate checks.",
+    "unknown-where-source-has-no-detections": "Baseline version check is incomplete because a source has no detections in one or more prior months.",
+    "no-qualifying-baseline-years": "No qualifying prior-year baseline is available for this selection."
+  };
+  $("#audit-baseline-versions").textContent = versionReading[data.baseline_version_status] || "Baseline product-version comparison unavailable.";
+  if (data.baseline_version_status === "mixed-product-versions-across-years") {
+    $("#baseline-years").textContent = `Based on ${data.baseline_years.join(", ")} · versions differ`;
+  }
+  $("#download-audit").disabled = false;
+}
+
+async function loadHarmonizationAudit() {
+  const request = ++auditRequest;
+  state.audit = null;
+  if ($("#download-audit")) $("#download-audit").disabled = true;
+  if ($("#audit-status")) $("#audit-status").textContent = "Checking the selected month and source exports…";
+  if ($("#audit-baseline-versions")) $("#audit-baseline-versions").textContent = "Checking baseline product versions…";
+  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+  try {
+    const data = await getJson(`/api/harmonization?${params}`);
+    if (request === auditRequest) renderHarmonizationAudit(data);
+  } catch (error) {
+    if (request === auditRequest && $("#audit-status")) $("#audit-status").textContent = `Method audit unavailable: ${error.message}`;
+  }
+}
+
+async function loadBriefing() {
+  const request = ++briefingRequest;
+  const params = new URLSearchParams({year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
+  try {
+    const data = await getJson(`/api/briefing?${params}`);
+    if (request === briefingRequest) renderBriefing(data);
+  } catch (error) {
+    if (request === briefingRequest) {
+      const card = $("#responder-briefing");
+      if (card) { card.hidden = false; $("#briefing-title").textContent = "Historical brief unavailable"; $("#briefing-action").textContent = error.message; }
+    }
+  }
+}
+
 function renderSourceComparison() {
   const isHms = !["joint", "modis", "viirs-snpp"].includes(state.series);
   $("#additional-source").value = state.series;
@@ -172,6 +295,7 @@ function renderSourceComparison() {
   $("#hms-source-compare").hidden = !isHms;
   $("#firms-source-compare").hidden = isHms;
   $("#source-compare-note").hidden = isHms;
+  const reading = $("#sensor-study-reading");
   if (isHms) {
     const month = state.data.monthly[state.month];
     const records = state.data.daily.filter(day => Number(day.date_utc.slice(5,7)) === state.month + 1);
@@ -179,6 +303,7 @@ function renderSourceComparison() {
     $("#hms-raw").textContent = pixels.toLocaleString();
     $("#hms-cells").textContent = month.detected_cell_days === null ? "—" : month.detected_cell_days.toLocaleString();
     $("#hms-period").textContent = `${monthNames[state.month]} ${state.year} · ${month.export_window_complete ? "complete export" : "partial / no complete export"}`;
+    if (reading) reading.textContent = "This view is the NOAA HMS VIIRS archive, so it cannot be compared pixel-for-pixel with MODIS here. Select Joint, MODIS, or VIIRS S-NPP to compare the matched NASA source products.";
     return;
   }
   const month = state.comparison.monthly[state.month];
@@ -200,6 +325,11 @@ function renderSourceComparison() {
   $("#source-compare-note").textContent = known
     ? `${monthNames[state.month]} ${state.year} · Raw pixels retain each sensor’s detections; joint cell-days count each shared grid cell once per UTC day. These are different measures, not a sensitivity ranking.`
     : `${monthNames[state.month]} ${state.year} · A complete export for both sources is needed before comparing the raw pixels with joint cell-days.`;
+  if (reading) {
+    reading.textContent = known && modis && viirs
+      ? `This selection contains ${modis.toLocaleString()} MODIS and ${viirs.toLocaleString()} VIIRS raw pixels. VIIRS is ${(viirs / modis).toFixed(1)}× higher in raw detections here; pixel scale and overpasses differ, so this is not a ratio of fires. The joint grouping yields ${month.detected_cell_days?.toLocaleString() || "—"} shared 1 km cell-days, without calibrating sensor sensitivity.`
+      : "The source export is incomplete, so the sensor counts cannot support a like-for-like interpretation yet. Gray or missing days mean unknown coverage, not zero fire.";
+  }
   document.querySelectorAll("[data-source-target]").forEach(button => {
     const key = button.dataset.sourceTarget;
     if (sensorTips[key]) button.title = sensorTips[key];
@@ -211,7 +341,7 @@ function renderSourceComparison() {
 function selectCalendarMonth(index) {
   if (index < 0 || index > 11) return;
   stopMapPlayback(); mapDay = null; state.month = index; state.day = null;
-  render(); clearDay();
+  render(); clearDay(); loadBriefing(); loadHarmonizationAudit();
 }
 
 function renderMonths() {
@@ -250,6 +380,7 @@ function calendarHeat(value, maximum) {
 
 function renderDays() {
   const data = state.data, month = data.monthly[state.month];
+  const snppGapMonth = !state.demo && state.year === 2024 && state.month === 6 && data.sources.includes("VIIRS_SNPP_SP");
   const days = new Date(Date.UTC(state.year, state.month + 1, 0)).getUTCDate();
   const rows = data.daily.filter(row => Number(row.date_utc.slice(5, 7)) === state.month + 1);
   const byDate = new Map(rows.map(row => [row.date_utc, row]));
@@ -259,11 +390,12 @@ function renderDays() {
   $("#days-title").textContent = `${monthNames[state.month]} ${state.year}`;
   $("#calendar-prev").disabled = state.month === 0; $("#calendar-next").disabled = state.month === 11;
   $("#calendar-context").textContent = `${state.demo || data.demo_data ? "SYNTHETIC EXAMPLE" : "IMPORTED OBSERVATIONS"} · ${data.sources.join(" + ").replaceAll("_", " ")} · AOI ${data.bbox.map((value, i) => ["W", "S", "E", "N"][i] + " " + value + "°").join(", ")} · UTC`;
-  $("#calendar-grid-version").textContent = `Method: ${data.grid} · ${state.series === "joint" ? "Joint cell-day aggregation of the selected MODIS and VIIRS products." : "Single source series; cross-sensor harmonization is not applied in this view."}`;
+  if ($("#calendar-grid-version")) $("#calendar-grid-version").textContent = `Method: ${data.grid}`;
   const peakDates = positive.filter(row => row.detected_cell_days === maximum).map(row => Number(row.date_utc.slice(8)));
   $("#calendar-month-summary").textContent = month.export_window_complete
     ? `${days}/${days} export days complete · ${positive.length} days with detections${maximum ? ` · Peak ${maximum.toLocaleString()} cells on ${(peakDates.length > 3 ? peakDates.length + " dates" : peakDates.map(day => day + " " + shortMonths[state.month]).join(", "))}` : ""}`
     : `${month.partial_import_detected_cell_days > 0 ? "Partial records available" : "No complete export loaded"} · Full-month activity unknown`;
+  if (snppGapMonth) $("#calendar-month-summary").textContent += " · NASA S-NPP processing gap 24–28 Jul; pass/cloud unknown";
   const grid = $("#day-grid"); grid.replaceChildren();
   const offset = (new Date(Date.UTC(state.year, state.month, 1)).getUTCDay() + 6) % 7;
   for (let i = 0; i < offset; i++) {const blank = document.createElement("span"); blank.className = "day blank"; blank.setAttribute("aria-hidden", "true"); grid.append(blank);}
@@ -276,11 +408,13 @@ function renderDays() {
     const button = document.createElement("button"); button.type = "button";
     button.dataset.date = stamp;
     button.className = `day ${partial ? "partial-export" : value === null ? "unloaded" : value > 0 ? "detected" : "clear-export"}${stamp === state.day ? " chosen" : ""}${peak ? " day-peak" : ""}`;
+    const snppGapDay = snppGapMonth && dayNumber >= 24 && dayNumber <= 28;
+    if (snppGapDay) button.classList.add("source-gap");
     button.tabIndex = stamp === (state.day || `${state.year}-${String(state.month + 1).padStart(2,"0")}-01`) ? 0 : -1;
     button.setAttribute("aria-pressed", String(stamp === state.day));
     const raw = Object.entries(item.raw_pixels_by_sensor || {}).map(([sensor, count]) => `${sensor}: ${count.toLocaleString()} raw pixels`).join("; ");
     const status = partial ? `At least ${countValue.toLocaleString()} detected cells, partial export` : value === null ? "Activity unknown, source export incomplete" : `${value.toLocaleString()} detected ${value === 1 ? "cell" : "cells"}, complete export`;
-    button.setAttribute("aria-label", `${stamp} UTC · ${status}${raw ? " · " + raw : ""}${peak ? " · Highest count this month" : ""}. Inspect source records.`);
+    button.setAttribute("aria-label", `${stamp} UTC · ${status}${raw ? " · " + raw : ""}${peak ? " · Highest count this month" : ""}${snppGapDay ? " · NASA S-NPP processing gap; observation coverage unknown" : ""}. Inspect source records.`);
     button.title = button.getAttribute("aria-label");
     if (value > 0) {const heat = calendarHeat(value, scaleMaximum); button.style.setProperty("--day-heat", heat.color); button.classList.toggle("dark-ink", heat.dark);}
     const number = document.createElement("span"); number.className = "day-number"; number.textContent = dayNumber;
@@ -298,7 +432,13 @@ function renderDays() {
       const next = grid.querySelector(`[data-date$="-${String(Math.max(1, Math.min(days, target))).padStart(2,"0")}"]`);
       if (next) {grid.querySelectorAll("button").forEach(node => node.tabIndex = -1); next.tabIndex = 0; next.focus();}
     });
-    button.addEventListener("click", async () => { state.day = stamp; mapDay = dayNumber; renderDays(); renderTimeline(); syncView(); updateContextLayer(); updateMap(); await loadDay(stamp); if (state.day === stamp) document.querySelector("#evidence-section").scrollIntoView({behavior:"smooth",block:"start"}); });
+    button.addEventListener("click", async () => {
+      state.day = stamp;
+      mapDay = dayNumber;
+      renderDays(); renderTimeline(); syncView(); updateContextLayer(); updateMap();
+      await loadDay(stamp);
+      if (state.day === stamp) document.querySelector("#evidence-section")?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
     grid.append(button);
   }
   const scale = $("#calendar-scale"); scale.replaceChildren();
@@ -313,11 +453,17 @@ function renderDays() {
     const count = selected.detected_cell_days;
     const sensors = Object.entries(selected.raw_pixels_by_sensor || {}).map(([sensor, n]) => `${sensor}: ${n.toLocaleString()} pixels`).join(" · ");
     summary.textContent = `${state.day} UTC · ${count === null ? selected.partial_import_detected_cell_days > 0 ? "≥" + selected.partial_import_detected_cell_days.toLocaleString() + " cells (partial export)" : "Unknown activity (incomplete export)" : count.toLocaleString() + ` distinct detected ${count === 1 ? "cell" : "cells"}`}${sensors ? " · " + sensors : ""}`;
+    if (snppGapMonth && Number(state.day.slice(8)) >= 24 && Number(state.day.slice(8)) <= 28) summary.textContent += " · NASA S-NPP processing gap; pass/cloud unknown";
+    const link = document.createElement("a");
+    link.href = methodUrl(); link.textContent = "Inspect this day’s source records ↗";
+    link.className = "calendar-evidence-link"; summary.append(link);
   }
 }
 
 function clearDay() {
   ++dayRequest;
+  if (!$("#evidence-section")) return;
+  $("#evidence-section").hidden = true;
   $("#evidence-date").textContent = "SELECT A DAY";
   $("#record-count").textContent = "—";
   $("#records").replaceChildren();
@@ -326,11 +472,13 @@ function clearDay() {
 }
 
 async function loadDay(stamp) {
+  if (!$("#evidence-section")) return;
   const request = ++dayRequest;
   const params = new URLSearchParams({date: stamp, series: state.series, bbox: state.bbox, demo: state.demo ? 1 : 0});
   try {
     const data = await getJson(`/api/observations?${params}`);
     if (request !== dayRequest) return;
+    $("#evidence-section").hidden = false;
     $("#evidence-date").textContent = stamp + " UTC";
     $("#record-count").textContent = `${data.observations.length}${data.truncated ? "+" : ""} RAW PIXELS`;
     const container = $("#records"); container.replaceChildren();
@@ -355,7 +503,9 @@ async function loadDay(stamp) {
 }
 
 function renderProvenance() {
-  const container = $("#provenance"); container.replaceChildren();
+  const container = $("#provenance");
+  if (!container || !state.data) return;
+  container.replaceChildren();
   const label = document.createElement("strong"); label.textContent = "SOURCE PROVENANCE"; container.append(label);
   const grid = document.createElement("p"); grid.textContent = state.data.grid; container.append(grid);
   for (const item of state.data.product_versions) {
@@ -380,6 +530,7 @@ function initMap() {
   }).addTo(map);
   markers = L.layerGroup().addTo(map);
   map.on("moveend", () => { if (state.data) updateMap(); });
+  map.on("zoomend moveend", renderReplayAnnotations);
   drawAoi(false);
 }
 
@@ -398,11 +549,41 @@ function compositeDate() {
   return new Date(first + Math.floor(elapsed / 16) * 16 * 86400000).toISOString().slice(0, 10);
 }
 
+function renderMapLegend() {
+  const legend = $("#map-legend");
+  if (!legend) return;
+  const context = {
+    none: {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."},
+    ndvi: {title: "Vegetation condition (NDVI)", range: "lower signal → higher signal", note: state.demo ? "Synthetic monthly illustration; it is not measured fuel moisture or fire risk." : "NASA MODIS 16-day composite; vegetation context only."},
+    landcover: {title: "Broad land-cover class", range: "forest · shrubland · grassland · cropland", note: state.demo ? "Synthetic class illustration for the Northern California showcase." : "NASA MODIS annual class context; it does not identify current fuels."},
+    fwi: {title: "Fire-weather index illustration", range: "lower index → higher index", note: state.demo ? "Synthetic monthly illustration in arbitrary units; it is not measured weather or a forecast." : "Measured fire-weather data have not been imported. No weather risk is shown."},
+  }[contextChoice] || {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."};
+  const badge = $("#map-legend-badge");
+  badge.textContent = state.demo ? "SYNTHETIC" : "IMPORTED";
+  const title = $("#map-legend-context-title");
+  title.textContent = context.title;
+  const swatch = $("#map-legend-context-swatch");
+  swatch.className = `map-legend-swatch ${contextChoice}`;
+  const scale = $("#map-legend-context-range");
+  scale.className = `map-legend-context-range ${contextChoice}`;
+  scale.querySelector("span").textContent = context.range;
+  const observationNote = $("#map-legend-observation-note");
+  if (observationNote) observationNote.textContent = state.demo
+    ? "Synthetic FIRMS-shaped example points; positions are illustrative."
+    : "Imported NASA FIRMS standard-product detection records.";
+  $("#map-legend-note").textContent = context.note;
+}
+
 async function updateContextLayer() {
   const request = ++contextRequest;
   if (!map) return;
+  renderMapLegend();
   if (contextLayer) { map.removeLayer(contextLayer); contextLayer = null; }
   if (state.demo && contextChoice !== "none") {
+    if (state.year < 2023 || state.year > 2026) {
+      $("#layer-status").textContent = "Synthetic context is available only for the 2023–2026 showcase years; the selected 2015 study remains satellite evidence only.";
+      return;
+    }
     $("#layer-status").textContent = "Loading synthetic context…";
     try {
       const fixture = await getJson(`/api/context?${new URLSearchParams({demo:1,year:state.year,month:state.month+1,bbox:state.bbox,layer:contextChoice})}`);
@@ -456,6 +637,59 @@ function stopMapPlayback() {
   if (button) button.textContent = "▶ Play month";
 }
 
+function updateReplayGuide() {
+  const guide = $("#map-replay-guide");
+  if (!guide) return;
+  const day = mapDay || 1;
+  const total = Number($("#map-day")?.max || 31);
+  guide.hidden = false;
+  guide.dataset.phase = day <= 1 ? "map" : day >= total ? "bars" : "timeline";
+  const targets = {
+    map: $("#map"),
+    timeline: $("#map-day"),
+    bars: $("#map-timeline-bars"),
+  };
+  Object.entries(targets).forEach(([name, node]) => node?.classList.toggle("replay-guide-target", guide.dataset.phase === name));
+}
+
+function renderReplayAnnotations(features = replayFeatures, mode = replayMode) {
+  const layer = $("#map-replay-annotations");
+  const guide = $("#map-replay-guide");
+  if (!layer || !map || !guide || guide.hidden) return;
+  layer.replaceChildren();
+  if (!features?.length) { layer.hidden = true; return; }
+  layer.hidden = false;
+  const ranked = [...features].sort((a, b) => (b.count ?? 1) - (a.count ?? 1)).slice(0, 3);
+  const seen = new Set();
+  ranked.forEach((feature, index) => {
+    const point = map.latLngToContainerPoint([feature.lat, feature.lon]);
+    const box = document.createElement("span");
+    box.className = "replay-map-box";
+    box.style.left = `${point.x}px`; box.style.top = `${point.y}px`;
+    const card = document.createElement("span");
+    card.className = "replay-map-label";
+    card.style.left = `${Math.min(Math.max(point.x + 24, 12), Math.max(12, map.getSize().x - 242))}px`;
+    card.style.top = `${Math.max(10, point.y - 42 - index * 4)}px`;
+    const nearby = index > 0 && ranked.slice(0, index).some(previous => Math.hypot((feature.lat - previous.lat) * 111, (feature.lon - previous.lon) * 90) < 35);
+    let title, detail;
+    if (mode === "aggregates") {
+      title = index === 0 ? "Largest observed cluster" : `Observed cluster ${index + 1}`;
+      detail = `${feature.count} satellite pixels share this grid cell. ${feature.count > 2 ? "A concentrated group suggests sustained or intense thermal activity." : "This is a small localized heat signal."} It is not a mapped fire boundary.`;
+    } else if (nearby) {
+      title = "Clustered heat signals";
+      detail = `${feature.sensor || "Satellite"} is close to another observation. Several nearby signals suggest concentrated thermal activity, but they do not define the fire's size or perimeter.`;
+    } else {
+      title = index === 0 ? "Satellite heat observation" : `Separate heat observation ${index + 1}`;
+      detail = `${feature.sensor || "Satellite"} detected thermal energy at this place and time. It is an observation signal, not a confirmed fire perimeter.`;
+    }
+    const messageKey = `${title}|${detail}`;
+    if (seen.has(messageKey)) return;
+    seen.add(messageKey);
+    card.innerHTML = `<b>${title}</b><span>${detail}</span>`;
+    layer.append(box, card);
+  });
+}
+
 function renderTimeline() {
   if (!state.data) return;
   const month = state.month + 1;
@@ -494,9 +728,11 @@ function playMapMonth() {
   if (mapPlayback) { stopMapPlayback(); return; }
   if (mapDay === null || mapDay >= Number($("#map-day").max)) mapDay = 0;
   const totalDays = Number($("#map-day").max);
+  updateReplayGuide();
   $("#map-play").textContent = `⏸ Pause (${mapDay}/${totalDays})`;
   const step = () => {
     mapDay += 1;
+    updateReplayGuide();
     $("#map-play").textContent = `⏸ Pause (${mapDay}/${totalDays})`;
     renderTimeline(); updateMap();
     if (mapDay >= totalDays) { stopMapPlayback(); return; }
@@ -517,6 +753,7 @@ async function updateMap() {
   try {
     const result = await getJson(`/api/map?${params}`);
     if (request !== mapRequest) return;
+    replayFeatures = result.features || []; replayMode = result.mode || "";
     markers.clearLayers();
     for (const feature of result.features) {
       if (result.mode === "aggregates") {
@@ -535,8 +772,9 @@ async function updateMap() {
         action.addEventListener("click", async () => {
           state.day = feature.acquisition_utc.slice(0,10);
           state.month = Number(state.day.slice(5,7)) - 1;
-          render(); await loadDay(state.day);
-          $("#evidence-section").scrollIntoView({behavior: "smooth"});
+          render();
+          await loadDay(state.day);
+          $("#evidence-section")?.scrollIntoView({behavior: "smooth", block: "start"});
         });
         body.append(title, line, action); marker.bindPopup(body); markers.addLayer(marker);
       }
@@ -552,11 +790,13 @@ async function updateMap() {
       map.fitBounds(bounds.pad(.25), {padding: [45, 45], maxZoom: 11});
     }
     if (result.truncated) $("#map-status").textContent += " · sampled across all imported dates";
+    renderReplayAnnotations();
   } catch (error) { if (request === mapRequest) $("#map-status").textContent = error.message; }
 }
 
 function render() {
-  syncView(); renderStudySources();
+  syncView();
+  renderStudySources();
   renderStats(); renderSourceComparison(); renderMonths(); renderDays(); renderTimeline(); renderProvenance(); drawAoi(false); updateContextLayer(); updateMap();
   const research = $("#open-research-study");
   const researchUsesDemo = !["joint", "modis", "viirs-snpp"].includes(state.series);
@@ -565,7 +805,7 @@ function render() {
     : {year: state.year, month: state.month + 1, bbox: state.bbox, demo: state.demo ? 1 : 0};
   const researchUrl = `/research.html?${new URLSearchParams(researchContext)}`;
   if (research) research.href = researchUrl;
-  $("#research-entry-copy").textContent = researchUsesDemo
+  if ($("#research-entry-copy")) $("#research-entry-copy").textContent = researchUsesDemo
     ? "Explore source overlap and candidate groups in a clearly labelled synthetic MODIS/VIIRS example. Your selected satellite product stays in the atlas."
     : "Compare source overlap, test candidate groups, and inspect observation-mask denominators.";
   document.querySelectorAll('a[href^="/research.html"]:not(#open-research-study)').forEach(link => { link.href = researchUrl; });
@@ -579,7 +819,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $("#calendar-prev").addEventListener("click", () => selectCalendarMonth(state.month - 1));
   $("#calendar-next").addEventListener("click", () => selectCalendarMonth(state.month + 1));
-  initStudyTools();
   $("#additional-source").addEventListener("change", async event => {
     if (!event.target.value) return;
     try { await loadCalendar({series:event.target.value, day:null}); } catch (error) { toast(error.message); }
@@ -591,6 +830,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     clearTimeout(mapInputTimer); mapInputTimer = setTimeout(updateMap, 120);
   });
   document.querySelectorAll("[data-demo]").forEach(button => button.addEventListener("click", () => selectDataset(button.dataset.demo === "1")));
+  initStudyTools();
+  $("#download-audit")?.addEventListener("click", () => {
+    if (!state.audit) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(state.audit, null, 2)], {type: "application/json"}));
+    const link = document.createElement("a"); link.href = url;
+    link.download = `fireatlas_method_audit_${state.audit.series}_${state.audit.year}_${String(state.audit.month).padStart(2, "0")}.json`;
+    link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
   $("#analyze").addEventListener("click", async () => {
     try {
       const next = validateView({...viewConfig(), bbox: $("#bbox").value.trim(), year: $("#year").value, day: ""});
@@ -621,6 +868,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-source-target]").forEach(button => button.addEventListener("click", async () => {
     try { await loadCalendar({series: button.dataset.sourceTarget, day: null}); } catch (error) { toast(error.message); }
   }));
+  let calendarInitialized = false, pendingValidityDetail = null;
+  async function applyValidityDay(detail) {
+    const {date: stamp, bbox, year, month} = detail || {};
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(stamp || "") || !Array.isArray(bbox)) return;
+    try {
+      if (state.demo) { state.demo = false; await loadMeta(); }
+      const area = bbox.join(","), index = month - 1;
+      if (!state.data || state.year !== year || state.month !== index || state.bbox !== area || state.series !== "joint") {
+        await loadCalendar({year, month:index, bbox:area, series:"joint", demo:false, day:stamp});
+        drawAoi(true);
+      } else {
+        state.day = stamp; mapDay = Number(stamp.slice(8));
+        renderDays(); renderTimeline(); syncView(); updateMap();
+        await loadDay(stamp);
+      }
+    } catch (error) { toast(error.message); }
+  }
+  window.addEventListener("fireatlas:validity-day", event => {
+    if (!calendarInitialized) {pendingValidityDetail = event.detail; return;}
+    applyValidityDay(event.detail);
+  });
   try {
     const initialParams = new URLSearchParams(location.search);
     const realMeta = !initialParams.has("demo") && !initialParams.has("year") && !initialParams.has("bbox") && !initialParams.has("series")
@@ -636,4 +904,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     await loadCalendar(next); drawAoi(true);
   } catch (error) { toast(error.message); }
+  calendarInitialized = true;
+  if (pendingValidityDetail) await applyValidityDay(pendingValidityDetail);
 });

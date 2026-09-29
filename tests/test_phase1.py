@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import os
 import tempfile
 import unittest
@@ -10,6 +11,7 @@ from unittest.mock import patch
 from fireatlas.core import calendar, connect, ingest
 from fireatlas.demo import BBOX, FIELDS, make_demo
 from fireatlas.fetch import fetch_month
+from fireatlas.harmonization import month_audit
 
 
 def row(**changes):
@@ -56,6 +58,27 @@ class Phase1Tests(unittest.TestCase):
             set(r["confidence_raw"] for r in self.db.execute("SELECT confidence_raw FROM observations")),
             {"80", "n", "h"},
         )
+
+    def test_harmonization_flags_mixed_versions_in_complete_source_export(self):
+        modis = self.root / "modis-mixed.csv"
+        viirs = self.root / "viirs-standard.csv"
+        write_csv(modis, [row(version="6.1"), row(version="6.2", longitude="-121.22345")])
+        write_csv(viirs, [row(instrument="VIIRS", satellite="N", version="2.0",
+                              confidence="n", scan="0.38", track="0.38")])
+        ingest(self.db, modis, "MODIS_SP", complete_month="2024-07", bbox=BBOX)
+        ingest(self.db, viirs, "VIIRS_SNPP_SP", complete_month="2024-07", bbox=BBOX)
+        audit = month_audit(self.db, year=2024, month=7, series="joint", bbox=BBOX)
+        self.assertEqual(audit["status"], "mixed-product-versions")
+        self.assertEqual(audit["sources"][0]["product_versions"], ["6.1", "6.2"])
+
+    def test_suomi_archive_instrument_is_normalized_without_changing_raw_row(self):
+        path = self.root / "snpp-archive.csv"
+        write_csv(path, [row(instrument="SNPP", satellite="SNPP", version="2",
+                             confidence="n", scan="0.38", track="0.38")])
+        ingest(self.db, path, "VIIRS_SNPP_SP", complete_month="2024-07", bbox=BBOX)
+        stored = self.db.execute("SELECT sensor,platform,raw_json FROM observations").fetchone()
+        self.assertEqual((stored["sensor"], stored["platform"]), ("VIIRS", "SNPP"))
+        self.assertEqual(json.loads(stored["raw_json"])["instrument"], "SNPP")
 
     def test_reimport_is_idempotent_and_invalid_csv_rolls_back(self):
         path = self.root / "modis.csv"

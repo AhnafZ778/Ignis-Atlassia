@@ -64,6 +64,43 @@ class StudyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "does not reproduce" if rehash else "checksum mismatch"):
                 verify_bundle(io.BytesIO(output.getvalue()))
 
+    def test_rejects_rehashed_harmonization_count_that_disagrees_with_source_rows(self):
+        with zipfile.ZipFile(io.BytesIO(self.bundle())) as z:
+            files = {name: z.read(name) for name in z.namelist()}
+        audit = json.loads(files["harmonization.json"])
+        audit["co_detected_cell_days"] += 1
+        files["harmonization.json"] = json.dumps(audit).encode()
+        manifest = json.loads(files["manifest.json"])
+        manifest["files"]["harmonization.json"] = hashlib.sha256(files["harmonization.json"]).hexdigest()
+        files["manifest.json"] = json.dumps(manifest).encode()
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w") as z:
+            for name, body in files.items():
+                z.writestr(name, body)
+        with self.assertRaisesRegex(ValueError, "harmonization audit does not reproduce"):
+            verify_bundle(io.BytesIO(output.getvalue()))
+
+    def test_versioned_audit_preserves_old_bundle_verification(self):
+        with zipfile.ZipFile(io.BytesIO(self.bundle())) as z:
+            files = {name: z.read(name) for name in z.namelist()}
+        files.pop("harmonization.json")
+        manifest = json.loads(files["manifest.json"])
+        manifest["files"].pop("harmonization.json")
+        files["manifest.json"] = json.dumps(manifest).encode()
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w") as z:
+            for name, body in files.items():
+                z.writestr(name, body)
+        with self.assertRaisesRegex(ValueError, "incomplete study bundle"):
+            verify_bundle(io.BytesIO(output.getvalue()))
+        manifest["schema"] = "fireatlas-study-v1"
+        files["manifest.json"] = json.dumps(manifest).encode()
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w") as z:
+            for name, body in files.items():
+                z.writestr(name, body)
+        self.assertEqual(verify_bundle(io.BytesIO(output.getvalue()))["schema"], "fireatlas-study-v1")
+
     def test_invalid_selection_and_oversize_never_silently_truncate(self):
         for config in [dict(day="2015-02-30"), dict(day="2014-07-01"), dict(month=13), dict(layer="bogus")]:
             with self.assertRaises(ValueError): self.bundle(**config)

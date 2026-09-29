@@ -1,5 +1,10 @@
 # Data readiness — 27 September 2026
 
+**Historical snapshot:** The authentic NASA MODIS/Suomi NPP archive was added
+on 29 September 2026. For the current data inventory and reproduction commands,
+see [NASA archive import](NASA_ARCHIVE_IMPORT.md) and the root README. Counts
+and verification results below describe the repository before that import.
+
 **Ready to proceed with presentation UI, navigation and interaction improvements.**
 The current local backend serves authentic imports alongside a separate, clearly
 labelled synthetic showcase. NASA API availability does not block these workflows.

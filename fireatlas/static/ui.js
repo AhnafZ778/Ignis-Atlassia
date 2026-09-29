@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("click", event => { if (!event.target.closest(".topbar")) close(); });
     matchMedia("(min-width: 761px)").addEventListener("change", close);
   }
-  const links = [...document.querySelectorAll(".workspace-nav a")];
+  const links = [...document.querySelectorAll('.workspace-nav a[href^="#"]')];
   if (links.length && "IntersectionObserver" in window) {
     const visible = new Set();
     const observer = new IntersectionObserver(entries => {

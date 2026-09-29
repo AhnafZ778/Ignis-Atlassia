@@ -19,4 +19,4 @@ build-backend = "setuptools.build_meta"
 include = ["fireatlas*"]
 
 [tool.setuptools.package-data]
-fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "samples/*"]
+fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "static/incident-media/*", "samples/*"]

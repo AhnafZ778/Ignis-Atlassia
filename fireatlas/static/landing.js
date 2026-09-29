@@ -48,15 +48,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   window.addEventListener('resize',schedule,{passive:true});
   depthMedia.addEventListener('change',schedule);
   update();
-  const workspace=document.getElementById('study-workspace');
-  const revealWorkspace=hash=>{
-    if(!hash || workspace?.tagName!=='DETAILS')return;
-    let target;try{target=document.getElementById(decodeURIComponent(hash.slice(1)));}catch{return;}
-    if(target && workspace.contains(target))workspace.open=true;
-  };
-  revealWorkspace(location.hash);
-  window.addEventListener('hashchange',()=>revealWorkspace(location.hash));
-  document.addEventListener('click',e=>{const link=e.target.closest('a[href^="#"]');if(link)revealWorkspace(link.hash);});
   const resources=document.querySelector('.nav-resources');
   document.addEventListener('click',e=>{if(resources&&!resources.contains(e.target))resources.open=false;});
   resources?.addEventListener('click',e=>{if(e.target.closest('a'))resources.open=false;});

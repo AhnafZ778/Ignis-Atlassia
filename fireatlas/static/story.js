@@ -18,14 +18,13 @@
         await loadCalendar({year:2015,month:6,series:"viirs-snpp",day:"2015-07-01"});
       }},
     {topic:"04 / VERIFY",icon:"⌁",title:"Open the raw evidence.",
-      description:"The joint view shows all four original pixels behind July 1. Expand a record to inspect the source fields and acquisition time.",
-      target:"evidence-section",focus:".evidence-grid",apply: async () => {
+      description:"Use Inspect this day’s source records below the calendar to open the Data & Method page with this synthetic selection preserved.",
+      target:"calendar-section",focus:"#calendar-day-summary",apply: async () => {
         await loadCalendar({year:2015,month:6,series:"joint",day:"2015-07-01"});
-        $("records").querySelector("details")?.setAttribute("open", "");
       }},
-    {topic:"05 / EXPLORE",icon:"✦",title:"Take the next step.",
-      description:"The Training Lab turns these ideas into a clearly simulated crew exercise. The Research Lab lets you inspect overlap and question the method.",
-      target:"open-research-study",focus:".workspace-links",apply: async () => {}},
+    {topic:"05 / EXPORT",icon:"↓",title:"Take the evidence with you.",
+      description:"Download the selected calendar, source ledger and checksums so another reviewer can inspect the same result.",
+      target:"study-workspace",focus:".study-tools",apply: async () => {}},
   ];
   let current = -1, focus = null, opening = null, sequence = 0;
   const motion = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
@@ -36,8 +35,6 @@
     opening?.focus(); opening = null;
   }
   async function show(index) {
-    const workspace = $("study-workspace");
-    if (workspace?.tagName === "DETAILS") workspace.open = true;
     const turn = ++sequence, step = steps[index];
     if (!step) return;
     $("story-next").disabled = $("story-back").disabled = true;
