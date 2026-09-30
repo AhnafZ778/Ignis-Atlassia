@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const colors = ["#e9ad80", "#8cc5c9", "#bbc6a0", "#b5a2ca", "#d8c287", "#93b3d4"];
-  const state = {report: null, mask: null, selected: null, busy: false, map: null, layer: null};
+  const state = {report: null, mask: null, selected: null, busy: false, map: null, layer: null, contextLayer: null, aoiOutline: null};
   const number = value => value == null ? "—" : new Intl.NumberFormat("en", {maximumFractionDigits: 2}).format(value);
   function el(tag, className, text) {
     const node = document.createElement(tag); if (className) node.className = className;
@@ -95,7 +95,41 @@
   function initMap() {
     if (typeof L === "undefined") { $("candidate-map").textContent = "Map unavailable. Inspect candidate membership in the list."; return; }
     state.map = L.map("candidate-map", {scrollWheelZoom: false, attributionControl: false, maxZoom: 13, minZoom: 2});
+    L.control.attribution({prefix: false, position: "bottomright"}).addTo(state.map);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap contributors",
+      keepBuffer: 2
+    }).addTo(state.map);
+    updateCandidateVegetation();
     state.layer = L.layerGroup().addTo(state.map); state.map.setView([40.12, -121.12], 9);
+  }
+  function candidateCompositeDate() {
+    const cutoff = $("research-cutoff").value;
+    const selected = new Date(`${cutoff}T00:00:00.000Z`);
+    if (!cutoff || Number.isNaN(selected.getTime())) return null;
+    const first = Date.UTC(selected.getUTCFullYear(), 0, 1);
+    const elapsed = Math.floor((selected.getTime() - first) / 86400000);
+    return new Date(first + Math.floor(elapsed / 16) * 16 * 86400000).toISOString().slice(0, 10);
+  }
+  function updateCandidateVegetation() {
+    if (!state.map || typeof L === "undefined") return;
+    const time = candidateCompositeDate();
+    if (!time) return;
+    if (state.contextLayer) state.map.removeLayer(state.contextLayer);
+    state.contextLayer = L.tileLayer.wms("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi", {
+      layers: "MODIS_Terra_L3_NDVI_16Day",
+      format: "image/png",
+      transparent: true,
+      version: "1.1.1",
+      time,
+      attribution: "NASA GIBS / MODIS",
+      opacity: 0.9,
+      maxZoom: 13,
+      keepBuffer: 2
+    }).addTo(state.map);
+    const label = $("candidate-map-label");
+    if (label) label.textContent = `NASA MODIS NDVI · ${time} · CONTEXT ONLY`;
   }
   function fitMap() {
     if (!state.map || !state.report) return;
@@ -103,6 +137,23 @@
     const points = state.report.candidates.groups.flatMap(g => g.points.map(p => [p.coordinates[1], p.coordinates[0]]));
     if (points.length) state.map.fitBounds(L.latLngBounds(points).pad(.25), {padding: [45, 45], maxZoom: 11});
     else { const [w,s,e,n] = state.report.config.bbox; state.map.fitBounds([[s,w],[n,e]], {padding: [20, 20]}); }
+  }
+  function fitStudyArea() {
+    if (!state.map || !state.report) return;
+    state.map.invalidateSize();
+    const bbox = state.report.config.bbox;
+    if (!Array.isArray(bbox) || bbox.length !== 4 || !bbox.every(Number.isFinite)) {
+      fitMap(); return;
+    }
+    const [west, south, east, north] = bbox;
+    if (west >= east || south >= north) { fitMap(); return; }
+    const bounds = [[south, west], [north, east]];
+    if (state.aoiOutline) state.map.removeLayer(state.aoiOutline);
+    state.aoiOutline = L.rectangle(bounds, {
+      color: "#f49c68", weight: 2, fillOpacity: 0.025, dashArray: "6 5",
+      interactive: false
+    }).addTo(state.map);
+    state.map.fitBounds(bounds, {padding: [20, 20], maxZoom: 10});
   }
   function drawCandidates() {
     $("candidate-list").replaceChildren();
@@ -123,7 +174,7 @@
         if (!unique.has(key)) unique.set(key, {point, days: []}); unique.get(key).days.push(point.date);
       }
       for (const {point, days} of unique.values()) {
-        L.circleMarker([point.coordinates[1], point.coordinates[0]], {radius: selected ? 11 : 7, color, weight: selected ? 2 : 1, fillColor: color, fillOpacity: selected ? .65 : .22})
+        L.circleMarker([point.coordinates[1], point.coordinates[0]], {radius: selected ? 11 : 7, color: "#fff4df", opacity: .96, weight: selected ? 2.5 : 1.5, fillColor: color, fillOpacity: selected ? .9 : .72})
           .bindTooltip(el("span", "", `Candidate ${index + 1} · ${days.length} detected days · grid ${point.grid_x}, ${point.grid_y}`))
           .on("click", () => { state.selected = group.id; drawCandidates(); renderCandidateDetail(); }).addTo(state.layer);
       }
@@ -181,7 +232,7 @@
     $("study-temporal-note").textContent = report.temporal_scope;
     $("study-provenance").replaceChildren();
     for (const source of report.provenance) $("study-provenance").append(el("div", "provenance-file", `${source.source_id} · ${source.source_uri} · SHA-256 ${source.file_sha256}`));
-    renderChart(); drawCandidates(); renderCandidateDetail(); renderCoverage(); fitMap();
+    renderChart(); drawCandidates(); renderCandidateDetail(); renderCoverage(); fitStudyArea();
   }
   function download(value, name) {
     const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], {type: "application/json"}));
@@ -191,7 +242,8 @@
     months.forEach((name, i) => { const option = el("option", "", name); option.value = i + 1; $("research-month").append(option); });
     $("research-month").value = "7";
     $("research-form").addEventListener("submit", event => { event.preventDefault(); run(); });
-    for (const id of ["research-year", "research-month"]) $(id).addEventListener("change", dateRange);
+    for (const id of ["research-year", "research-month"]) $(id).addEventListener("change", () => { dateRange(); updateCandidateVegetation(); });
+    $("research-cutoff").addEventListener("change", updateCandidateVegetation);
     $("rebuild-candidates").addEventListener("click", () => { if ($("research-form").reportValidity()) run(); });
     $("fit-candidates").addEventListener("click", fitMap);
     $("export-study").addEventListener("click", () => download({format: "fireatlas-study-export-v1", report: state.report, input_mask: state.mask}, `fireatlas-research-${state.report.config.as_of}.json`));

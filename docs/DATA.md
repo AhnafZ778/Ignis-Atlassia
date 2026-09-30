@@ -114,13 +114,33 @@ uv run python -m fireatlas.calibration --db data/fireatlas.sqlite3
 ```
 
 The values remain a descriptive scaling experiment, not proof that the sensors
-are interchangeable. Leave-one-year-out 95% interval coverage is low (41.5%
-in Northern California and 39.0% in Punjab–Haryana), so the uncertainty
-intervals are under-calibrated. The artifacts explicitly leave the 2012 sensor
-step pending: older detections are available as positive rows, including the
-new reconstructed S-NPP 2021–2022 window, but their original request metadata
-do not establish complete observation windows.
-Independent review is also still required.
+are interchangeable. Fixed-candidate leave-one-year-out errors are retained as
+reference baselines; the nested selected-pipeline result is the estimate that
+accounts for model choice. Across four outer year folds, Northern California's
+nested median absolute log error is 0.304 and its median full-year absolute
+error is 25.2%. Punjab–Haryana's corresponding errors are 0.322 and 26.3%.
+Daily and 1-, 3-, 7-, and 14-day seasonal gap results are included in the same
+artifacts. The rolling gap windows overlap and are grouped by held-out year, so
+their window counts are not independent sample sizes.
+
+For the nested selected pipeline, held-out daily median absolute log error is
+0.571 in Northern California and 0.926 in Punjab–Haryana. Median absolute
+percentage error on nonzero VIIRS days is 100.0% and 93.0%, respectively. These
+values describe this short paired sample and should be read alongside the
+season-by-gap table in the Method page; they do not establish sensor detection
+probability.
+
+Prediction intervals are explicitly **withheld**: the artifacts contain zero
+independently evaluated prediction-interval pairs and make no interval
+coverage or width claim. The earlier 17/41 (41.5%) and 16/41 (39.0%) values
+were coverage diagnostics for monthly-ratio factor intervals, not prediction
+interval coverage, and are not presented as prediction reliability. The
+production calendar's current method choice is fit using all available overlap
+months; it is separate from the nested held-out estimate. The artifacts also
+leave the 2012 sensor step pending: older detections are available as positive
+rows, including the reconstructed S-NPP 2021–2022 window, but their original
+request metadata do not establish complete observation windows. Independent
+review is still required.
 
 ## Use and license
 
@@ -131,17 +151,31 @@ The code license in the repository does not apply to NASA data. NASA Earthdata�
 ### MCD64A1 Collection 6.1 corroboration
 
 Official University of Maryland MCD64A1 Collection 6.1 monthly Burn Date and
-companion QA rasters are now included for dated Park, Grove, and Punjab–Haryana
+companion QA rasters are included for dated Park, Grove, and Punjab–Haryana
 checks. `fireatlas/samples/mcd64_corroboration.json` records each clipped box,
-mapped Burn Date count, day-of-year range, active-fire context, and SHA-256 for
-both source files. Retrieved and imported 2026-09-30. Static exports copy the
-same report to `data/v2/validity/mcd64-corroboration.json`.
+QA-supported Burn Date counts, day-of-year range, same-date grid co-location,
+active-fire context, and SHA-256 for both source files. Retrieved and imported
+2026-09-30. Static exports copy the same report to
+`data/v2/validity/mcd64-corroboration.json`.
+
+The [Collection 6.1 guide](https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf)
+defines QA bit 0 as land, bit 1 as sufficient valid data, bit 2 as a shortened
+reliable mapping period, bit 3 as contextual relabeling, and bits 5–7 as a
+special-condition code for unburned cells. A Burn Date of 1–366 is counted as
+QA-supported burned only when bits 0 and 1 are set. A Burn Date of 0 is counted
+as full-period unburned only when bits 0 and 1 are set, bits 2 and 3 are clear,
+and the special-condition code is zero. Other categories remain visible in the
+evidence report. These are product QA rules, not ground-truth labels.
 
 Sources: [MCD64A1 DOI](https://doi.org/10.5067/MODIS/MCD64A1.061) and the
 [official Collection 6.1 guide](https://modis-fire.umd.edu/files/MODIS_C61_BA_User_Guide_1.1.pdf).
 This is lagged burned-area context only; it does not establish active-fire
 truth, satellite pass, cloud clearance, a fire perimeter, or fire-free area.
-Independent review remains pending.
+Same-date co-location assigns MCD64A1 pixel centers and FIRMS centroids to the
+same 1 km EPSG:6933 cells. It is descriptive rather than independent validation:
+the MCD64A1 algorithm uses cumulative MODIS active-fire maps to guide training
+samples and prior probabilities. A lack of same-date co-location does not
+establish fire absence. Independent review remains pending.
 
 The local app can now display partial historical detections from July 2006 MODIS and July 2012 S-NPP, including reconstructed S-NPP rows through July 2022, but it still cannot produce a complete harmonized calendar or long-term baseline for those years. No rows have been synthesized. The monthly calendar keeps reconstructed months incomplete unless exact request dates and area establish a complete export.
 

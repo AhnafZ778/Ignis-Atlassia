@@ -27,14 +27,14 @@ the absence of that product.
 - **File:** `fireatlas/calendar_v2.py`. Route `GET /api/v2/calendar`.
 - **Parameters:** `region` (`norcal` or `punjab-haryana` only), `year`. Reject anything else with HTTP 400.
 - **Response:** schema `fireatlas-calendar-v2` in the appendix. For each day: harmonized value, low, high, `estimate_type`, `source_used`, `quality` (`good` for complete S-NPP exports, `degraded` for a MODIS estimate outside the downloaded S-NPP window or within a documented product gap, `unknown` for incomplete exports or unvalidated scaling), `evidence_state`, `coverage_state`, `sensor_bridge`, and source-separated `frp_mw_day`. A scaled value during a documented gap has `evidence_state=scaled` and `coverage_state=documented_processing_gap`; the UI says “gap · scaled estimate”. A complete export with zero records is an observed zero-detection day; pass/cloud coverage stays unknown. For each month: value, percentile among baseline years, rank, `n_years`, and `flag` (`unusually-high` at or above the 90th percentile, `unusually-low` at or below the 10th, `typical`, or `insufficient-history` when `n_years` < 10).
-- **Baseline:** years from 2010 through the year before the selected year, and only years whose MODIS collection matches the selected year. List excluded years.
+- **Baseline:** years from 2006 through the year before the selected year, and only complete months whose MODIS collection matches the selected year. Reconstructed row-only periods and missing dates remain unknown and cannot enter the baseline. List excluded years.
 - **Checks:**
   - [x] Northern California 2024 returns 12 months from authentic bundled NASA records through `/api/v2/calendar` (`tests/test_validity.py::test_real_calendar_api_and_day_drawer_keep_nasa_source_evidence`).
   - [x] A third region id returns 400 (`tests/test_web.py::test_region_calendar_api_is_named_scoped_and_never_fabricates_empty_data`).
 
 ## C1-T2 — Heatmap
 
-Under the globe, years as rows and days as columns, 2010 through the latest complete year. An incomplete export, a documented product-gap interval, and a complete zero-detection export have distinct patterns and labels. A daily outage hatch means the UTC day intersects the notice; it does not mean the whole day had no S-NPP data. Hover or keyboard focus reads the date, the value, the unit "VIIRS-equivalent active-fire cell-days", and whether the value is observed, scaled, unknown, a documented processing gap, or a complete zero export.
+Under the globe, years as rows and days as columns, 2006 through the latest complete year. An incomplete export, a documented product-gap interval, and a complete zero-detection export have distinct patterns and labels. A daily outage hatch means the UTC day intersects the notice; it does not mean the whole day had no S-NPP data. Hover or keyboard focus reads the date, the value, the unit "VIIRS-equivalent active-fire cell-days", and whether the value is observed, scaled, unknown, a documented processing gap, or a complete zero export.
 
 - [x] Screenshot `docs/winning-plan/evidence/C1-T2-norcal.png` shows the 2010s, unknown export months, and the documented S-NPP outage interval intersecting 24–29 July 2024 with partial endpoint days marked distinctly. Captured from the live local archive on 2026-09-29 at 1440 CSS px / DPR 2; includes the July 2024 daily grid and full historical legend.
 
@@ -76,7 +76,7 @@ The perfected plan adds the compact Sensor Bridge and FRP audit to the existing 
 it does not add a second globe, a spread forecast, or an operational recommendation. Any MCD64A1
 context remains a lagged corroboration note with its own source and date.
 
-- [x] The model errors, annual errors, selected model, and interval-coverage values displayed for both regions match the corresponding calibration JSON (`uv run --with playwright python scripts/verify_calibration_ui.py --base http://127.0.0.1:8765`; captures: `docs/winning-plan/evidence/C10-T1-calibration-norcal.png` and `C10-T1-calibration-punjab-haryana.png`).
+- [x] The nested held-out estimate, fixed candidate references, daily and seasonal gap results, withheld prediction-interval state, and 2012 step state displayed for both regions match their calibration JSON (`node scripts/verify_calibration_ui.mjs --base http://127.0.0.1:8877/fireatlas-subpath`; captures: `docs/winning-plan/evidence/C10-T1-calibration-norcal.png` and `C10-T1-calibration-punjab-haryana.png`).
 - [ ] The 2012 step is still pending because row-only legacy imports do not establish complete monthly source exports; do not show a ratio as a measured complete-window result until that input gate passes.
 
 ## C11-T1 — Home page

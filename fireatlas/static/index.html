@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FireAtlas — MODIS + VIIRS burning activity calendar</title>
+  <title>Ignis-Atlassia — MODIS + VIIRS burning activity calendar</title>
   <meta name="description" content="Explore a dated Northern California burning activity calendar built from authentic NASA FIRMS MODIS and VIIRS hotspot records. Compare sources, inspect original observations, and see data limits.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
@@ -13,7 +13,7 @@
   <script src="/study-ui.js" defer></script>
   <script src="/earth-embed.js" defer></script>
   <script src="/globe-math.js" defer></script>
-  <script src="/globe.js" defer></script>
+  <script src="/globe.js?v=static-snapshot-20260930" defer></script>
   <link rel="stylesheet" href="/design.css">
   <link rel="stylesheet" href="/globe.css">
   <link rel="stylesheet" href="/vendor/ui-primitives.css">
@@ -28,7 +28,7 @@
 <body class="atlas-page landing-overhaul">
   <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="topbar floating-header">
-    <a class="brand" href="/" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
+    <a class="brand" href="/" aria-label="Ignis-Atlassia home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a>
     <div class="navigation-glass">
     <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#menu"></use></svg><span class="menu-label">Menu</span></button>
     <nav id="site-navigation" aria-label="Project navigation"><a href="#top" class="active">Overview</a><a href="/method.html">Data &amp; method</a><a href="#harmonized-calendar">Fire calendar</a><details class="nav-resources"><summary>Labs &amp; sources <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary><div><a href="/research.html">Research lab</a><a href="/data.html">Data sources</a></div></details></nav>
@@ -150,7 +150,7 @@
       <p id="harm-build-meta" class="harm-build-meta" role="status">Evidence bundle: loading source hashes…</p>
       <div class="harm-summary-grid">
         <article class="harm-summary-card"><span>HARMONIZED CELL-DAYS</span><strong id="harm-value">—</strong><small id="harm-value-note">Unknown until source exports are complete</small></article>
-        <article class="harm-summary-card"><span>COMPARABLE YEARS</span><strong id="harm-years">—</strong><small id="harm-percentile">No baseline loaded</small></article>
+        <article class="harm-summary-card" title="Only complete prior months with the same observed or estimated sources and product versions enter this comparison."><span>COMPARABLE YEARS</span><strong id="harm-years">—</strong><small id="harm-percentile">No baseline loaded</small></article>
         <article class="harm-summary-card"><span>CRITICAL DATES</span><strong id="harm-season">—</strong><small id="harm-season-note">Cumulative activity and 15-day peak window</small></article>
         <article class="harm-summary-card harm-model-card"><span>CALIBRATION CHECK</span><strong id="harm-model">Awaiting data</strong><small id="harm-model-note">Held-out comparison controls whether scaling is used</small></article>
       </div>
@@ -165,7 +165,7 @@
         </div>
         <div class="harm-bridge-detail-grid">
           <div class="harm-mismatch-card"><div class="harm-mini-heading"><span>DAILY MISMATCH · COMMON GRID</span><small id="harm-bridge-days">—</small></div><div class="harm-mismatch-bars"><span><i class="modis-only" id="harm-mismatch-modis-bar"></i><b id="harm-mismatch-modis">—</b><small>MODIS only</small></span><span><i class="both" id="harm-mismatch-both-bar"></i><b id="harm-mismatch-both">—</b><small>Both</small></span><span><i class="viirs-only" id="harm-mismatch-viirs-bar"></i><b id="harm-mismatch-viirs">—</b><small>VIIRS only</small></span><span><i class="gap" id="harm-mismatch-gap-bar"></i><b id="harm-mismatch-gap">—</b><small>Gap / unknown</small></span></div><p id="harm-bridge-note">Both sensors are retained; their raw pixels are never added together.</p></div>
-          <div class="harm-frp-card"><div class="harm-mini-heading"><span>RAW FRP CONTEXT</span><small>MW / UTC day</small></div><strong id="harm-frp-value">—</strong><p id="harm-frp-note">Fire Radiative Power is shown separately from activity cell-days.</p></div>
+          <div class="harm-frp-card"><div class="harm-mini-heading"><span>RAW FRP CONTEXT</span><small id="harm-frp-unit">MW · paired UTC dates</small></div><strong id="harm-frp-value">—</strong><p id="harm-frp-note">Fire Radiative Power is shown separately from activity cell-days.</p></div>
           <div class="harm-corroboration-card"><div class="harm-mini-heading"><span>DATED CORROBORATION</span><small id="harm-corroboration-state">ACTIVE FIRE ONLY</small></div><strong>MCD64A1 · C6.1</strong><p id="harm-corroboration-note">Select a dated calendar month to inspect the hash-bound burned-area check.</p><a href="/data/v2/validity/mcd64-corroboration.json" target="_blank" rel="noopener noreferrer">Evidence report ↗</a> · <a href="https://doi.org/10.5067/MODIS/MCD64A1.061" target="_blank" rel="noopener noreferrer">NASA product record ↗</a></div>
         </div>
         <div id="harm-share-card" class="harm-share-card" hidden aria-live="polite"><div><span class="harm-share-kicker">EVIDENCE CARD · <span id="harm-share-card-case">—</span></span><strong id="harm-share-card-title">—</strong><small id="harm-share-card-subtitle">—</small></div><dl><div><dt>CALENDAR</dt><dd id="harm-share-card-value">—</dd></div><div><dt>STATE</dt><dd id="harm-share-card-state">—</dd></div><div><dt>QUALITY</dt><dd id="harm-share-card-quality">—</dd></div><div><dt>INPUTS + HASH</dt><dd id="harm-share-card-inputs">—</dd></div><div><dt>LIMIT</dt><dd id="harm-share-card-limit">ACTIVE FIRE ONLY · pass/cloud coverage unknown</dd></div><div class="harm-share-card-url"><dt>URL</dt><dd><a id="harm-share-card-url" href="#harmonized-calendar">—</a></dd></div></dl></div>
@@ -236,7 +236,7 @@
       <div class="section-heading"><div><p class="eyebrow">01 / LOCATE</p><h2>Regional study atlas</h2><p>Select an area, choose a context layer, and replay its daily observations.</p></div><span class="ui-badge"><svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#scan-eye"></use></svg> Observations, not boundaries</span></div>
       <div class="atlas-panel">
         <div class="map-toolbar"><div class="layer-buttons" role="group" aria-label="Map context layer"><button data-layer="none" type="button">Hotspots</button><button data-layer="ndvi" class="selected" type="button">Vegetation NDVI</button><button data-layer="landcover" type="button">Land cover</button><button data-layer="fwi" type="button" aria-disabled="true">Fire weather · unavailable</button></div><button id="use-map-aoi" class="map-action" type="button">Study this map area <svg class="ui-icon" aria-hidden="true"><use href="/vendor/lucide-icons.svg#arrow-right"></use></svg></button></div>
-        <div id="map" role="application" aria-label="FireAtlas map with imported fire observations"><div id="map-replay-annotations" class="map-replay-annotations" hidden aria-live="polite"></div></div>
+        <div id="map" role="application" aria-label="Ignis-Atlassia map with imported fire observations"><div id="map-replay-annotations" class="map-replay-annotations" hidden aria-live="polite"></div></div>
         <aside id="map-legend" class="map-legend" aria-label="Map legend"><div class="map-legend-head"><span>MAP LEGEND</span><b id="map-legend-badge">NASA / FIRMS</b></div><div class="map-legend-block"><small>CONTEXT LAYER</small><div class="map-legend-context-row"><i id="map-legend-context-swatch" class="map-legend-swatch none" aria-hidden="true"></i><strong id="map-legend-context-title">No context overlay</strong></div><div id="map-legend-context-range" class="map-legend-context-range none"><i aria-hidden="true"></i><span>Only satellite detections</span></div></div><div class="map-legend-block"><small>POINTS ON MAP</small><div class="map-legend-items"><span><i class="map-legend-swatch modis" aria-hidden="true"></i><b>MODIS</b> thermal detection</span><span><i class="map-legend-swatch viirs" aria-hidden="true"></i><b>VIIRS S-NPP</b> thermal detection</span><span><i class="map-legend-swatch aoi" aria-hidden="true"></i> Study area boundary</span></div><p id="map-legend-observation-note" class="map-legend-observation-note">Imported NASA FIRMS detection records.</p></div><p id="map-legend-note">The map shows dated detection locations. A point is not a fire perimeter.</p></aside>
         <div class="map-footer"><span id="map-status">Loading imported observations…</span><span id="layer-status">Map points show dated satellite detection locations.</span></div>
         <div class="map-timeline" aria-label="Replay selected month of satellite detections"><div class="map-timeline-top"><div><span>REPLAY THE ARCHIVE</span><strong id="map-timeline-title">Select a month to begin</strong></div><div class="map-timeline-actions"><button id="map-play" type="button">▶ Play month</button><button id="map-all" type="button" disabled>Show all dates</button></div></div><div id="map-timeline-bars" class="map-timeline-bars" role="group" aria-label="Select an acquisition day"></div><input id="map-day" type="range" min="1" max="31" value="1" aria-label="Acquisition day of selected month"><p>Drag through the daily detections. Each frame shows observed pixels from that date, not a predicted fire perimeter.</p><div id="map-replay-guide" class="map-replay-guide" hidden aria-live="polite"><article data-guide="map"><b>01 · Read the map</b><span>Dots are observed satellite detection cells for the selected UTC day.</span></article><article data-guide="timeline"><b>02 · Follow the date</b><span>Playback advances one day at a time so the pattern is easy to compare.</span></article><article data-guide="bars"><b>03 · Read the bars</b><span>Bar height shows detected cell-days; incomplete exports are marked as unknown.</span></article></div></div>
@@ -304,9 +304,9 @@
   </div>
   </section>
   </div>
-  <footer class="plan-safety-footer" aria-label="FireAtlas use limitations">
+  <footer class="plan-safety-footer" aria-label="Ignis-Atlassia use limitations">
     <span>RESEARCH TOOL · NOT OPERATIONAL</span>
-    <p>FireAtlas is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.</p>
+    <p>Ignis-Atlassia is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.</p>
     <a href="/method.html">Review the method and limits ↗</a>
   </footer>
   </main>

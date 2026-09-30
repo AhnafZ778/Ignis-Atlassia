@@ -54,7 +54,7 @@
   "scope": "local static-bundle rehearsal with a timed WebVTT sidecar; public URL, voice-over, and outside-user review remain open",
   "static_bundle": {
     "path": "site/data/v2/manifest.json",
-    "sha256": "e74a06f4e144b84fb15baa4d2917419a069d37a127d0315ef25fcabbaa71a3c2"
+    "sha256": "06ff26ca0a3f2d1ea1c8a1672499cf4b9004c7b39ce473e9772c4a1c5098d74f"
   },
   "video": {
     "audio": false,

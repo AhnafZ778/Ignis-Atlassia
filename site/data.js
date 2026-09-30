@@ -13,6 +13,38 @@
     if (className) el.className = className;
     return el;
   }
+  async function loadNativeMaskDownloads() {
+    const panel = $("native-mask-downloads");
+    if (!panel) return;
+    const summary = panel.querySelector("summary");
+    const status = $("native-mask-status");
+    const list = $("native-mask-file-list");
+    if (staticDataRoot) {
+      summary.textContent = "Native files in the local project (8.7 GiB)";
+      status.textContent = "The static release provides the full file inventory and NASA source links where recorded. Native binaries stay in the local project folder; run the local FireAtlas server to download each file directly from this page.";
+      return;
+    }
+    try {
+      const response = await fetch("/api/native-masks");
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Local asset list unavailable.");
+      const formatSize = bytes => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GiB`
+        : bytes >= 1024 ** 2 ? `${(bytes / 1024 ** 2).toFixed(1)} MiB` : `${(bytes / 1024).toFixed(0)} KiB`;
+      summary.textContent = `Download ${result.asset_count.toLocaleString()} native files · ${formatSize(result.total_bytes)} total`;
+      status.textContent = "Original local NASA HDF and NetCDF files. Each link streams the source file; SHA-256 values are in the inventory download above.";
+      list.replaceChildren(...result.assets.map(asset => {
+        const item = document.createElement("li");
+        const link = node("a", `${asset.filename} · ${formatSize(asset.bytes)}`);
+        link.href = asset.download_url;
+        link.download = asset.filename;
+        item.append(link);
+        return item;
+      }));
+    } catch (error) {
+      summary.textContent = "Native files are available from the local project folder";
+      status.textContent = `Direct downloads are unavailable on this static page. ${error.message} The complete fingerprint inventory and recorded NASA source URLs remain downloadable above.`;
+    }
+  }
   async function staticFile(path) {
     const target = new URL(path, new URL(staticDataRoot, document.baseURI));
     if (!staticCache.has(target.href)) {
@@ -282,5 +314,6 @@
     } catch (error) { $("data-error").hidden = false; $("data-error").textContent = error.message; $("sync-pilots").disabled = false; }
   });
   refreshArchiveCoverage();
+  loadNativeMaskDownloads();
   refresh();
 })();

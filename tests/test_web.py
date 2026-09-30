@@ -40,7 +40,7 @@ class WebMvpTests(unittest.TestCase):
             return response.headers, response.read()
 
     def test_winning_plan_safety_and_data_disclosures(self):
-        limit = b"FireAtlas is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool."
+        limit = b"Ignis-Atlassia is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool."
         _, home = self.get("/")
         self.assertIn(limit, home)
         _, method = self.get("/method.html")
@@ -93,7 +93,8 @@ class WebMvpTests(unittest.TestCase):
         self.assertIn(b'id="calibration-download"', page)
         self.assertIn(b'id="calibration-provenance"', page)
         _, script = self.get("/calibration-validation.js")
-        self.assertIn(b"/samples/calibration/", script)
+        self.assertIn(b"new URL(`samples/calibration/", script)
+        self.assertIn(b"document.baseURI", script)
         self.assertNotIn(b"/api/v2/calendar?", script)
         for region in ("norcal", "punjab-haryana"):
             headers, body = self.get(f"/samples/calibration/{region}.json")
@@ -244,8 +245,8 @@ class WebMvpTests(unittest.TestCase):
         self.assertTrue(all(item["value"] is None for item in data["days"]))
         _, body = self.get("/api/v2/calendar?region=norcal&year=2024&month=7&history=1")
         history = json.loads(body)["history"]
-        self.assertEqual(history["start"], "2010-07-01")
-        self.assertEqual(history["days"][0]["date"], "2010-07-01")
+        self.assertEqual(history["start"], "2006-07-01")
+        self.assertEqual(history["days"][0]["date"], "2006-07-01")
         self.assertIsNone(history["days"][0]["value"])
         with self.assertRaises(HTTPError) as caught:
             self.get("/api/v2/calendar?region=world&year=2024")

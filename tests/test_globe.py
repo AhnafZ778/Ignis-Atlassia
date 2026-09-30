@@ -11,7 +11,7 @@ from urllib.request import urlopen
 
 from fireatlas.core import connect, ingest
 from fireatlas.demo import FIELDS
-from fireatlas.globe import snapshot, detail
+from fireatlas.globe import snapshot, detail, static_bundle
 from fireatlas.web import handler_factory
 
 
@@ -70,6 +70,22 @@ class GlobeTests(unittest.TestCase):
         self.assertEqual(detail(self.db, cell="200:87", source="MODIS_NRT")["total"], 2)
         self.assertEqual(detail(self.db, cell="359:135")["observations"][0]["lon"], 180)
         self.assertIsNone(detail(self.db, cell="0:135")["observations"][0]["frp_mw"])
+
+    def test_static_bundle_is_bounded_authentic_and_keeps_reproducible_details(self):
+        bundle = static_bundle(self.db)
+        self.assertEqual(bundle["schema"], "fireatlas-globe-static-v1")
+        self.assertEqual(bundle["data_class"], "authentic")
+        self.assertEqual((bundle["window_start"], bundle["window_end"]), ("2026-09-20", "2026-09-27"))
+        self.assertEqual(sum(row["count"] for row in bundle["aggregates"]), 5)
+        self.assertEqual(len(bundle["samples"]), 5)
+        self.assertTrue(all(row["date"] != "2030-01-01" for row in bundle["aggregates"]))
+        cell_samples = [row for row in bundle["samples"] if row["x"] == 200 and row["y"] == 87]
+        self.assertEqual({row["detection_id"] for row in cell_samples},
+                         {row["detection_id"] for row in detail(self.db, cell="200:87")["observations"]})
+        input_hashes = set(bundle["input_file_sha256"])
+        detail_hashes = {row["file_sha256"] for row in detail(self.db, cell="200:87")["observations"]}
+        self.assertTrue(input_hashes)
+        self.assertTrue(detail_hashes.issubset(input_hashes))
 
     def test_invalid_requests_and_empty_dataset(self):
         for args in ({"source":"NOT_A_SOURCE"},{"day":"2026-09-19"},{"day":"2026-09-99"}):

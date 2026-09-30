@@ -26,6 +26,8 @@
     detailController: null,
     failedEarth: false,
     fullDaily: null,
+    staticBundle: null,
+    staticBundleLoading: null,
     windowStart: null,
     windowEnd: null,
     loading: null,
@@ -83,7 +85,7 @@
 
   function updateLayerStamp() {
     $("globe-layer-label").textContent = "NASA SATELLITE EVIDENCE";
-    $("globe-layer-icon").setAttribute("href", "./vendor/lucide-icons.svg#satellite");
+    $("globe-layer-icon").setAttribute("href", `${new URL("./vendor/lucide-icons.svg", document.baseURI).href}#satellite`);
     const data = state.data;
     $("globe-stamp").textContent = data?.latest_observation
       ? `${data.date === "all" ? data.window_start + " → " + data.window_end : data.date} · IMPORTED SNAPSHOT`
@@ -514,6 +516,115 @@
     return body;
   }
 
+  function staticDataRoot() {
+    const meta = document.querySelector('meta[name="fireatlas-static-data"]');
+    return meta ? new URL(meta.content, document.baseURI) : null;
+  }
+
+  async function loadStaticGlobe() {
+    if (state.staticBundle) return state.staticBundle;
+    if (state.staticBundleLoading) return state.staticBundleLoading;
+    const root = staticDataRoot();
+    if (!root) throw new Error("Static observation snapshot is not configured.");
+    state.staticBundleLoading = (async () => {
+      const response = await fetch(new URL("globe/recent.json.gz", root));
+      if (!response.ok) throw new Error("The bundled NASA globe snapshot is unavailable.");
+      if (!window.DecompressionStream) throw new Error("This browser cannot open the compressed NASA globe snapshot.");
+      const data = await new Response(response.body.pipeThrough(new DecompressionStream("gzip"))).json();
+      if (data.schema !== "fireatlas-globe-static-v1" || !Array.isArray(data.aggregates) || !Array.isArray(data.samples)) {
+        throw new Error("The bundled NASA globe snapshot has an unsupported format.");
+      }
+      state.staticBundle = data;
+      return data;
+    })().catch(error => {
+      state.staticBundleLoading = null;
+      throw error;
+    });
+    return state.staticBundleLoading;
+  }
+
+  function staticSnapshot(bundle, source, day) {
+    if (source !== "all" && !Object.hasOwn(bundle.sources, source)) throw new Error("unsupported globe satellite");
+    if (day !== "all" && (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < bundle.window_start || day > bundle.window_end)) {
+      throw new Error("date outside the imported globe snapshot");
+    }
+    const selected = row => (source === "all" || row.source_id === source) && (day === "all" || row.date === day);
+    const cells = new Map();
+    const dailyCounts = new Map();
+    for (const row of bundle.aggregates) {
+      if (!selected(row)) continue;
+      const id = `${row.x}:${row.y}`;
+      let cell = cells.get(id);
+      if (!cell) {
+        cell = {id, x: row.x, y: row.y, lon_sum: 0, lat_sum: 0, count: 0,
+          first: row.first, last: row.last, max_frp_mw: row.max_frp_mw};
+        cells.set(id, cell);
+      }
+      cell.lon_sum += row.lon_sum;
+      cell.lat_sum += row.lat_sum;
+      cell.count += row.count;
+      if (row.first < cell.first) cell.first = row.first;
+      if (row.last > cell.last) cell.last = row.last;
+      if (row.max_frp_mw != null && (cell.max_frp_mw == null || row.max_frp_mw > cell.max_frp_mw)) cell.max_frp_mw = row.max_frp_mw;
+      dailyCounts.set(row.date, (dailyCounts.get(row.date) || 0) + row.count);
+    }
+    const clusters = [...cells.values()].map(cell => ({
+      id: cell.id, lon: Math.round(cell.lon_sum / cell.count * 1e5) / 1e5,
+      lat: Math.round(cell.lat_sum / cell.count * 1e5) / 1e5,
+      count: cell.count, first: cell.first, last: cell.last, max_frp_mw: cell.max_frp_mw
+    })).sort((a, b) => b.count - a.count || Number(a.id.split(":")[0]) - Number(b.id.split(":")[0]) || Number(a.id.split(":")[1]) - Number(b.id.split(":")[1]));
+    const sourceCounts = new Map();
+    for (const row of bundle.aggregates) {
+      let item = sourceCounts.get(row.source_id);
+      if (!item) {
+        item = {source_id: row.source_id, count: 0, first: row.first, last: row.last};
+        sourceCounts.set(row.source_id, item);
+      }
+      item.count += row.count;
+      if (row.first < item.first) item.first = row.first;
+      if (row.last > item.last) item.last = row.last;
+    }
+    const sources = Object.entries(bundle.sources).map(([source_id, label]) => {
+      const item = sourceCounts.get(source_id);
+      return item ? {...item, label} : null;
+    }).filter(Boolean);
+    return {data_class: bundle.data_class, kind: bundle.kind, source, date: day,
+      latest_observation: bundle.latest_observation, window_start: bundle.window_start,
+      window_end: bundle.window_end, total: clusters.reduce((sum, row) => sum + row.count, 0),
+      cluster_degrees: 1, clusters, sources,
+      daily: [...dailyCounts].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([date, count]) => ({date, count})),
+      note: bundle.note};
+  }
+
+  function staticDetail(bundle, cell, source, day) {
+    const [x, y] = cell.split(":").map(Number);
+    if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || x > 359 || y < 0 || y > 179) throw new Error("invalid globe cell");
+    const matches = row => row.x === x && row.y === y && (source === "all" || row.source_id === source) && (day === "all" || row.date === day);
+    const counts = new Map();
+    for (const row of bundle.aggregates) {
+      if (!matches(row)) continue;
+      let item = counts.get(row.source_id);
+      if (!item) {
+        item = {source_id: row.source_id, count: 0, first: row.first, last: row.last, max_frp_mw: row.max_frp_mw};
+        counts.set(row.source_id, item);
+      }
+      item.count += row.count;
+      if (row.first < item.first) item.first = row.first;
+      if (row.last > item.last) item.last = row.last;
+      if (row.max_frp_mw != null && (item.max_frp_mw == null || row.max_frp_mw > item.max_frp_mw)) item.max_frp_mw = row.max_frp_mw;
+    }
+    const observations = bundle.samples.filter(matches).sort((a, b) => {
+      if (a.acquisition_utc !== b.acquisition_utc) return a.acquisition_utc > b.acquisition_utc ? -1 : 1;
+      const left = String(a.detection_id), right = String(b.detection_id);
+      return left < right ? -1 : left > right ? 1 : 0;
+    }).slice(0, 12).map(({date: _date, x: _x, y: _y, ...record}) => record);
+    return {id: cell, data_class: bundle.data_class, bbox: [x - 180, y - 90, x - 179, y - 89],
+      source, date: day, total: [...counts.values()].reduce((sum, item) => sum + item.count, 0),
+      sources: [...counts.values()].sort((a, b) => a.source_id < b.source_id ? -1 : a.source_id > b.source_id ? 1 : 0),
+      observations, sample_order: "latest acquisition first; up to 12 records",
+      condition: "Thermal activity detected at the listed times. Current fire status, ignition time and perimeter are unknown."};
+  }
+
   function clearSelection() {
     state.detailController?.abort();
     state.detailRequest++;
@@ -657,11 +768,18 @@
     $("globe-status").textContent = "Loading data…";
     if ($("globe-markers").checked) revealStatus("Loading data…");
     try {
-      const signal = AbortSignal.any([state.controller.signal, AbortSignal.timeout(45000)]);
-      const [data, profile] = await Promise.all([
-        json(`/api/globe?${new URLSearchParams({source, date: day})}`, signal),
-        day === "all" ? Promise.resolve(null) : json(`/api/globe?${new URLSearchParams({source, date: "all"})}`, signal)
-      ]);
+      let data, profile;
+      if (staticDataRoot()) {
+        const bundle = await loadStaticGlobe();
+        data = staticSnapshot(bundle, source, day);
+        profile = day === "all" ? null : staticSnapshot(bundle, source, "all");
+      } else {
+        const signal = AbortSignal.any([state.controller.signal, AbortSignal.timeout(45000)]);
+        [data, profile] = await Promise.all([
+          json(`/api/globe?${new URLSearchParams({source, date: day})}`, signal),
+          day === "all" ? Promise.resolve(null) : json(`/api/globe?${new URLSearchParams({source, date: "all"})}`, signal)
+        ]);
+      }
       if (request !== state.request) return false;
       state.data = data;
       state.fullDaily = (profile || data).daily;
@@ -742,7 +860,9 @@
     panel.replaceChildren(element("p", "Loading source evidence…"));
     showPointCallout(item);
     try {
-      const data = await json(`/api/globe/detail?${new URLSearchParams({cell: id, source: state.data.source, date: state.data.date})}`, AbortSignal.any([state.detailController.signal, AbortSignal.timeout(30000)]));
+      const data = state.staticBundle
+        ? staticDetail(state.staticBundle, id, state.data.source, state.data.date)
+        : await json(`/api/globe/detail?${new URLSearchParams({cell: id, source: state.data.source, date: state.data.date})}`, AbortSignal.any([state.detailController.signal, AbortSignal.timeout(30000)]));
       if (request !== state.detailRequest) return;
       state.details = data;
       panel.replaceChildren();
@@ -762,7 +882,7 @@
         const name = state.data.sources.find(s => s.source_id === src.source_id)?.label || src.source_id;
         const link = element("a", `${name} ↗`);
         const bbox = [data.bbox[0], Math.max(-86, data.bbox[1]), data.bbox[2], Math.min(86, data.bbox[3])];
-        link.href = `/?${new URLSearchParams({series: series[src.source_id], year: src.last.slice(0, 4), month: Number(src.last.slice(5, 7)), bbox: bbox.join(",")})}#atlas-section`;
+        link.href = `./?${new URLSearchParams({series: series[src.source_id], year: src.last.slice(0, 4), month: Number(src.last.slice(5, 7)), bbox: bbox.join(",")})}#atlas-section`;
         link.title = "Inspect this satellite and area in the atlas";
         links.append(link);
       }

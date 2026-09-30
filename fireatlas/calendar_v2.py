@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import calendar
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 from statistics import median
@@ -13,9 +13,11 @@ from .aggregates import daily_aggregates
 from .calibration import calibrate
 from .regions import REGIONS
 
-MODIS_ARCHIVE_START = date(2010, 7, 1)
 MODIS_EARLIEST_SUPPORTED_HISTORY = date(2006, 7, 1)
+MODIS_ARCHIVE_START = MODIS_EARLIEST_SUPPORTED_HISTORY
 SNPP_ARCHIVE_START = date(2012, 7, 1)
+MIN_COMPARABLE_BASELINE_YEARS = 3
+MIN_PERCENTILE_BASELINE_YEARS = 10
 MCD64_REPORT = Path(__file__).resolve().parent / "samples" / "mcd64_corroboration.json"
 
 
@@ -31,7 +33,9 @@ def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
         report = json.loads(MCD64_REPORT.read_text(encoding="utf-8"))
     except (FileNotFoundError, OSError, json.JSONDecodeError):
         return base
-    if report.get("schema") != "fireatlas-mcd64-corroboration-v1" or report.get("status") != "loaded":
+    if report.get("schema") not in {
+            "fireatlas-mcd64-corroboration-v1", "fireatlas-mcd64-corroboration-v2"} \
+            or report.get("status") != "loaded":
         return base
     key = f"{year:04d}-{month:02d}"
     case_records = [item for item in report.get("cases", {}).values()
@@ -43,6 +47,7 @@ def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
     if selected is None:
         return base
     burned = selected.get("burn_date", {})
+    qa = selected.get("qa", {})
     active = selected.get("active_fire", {})
     return {
         **base,
@@ -57,6 +62,23 @@ def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
         "burned_pixels_in_bbox": burned.get("burned_pixels", 0),
         "burn_date_min": burned.get("burn_date_min"),
         "burn_date_max": burned.get("burn_date_max"),
+        "qa_pixel_count": qa.get("pixel_count"),
+        "qa_raw_value_counts": qa.get("qa_raw_value_counts", {}),
+        "qa_burned_pixels_by_raw_value": qa.get("burned_pixels_by_qa_raw_value", {}),
+        "qa_disposition_pixel_counts": qa.get("qa_disposition_pixel_counts", {}),
+        "qa_supported_burned_pixels": qa.get("qa_supported_burned_pixels"),
+        "qa_supported_burn_date_min": qa.get("qa_supported_burn_date_min"),
+        "qa_supported_burn_date_max": qa.get("qa_supported_burn_date_max"),
+        "qa_excluded_burned_pixels": qa.get("qa_excluded_burned_pixels"),
+        "qa_excluded_burned_pixels_by_reason": qa.get("qa_excluded_burned_pixels_by_reason", {}),
+        "qa_supported_full_period_unburned_pixels": qa.get("qa_supported_full_period_unburned_pixels"),
+        "qa_excluded_burn_date_zero_pixels_by_reason": qa.get("qa_excluded_burn_date_zero_pixels_by_reason", {}),
+        "qa_coordinate_mismatches": qa.get("coordinate_mismatches"),
+        "qa_interpretation": report.get("qa_interpretation") or
+            "Legacy report: raw QA values are cross-tabulated; bit decoding was not applied.",
+        "qa_burned_pixel_rule": qa.get("burned_pixel_filter"),
+        "qa_unburned_pixel_rule": qa.get("full_period_unburned_filter"),
+        "same_day_spatial_comparison": selected.get("same_day_spatial_comparison", {}),
         "active_fire_rows": active.get("rows_by_source", {}),
         "active_fire_cells": active.get("unique_common_grid_cells_by_source", {}),
         "review_status": "analytical-only-independent-review-pending",
@@ -83,11 +105,15 @@ def _selected_modis_version(days: list[dict], year: int) -> str | None:
 
 
 def _percentile_rank(value: float, baseline: list[float]) -> tuple[float | None, int | None]:
-    if not baseline:
+    if len(baseline) < MIN_PERCENTILE_BASELINE_YEARS:
         return None, None
     rank = 1 + sum(item < value for item in baseline)
     percentile = 100 * sum(item <= value for item in baseline) / len(baseline)
     return percentile, rank
+
+
+def _baseline_median(values: list[float]) -> float | None:
+    return median(values) if len(values) >= MIN_COMPARABLE_BASELINE_YEARS else None
 
 
 def _ordinal(value: float) -> str:
@@ -108,7 +134,7 @@ def _verdict(region_name: str, year: int, item: dict) -> str:
                     "The full-month total is unknown; other dates are not zeros.")
         return (f"{region_name}, {label}: monthly activity is unknown because the imported "
                 "source exports are incomplete; missing dates are not zeros.")
-    if item["n_years"] < 10:
+    if item["n_years"] < MIN_PERCENTILE_BASELINE_YEARS:
         return f"{region_name}, {label}: comparison not usable. Only {item['n_years']} comparable years."
     estimated_days = (item["outside_downloaded_snpp_period_days"]
                       + item["documented_gap_estimate_days"])
@@ -152,23 +178,89 @@ def _season(days: list[dict]) -> dict:
             "season_status": status, "missing_days": missing}
 
 
+def _history_start(db, region: str, fallback_year: int) -> date:
+    """Use the earliest complete export or imported row as the visible history edge."""
+    first_month = db.execute("""
+        SELECT min(e.month) FROM source_exports e
+        JOIN batches b ON b.id=e.batch_id
+        WHERE e.region_id=? AND e.source_id='MODIS_SP' AND b.demo=0
+          AND (e.complete_export=1 OR b.row_count>0)
+    """, (region,)).fetchone()[0]
+    if first_month:
+        evidence_start = date.fromisoformat(first_month + "-01")
+        return max(MODIS_EARLIEST_SUPPORTED_HISTORY, evidence_start)
+    # Keep the full supported timeline available even when a database has no
+    # month ledger yet.  A later fallback year can otherwise make requests for
+    # older years return an empty `days` array (the web server prepares one
+    # shared calendar for all selectable years).
+    return MODIS_EARLIEST_SUPPORTED_HISTORY
+
+
+def _month_composition(days: list[dict | None], expected_days: int) -> dict:
+    """Summarize a month only when every UTC date has a known calendar value."""
+    observed = sum(bool(item and item["value"] is not None and item["estimate_type"] == "observed")
+                   for item in days)
+    estimated = sum(bool(item and item["value"] is not None and item["estimate_type"] == "scaled")
+                    for item in days)
+    unknown = max(0, expected_days - observed - estimated)
+    total = (sum(float(item["value"]) for item in days)
+             if len(days) == expected_days and unknown == 0 else None)
+    if total is None:
+        estimate_type = "unknown"
+    elif observed and estimated:
+        estimate_type = "mixed"
+    elif estimated:
+        estimate_type = "scaled"
+    else:
+        estimate_type = "observed"
+    return {"value": total, "estimate_type": estimate_type,
+            "observed_days": observed, "estimated_days": estimated,
+            "unknown_days": unknown, "day_count": expected_days}
+
+
+def _baseline_signature(days: list[dict | None], raw_by_date: dict[str, dict]) -> tuple[dict | None, str | None]:
+    """Describe the complete daily source and product-version mix of a month."""
+    if not days:
+        return None, "incomplete-or-unknown-month"
+    quantities = Counter()
+    products = Counter()
+    for item in days:
+        if not item or item.get("value") is None:
+            return None, "incomplete-or-unknown-month"
+        estimate_type = item.get("estimate_type")
+        source_id = item.get("source_used")
+        if (estimate_type, source_id) not in {
+                ("observed", "VIIRS_SNPP_SP"), ("scaled", "MODIS_SP")}:
+            return None, "source-composition-unknown"
+        raw = raw_by_date.get(item["date"], {})
+        source = raw.get("sources", {}).get(source_id)
+        if not source or not source.get("export_complete"):
+            return None, "source-export-incomplete"
+        versions = tuple(sorted(set(source.get("product_versions") or [])))
+        if len(versions) != 1:
+            return None, "product-version-unknown-or-mixed"
+        quantities[(estimate_type, source_id)] += 1
+        products[(estimate_type, source_id, versions[0])] += 1
+    return {
+        "quantity": tuple(sorted(quantities.items())),
+        "products": tuple(sorted(products.items())),
+    }, None
+
+
+def _baseline_mismatch_reason(target: dict, prior: dict) -> str | None:
+    if target["quantity"] != prior["quantity"]:
+        return "source-composition-mismatch"
+    if target["products"] != prior["products"]:
+        return "product-version-mismatch"
+    return None
+
+
 def prepare_calendar_v2(db, *, region: str, fallback_year: int = 2024) -> dict:
     """Load and calibrate a region once so multiple year views reuse the same rows."""
     if region not in REGIONS:
         raise ValueError(f"region must be one of {', '.join(REGIONS)}")
     bbox = REGIONS[region]["bbox"]
-    earliest_row_only_month = db.execute("""
-        SELECT min(e.month) FROM source_exports e
-        JOIN batches b ON b.id=e.batch_id
-        WHERE e.region_id=? AND e.source_id='MODIS_SP'
-          AND e.coverage_basis='reconstructed-rows-only' AND e.complete_export=0
-          AND b.demo=0 AND b.row_count>0
-    """, (region,)).fetchone()[0]
-    history_start = MODIS_ARCHIVE_START
-    if earliest_row_only_month:
-        row_start = date.fromisoformat(earliest_row_only_month + "-01")
-        history_start = max(MODIS_EARLIEST_SUPPORTED_HISTORY,
-                            min(MODIS_ARCHIVE_START, row_start))
+    history_start = _history_start(db, region, fallback_year)
     latest = db.execute("""
         SELECT max(substr(o.acquisition_utc,1,10)) FROM observations o
         JOIN batches b ON b.id=o.batch_id
@@ -260,8 +352,10 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
                         factor, factor_low, factor_high = 1.0, 1.0, 1.0
                     if factor is not None:
                         value = modis_value * factor
-                        low = modis_value * factor_low if factor_low is not None else None
-                        high = modis_value * factor_high if factor_high is not None else None
+                        # Bootstrap bounds describe the fitted scale factor, not
+                        # the prediction error for this day. Keep `low`/`high`
+                        # withheld until an independent prediction interval is
+                        # calibrated; expose factor bounds separately below.
                         scale_factor = factor
                         scale_interval = [factor_low, factor_high]
                         estimate_type, source_used, quality = "scaled", "MODIS_SP", "degraded"
@@ -294,6 +388,10 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
                            "quality": quality, "reason": reason,
                            "modis_cell_days": modis_value, "scale_factor": scale_factor,
                            "scale_interval": scale_interval, "viirs_status": viirs_state,
+                           "prediction_interval_status": (
+                               "withheld-not-independently-validated" if estimate_type == "scaled"
+                               else "not-applicable" if estimate_type == "observed"
+                               else "unavailable"),
                            "viirs_gap_partial_day": viirs_gap_partial_day,
                            "partial_modis_cell_days": partial_modis,
                            "partial_viirs_cell_days": partial_viirs,
@@ -307,6 +405,7 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
         current += timedelta(days=1)
 
     by_harmonized_date = {item["date"]: item for item in harmonized}
+    raw_by_date = {item["date_utc"]: item for item in raw["days"]}
     year_days = [item for item in harmonized if int(item["date"][:4]) == year]
     season = _season(year_days)
     monthly = []
@@ -316,16 +415,16 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
         last = date(year, month, calendar.monthrange(year, month)[1])
         target_days = [by_harmonized_date.get((first + timedelta(days=offset)).isoformat())
                        for offset in range((last - first).days + 1)]
-        target_days = [item for item in target_days if item]
-        total = sum(float(item["value"]) for item in target_days) if target_days and all(item["value"] is not None for item in target_days) else None
-        degraded = sum(item["quality"] == "degraded" for item in target_days)
+        composition = _month_composition(target_days, (last - first).days + 1)
+        total = composition["value"]
+        degraded = sum(bool(item and item["quality"] == "degraded") for item in target_days)
         partial_detection_days = sum(
-            item["partial_modis_cell_days"] > 0 or item["partial_viirs_cell_days"] > 0
+            bool(item and (item["partial_modis_cell_days"] > 0 or item["partial_viirs_cell_days"] > 0))
             for item in target_days)
-        partial_modis_cell_days = sum(item["partial_modis_cell_days"] for item in target_days)
-        partial_viirs_cell_days = sum(item["partial_viirs_cell_days"] for item in target_days)
-        pre_overlap = sum(item["reason"] == "outside-downloaded-SNPP-period" for item in target_days)
-        outage_estimates = sum(item["reason"] == "documented-processing-gap" for item in target_days)
+        partial_modis_cell_days = sum(item["partial_modis_cell_days"] for item in target_days if item)
+        partial_viirs_cell_days = sum(item["partial_viirs_cell_days"] for item in target_days if item)
+        pre_overlap = sum(bool(item and item["reason"] == "outside-downloaded-SNPP-period") for item in target_days)
+        outage_estimates = sum(bool(item and item["reason"] == "documented-processing-gap") for item in target_days)
         target_versions = set()
         for day in raw["days"]:
             if day["date_utc"].startswith(f"{year}-{month:02d}"):
@@ -333,40 +432,45 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
                 if source["export_complete"]:
                     target_versions.update(source["product_versions"])
         baseline, excluded_for_month = [], []
-        if len(target_versions) == 1:
-            target_version = next(iter(target_versions))
-            for prior_year in range(2010, year):
+        target_signature, target_signature_issue = _baseline_signature(target_days, raw_by_date)
+        if target_signature is not None:
+            for prior_year in range(MODIS_EARLIEST_SUPPORTED_HISTORY.year, year):
                 key = f"{prior_year}-{month:02d}"
                 prior_days = [item for item in harmonized if item["date"].startswith(key)]
-                versions = set()
-                for day in raw["days"]:
-                    if day["date_utc"].startswith(key):
-                        source = day["sources"]["MODIS_SP"]
-                        if source["export_complete"]:
-                            versions.update(source["product_versions"])
-                if not prior_days or any(item["value"] is None for item in prior_days):
-                    excluded_for_month.append({"year": prior_year, "reason": "incomplete-or-unknown-month"})
-                elif versions != {target_version}:
-                    excluded_for_month.append({"year": prior_year, "reason": "MODIS-product-version-mismatch"})
+                prior_signature, prior_issue = _baseline_signature(prior_days, raw_by_date)
+                if prior_signature is None:
+                    excluded_for_month.append({"year": prior_year, "reason": prior_issue})
                 else:
-                    baseline.append({"year": prior_year, "value": sum(float(item["value"]) for item in prior_days)})
+                    mismatch = _baseline_mismatch_reason(target_signature, prior_signature)
+                    if mismatch:
+                        excluded_for_month.append({"year": prior_year, "reason": mismatch})
+                    else:
+                        baseline.append({"year": prior_year, "value": sum(float(item["value"]) for item in prior_days)})
         else:
-            excluded_for_month.append({"year": year, "reason": "selected-MODIS-product-version-unknown-or-mixed"})
+            excluded_for_month.append({"year": year, "reason": target_signature_issue})
         if total is not None:
             values = [item["value"] for item in baseline]
-            percentile, rank = _percentile_rank(total, values)
             n = len(values)
-            baseline_median = median(values) if values else None
-            flag = ("insufficient-history" if n < 10 else "unusually-high" if percentile >= 90
+            percentile, rank = _percentile_rank(total, values)
+            baseline_median = _baseline_median(values)
+            flag = ("insufficient-history" if n < MIN_PERCENTILE_BASELINE_YEARS else "unusually-high" if percentile >= 90
                     else "unusually-low" if percentile <= 10 else "typical")
         else:
             percentile = rank = None
-            baseline_median = median(item["value"] for item in baseline) if baseline else None
+            baseline_median = _baseline_median([item["value"] for item in baseline])
             n, flag = len(baseline), "unknown-month"
         if baseline:
             years_used.update(item["year"] for item in baseline)
         excluded.append({"month": f"{year}-{month:02d}", "years": excluded_for_month})
         month_item = {"month": f"{year}-{month:02d}", "value": total,
+                        "estimate_type": composition["estimate_type"],
+                        "observed_days": composition["observed_days"],
+                        "estimated_days": composition["estimated_days"],
+                        "unknown_days": composition["unknown_days"],
+                        "day_count": composition["day_count"],
+                        "prediction_interval_status": "withheld-not-independently-validated",
+                        "uncertainty_note": ("Calibration-factor bootstrap intervals are not prediction intervals; "
+                                             "a reliable prediction interval is not established."),
                         "percentile_rank": percentile, "rank": rank, "n_years": n,
                         "flag": flag, "degraded_days": degraded,
                         "partial_detection_days": partial_detection_days,
@@ -375,6 +479,7 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
                         "outside_downloaded_snpp_period_days": pre_overlap,
                         "documented_gap_estimate_days": outage_estimates,
                         "baseline_median": baseline_median,
+                        "baseline_quantity": "VIIRS-equivalent active-fire cell-days; prior months require complete daily values and matching observed/estimated source composition and product versions",
                         "anomaly_cell_days": total - baseline_median if total is not None and baseline_median is not None else None,
                         "modis_product_version": next(iter(target_versions)) if len(target_versions) == 1 else None,
                         "baseline_years": [item["year"] for item in baseline]}
@@ -405,7 +510,7 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
             "calibration_model": model,
             "calibration_validation": fitted.get("validation"),
             "data_class": "authentic-imported" if raw.get("inputs") else "no-authentic-imports",
-            "period": {"requested_start": MODIS_ARCHIVE_START.isoformat(),
+            "period": {"requested_start": MODIS_EARLIEST_SUPPORTED_HISTORY.isoformat(),
                        "history_start": prepared["history_start"].isoformat(),
                        "actual_latest_detection": latest,
                        "selected_year": year, "selected_month": selected_month_number,
@@ -445,7 +550,7 @@ def region_status(db) -> dict:
     for key, region in REGIONS.items():
         sources = {}
         w, south, east, north = region["bbox"]
-        history_start = MODIS_ARCHIVE_START
+        history_start = _history_start(db, key, MODIS_EARLIEST_SUPPORTED_HISTORY.year)
         for source, planned_start in (("MODIS_SP", MODIS_ARCHIVE_START.isoformat()),
                                       ("VIIRS_SNPP_SP", SNPP_ARCHIVE_START.isoformat())):
             rows = db.execute("""
@@ -484,10 +589,6 @@ def region_status(db) -> dict:
                 WHERE o.source_id=? AND b.demo=0 AND o.lon>=? AND o.lon<=?
                   AND o.lat>=? AND o.lat<=?
             """, (source, w, east, south, north)).fetchone()[0]
-            if source == "MODIS_SP" and row_only_months:
-                row_start = date.fromisoformat(min(row_only_months) + "-01")
-                history_start = max(MODIS_EARLIEST_SUPPORTED_HISTORY,
-                                    min(MODIS_ARCHIVE_START, row_start))
             sources[source] = {"planned_start": planned_start,
                                "complete_month_count": len(months),
                                "first_complete_month": months[0] if months else None,

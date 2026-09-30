@@ -93,12 +93,21 @@ class HistoricalValidityTests(unittest.TestCase):
         self.assertIn("July 2024", result["meta"]["verdict"])
         self.assertEqual(result["meta"]["calibration_status"], "calibrated")
         self.assertEqual(result["calibration"]["step_2012"]["status"], "awaiting-2012-standard-exports")
-        self.assertEqual(result["calibration"]["validation"]["years_held_out"], [2023, 2024, 2025])
-        self.assertEqual(result["calibration"]["validation"]["monthly_interval_pairs"], 36)
+        validation = result["calibration"]["validation"]
+        eligible_nested_folds = sum(fold["selected_model"] is not None
+                                    for fold in validation["outer_folds"])
+        self.assertEqual(validation["nested_selected_pipeline"]["outer_evaluation_folds"],
+                         eligible_nested_folds)
+        if eligible_nested_folds == 0:
+            self.assertIsNone(validation["nested_selected_pipeline"]["median_absolute_log_error"])
+        self.assertEqual(validation["prediction_interval"]["status"],
+                         "withheld-not-independently-calibrated")
+        self.assertEqual(validation["prediction_interval"]["evaluated_pairs"], 0)
+        self.assertEqual(validation["daily_gap_benchmark"]["gap_durations_days"], [1, 3, 7, 14])
         model = result["meta"]["calibration_model"]
         self.assertLess(
-            result["calibration"]["validation"]["models"][model]["median_absolute_log_error"],
-            result["calibration"]["validation"]["models"]["no_harmonization"]["median_absolute_log_error"],
+            validation["models"][model]["median_absolute_log_error"],
+            validation["models"]["no_harmonization"]["median_absolute_log_error"],
         )
         outage_day = next(day for day in result["days"] if day["date"] == "2024-07-25")
         self.assertEqual(outage_day["reason"], "documented-processing-gap")
@@ -141,10 +150,10 @@ class HistoricalValidityTests(unittest.TestCase):
         with connect(self.database) as db:
             result = calendar_v2(db, region="norcal", year=2024, month=7, include_history=True)
         history = result["history"]
-        self.assertEqual(history["start"], "2010-07-01")
+        self.assertEqual(history["start"], "2006-07-01")
         self.assertEqual(history["end"], "2026-06-30")
         first = history["days"][0]
-        self.assertEqual(first["date"], "2010-07-01")
+        self.assertEqual(first["date"], "2006-07-01")
         self.assertEqual(first["quality"], "unknown")
         self.assertIsNone(first["value"])
         loaded = next(item for item in history["days"] if item["date"] == "2022-07-01")

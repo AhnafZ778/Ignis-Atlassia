@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ignis-Atlassia / FireAtlas project brief</title>
+<style>
+@page { size: 11.69in 8.27in; margin: .42in; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #081014; color: #dbe5e7; font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.36; }
+.page { page-break-after: always; min-height: 7.42in; position: relative; overflow: hidden; }
+.page:last-child { page-break-after: auto; }
+h1, h2, h3 { margin: 0 0 9px; color: #f4fbfa; letter-spacing: .01em; }
+h1 { font-size: 32px; line-height: 1.04; }
+h2 { font-size: 21px; border-left: 4px solid #ff865c; padding-left: 10px; }
+h3 { font-size: 14px; color: #ffc86f; margin-top: 12px; }
+p { margin: 0 0 8px; }
+ul, ol { margin: 5px 0 8px 20px; padding: 0; }
+li { margin: 3px 0; }
+small, .muted { color: #92a8ac; }
+.kicker { text-transform: uppercase; letter-spacing: .18em; font-size: 9px; color: #ff9a6e; font-weight: bold; }
+.subtitle { color: #9eb5b8; font-size: 15px; margin: 7px 0 18px; }
+.card { background: #101e23; border: 1px solid #29434a; border-radius: 8px; padding: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.stat { background: #0d1a1f; border: 1px solid #29434a; border-radius: 7px; padding: 10px; min-height: 68px; }
+.stat b { display: block; color: #ffc86f; font-size: 19px; line-height: 1; margin-bottom: 4px; }
+.tag { display: inline-block; padding: 3px 7px; border: 1px solid #4a6970; border-radius: 999px; margin: 2px 3px 2px 0; color: #c7e7e8; font-size: 9px; }
+.warn { border-color: #8b6448; background: #211a18; }
+.good { border-color: #316b60; background: #0d211f; }
+img { max-width: 100%; display: block; border: 1px solid #2d4a50; border-radius: 6px; }
+.shot { width: 100%; max-height: 4.85in; object-fit: contain; background: #0a1519; }
+.shot.tall { max-height: 5.25in; }
+.caption { color: #93aaad; font-size: 9px; margin-top: 4px; }
+.twoshot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+.twoshot img { height: 2.72in; object-fit: cover; }
+.footer { position: absolute; bottom: 2px; left: 0; right: 0; border-top: 1px solid #20363c; padding-top: 5px; color: #70868a; font-size: 8px; display: flex; justify-content: space-between; }
+.metric { color: #ffb981; font-weight: bold; }
+.code { font-family: "DejaVu Sans Mono", monospace; color: #b7d7d5; font-size: 9px; }
+hr { border: 0; border-top: 1px solid #29434a; margin: 10px 0; }
+a { color: #8dd4e2; }
+table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+th, td { border: 1px solid #29434a; padding: 5px 6px; text-align: left; vertical-align: top; }
+th { color: #ffc86f; background: #15272c; }
+.cover { display: flex; flex-direction: column; justify-content: center; }
+.cover .mark { font-size: 11px; letter-spacing: .24em; color: #7fe2df; margin-bottom: 14px; }
+.cover .bigline { font-size: 17px; color: #e9f5f4; max-width: 8.5in; }
+.cover .meta { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; max-width: 8.7in; }
+.cover .meta div { border-top: 2px solid #ff865c; padding-top: 7px; color: #a3b8bb; }
+.cover .meta b { display: block; color: #f4fbfa; margin-bottom: 3px; }
+.callout { font-size: 14px; padding: 12px 14px; border-left: 4px solid #ffc86f; background: #192528; margin: 11px 0; }
+</style>
+</head>
+<body>
+
+<section class="page cover">
+  <div class="mark">NASA SPACE APPS 2026 · PROJECT HANDOFF</div>
+  <h1>Ignis-Atlassia</h1>
+  <div class="subtitle">A harmonized MODIS and VIIRS active-fire research atlas</div>
+  <p class="bigline">A complete context brief for a new brainstorming chat. It captures what we built, why we built it, which NASA data are real, how the interface works, what the evidence proves, what remains open, and where the next score-bearing work should go.</p>
+  <div class="callout"><b>Challenge theme:</b> NASA Space Apps 2026 · Harmonization of MODIS and VIIRS Hot Spots</div>
+  <div class="meta">
+    <div><b>Project identity</b>Ignis-Atlassia / FireAtlas</div>
+    <div><b>Current release</b>Evidence-backed static bundle plus local API</div>
+    <div><b>Current truth</b>41.6 / 100 implementation estimate; public deployment still open</div>
+  </div>
+  <p class="muted" style="margin-top:26px">Prepared from the repository state on 30 September 2026. This is an internal handoff and planning document, not a NASA endorsement or a final submission score.</p>
+  <div class="footer"><span>Ignis-Atlassia project brief</span><span>1 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">01 · The idea</div>
+  <h2>What the project is trying to make understandable</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>The problem</h3>
+      <p>MODIS and VIIRS report thermal anomalies at different native resolutions, over different overpass patterns, and with different archive histories. A raw point count can look like a fire count even when the same activity is sampled by two sensors or when a source month is incomplete.</p>
+      <p>Judges and researchers need a view that says what was observed, what was harmonized, what is estimated, and what is unknown.</p>
+    </div>
+    <div class="card good">
+      <h3>The answer</h3>
+      <p>Ignis-Atlassia converts detections into distinct <span class="metric">VIIRS-equivalent active-fire cell-days</span> on a common 1 km EPSG:6933 equal-area grid, while preserving native sensor detail, raw FRP, source rows, versions, UTC dates, evidence state, and coverage state.</p>
+      <p>The result is a dated research atlas rather than a dramatic but unsupported fire map.</p>
+    </div>
+  </div>
+  <h3>Non-negotiable scientific language</h3>
+  <div class="card warn">
+    <p>A hotspot is a satellite thermal observation. It is not a confirmed wildfire, fire perimeter, burned area, proof of crop-burning cause, proof that no fire occurred, or a full observation-coverage denominator.</p>
+    <p>The tool is a research and learning instrument. It is not an operational evacuation, fire-management, flight-planning, or spread-forecast system.</p>
+  </div>
+  <h3>Who the experience is for</h3>
+  <div class="grid3">
+    <div class="stat"><b>Judge</b>Needs an immediate story, visible NASA provenance, and a reproducible path from map to evidence.</div>
+    <div class="stat"><b>Researcher</b>Needs common units, version matching, raw source rows, explicit gaps, and honest uncertainty.</div>
+    <div class="stat"><b>Public learner</b>Needs a visual atlas that explains why two satellites can disagree without hiding the reason.</div>
+  </div>
+  <div class="footer"><span>From README.md, PRD.md, DATA.md</span><span>2 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">02 · The visual story</div>
+  <h2>Landing globe: a memorable entry point with an evidence path</h2>
+  <div class="grid2">
+    <div>
+      <img class="shot tall" src="winning-plan/evidence/video-frames/01-globe-home.png" alt="Ignis-Atlassia landing globe">
+      <div class="caption">The home flow opens on a 3D Earth, then moves into dated observations, the calendar, and source evidence.</div>
+    </div>
+    <div class="card">
+      <h3>What a judge should understand in 30 seconds</h3>
+      <ol>
+        <li>This is a NASA FIRMS active-fire observation atlas.</li>
+        <li>The same activity can be represented across MODIS and VIIRS without simply adding raw points.</li>
+        <li>Every visible result can be followed to a date, region, sensor, source record, and evidence state.</li>
+        <li>The interface does not turn missing coverage into a false zero.</li>
+      </ol>
+      <h3>Main navigation</h3>
+      <p><span class="tag">Globe</span><span class="tag">Calendar</span><span class="tag">Research Lab</span><span class="tag">Data &amp; Method</span><span class="tag">Review</span></p>
+      <h3>Experience promise</h3>
+      <p>Start with an intuitive globe, make the harmonization visible, then let a skeptical user inspect the exact data behind a day or month.</p>
+    </div>
+  </div>
+  <hr>
+  <div class="twoshot">
+    <div><img src="presentation/screenshots/03-calendar.png" alt="calendar screenshot"><div class="caption">Calendar view turns a long archive into a dated, UTC-aware activity record.</div></div>
+    <div><img src="winning-plan/evidence/video-frames/09-norcal-share-card.png" alt="share card screenshot"><div class="caption">Share card carries the result, quality/coverage state, limitation, URL, build line, and abbreviated input hashes.</div></div>
+  </div>
+  <div class="footer"><span>Evidence frames are stored in docs/winning-plan/evidence and docs/presentation/screenshots</span><span>3 / 10</span></div>
+</section>
+<section class="page">
+  <div class="kicker">03 · Real data and provenance</div>
+  <h2>What is actually in the project</h2>
+  <div class="grid3">
+    <div class="stat"><b>1,994,162</b>unique standard FIRMS rows in the local database</div>
+    <div class="stat"><b>456,202</b>MODIS rows across Terra and Aqua</div>
+    <div class="stat"><b>1,537,960</b>Suomi NPP VIIRS rows</div>
+    <div class="stat"><b>34</b>sidecar-backed standard archive exports imported</div>
+    <div class="stat"><b>2006</b>earliest positive MODIS history displayed</div>
+    <div class="stat"><b>2012</b>earliest positive S-NPP history displayed</div>
+  </div>
+  <h3>Two study regions</h3>
+  <table>
+    <tr><th>Region</th><th>Bounding box</th><th>Use in the story</th><th>Data status</th></tr>
+    <tr><td>Northern California</td><td>−122.2, 38.8 to −120.0, 41.0</td><td>Park Fire / Grove native-mask evidence; calibration and sensor bridge</td><td>48 complete MODIS months and 47 complete S-NPP months from July 2022 through June 2026</td></tr>
+    <tr><td>Punjab–Haryana</td><td>73.8, 29.5 to 77.6, 32.6</td><td>Seasonal monitoring context; October 2024 example with 5,174 observed cell-days</td><td>Same verified 2022–2026 window; reconstructed historical rows remain partial</td></tr>
+  </table>
+  <h3>Provenance rules</h3>
+  <ul>
+    <li>Eight exports retain original NASA request metadata. Twenty-six older exports have explicit reconstructed, row-only sidecars.</li>
+    <li>Reconstructed rows are positive evidence only. They do not prove a complete month, clear satellite pass, cloud-free coverage, or a no-fire day.</li>
+    <li>MODIS detections can be displayed from July 2006; S-NPP rows can be displayed from July 2012 and row-level data now extend through July 2022. The verified complete harmonized window starts later.</li>
+    <li>Native MODIS fire-mask/geolocation products are separate evidence tracks, not silently mixed into the FIRMS calendar.</li>
+  </ul>
+  <div class="card warn"><b>Repository boundary:</b> the raw NASA_data archive and local SQLite database are intentionally ignored from GitHub. The publishable static bundle contains derived, checksummed, read-only evidence instead of credentials or a multi-gigabyte archive.</div>
+  <div class="footer"><span>See docs/DATA.md, docs/DATA_READINESS.md, README.md</span><span>4 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">04 · The harmonization method</div>
+  <h2>One comparable unit, with native detail kept visible</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Processing chain</h3>
+      <p><span class="tag">NASA FIRMS rows</span> → <span class="tag">UTC dates</span> → <span class="tag">centroids</span> → <span class="tag">EPSG:6933 cells</span> → <span class="tag">one cell/day</span> → <span class="tag">sensor bridge</span> → <span class="tag">calendar verdict</span></p>
+      <p>Every source row preserves the original sensor, product, collection/version, confidence, FRP, latitude/longitude, acquisition time, source URL and provenance hash.</p>
+      <p>The production calendar counts FIRMS type 0 or missing rows across confidence levels. Other types remain inspectable and are excluded from totals with visible counts.</p>
+    </div>
+    <div class="card good">
+      <h3>Common analysis unit</h3>
+      <p><b>VIIRS-equivalent active-fire cell-days</b> on a shared 1 km equal-area grid. A detection centroid contributes at most once per cell per UTC day.</p>
+      <p>Native VIIRS 375 m detail and native MODIS approximately 1 km rows remain visible in the Sensor Bridge. Raw FRP stays sensor-specific in MW/day and is never added across sensors.</p>
+      <p>This is a sampling proxy. It does not prove full footprint overlap, deduplicate a physical event, or establish satellite pass/cloud denominators.</p>
+    </div>
+  </div>
+  <h3>Calendar states that prevent false certainty</h3>
+  <div class="grid3">
+    <div class="stat"><b style="color:#79e0e0">Observed</b>real source rows support the day/month</div>
+    <div class="stat"><b style="color:#ffc86f">Estimated</b>transparent bridge estimate is shown separately</div>
+    <div class="stat"><b style="color:#b58de9">Documented gap</b>processing or source gap is named</div>
+    <div class="stat"><b style="color:#b9c2c4">Unknown</b>no evidence is not converted to zero</div>
+    <div class="stat"><b>Typical / high</b>baseline flags are descriptive, not alarm thresholds</div>
+    <div class="stat"><b>FRP separate</b>MW/day is context, not a cross-sensor sum</div>
+  </div>
+  <h3>What the ratio does and does not mean</h3>
+  <p>When version-matched overlap records pass eligibility gates, the app can fit and hold out a transparent count ratio for a region. That ratio is an exploratory harmonization aid, not a validated sensor-sensitivity model, fire-size estimate, or forecast. Prediction intervals are withheld because independent calibration is not yet supported.</p>
+  <div class="footer"><span>See docs/HARMONIZATION_METHOD.md and README.md</span><span>5 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">05 · Research Lab</div>
+  <h2>From a map of points to a testable research question</h2>
+  <div class="grid2">
+    <div>
+      <img class="shot" src="presentation/screenshots/11-candidates.png" alt="Research Lab candidate groups">
+      <div class="caption">Candidate-group view: detections are clustered into inspectable temporal/spatial candidates rather than presented as a single definitive event.</div>
+    </div>
+    <div class="card">
+      <h3>Research Lab controls</h3>
+      <ul>
+        <li>Choose region/AOI, UTC month, and an acquisition cutoff.</li>
+        <li>Set spatial and date-gap thresholds to form candidate groups.</li>
+        <li>Compare common-cell overlap, union, and co-occurrence.</li>
+        <li>View an exploratory ratio band only when the eligibility gates pass.</li>
+        <li>Inspect source rows and preserve the distinction between native and bridged values.</li>
+      </ul>
+      <h3>Vegetation context layer</h3>
+      <p>The requested context layer is NASA MODIS 16-day NDVI imagery over OpenStreetMap. It is a vegetation-condition backdrop for interpreting where detections sit; it is not a fire mask, causal crop-burning classifier, or extra count source.</p>
+      <h3>Interpretation boundary</h3>
+      <p>Candidate groups are descriptive. They do not identify one physical fire, prove cause, or forecast spread. The lab is a place to ask a better question and expose the evidence needed to answer it.</p>
+    </div>
+  </div>
+  <hr>
+  <div class="twoshot">
+    <div><img src="presentation/screenshots/10-overlap.png" alt="Research Lab overlap view"><div class="caption">Overlap / co-occurrence exploration.</div></div>
+    <div><img src="presentation/screenshots/12-exposure.png" alt="Research Lab exposure view"><div class="caption">Candidate exposure and context panel.</div></div>
+  </div>
+  <div class="footer"><span>Research Lab implementation: fireatlas/research.py, research.js, research.html</span><span>6 / 10</span></div>
+</section>
+<section class="page">
+  <div class="kicker">06 · Validation and native evidence</div>
+  <h2>What has been measured, checked, and deliberately left open</h2>
+  <div class="grid2">
+    <div>
+      <img class="shot" src="winning-plan/evidence/video-frames/10-grove-method-audit.png" alt="Grove native mask audit">
+      <div class="caption">Grove native-mask audit frame: current ledger records 20/20 expected granules decoded, 15,495 clipped pixels, and 7/7 available FIRMS rows reconciled.</div>
+    </div>
+    <div>
+      <img class="shot" src="winning-plan/evidence/video-frames/10-park-method-audit.png" alt="Park native mask audit">
+      <div class="caption">Park native-mask audit frame: current ledger records 114/114 granules decoded, 1,372,872 clipped pixels, and 3,137/3,137 FIRMS rows reconciled.</div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:10px">
+    <div class="card good">
+      <h3>Calibration evidence</h3>
+      <p>There are 41 eligible 2023–2026 MODIS 61.03 / VIIRS 2 month-pairs. Nested selected-pipeline median absolute log errors are 0.304 for Northern California and 0.322 for Punjab–Haryana. Median full-year absolute errors are 25.2% and 26.3%.</p>
+      <p>These are transparent held-out diagnostics, not proof of independent prediction coverage.</p>
+    </div>
+    <div class="card warn">
+      <h3>Still open</h3>
+      <ul>
+        <li>Both native cases are processed-unreviewed.</li>
+        <li>Human review of the deterministic 30-cell queue is not signed.</li>
+        <li>Full footprint, pass, and cloud denominators are absent.</li>
+        <li>Grove still has a missing companion in the complete expected set.</li>
+        <li>Park/S-NPP evidence includes a documented processing gap on selected dates.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>See docs/VALIDITY_CASES.md, docs/winning-plan/SCORECARD.md</span><span>7 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">07 · Build, release, and architecture</div>
+  <h2>What a clean clone can inspect without NASA credentials</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Local architecture</h3>
+      <p><span class="tag">Python / FastAPI</span><span class="tag">SQLite locally</span><span class="tag">vanilla JS/CSS</span><span class="tag">Leaflet / globe shell</span><span class="tag">GDAL native processing</span></p>
+      <ol>
+        <li>Owner-supplied NASA FIRMS archives are imported locally.</li>
+        <li>Python services calculate calendars, research candidates, validation and calibration.</li>
+        <li><code class="code">scripts/export_static.py</code> writes a read-only site bundle.</li>
+        <li>Browser pages load derived JSON, compressed rows, evidence ZIPs, review templates and hashes directly.</li>
+      </ol>
+      <p>The static copy does not ship the local database, raw NASA_data archive, credentials, or server-only imports.</p>
+    </div>
+    <div class="card good">
+      <h3>Reproducibility surface</h3>
+      <ul>
+        <li>42 region-year calendars spanning 2006–2026.</li>
+        <li>Manifest-listed checksummed files and source SHA-256 fingerprints.</li>
+        <li>Compressed source-row samples, dated validity reports, analytical recounts, evidence ZIPs, and blank hash-bound review templates.</li>
+        <li>Sensor Bridge/share-card data and an eight-day static globe snapshot.</li>
+        <li>Local 30-second and approximately 90-second silent H.264 rehearsal videos with captions and manifests.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>How a new chat can run it</h3>
+  <div class="card">
+    <p><span class="code">uv sync</span> then <span class="code">bash scripts/launch_demo.sh</span></p>
+    <p>For the read-only release: serve the <span class="code">site/</span> directory with a static HTTP server. For a fresh export, use <span class="code">uv run python scripts/export_static.py --db data/fireatlas.sqlite3 --output site-release</span>.</p>
+    <p>Full tests are run locally with <span class="code">uv run python -m unittest discover -s tests</span>. The static verification scripts cover calendar, method, data, globe, responsive layout, hashes and status consistency.</p>
+  </div>
+  <div class="footer"><span>See README.md, scripts/export_static.py, .github/workflows/pages.yml</span><span>8 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">08 · Honest judging position</div>
+  <h2>Why the score stopped moving</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Current estimate</h3>
+      <p class="metric" style="font-size:25px">41.6 / 100 implementation</p>
+      <p>Current local rubric estimate: approximately 71 / 118. Earlier 44.8 / 100 and 93 / 118 claims were withdrawn; they counted presentation or incomplete evidence as if the scientific gates had passed.</p>
+      <p>Adding more rows and extending the display history improved completeness and honesty, but did not close the gates that carry the largest score weight.</p>
+    </div>
+    <div class="card warn">
+      <h3>Largest score-bearing weaknesses</h3>
+      <ol>
+        <li>No verified public deployment or outside-user capture.</li>
+        <li>No independent scientific review of native masks.</li>
+        <li>No complete, request-verified 2012 sensor-step overlap.</li>
+        <li>No full footprint/pass/cloud denominator for “no detection” interpretation.</li>
+        <li>Many older rows lack original request metadata.</li>
+        <li>MCD64A1 is credited and locally inventoried, but not yet a valid active-fire truth layer.</li>
+      </ol>
+    </div>
+  </div>
+  <h3>What is already strong</h3>
+  <div class="grid3">
+    <div class="stat"><b>Story</b>Globe → calendar → bridge → source row → evidence drawer.</div>
+    <div class="stat"><b>Honesty</b>Observed, estimated, gap, and unknown states are visible.</div>
+    <div class="stat"><b>Science</b>Common 1 km cell-days, native detail, FRP separation, no invented zeros.</div>
+    <div class="stat"><b>Evidence</b>Hashes, manifests, ZIPs, recounts and review workflow exist.</div>
+    <div class="stat"><b>Context</b>Punjab–Haryana seasonal example is dated and sourced.</div>
+    <div class="stat"><b>Polish</b>Responsive visual grammar, share card and rehearsal cut are ready locally.</div>
+  </div>
+  <div class="callout">The honest pitch is strong because it shows what the data can support and where it cannot. The next points come from closing independent/public gates, not adding decorative metrics.</div>
+  <div class="footer"><span>Authoritative source: docs/winning-plan/SCORECARD.md</span><span>9 / 10</span></div>
+</section>
+
+<section class="page">
+  <div class="kicker">09 · Brainstorming handoff</div>
+  <h2>What the next chat should do</h2>
+  <div class="grid2">
+    <div class="card good">
+      <h3>Immediate, implementable work</h3>
+      <ol>
+        <li>Deploy the committed <span class="code">site/</span> bundle publicly and verify the exact project-subpath URL on desktop and phone.</li>
+        <li>Deploy the read-only Python API only where it adds value; keep the static bundle as the no-credential fallback.</li>
+        <li>Run an outside-user walkthrough and capture a public URL, timing, errors, and screenshots.</li>
+        <li>Make the Research Lab NDVI layer, calendar, share card and data ledger the first-class demo path.</li>
+        <li>Split any over-100 MB generated archive before pushing to GitHub; never commit the local database or raw NASA archive.</li>
+      </ol>
+    </div>
+    <div class="card warn">
+      <h3>Work that needs outside evidence</h3>
+      <ol>
+        <li>Qualified independent reviewer signs the Grove/Park native review forms.</li>
+        <li>Complete native granule inventory and footprint/pass/cloud accounting.</li>
+        <li>Original request metadata for reconstructed historical exports.</li>
+        <li>Request-verified 2012 S-NPP overlap and a defensible sensor-step test.</li>
+        <li>Valid use of MCD64A1 as lagged corroboration, with its temporal limitation shown.</li>
+      </ol>
+    </div>
+  </div>
+  <h3>Recommended deployment shape</h3>
+  <p><b>GitHub</b> remains source control. <b>Vercel</b> is a good host for the static <span class="code">site/</span> bundle. <b>Render</b> can host the FastAPI service if the API is needed. Keep the app read-only in production unless a persistent datastore is deliberately added. GitHub Pages is a useful static fallback, but the Vercel + Render split better matches the current architecture.</p>
+  <h3>Prompt for the next brainstorming chat</h3>
+  <div class="card"><p>“Use this PDF as the source of truth. Preserve the scientific caveats and current score. First audit the exact public release path, then choose one score-bearing gate to close. Do not add cosmetic metrics or claim a higher score without new evidence. Keep the globe, NDVI Research Lab, calendar verdict, Sensor Bridge, source evidence and review workflow coherent.”</p></div>
+  <p class="muted">Repository: github.com/AhnafZ778/NASA-Spaceapps · Local public-demo status at document time: not deployed from this checkout.</p>
+  <div class="footer"><span>End of handoff · continue from evidence, not assumptions</span><span>10 / 10</span></div>
+</section>
+</body>
+</html>

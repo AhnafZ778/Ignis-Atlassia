@@ -50,6 +50,35 @@ class CalibrationTests(unittest.TestCase):
         self.assertEqual(first["validation"]["partial_years_excluded_from_annual_error"],
                          [{"year": 2012, "eligible_months": 6, "annual_error_used": False}])
 
+    def test_nested_evaluation_never_uses_outer_test_year_for_selection(self):
+        result = calibrate(synthetic_daily())
+        validation = result["validation"]
+        for fold in validation["outer_folds"]:
+            outer_year = fold["outer_test_year"]
+            self.assertNotIn(outer_year, fold["outer_train_years"])
+            for inner in fold["inner_selection"]["folds"]:
+                self.assertNotEqual(inner["validation_year"], outer_year)
+                self.assertNotIn(outer_year, inner["fit_years"])
+        self.assertEqual(validation["prediction_interval"]["status"],
+                         "withheld-not-independently-calibrated")
+        benchmark = validation["daily_gap_benchmark"]
+        self.assertEqual(benchmark["status"], "evaluated")
+        self.assertEqual(benchmark["gap_durations_days"], [1, 3, 7, 14])
+        self.assertIn("selected_pipeline", benchmark["daily_metrics"])
+        for fold in benchmark["outer_folds"]:
+            self.assertNotIn(fold["held_out_year"], fold["training_years"])
+        gaps = [item for item in benchmark["contiguous_gap_contribution_metrics"]
+                if item["model"] == "selected_pipeline"]
+        self.assertEqual(len(gaps), 16)
+        self.assertEqual({(item["gap_duration_days"], item["season"]) for item in gaps},
+                         {(days, season) for days in (1, 3, 7, 14)
+                          for season in ("DJF", "MAM", "JJA", "SON")})
+        self.assertTrue(all(item["window_count"] > 0 and item["outer_test_years"]
+                            for item in gaps))
+        self.assertTrue(all(item["median_absolute_log_error"] is not None for item in gaps))
+        self.assertTrue(all(item["median_absolute_percent_error_nonzero"] is not None
+                            for item in gaps))
+
     def test_calibration_artifact_hashes_exact_paired_inputs(self):
         report = calibrate(synthetic_daily())
         region = {"id": "norcal", "name": "Northern California", "bbox": [-122.2, 38.8, -120.0, 41.0]}

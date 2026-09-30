@@ -48,7 +48,7 @@ C1 and C2 remain at 4. Dated MCD64A1 corroboration is now hash-bound, but archiv
 | P1 usability and deployment | Outside-user check, public no-credential URL, globe and mobile rehearsal | **OPEN** |
 | P2 rapid mode | Separate Recent Pulse data mode, calibration, and limits | **DEFERRED** |
 
-## 2.2 Local rubric — current **≈70 / 118** · earlier **93 / 118 withdrawn**
+## 2.2 Local rubric — current **≈71 / 118** · earlier **93 / 118 withdrawn**
 
 | Criterion | Max | Now | Earlier claim (withdrawn) | Perfected-plan evidence gate |
 |---|---:|---:|---:|---|
@@ -59,11 +59,11 @@ C1 and C2 remain at 4. Dated MCD64A1 corroboration is now hash-bound, but archiv
 | Presentation | 20 | 12 | 16 | Globe remains, public link works, and both 30-second and 90-second evidence paths are rehearsed |
 | Teamwork | 5 | 2 | 2 | This plan adds no teamwork tasks, so this box stays 2 |
 | User experience | 5 | 3 | 4 | Pick an area, read the sentence, open one hatched day, inspect the bridge, and share the evidence card; outside-user check required for 4 |
-| NASA data usage | 5 | 4 | 5 | Sources page lists MODIS C6.1, VIIRS S-NPP, FIRMS acknowledgement, and any MCD64A1 input with version, retrieval, and hash |
+| NASA data usage | 5 | 5 | 5 | Sources page lists MODIS C6.1, VIIRS S-NPP, FIRMS acknowledgement, and MCD64A1 Collection 6.1 with retrieval date, UMD distribution, and all input TIFF hashes |
 | Category named | 1 | 1 | 1 | Challenge name is on the home page |
 | Repository access | 1 | 0 | 1 | Public repo matches the running site |
 | Project page | 1 | 0 | 1 | Space Apps project page submitted |
-| **Total** | **118** | **≈70** | **93 (withdrawn)** | Current: 15+11+11+11+12+2+3+4+1+0+0 = **70**; no perfected-plan claim is set |
+| **Total** | **118** | **≈71** | **93 (withdrawn)** | Current: 15+11+11+11+12+2+3+5+1+0+0 = **71**; no perfected-plan claim is set |
 
 A judge can still score a box lower if the sentence is buried or the demo fails. The earlier
 93-point row is a withdrawn planning ceiling, not a prediction. Re-score only after the perfected

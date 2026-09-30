@@ -107,57 +107,65 @@
   function monthBridge(monthKey) {
     const days = current?.days?.filter((item) => item.date.startsWith(monthKey)) || [];
     const availability = new Map((current?.availability || []).filter((item) => item.date.startsWith(monthKey)).map((item) => [item.date, item.sources || {}]));
-    const totals = {};
+    const matchedTotals = {};
+    const paired = days.filter((day) => {
+      if (day.sensor_bridge?.status !== "complete" || day.viirs_status === "documented_processing_gap") return false;
+      const sources = availability.get(day.date) || {};
+      return ["MODIS_SP", "VIIRS_SNPP_SP"].every((source) =>
+        sources[source]?.export_complete && sources[source]?.availability?.status !== "documented_processing_gap");
+    });
     for (const source of ["MODIS_SP", "VIIRS_SNPP_SP"]) {
-      const values = days.map((day) => availability.get(day.date)?.[source]).filter(Boolean);
-      const complete = values.filter((item) => item.export_complete && item.availability?.status !== "documented_processing_gap");
-      const partial = values.filter((item) => !item.export_complete);
-      totals[source] = {
-        rows: complete.reduce((sum, item) => sum + (item.raw_pixel_count || 0), 0),
-        cells: complete.reduce((sum, item) => sum + (item.detected_cell_days || 0), 0),
-        excluded: complete.reduce((sum, item) => sum + (item.excluded_row_count || 0), 0),
-        excludedTypes: complete.reduce((counts, item) => {
-          for (const [type, count] of Object.entries(item.excluded_type_counts || {})) counts[type] = (counts[type] || 0) + Number(count || 0);
-          return counts;
-        }, {}),
-        frp: complete.reduce((sum, item) => sum + (item.frp_sum_mw === null || item.frp_sum_mw === undefined ? 0 : Number(item.frp_sum_mw)), 0),
-        frpKnownDays: complete.filter((item) => item.frp_sum_mw !== null && item.frp_sum_mw !== undefined).length,
-        partialRows: partial.reduce((sum, item) => sum + (item.partial_raw_pixel_count || 0), 0),
-        partialCells: partial.reduce((sum, item) => sum + (item.partial_detected_cell_days || 0), 0),
-        partialExcluded: partial.reduce((sum, item) => sum + (item.partial_excluded_row_count || 0), 0),
-        partialFrp: partial.reduce((sum, item) => sum + (item.partial_frp_sum_mw === null || item.partial_frp_sum_mw === undefined ? 0 : Number(item.partial_frp_sum_mw)), 0),
-        partialFrpKnownDays: partial.filter((item) => item.partial_frp_sum_mw !== null && item.partial_frp_sum_mw !== undefined).length,
-        completeDays: complete.length,
-        gapDays: values.filter((item) => item.availability?.status === "documented_processing_gap").length,
+      const values = paired.map((day) => availability.get(day.date)?.[source]).filter(Boolean);
+      matchedTotals[source] = {
+        rows: values.reduce((sum, item) => sum + (item.raw_pixel_count || 0), 0),
+        cells: values.reduce((sum, item) => sum + (item.detected_cell_days || 0), 0),
+        excluded: values.reduce((sum, item) => sum + (item.excluded_row_count || 0), 0),
+        pairedDays: values.length,
       };
     }
-    const bridged = days.filter((item) => item.sensor_bridge?.status === "complete" && item.viirs_status !== "documented_processing_gap");
-    const gaps = days.length - bridged.length;
-    const mismatch = bridged.reduce((sum, item) => {
+    const gaps = days.length - paired.length;
+    const mismatch = paired.reduce((sum, item) => {
       const bridge = item.sensor_bridge || {};
       sum.modis += Number(bridge.modis_only_cell_days) || 0;
       sum.both += Number(bridge.co_detected_cell_days) || 0;
       sum.viirs += Number(bridge.viirs_only_cell_days) || 0;
       return sum;
     }, {modis: 0, both: 0, viirs: 0});
-    return {days, totals, bridgedDays: bridged.length, gaps, mismatch, month: monthKey};
+    const frpPairs = paired.map((day) => {
+      const sources = availability.get(day.date) || {};
+      return {MODIS_SP: sources.MODIS_SP?.frp_sum_mw, VIIRS_SNPP_SP: sources.VIIRS_SNPP_SP?.frp_sum_mw};
+    }).filter((pair) => [pair.MODIS_SP, pair.VIIRS_SNPP_SP].every((value) =>
+      value !== null && value !== undefined && Number.isFinite(Number(value))));
+    const frp = {};
+    for (const source of ["MODIS_SP", "VIIRS_SNPP_SP"]) {
+      frp[source] = frpPairs.length
+        ? frpPairs.reduce((sum, pair) => sum + Number(pair[source]), 0) / frpPairs.length
+        : null;
+    }
+    return {days, matchedTotals, pairedDays: paired.length,
+      frp, frpSampleDays: frpPairs.length, frpMissingDays: paired.length - frpPairs.length,
+      bridgedDays: paired.length, gaps, mismatch, month: monthKey};
   }
 
   function renderBridge(month) {
     const key = month?.month;
     if (!key || !current) return;
-    const bridge = monthBridge(key), modis = bridge.totals.MODIS_SP, viirs = bridge.totals.VIIRS_SNPP_SP;
+    const bridge = monthBridge(key), modis = bridge.matchedTotals.MODIS_SP, viirs = bridge.matchedTotals.VIIRS_SNPP_SP;
     const max = Math.max(modis.cells, viirs.cells, Number(month.value) || 0, 1);
     const set = (id, value) => { const element = $(id); if (element) element.textContent = value; };
     set("#harm-bridge-modis", bridge.bridgedDays ? n(modis.cells, 0) : "—");
     set("#harm-bridge-viirs", bridge.bridgedDays ? n(viirs.cells, 0) : "—");
     set("#harm-bridge-result", month.value === null ? "UNKNOWN" : n(month.value, 1));
     const excludedNote = (value) => value.excluded ? ` · ${n(value.excluded, 0)} filtered` : "";
-    set("#harm-bridge-modis-note", `${n(modis.rows, 0)} eligible rows${excludedNote(modis)} · ${modis.completeDays} usable UTC days`);
-    set("#harm-bridge-viirs-note", `${n(viirs.rows, 0)} eligible rows${excludedNote(viirs)} · 375 m detail retained`);
-    set("#harm-bridge-result-note", month.value === null ? "No complete reference value" : `${month.estimate_type === "observed" ? "Observed VIIRS" : "MODIS scaled estimate"} · never summed`);
+    set("#harm-bridge-modis-note", `${n(modis.rows, 0)} eligible rows${excludedNote(modis)} · ${modis.pairedDays} matched UTC dates`);
+    set("#harm-bridge-viirs-note", `${n(viirs.rows, 0)} eligible rows${excludedNote(viirs)} · ${viirs.pairedDays} matched UTC dates`);
+    const resultState = month.estimate_type === "observed" ? "Observed VIIRS"
+      : month.estimate_type === "scaled" ? "MODIS-scaled estimate · prediction interval withheld"
+        : month.estimate_type === "mixed" ? "Observed + estimated days · prediction interval withheld"
+          : "State unknown";
+    set("#harm-bridge-result-note", month.value === null ? "No complete reference value" : `${resultState} · never summed`);
     [["#harm-bridge-modis-bar", modis.cells], ["#harm-bridge-viirs-bar", viirs.cells], ["#harm-bridge-result-bar", month.value || 0]].forEach(([id, value]) => $(id)?.style.setProperty("--bridge-fill", String(Math.min(1, Number(value || 0) / max))));
-    const gapLabel = bridge.gaps ? `${bridge.bridgedDays}/${bridge.days.length} usable days · ${bridge.gaps} gap/unknown` : `${bridge.bridgedDays} paired UTC days`;
+    const gapLabel = bridge.gaps ? `${bridge.pairedDays}/${bridge.days.length} paired UTC dates · ${bridge.gaps} gap/unknown` : `${bridge.pairedDays} paired UTC dates`;
     set("#harm-bridge-state", gapLabel);
     set("#harm-bridge-days", `${bridge.days.length} days`);
     const bridgeMethod = current.meta.bridge_method_version;
@@ -173,21 +181,25 @@
     [["#harm-mismatch-modis-bar", bridge.mismatch.modis], ["#harm-mismatch-both-bar", bridge.mismatch.both], ["#harm-mismatch-viirs-bar", bridge.mismatch.viirs]].forEach(([id, value]) => $(id)?.style.setProperty("--mismatch-size", `${Math.max(4, Math.round(48 * Number(value || 0) / barMax))}px`));
     set("#harm-mismatch-gap", bridge.gaps ? n(bridge.gaps, 0) : "0");
     $("#harm-mismatch-gap-bar")?.style.setProperty("--mismatch-size", `${Math.max(4, Math.round(48 * bridge.gaps / Math.max(bridge.days.length, 1)))}px`);
-    set("#harm-bridge-note", bridge.bridgedDays
+    set("#harm-bridge-note", bridge.pairedDays
       ? `${n(bridge.mismatch.both, 0)} common-grid cell-days were reported by both sensors; ${n(bridge.mismatch.modis + bridge.mismatch.viirs, 0)} were sensor-specific. Raw pixels are never added together.`
       : "No paired clear export is available for this month; mismatch values stay unknown.");
-    const frp = (value) => {
-      if (value.completeDays && value.frpKnownDays === value.completeDays) return n(value.frp, 1);
-      if (value.completeDays && value.frpKnownDays) return `${n(value.frp, 1)} · partial`;
-      if (value.partialFrpKnownDays) return `≥${n(value.partialFrp, 1)} · partial`;
-      return "unknown";
-    };
-    set("#harm-frp-value", `${frp(modis)} / ${frp(viirs)}`);
-    set("#harm-frp-note", `MODIS / VIIRS raw MW/day · ${bridge.gaps ? `${bridge.gaps} gap/unknown days excluded` : "source rows summed separately"}; missing FRP stays unknown`);
+    const frpValue = (value) => value === null ? "unknown" : n(value, 1);
+    set("#harm-frp-value", `${frpValue(bridge.frp.MODIS_SP)} / ${frpValue(bridge.frp.VIIRS_SNPP_SP)}`);
+    set("#harm-frp-unit", "mean MW · paired UTC dates");
+    set("#harm-frp-note", bridge.pairedDays
+      ? `Mean of daily source FRP sums on ${bridge.frpSampleDays} matched dates · MODIS / VIIRS; ${bridge.frpMissingDays} paired dates have unknown FRP.`
+      : "No matched UTC dates; source FRP comparison is unknown.");
     const corroboration = corroborationFor(key);
     set("#harm-corroboration-state", corroboration.status === "loaded" ? "MCD64A1 LAGGED" : "ACTIVE FIRE ONLY");
+    const qaSupported = corroboration.qa_supported_burned_pixels;
+    const firstBurnDoy = corroboration.qa_supported_burn_date_min;
+    const lastBurnDoy = corroboration.qa_supported_burn_date_max;
+    const overlap = corroboration.same_day_spatial_comparison?.shared_1km_cell_days_by_source || {};
+    const overlapSummary = Object.keys(overlap).length
+      ? ` · same-date shared 1 km cell-days: MODIS ${n(overlap.MODIS_SP || 0, 0)}, S-NPP ${n(overlap.VIIRS_SNPP_SP || 0, 0)}` : "";
     set("#harm-corroboration-note", corroboration.status === "loaded"
-      ? `${n(corroboration.burned_pixels_in_bbox, 0)} mapped Burn Date pixels${corroboration.burn_date_min ? ` · day ${corroboration.burn_date_min}–${corroboration.burn_date_max}` : ""}. Lagged context is separate from active-fire detections; review is analytical only.`
+      ? `${n(qaSupported ?? corroboration.burned_pixels_in_bbox, 0)} QA-supported burned pixels${firstBurnDoy ? ` · day ${firstBurnDoy}–${lastBurnDoy}` : ""}${overlapSummary}. Same-date matches are descriptive, not independent validation; no match does not mean no fire.`
       : "No dated MCD64A1 check is bundled for this month; the calendar uses active-fire detections only.");
     updateShareCard(month, bridge);
     renderBuildMeta();
@@ -200,7 +212,9 @@
       if (!item.date.startsWith(month.month)) continue;
       for (const source of Object.values(item.sources || {})) for (const version of source.product_versions || []) sourceVersions.add(version);
     }
-    const state = month.value === null ? "UNKNOWN" : month.estimate_type === "observed" ? "OBSERVED" : "ESTIMATED";
+    const state = month.value === null ? "UNKNOWN"
+      : month.estimate_type === "observed" ? "OBSERVED"
+        : month.estimate_type === "mixed" ? "MIXED" : month.estimate_type === "scaled" ? "ESTIMATED" : "UNKNOWN STATE";
     const readable = (value) => String(value || "unknown").replaceAll("_", " ");
     const evidenceStates = [...new Set(bridge.days.map((day) => day.evidence_state).filter(Boolean))];
     const coverageStates = [...new Set(bridge.days.map((day) => day.coverage_state).filter(Boolean))];
@@ -214,9 +228,12 @@
     const hashText = hashes.count ? `${hashes.count} SHA-256 · ${hashes.sample}` : "hash unavailable";
     $("#harm-share-card-inputs").textContent = `${sourceVersions.size ? [...sourceVersions].join(" / ") : "versions unknown"} · ${current.meta.inputs?.length || 0} ledger inputs · ${hashText}`;
     const corroboration = corroborationFor(month.month);
-    $("#harm-share-card-limit").textContent = corroboration.status === "loaded"
+    const estimateLimit = ["scaled", "mixed"].includes(month.estimate_type)
+      ? "Prediction interval withheld · " : "";
+    const coverageLimit = corroboration.status === "loaded"
       ? "MCD64A1 lagged context · pass/cloud coverage unknown"
       : "ACTIVE FIRE ONLY · pass/cloud coverage unknown";
+    $("#harm-share-card-limit").textContent = `${estimateLimit}${coverageLimit}`;
     const url = evidenceHref();
     const urlElement = $("#harm-share-card-url");
     urlElement.href = url;
@@ -261,7 +278,7 @@
     const note = document.createElement("span");
     note.textContent = region === "norcal"
       ? "Thermal detections are not a fire perimeter."
-      : "Thermal detections do not identify crop-burning cause.";
+      : "No verified official local source listed. Thermal detections do not identify crop-burning cause.";
     links.append(note);
     renderSeasonContext();
   }
@@ -344,15 +361,29 @@
             ? "Monthly activity is typical compared with the comparable baseline"
             : "Monthly activity baseline is insufficient or unknown");
     }
-    const observedDays = current.days.filter((item) => item.date.startsWith(month.month) && item.estimate_type === "observed").length;
-    const estimateDays = current.days.filter((item) => item.date.startsWith(month.month) && item.estimate_type === "scaled").length;
     const partialDays = month.partial_detection_days || 0;
     const partialModis = month.partial_modis_cell_days || 0;
     const partialViirs = month.partial_viirs_cell_days || 0;
     $("#harm-value-note").textContent = month.value === null
-      ? partialDays ? `${partialDays} UTC dates · partial source counts: MODIS ${n(partialModis, 0)} cell-days, S-NPP ${n(partialViirs, 0)} · other dates unknown` : "No complete harmonized month; missing dates are unknown, not zero"
-      : `${observedDays} VIIRS-observed days · ${estimateDays} MODIS-estimated days · ${month.degraded_days} degraded days`;
+      ? partialDays ? `${partialDays} UTC dates · partial source counts: MODIS ${n(partialModis, 0)} cell-days, S-NPP ${n(partialViirs, 0)} · ${month.unknown_days ?? "Other"} dates unknown`
+        : `No complete harmonized month · ${month.unknown_days ?? "All"} UTC dates unknown, not zero`
+      : `${month.observed_days} VIIRS-observed days · ${month.estimated_days} MODIS-estimated days · ${month.unknown_days} unknown days`;
     $("#harm-years").textContent = String(month.n_years);
+    const composition = n(month.observed_days, 0) + " VIIRS-observed days · "
+      + n(month.estimated_days, 0) + " MODIS-estimated days · "
+      + n(month.unknown_days, 0) + " unknown UTC dates";
+    const partialNote = partialDays
+      ? "Partial source detections on " + n(partialDays, 0) + " UTC dates: MODIS "
+        + n(partialModis, 0) + " cell-days, S-NPP " + n(partialViirs, 0)
+        + " cell-days (not included in the month total)"
+      : "No complete harmonized month";
+    $("#harm-value-note").textContent = month.value === null
+      ? partialNote + " · " + composition + " · total unknown, not zero"
+      : composition;
+    if (month.estimated_days > 0) {
+      $("#harm-value-note").textContent += " · "
+        + (month.uncertainty_note || "Prediction interval withheld; prediction error is not independently calibrated.");
+    }
     $("#harm-percentile").textContent = month.percentile_rank === null
       ? "Percentile withheld" : `${ordinal(month.percentile_rank)} percentile · ${month.flag.replaceAll("-", " ")}`;
     const season = current.meta.season || {};
@@ -364,10 +395,18 @@
     const calibration = current.meta.calibration_status;
     const model = current.meta.calibration_model;
     $("#harm-model").textContent = model ? model.replaceAll("_", " ") : "Not validated";
-    const check = current.meta.calibration_validation?.models?.[model];
-    $("#harm-model-note").textContent = check?.median_absolute_log_error === null || check?.median_absolute_log_error === undefined
-      ? `${calibration.replaceAll("-", " ")} · no held-out comparison supports scaling`
-      : `Held-out median absolute log error ${n(check.median_absolute_log_error, 3)} · ${current.calibration?.versions?.MODIS_SP || "MODIS version unknown"} / ${current.calibration?.versions?.VIIRS_SNPP_SP || "VIIRS version unknown"}`;
+    const validation = current.meta.calibration_validation || {};
+    const nested = validation.nested_selected_pipeline;
+    const fixed = validation.models?.[model];
+    const daily = validation.daily_gap_benchmark?.daily_metrics?.selected_pipeline;
+    const pairedNote = daily?.median_absolute_log_error === null || daily?.median_absolute_log_error === undefined
+      ? "daily gap benchmark unavailable"
+      : `${daily.n_days} paired daily checks · median log error ${n(daily.median_absolute_log_error, 3)}`;
+    $("#harm-model-note").textContent = nested?.median_absolute_log_error !== null && nested?.median_absolute_log_error !== undefined
+      ? `Nested selected-method outer holdout · monthly log error ${n(nested.median_absolute_log_error, 3)} · ${pairedNote}`
+      : fixed?.median_absolute_log_error !== null && fixed?.median_absolute_log_error !== undefined
+        ? `Fixed ${model.replaceAll("_", " ")} outer holdout · monthly log error ${n(fixed.median_absolute_log_error, 3)} · ${pairedNote}`
+        : `${calibration.replaceAll("-", " ")} · no held-out comparison supports scaling`;
     $("#harm-verdict").textContent = month.verdict;
     $("#harm-month-total").textContent = month.value === null ? "UNKNOWN MONTH" : `${n(month.value)} VIIRS-equivalent cell-days`;
     renderBridge(month);
@@ -610,7 +649,7 @@
     const detail = current.availability.find((row) => row.date === stamp)?.sources || {};
     const verdict = item?.value === null || !item ? "Harmonized value unknown. The product export does not cover this date." : item.estimate_type === "observed"
       ? `${n(item.value)} observed VIIRS cell-days; no scaling was applied.`
-      : `${n(item.value)} estimated VIIRS-equivalent cell-days from ${n(item.modis_cell_days)} MODIS common-grid cell-days × ${n(item.scale_factor, 3)} (95% factor range ${n(item.scale_interval?.[0], 3)}–${n(item.scale_interval?.[1], 3)}).`;
+      : `${n(item.value)} estimated VIIRS-equivalent cell-days from ${n(item.modis_cell_days)} MODIS common-grid cell-days × ${n(item.scale_factor, 3)}. The year-bootstrap 95% range describes the fitted factor only, not prediction uncertainty; a reliable prediction interval is withheld.`;
     $("#harm-day-title").textContent = `${stamp} UTC · ${item?.quality || "unknown"}`;
     $("#harm-day-summary").textContent = `${verdict} Satellite pass, cloud and fire-free status are not inferred.`;
     const sourceContainer = $("#harm-day-source-status");

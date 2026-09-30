@@ -12,6 +12,7 @@ import re
 import shutil
 import sqlite3
 import tempfile
+import zipfile
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -24,6 +25,7 @@ from fireatlas.validity import CASES as VALIDITY_CASES, report as validity_repor
 from fireatlas.validation_check import check as analytical_validity_check
 from fireatlas.mask_review import make_template
 from fireatlas.masks import read_evidence
+from fireatlas.globe import static_bundle as static_globe_bundle
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "fireatlas" / "static"
@@ -155,7 +157,6 @@ def _copy_site_assets(site: Path, static_source: Path = STATIC) -> None:
         if 'name="fireatlas-static-data"' not in text:
             text = text.replace("</head>", metadata + "</head>", 1)
         page.write_text(text, encoding="utf-8")
-    _rebase_local_asset_urls(site)
 
 
 def _latest_year(status: dict, db: sqlite3.Connection) -> int:
@@ -234,11 +235,145 @@ def _observations_for_region(db: sqlite3.Connection, site: Path, region_id: str,
     return output
 
 
+def _complete_observation_archive(db: sqlite3.Connection, site: Path, region_id: str,
+                                 input_hashes: set[str]) -> dict:
+    """Write every imported, non-demo observation as deterministic JSONL.GZ parts.
+
+    GitHub rejects individual objects above 100 MiB.  The Punjab–Haryana
+    archive is larger than that limit, so the public static release keeps the
+    complete row-level evidence but splits it into bounded, independently
+    checksummed parts.  A row-count boundary (rather than a byte boundary)
+    keeps exports deterministic across machines and Python versions.
+    """
+    west, south, east, north = REGIONS[region_id]["bbox"]
+    rows = db.execute("""
+        SELECT o.detection_id,o.source_id,o.platform,o.sensor,o.product_version,
+               o.processing_level,o.acquisition_utc,o.retrieval_time_utc,o.lon,o.lat,
+               o.scan_m,o.track_m,o.grid_x,o.grid_y,o.frp_raw,o.confidence_raw,
+               o.daynight,o.thermal_anomaly_flag,o.source_uri,o.raw_json,
+               b.file_sha256,b.source_uri AS batch_source_uri,b.retrieved_utc
+        FROM observations o JOIN batches b ON b.id=o.batch_id
+        WHERE b.demo=0 AND o.lon>=? AND o.lon<=? AND o.lat>=? AND o.lat<=?
+        ORDER BY o.acquisition_utc,o.source_id,o.grid_y,o.grid_x,o.detection_id
+    """, (west, east, south, north))
+    target_root = site / "data" / "v2" / "observations-full"
+    target_root.mkdir(parents=True, exist_ok=True)
+    for stale in target_root.glob(f"{region_id}.jsonl.gz"):
+        stale.unlink()
+    for stale in target_root.glob(f"{region_id}.part-*.jsonl.gz"):
+        stale.unlink()
+
+    rows_per_part = 400_000
+    parts: list[dict] = []
+    row_count = 0
+    part_row_count = 0
+    part_number = 0
+    compressed = None
+    raw_stream = None
+
+    def open_part() -> None:
+        nonlocal compressed, raw_stream, part_number, part_row_count
+        part_number += 1
+        part_row_count = 0
+        target = target_root / f"{region_id}.part-{part_number:02d}.jsonl.gz"
+        raw_stream = target.open("wb")
+        compressed = gzip.GzipFile(fileobj=raw_stream, mode="wb", mtime=0, compresslevel=6)
+
+    def close_part() -> None:
+        nonlocal compressed, raw_stream
+        if compressed is None or raw_stream is None:
+            return
+        compressed.close()
+        raw_stream.close()
+        target = target_root / f"{region_id}.part-{part_number:02d}.jsonl.gz"
+        body = target.read_bytes()
+        parts.append({"path": target.relative_to(site).as_posix(),
+                      "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
+                      "row_count": part_row_count})
+        compressed = None
+        raw_stream = None
+
+    for row in rows:
+        if compressed is None or part_row_count >= rows_per_part:
+            close_part()
+            open_part()
+        record = {
+            "detection_id": row["detection_id"], "source_id": row["source_id"],
+            "platform": row["platform"], "sensor": row["sensor"],
+            "product_version": row["product_version"],
+            "processing_level": row["processing_level"],
+            "acquisition_utc": row["acquisition_utc"],
+            "retrieval_time_utc": row["retrieval_time_utc"],
+            "lon": row["lon"], "lat": row["lat"],
+            "scan_m": row["scan_m"], "track_m": row["track_m"],
+            "grid_x": row["grid_x"], "grid_y": row["grid_y"],
+            "frp_raw": row["frp_raw"], "confidence_raw": row["confidence_raw"],
+            "daynight": row["daynight"],
+            "thermal_anomaly_flag": row["thermal_anomaly_flag"],
+            "source_file_sha256": row["file_sha256"],
+            "source_uri": row["source_uri"],
+            "batch_source_uri": row["batch_source_uri"],
+            "retrieved_utc": row["retrieved_utc"],
+        }
+        try:
+            record["raw"] = json.loads(row["raw_json"])
+        except (TypeError, json.JSONDecodeError):
+            record["raw"] = row["raw_json"]
+        compressed.write(json.dumps(record, separators=(",", ":"), allow_nan=False).encode("utf-8") + b"\n")
+        if row["file_sha256"]:
+            input_hashes.add(row["file_sha256"])
+        row_count += 1
+        part_row_count += 1
+    close_part()
+    if not parts:
+        open_part()
+        close_part()
+    return {"parts": parts, "row_count": row_count,
+            "format": "gzip-compressed JSON Lines; deterministic row-count parts",
+            "scope": "all imported non-demo observation rows inside this region bbox; all source IDs"}
+
+
+def _bundle_mcd64_sources(site: Path, file_inventory: list[dict]) -> None:
+    source_root = ROOT / "NASA_data" / "mcd64a1"
+    source_files = sorted(source_root.rglob("*.tif")) if source_root.is_dir() else []
+    if source_files:
+        target = site / "data" / "v2" / "validity" / "mcd64-inputs.zip"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=1) as archive:
+            for source in source_files:
+                archive.write(source, Path("mcd64a1") / source.relative_to(source_root))
+        body = target.read_bytes()
+        file_inventory.append({"path": target.relative_to(site).as_posix(),
+                               "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
+                               "input_files": len(source_files),
+                               "description": "All locally supplied MCD64A1 Burn Date and QA GeoTIFFs."})
+    checklist = ROOT / "NASA_data" / "fire_masks" / "download_checklist.csv"
+    if checklist.is_file():
+        target = site / "data" / "v2" / "validity" / "fire-mask-download-checklist.csv"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(checklist, target)
+        body = target.read_bytes()
+        file_inventory.append({"path": target.relative_to(site).as_posix(),
+                               "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
+                               "description": "NASA native fire-mask/geolocation source checklist with source URLs."})
+    local_inventory = ROOT / "NASA_data" / "fire_masks" / "local_asset_inventory.csv"
+    if local_inventory.is_file():
+        target = site / "data" / "v2" / "validity" / "fire-mask-local-inventory.csv"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(local_inventory, target)
+        body = target.read_bytes()
+        file_inventory.append({"path": target.relative_to(site).as_posix(),
+                               "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
+                               "description": "Complete SHA-256 inventory of local fire-mask/geolocation files; source metadata is included where the NASA checklist has a matching filename."})
+
+
 def _export_static_into(database: Path, site: Path, *, static_source: Path,
-                        first_year: int, last_year: int | None) -> dict:
+                        first_year: int, last_year: int | None,
+                        reuse_validity_from: Path | None = None) -> dict:
     _copy_site_assets(site, Path(static_source))
     site_data = site / "data" / "v2"
     file_inventory = []
+    complete_observation_exports = []
     with connect(database) as db:
         status = region_status(db)
         end_year = last_year or _latest_year(status, db)
@@ -260,6 +395,23 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
             file_inventory.append(_write_json(site_data / "history" / f"{region_id}.json",
                                               latest_result["history"], site))
             file_inventory.extend(_observations_for_region(db, site, region_id, first_year, end_year))
+            archive = _complete_observation_archive(db, site, region_id, source_hashes)
+            file_inventory.extend(archive["parts"])
+            complete_observation_exports.append({
+                "region": region_id,
+                "parts": archive["parts"],
+                "row_count": archive["row_count"],
+                "format": archive["format"],
+                "scope": archive["scope"],
+            })
+
+        # The landing globe's recent view remains interactive in a static
+        # checkout. Keep per-source/day/cell aggregates and bounded detail
+        # samples, with input hashes, rather than copying the whole database.
+        globe = static_globe_bundle(db)
+        source_hashes.update(globe["input_file_sha256"])
+        file_inventory.append(_write_bundle_json(
+            site_data / "globe" / "recent.json.gz", globe, site))
 
         # Keep the dated evidence story usable from a static checkout too.  Each
         # case/date report is generated from the same database snapshot as the
@@ -268,10 +420,14 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
         # compact; raw inputs remain outside the export and are referenced by
         # their hashes in the report and downloadable evidence ZIP.
         validity_root = site / "data" / "v2" / "validity"
+        reusable_validity = (reuse_validity_from / "data" / "v2" / "validity"
+                             if reuse_validity_from else None)
+        if reusable_validity and reusable_validity.is_dir():
+            shutil.copytree(reusable_validity, validity_root, dirs_exist_ok=True)
         has_authentic_rows = db.execute(
             "SELECT 1 FROM observations o JOIN batches b ON b.id=o.batch_id "
             "WHERE b.demo=0 AND o.source_id IN (?,?) LIMIT 1", SOURCES).fetchone()
-        if has_authentic_rows:
+        if has_authentic_rows and not (reusable_validity and reusable_validity.is_dir()):
             for case_id, case in VALIDITY_CASES.items():
                 default = compact_static_validity_report(validity_report(db, case_id=case_id))
                 file_inventory.append(_write_json(validity_root / f"{case_id}.json", default, site))
@@ -303,9 +459,32 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
         mcd64_report = SAMPLES / "mcd64_corroboration.json"
         if has_authentic_rows and mcd64_report.is_file():
             corroboration = json.loads(mcd64_report.read_text(encoding="utf-8"))
-            if corroboration.get("schema") == "fireatlas-mcd64-corroboration-v1":
+            if corroboration.get("schema") in {
+                    "fireatlas-mcd64-corroboration-v1", "fireatlas-mcd64-corroboration-v2"}:
                 file_inventory.append(_write_json(validity_root / "mcd64-corroboration.json",
                                                   corroboration, site))
+
+    _bundle_mcd64_sources(site, file_inventory)
+
+    # Include reused validity files in the new manifest and avoid duplicating
+    # entries already produced during a full evidence rebuild.
+    validity_root = site / "data" / "v2" / "validity"
+    indexed_paths = {item["path"] for item in file_inventory}
+    if validity_root.is_dir():
+        for path in sorted(validity_root.rglob("*")):
+            if path.is_file():
+                relative = path.relative_to(site).as_posix()
+                if relative not in indexed_paths:
+                    body = path.read_bytes()
+                    file_inventory.append({"path": relative,
+                                           "sha256": hashlib.sha256(body).hexdigest(),
+                                           "bytes": len(body),
+                                           "description": "Reused dated validity evidence from the existing local site export."})
+
+    # Rebase only after generated data files exist. Pages may link to evidence
+    # written during this export, and those routes must work under a project
+    # prefix such as GitHub Pages' /<repository>/ path.
+    _rebase_local_asset_urls(site)
 
     manifest = {
         "schema": "fireatlas-static-site-v1",
@@ -315,10 +494,12 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
         "regions": [{"id": key, "name": value["name"], "bbox": list(value["bbox"])}
                     for key, value in REGIONS.items()],
         "input_file_sha256": sorted(source_hashes),
+        "complete_observation_exports": complete_observation_exports,
         "limitations": [
             "This is a dated static export from the local imported FIRMS archive.",
             "Older reconstructed-row periods remain partial; missing dates are unknown.",
             "Detection export completeness does not establish pass, cloud, or fire-free coverage.",
+            "The static globe is a checksummed eight-day imported snapshot, not a live FIRMS feed.",
             "A static calendar does not provide live FIRMS updates or the local research API.",
             "Static validity reports are summary-only dated snapshots; the downloadable ZIP references the complete raw inputs and row-level evidence by hash.",
         ],
@@ -334,7 +515,8 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
 
 def export_static(database: str | Path, output: str | Path, *,
                   static_source: str | Path = STATIC, first_year: int = FIRST_YEAR,
-                  last_year: int | None = None) -> dict:
+                  last_year: int | None = None,
+                  reuse_validity_from: str | Path | None = None) -> dict:
     """Export to a fresh directory; existing output is never deleted or overwritten."""
     database, destination = Path(database), Path(output).resolve()
     if destination.exists():
@@ -343,7 +525,9 @@ def export_static(database: str | Path, output: str | Path, *,
     with tempfile.TemporaryDirectory(prefix=f".{destination.name}-", dir=destination.parent) as temporary:
         workdir = Path(temporary) / "site"
         result = _export_static_into(database, workdir, static_source=Path(static_source),
-                                     first_year=first_year, last_year=last_year)
+                                     first_year=first_year, last_year=last_year,
+                                     reuse_validity_from=(Path(reuse_validity_from)
+                                                          if reuse_validity_from else None))
         workdir.rename(destination)
         result["output"] = str(destination)
         return result
@@ -355,9 +539,12 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=ROOT / "site")
     parser.add_argument("--first-year", type=int, default=FIRST_YEAR)
     parser.add_argument("--last-year", type=int)
+    parser.add_argument("--reuse-validity-from", type=Path,
+                        help="Reuse dated evidence files from an existing local site export.")
     args = parser.parse_args()
     print(json.dumps(export_static(args.db, args.output, first_year=args.first_year,
-                                   last_year=args.last_year), indent=2))
+                                   last_year=args.last_year,
+                                   reuse_validity_from=args.reuse_validity_from), indent=2))
 
 
 if __name__ == "__main__":

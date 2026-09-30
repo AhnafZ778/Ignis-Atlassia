@@ -46,8 +46,14 @@ cell-day difference as descriptive.
 
 Monthly totals are the sum of complete daily cell-day counts. A month without a
 verified complete export remains unknown; partial records are shown as a lower
-bound. Prior-year medians require at least three complete same-month exports for
-the same source cohort and AOI.
+bound. Prior-year medians require at least three complete same-month years;
+percentiles require ten. A year enters the calendar baseline only when every day
+is known and its daily mix of observed VIIRS and MODIS-scaled estimates,
+including the product version used for each source, matches the selected month.
+This prevents a mixed month from being ranked against a month made entirely
+from observed VIIRS values. The comparison is on the VIIRS-equivalent cell-day
+scale; matching source composition does not establish equal satellite
+observation opportunity or fire-free days.
 
 The local archive now contains positive records from older annual files back
 to July 2006 MODIS and July 2012 S-NPP. Their original FIRMS request metadata
@@ -66,15 +72,20 @@ the pass and cloud masks needed to say that a zero-detection day was observed
 fire-free. MODIS and VIIRS era changes must therefore be interpreted with the
 source cohort and processing level visible in the audit.
 
-## Raw FRP and independent corroboration
+## Raw FRP and lagged corroboration
 
 Daily aggregates retain each source’s raw FIRMS Fire Radiative Power sum in MW/day as
 secondary context. FRP is displayed per sensor and is never added to the harmonized
-cell-day measure. The perfected plan calls for MCD64A1 Collection 6.1 burned-area context
-as a lagged, independent product. Dated Burn Date and QA rasters are now hash-bound in
+cell-day measure. MCD64A1 Collection 6.1 provides a distinct lagged burned-area product.
+Dated Burn Date and QA rasters are now hash-bound in
 `fireatlas/samples/mcd64_corroboration.json`; the UI shows mapped counts for matching months
-as separate context. It does not treat them as active-fire truth, a pass/cloud mask, or a
-perimeter, and independent review remains pending.
+as separate context. The Collection 6.1 QA guide is applied conservatively to
+Burn Date counts, with pixel reasons retained in the evidence report. The report
+also counts same-UTC-date shared 1 km centroid-grid cells. That comparison is
+descriptive rather than independent validation because MCD64A1 uses cumulative
+MODIS active-fire maps to guide training-sample selection and prior
+probabilities. It does not treat Burn Date as active-fire truth, a pass/cloud
+mask, or a perimeter, and independent review remains pending.
 
 NASA advises scientific users to use standard processing when available; the
 importer rejects rows labelled NRT/RT/URT under a standard source. NRT products

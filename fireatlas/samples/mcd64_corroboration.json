@@ -3,6 +3,8 @@
   "cases": {
     "grove-2025": {
       "active_fire": {
+        "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+        "excluded_type_counts": {},
         "rows_by_source": {
           "MODIS_SP": 3,
           "VIIRS_SNPP_SP": 4
@@ -23,6 +25,8 @@
       "checks": [
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {},
             "rows_by_source": {
               "MODIS_SP": 3,
               "VIIRS_SNPP_SP": 6
@@ -55,14 +59,80 @@
           "label": "grove-2025",
           "month": "2025-07",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "131": 5,
+                "3": 3102
+              },
+              "burn_date_minus_2": {
+                "0": 4
+              }
+            },
+            "burn_date_positive_doy_counts": {},
+            "burn_date_positive_pixels": 0,
+            "burn_date_zero_pixels": 3107,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {},
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "land": 3107,
+              "valid_data": 3107
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 61,
+            "pixel_count": 3111,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 5,
+              "not-burned-or-unburned": 4,
+              "qa-supported-full-period-unburned": 3102
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "special-condition-4": 5
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 4,
+              "131": 5,
+              "3": 3102
+            },
+            "qa_supported_burn_date_max": null,
+            "qa_supported_burn_date_min": null,
+            "qa_supported_burned_doy_counts": {},
+            "qa_supported_burned_pixels": 0,
+            "qa_supported_burned_pixels_with_flags": {},
+            "qa_supported_full_period_unburned_pixels": 3102,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 3102,
+              "4": 5
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2025182.Win03.061.ba_qa.tif",
           "qa_source_sha256": "11edb36a9d3d2456d9ac15599ed548bea116c9aa1ef66a7e082a16c8350072e1",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {},
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [],
+            "shared_1km_cell_days_by_source": {},
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2025182.Win03.061.burndate.tif",
           "source_sha256": "dd76c0f04a9d144a61016fd8c72b07e65b779f9e4bf10b9f787410bd0847aecc",
           "window": "Win03"
         },
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {},
             "rows_by_source": {},
             "unique_common_grid_cells_by_source": {},
             "utc_end": "2025-08-31",
@@ -89,8 +159,72 @@
           "label": "grove-2025",
           "month": "2025-08",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "131": 4,
+                "3": 3103
+              },
+              "burn_date_minus_2": {
+                "0": 4
+              }
+            },
+            "burn_date_positive_doy_counts": {},
+            "burn_date_positive_pixels": 0,
+            "burn_date_zero_pixels": 3107,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {},
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "land": 3107,
+              "valid_data": 3107
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 61,
+            "pixel_count": 3111,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 4,
+              "not-burned-or-unburned": 4,
+              "qa-supported-full-period-unburned": 3103
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "special-condition-4": 4
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 4,
+              "131": 4,
+              "3": 3103
+            },
+            "qa_supported_burn_date_max": null,
+            "qa_supported_burn_date_min": null,
+            "qa_supported_burned_doy_counts": {},
+            "qa_supported_burned_pixels": 0,
+            "qa_supported_burned_pixels_with_flags": {},
+            "qa_supported_full_period_unburned_pixels": 3103,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 3103,
+              "4": 4
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2025213.Win03.061.ba_qa.tif",
           "qa_source_sha256": "d3bd2117f17773de83b154bcfd34838f715939927c02aa0265517899901ddbb9",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {},
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [],
+            "shared_1km_cell_days_by_source": {},
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2025213.Win03.061.burndate.tif",
           "source_sha256": "dbada417416ea7d691e829a1fd64b9eb94f122613495893fc34c9733f352579a",
           "window": "Win03"
@@ -100,12 +234,18 @@
     },
     "park-2024": {
       "active_fire": {
+        "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+        "excluded_type_counts": {
+          "MODIS_SP": {
+            "2": 8
+          }
+        },
         "rows_by_source": {
-          "MODIS_SP": 2117,
+          "MODIS_SP": 2109,
           "VIIRS_SNPP_SP": 1020
         },
         "unique_common_grid_cells_by_source": {
-          "MODIS_SP": 1165,
+          "MODIS_SP": 1164,
           "VIIRS_SNPP_SP": 164
         },
         "utc_end": "2024-07-31",
@@ -120,12 +260,21 @@
       "checks": [
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {
+              "MODIS_SP": {
+                "2": 8
+              },
+              "VIIRS_SNPP_SP": {
+                "3": 1
+              }
+            },
             "rows_by_source": {
-              "MODIS_SP": 2148,
-              "VIIRS_SNPP_SP": 1171
+              "MODIS_SP": 2140,
+              "VIIRS_SNPP_SP": 1170
             },
             "unique_common_grid_cells_by_source": {
-              "MODIS_SP": 1190,
+              "MODIS_SP": 1189,
               "VIIRS_SNPP_SP": 194
             },
             "utc_end": "2024-07-31",
@@ -167,14 +316,317 @@
           "label": "park-2024",
           "month": "2024-07",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "11": 24,
+                "131": 43,
+                "3": 27577,
+                "35": 1
+              },
+              "burn_date_1_to_366": {
+                "11": 43,
+                "3": 8071
+              },
+              "burn_date_minus_2": {
+                "0": 107
+              }
+            },
+            "burn_date_positive_doy_counts": {
+              "183": 4,
+              "184": 10,
+              "185": 82,
+              "186": 1,
+              "188": 2,
+              "189": 1,
+              "206": 10,
+              "207": 2120,
+              "208": 2198,
+              "209": 2420,
+              "210": 809,
+              "211": 224,
+              "212": 138,
+              "213": 95
+            },
+            "burn_date_positive_pixels": 8114,
+            "burn_date_zero_pixels": 27645,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {
+              "11": 43,
+              "3": 8071
+            },
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "contextual_relabeling": 67,
+              "land": 35759,
+              "valid_data": 35759
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 386,
+            "pixel_count": 35866,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 68,
+              "not-burned-or-unburned": 107,
+              "qa-supported-burned": 8114,
+              "qa-supported-full-period-unburned": 27577
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "contextual-relabeling": 24,
+              "special-condition-1": 1,
+              "special-condition-4": 43
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 107,
+              "11": 67,
+              "131": 43,
+              "3": 35648,
+              "35": 1
+            },
+            "qa_supported_burn_date_max": 213,
+            "qa_supported_burn_date_min": 183,
+            "qa_supported_burned_doy_counts": {
+              "183": 4,
+              "184": 10,
+              "185": 82,
+              "186": 1,
+              "188": 2,
+              "189": 1,
+              "206": 10,
+              "207": 2120,
+              "208": 2198,
+              "209": 2420,
+              "210": 809,
+              "211": 224,
+              "212": 138,
+              "213": 95
+            },
+            "qa_supported_burned_pixels": 8114,
+            "qa_supported_burned_pixels_with_flags": {
+              "contextual_relabeling": 43
+            },
+            "qa_supported_full_period_unburned_pixels": 27577,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 27601,
+              "1": 1,
+              "4": 43
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2024183.Win03.061.ba_qa.tif",
           "qa_source_sha256": "9f1e0c4a66d72807c384fc956a3a6d7adce641e06691e761d6a9fdc6d1c08cc2",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {
+              "MODIS_SP": 9,
+              "VIIRS_SNPP_SP": 5
+            },
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-01",
+                "burn_day_of_year": 183,
+                "qa_supported_mcd64_1km_cells": 3,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 7,
+                  "VIIRS_SNPP_SP": 20
+                },
+                "burn_date_utc": "2024-07-02",
+                "burn_day_of_year": 184,
+                "qa_supported_mcd64_1km_cells": 8,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 8
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 11,
+                  "VIIRS_SNPP_SP": 22
+                },
+                "burn_date_utc": "2024-07-03",
+                "burn_day_of_year": 185,
+                "qa_supported_mcd64_1km_cells": 25,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 6,
+                  "VIIRS_SNPP_SP": 19
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 4
+                },
+                "burn_date_utc": "2024-07-04",
+                "burn_day_of_year": 186,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-06",
+                "burn_day_of_year": 188,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-07",
+                "burn_day_of_year": 189,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-24",
+                "burn_day_of_year": 206,
+                "qa_supported_mcd64_1km_cells": 4,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 415,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-25",
+                "burn_day_of_year": 207,
+                "qa_supported_mcd64_1km_cells": 475,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 331,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 430,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-26",
+                "burn_day_of_year": 208,
+                "qa_supported_mcd64_1km_cells": 609,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 356,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 288,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-27",
+                "burn_day_of_year": 209,
+                "qa_supported_mcd64_1km_cells": 608,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 213,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 104,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-28",
+                "burn_day_of_year": 210,
+                "qa_supported_mcd64_1km_cells": 326,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 55,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 87,
+                  "VIIRS_SNPP_SP": 64
+                },
+                "burn_date_utc": "2024-07-29",
+                "burn_day_of_year": 211,
+                "qa_supported_mcd64_1km_cells": 100,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 45,
+                  "VIIRS_SNPP_SP": 38
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 95,
+                  "VIIRS_SNPP_SP": 129
+                },
+                "burn_date_utc": "2024-07-30",
+                "burn_day_of_year": 212,
+                "qa_supported_mcd64_1km_cells": 75,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 39,
+                  "VIIRS_SNPP_SP": 48
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 62,
+                  "VIIRS_SNPP_SP": 88
+                },
+                "burn_date_utc": "2024-07-31",
+                "burn_day_of_year": 213,
+                "qa_supported_mcd64_1km_cells": 48,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 17,
+                  "VIIRS_SNPP_SP": 21
+                }
+              }
+            ],
+            "shared_1km_cell_days_by_source": {
+              "MODIS_SP": 1063,
+              "VIIRS_SNPP_SP": 134
+            },
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2024183.Win03.061.burndate.tif",
           "source_sha256": "62ab309365ceaa8cc29fa5fc9a1d47763c4c7bce82ce8262b67bf8ca29450a9b",
           "window": "Win03"
         },
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {},
             "rows_by_source": {
               "MODIS_SP": 601,
               "VIIRS_SNPP_SP": 2516
@@ -220,8 +672,275 @@
           "label": "park-2024",
           "month": "2024-08",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "11": 10,
+                "131": 23,
+                "3": 34820
+              },
+              "burn_date_1_to_366": {
+                "11": 10,
+                "3": 896
+              },
+              "burn_date_minus_2": {
+                "0": 107
+              }
+            },
+            "burn_date_positive_doy_counts": {
+              "214": 132,
+              "215": 89,
+              "216": 76,
+              "217": 29,
+              "218": 35,
+              "219": 197,
+              "220": 218,
+              "221": 99,
+              "222": 8,
+              "223": 6,
+              "224": 16,
+              "230": 1
+            },
+            "burn_date_positive_pixels": 906,
+            "burn_date_zero_pixels": 34853,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {
+              "11": 10,
+              "3": 896
+            },
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "contextual_relabeling": 20,
+              "land": 35759,
+              "valid_data": 35759
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 386,
+            "pixel_count": 35866,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 33,
+              "not-burned-or-unburned": 107,
+              "qa-supported-burned": 906,
+              "qa-supported-full-period-unburned": 34820
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "contextual-relabeling": 10,
+              "special-condition-4": 23
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 107,
+              "11": 20,
+              "131": 23,
+              "3": 35716
+            },
+            "qa_supported_burn_date_max": 230,
+            "qa_supported_burn_date_min": 214,
+            "qa_supported_burned_doy_counts": {
+              "214": 132,
+              "215": 89,
+              "216": 76,
+              "217": 29,
+              "218": 35,
+              "219": 197,
+              "220": 218,
+              "221": 99,
+              "222": 8,
+              "223": 6,
+              "224": 16,
+              "230": 1
+            },
+            "qa_supported_burned_pixels": 906,
+            "qa_supported_burned_pixels_with_flags": {
+              "contextual_relabeling": 10
+            },
+            "qa_supported_full_period_unburned_pixels": 34820,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 34830,
+              "4": 23
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2024214.Win03.061.ba_qa.tif",
           "qa_source_sha256": "791c631328db16bdc781a8d27173a1a2beae3bef8f9ee6f258d18b688fe87f98",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {
+              "MODIS_SP": 9,
+              "VIIRS_SNPP_SP": 9
+            },
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 34,
+                  "VIIRS_SNPP_SP": 53
+                },
+                "burn_date_utc": "2024-08-01",
+                "burn_day_of_year": 214,
+                "qa_supported_mcd64_1km_cells": 71,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 19,
+                  "VIIRS_SNPP_SP": 28
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 52,
+                  "VIIRS_SNPP_SP": 70
+                },
+                "burn_date_utc": "2024-08-02",
+                "burn_day_of_year": 215,
+                "qa_supported_mcd64_1km_cells": 36,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 22,
+                  "VIIRS_SNPP_SP": 29
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-08-03",
+                "burn_day_of_year": 216,
+                "qa_supported_mcd64_1km_cells": 50,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 15,
+                  "VIIRS_SNPP_SP": 24
+                },
+                "burn_date_utc": "2024-08-04",
+                "burn_day_of_year": 217,
+                "qa_supported_mcd64_1km_cells": 10,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 5,
+                  "VIIRS_SNPP_SP": 7
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 49,
+                  "VIIRS_SNPP_SP": 45
+                },
+                "burn_date_utc": "2024-08-05",
+                "burn_day_of_year": 218,
+                "qa_supported_mcd64_1km_cells": 20,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 4,
+                  "VIIRS_SNPP_SP": 6
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 95,
+                  "VIIRS_SNPP_SP": 105
+                },
+                "burn_date_utc": "2024-08-06",
+                "burn_day_of_year": 219,
+                "qa_supported_mcd64_1km_cells": 57,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 28,
+                  "VIIRS_SNPP_SP": 50
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 74,
+                  "VIIRS_SNPP_SP": 89
+                },
+                "burn_date_utc": "2024-08-07",
+                "burn_day_of_year": 220,
+                "qa_supported_mcd64_1km_cells": 74,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 46,
+                  "VIIRS_SNPP_SP": 54
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 30,
+                  "VIIRS_SNPP_SP": 64
+                },
+                "burn_date_utc": "2024-08-08",
+                "burn_day_of_year": 221,
+                "qa_supported_mcd64_1km_cells": 41,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 15,
+                  "VIIRS_SNPP_SP": 22
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 31,
+                  "VIIRS_SNPP_SP": 43
+                },
+                "burn_date_utc": "2024-08-09",
+                "burn_day_of_year": 222,
+                "qa_supported_mcd64_1km_cells": 4,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 2,
+                  "VIIRS_SNPP_SP": 1
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 6,
+                  "VIIRS_SNPP_SP": 28
+                },
+                "burn_date_utc": "2024-08-10",
+                "burn_day_of_year": 223,
+                "qa_supported_mcd64_1km_cells": 4,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 2
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 6
+                },
+                "burn_date_utc": "2024-08-11",
+                "burn_day_of_year": 224,
+                "qa_supported_mcd64_1km_cells": 7,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 1
+                },
+                "burn_date_utc": "2024-08-17",
+                "burn_day_of_year": 230,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              }
+            ],
+            "shared_1km_cell_days_by_source": {
+              "MODIS_SP": 142,
+              "VIIRS_SNPP_SP": 199
+            },
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2024214.Win03.061.burndate.tif",
           "source_sha256": "5dae40a783fdb00c72484518ae6c7483176c034c323309209699ad947579ab58",
           "window": "Win03"
@@ -230,11 +949,40 @@
       "region": "norcal"
     }
   },
+  "dataset_accounting": {
+    "input_tiff_count": 24,
+    "outside_demo_pair_count": 6,
+    "raster_pair_count": 12,
+    "scope_note": "All supplied pairs are inventoried. Pairs outside the California and Punjab\u2013Haryana case footprints remain available in the source archive but are not mixed into these case summaries.",
+    "used_pair_count": 6
+  },
   "distribution": "University of Maryland fuoco SFTP; official guide section 4",
-  "generated_utc": "2026-09-30T06:08:55+00:00",
+  "generated_utc": "2026-09-30T11:06:41+00:00",
   "interpretation": "Lagged burned-area context only. Burn Date values 1\u2013366 are mapped burned pixels; 0 is unburned, -1 unmapped, and -2 water/invalid. This is not active-fire truth, an overpass mask, cloud mask, or a fire perimeter.",
   "product": "MCD64A1 Collection 6.1 monthly burned area",
   "product_url": "https://doi.org/10.5067/MODIS/MCD64A1.061",
+  "qa_interpretation": "QA bits are decoded using the official Collection 6.1 guide. Burn Date 1\u2013366 pixels count as QA-supported burned only when land and valid-data bits are set. Burn Date 0 counts as full-period unburned only when land and valid-data are set, the mapping period is not shortened, contextual relabeling is not set, and the special-condition code is zero. Other categories remain separately counted; this is product QA support, not ground truth.",
+  "qa_specification": {
+    "bits": {
+      "0": "1=land grid cell; 0=water grid cell",
+      "1": "1=sufficient valid reflectance data; 0=insufficient",
+      "2": "1=reliable mapping period is shorter than the full month",
+      "3": "1=cell was relabeled during contextual relabeling",
+      "4": "spare; guide states it is set to 0",
+      "5-7": "special-condition code for unburned grid cells"
+    },
+    "guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+    "special_condition_codes": {
+      "0": "none-or-not-applicable",
+      "1": "too-few-valid-observations",
+      "2": "low-separability-or-too-few-training-samples",
+      "3": "burn-date-at-time-series-limit",
+      "4": "water-contamination",
+      "5": "persistent-hotspot",
+      "6": "reserved",
+      "7": "reserved"
+    }
+  },
   "regional_checks": {
     "punjab-haryana": {
       "bbox": [
@@ -246,13 +994,22 @@
       "checks": [
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {
+              "MODIS_SP": {
+                "2": 4
+              },
+              "VIIRS_SNPP_SP": {
+                "2": 10
+              }
+            },
             "rows_by_source": {
-              "MODIS_SP": 46,
-              "VIIRS_SNPP_SP": 229
+              "MODIS_SP": 42,
+              "VIIRS_SNPP_SP": 219
             },
             "unique_common_grid_cells_by_source": {
-              "MODIS_SP": 41,
-              "VIIRS_SNPP_SP": 189
+              "MODIS_SP": 38,
+              "VIIRS_SNPP_SP": 185
             },
             "utc_end": "2024-07-31",
             "utc_start": "2024-07-01"
@@ -286,21 +1043,236 @@
           "label": "punjab-haryana",
           "month": "2024-07",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "1": 1298,
+                "11": 34,
+                "131": 49,
+                "3": 598414,
+                "35": 3626,
+                "67": 3623,
+                "7": 279,
+                "71": 49
+              },
+              "burn_date_1_to_366": {
+                "11": 15,
+                "3": 172
+              },
+              "burn_date_minus_2": {
+                "0": 1401
+              }
+            },
+            "burn_date_positive_doy_counts": {
+              "187": 1,
+              "190": 1,
+              "191": 1,
+              "193": 70,
+              "194": 62,
+              "195": 35,
+              "196": 17
+            },
+            "burn_date_positive_pixels": 187,
+            "burn_date_zero_pixels": 607372,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {
+              "11": 15,
+              "3": 172
+            },
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "contextual_relabeling": 49,
+              "land": 607559,
+              "mapping_period_shortened": 328,
+              "valid_data": 606261
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 865,
+            "pixel_count": 608960,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 8958,
+              "not-burned-or-unburned": 1401,
+              "qa-supported-burned": 187,
+              "qa-supported-full-period-unburned": 598414
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "contextual-relabeling": 34,
+              "qa-insufficient-valid-data": 1298,
+              "shortened-mapping-period": 328,
+              "special-condition-1": 3626,
+              "special-condition-2": 3623,
+              "special-condition-4": 49
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 1401,
+              "1": 1298,
+              "11": 49,
+              "131": 49,
+              "3": 598586,
+              "35": 3626,
+              "67": 3623,
+              "7": 279,
+              "71": 49
+            },
+            "qa_supported_burn_date_max": 196,
+            "qa_supported_burn_date_min": 187,
+            "qa_supported_burned_doy_counts": {
+              "187": 1,
+              "190": 1,
+              "191": 1,
+              "193": 70,
+              "194": 62,
+              "195": 35,
+              "196": 17
+            },
+            "qa_supported_burned_pixels": 187,
+            "qa_supported_burned_pixels_with_flags": {
+              "contextual_relabeling": 15
+            },
+            "qa_supported_full_period_unburned_pixels": 598414,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 600025,
+              "1": 3626,
+              "2": 3672,
+              "4": 49
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2024183.Win18.061.ba_qa.tif",
           "qa_source_sha256": "01cbe616f695d418960560f0d099bb952fdc14f89a8e3e88cb1a6282d1857759",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {
+              "MODIS_SP": 0,
+              "VIIRS_SNPP_SP": 0
+            },
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 4
+                },
+                "burn_date_utc": "2024-07-05",
+                "burn_day_of_year": 187,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 7
+                },
+                "burn_date_utc": "2024-07-08",
+                "burn_day_of_year": 190,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 13,
+                  "VIIRS_SNPP_SP": 44
+                },
+                "burn_date_utc": "2024-07-09",
+                "burn_day_of_year": 191,
+                "qa_supported_mcd64_1km_cells": 1,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 2,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-11",
+                "burn_day_of_year": 193,
+                "qa_supported_mcd64_1km_cells": 40,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-12",
+                "burn_day_of_year": 194,
+                "qa_supported_mcd64_1km_cells": 30,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 1,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-13",
+                "burn_day_of_year": 195,
+                "qa_supported_mcd64_1km_cells": 23,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              },
+              {
+                "active_fire_cells_by_source": {
+                  "MODIS_SP": 2,
+                  "VIIRS_SNPP_SP": 0
+                },
+                "burn_date_utc": "2024-07-14",
+                "burn_day_of_year": 196,
+                "qa_supported_mcd64_1km_cells": 12,
+                "shared_1km_cells_by_source": {
+                  "MODIS_SP": 0,
+                  "VIIRS_SNPP_SP": 0
+                }
+              }
+            ],
+            "shared_1km_cell_days_by_source": {
+              "MODIS_SP": 0,
+              "VIIRS_SNPP_SP": 0
+            },
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2024183.Win18.061.burndate.tif",
           "source_sha256": "f6c17763dbd2b528cdfcf548a9ca27f2b112264debc8bc39593b8272f7a92263",
           "window": "Win18"
         },
         {
           "active_fire": {
+            "detection_filter": "FIRMS type 0 or missing, matching the harmonized calendar",
+            "excluded_type_counts": {
+              "VIIRS_SNPP_SP": {
+                "2": 13
+              }
+            },
             "rows_by_source": {
               "MODIS_SP": 13,
-              "VIIRS_SNPP_SP": 123
+              "VIIRS_SNPP_SP": 110
             },
             "unique_common_grid_cells_by_source": {
               "MODIS_SP": 13,
-              "VIIRS_SNPP_SP": 98
+              "VIIRS_SNPP_SP": 92
             },
             "utc_end": "2025-07-31",
             "utc_start": "2025-07-01"
@@ -326,8 +1298,89 @@
           "label": "punjab-haryana",
           "month": "2025-07",
           "product": "MCD64A1",
+          "qa": {
+            "burn_date_category_by_qa_raw_value": {
+              "burn_date_0": {
+                "1": 8506,
+                "131": 113,
+                "3": 584747,
+                "35": 10934,
+                "67": 2070,
+                "7": 1103,
+                "71": 86
+              },
+              "burn_date_minus_2": {
+                "0": 1401
+              }
+            },
+            "burn_date_positive_doy_counts": {},
+            "burn_date_positive_pixels": 0,
+            "burn_date_zero_pixels": 607559,
+            "burned_pixel_filter": "retain Burn Date 1\u2013366 only when QA bit 0 (land) and bit 1 (valid data) are both set; shortened-period and contextual-relabel flags remain counted and visible",
+            "burned_pixels_by_qa_raw_value": {},
+            "coordinate_mismatches": 0,
+            "decoded_qa_bit_counts": {
+              "land": 607559,
+              "mapping_period_shortened": 1189,
+              "valid_data": 599053
+            },
+            "filter_applied": true,
+            "full_period_unburned_filter": "count Burn Date 0 only when land and valid-data bits are set, the mapping period is not shortened, contextual relabeling is not set, and special-condition code is 0",
+            "interpretation_limit": "The conservative unburned subset describes mapped MCD64A1 output only; it is not an overpass, clear-sky, or fire-free mask.",
+            "outside_bbox_pixel_centers": 865,
+            "pixel_count": 608960,
+            "qa_disposition_pixel_counts": {
+              "excluded-unburned": 22812,
+              "not-burned-or-unburned": 1401,
+              "qa-supported-full-period-unburned": 584747
+            },
+            "qa_excluded_burn_date_zero_pixels_by_reason": {
+              "qa-insufficient-valid-data": 8506,
+              "shortened-mapping-period": 1189,
+              "special-condition-1": 10934,
+              "special-condition-2": 2070,
+              "special-condition-4": 113
+            },
+            "qa_excluded_burned_pixels": 0,
+            "qa_excluded_burned_pixels_by_reason": {},
+            "qa_raw_value_counts": {
+              "0": 1401,
+              "1": 8506,
+              "131": 113,
+              "3": 584747,
+              "35": 10934,
+              "67": 2070,
+              "7": 1103,
+              "71": 86
+            },
+            "qa_supported_burn_date_max": null,
+            "qa_supported_burn_date_min": null,
+            "qa_supported_burned_doy_counts": {},
+            "qa_supported_burned_pixels": 0,
+            "qa_supported_burned_pixels_with_flags": {},
+            "qa_supported_full_period_unburned_pixels": 584747,
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+            "status": "decoded-and-filtered-using-collection-6.1-guide",
+            "unburned_special_condition_code_counts": {
+              "0": 594356,
+              "1": 10934,
+              "2": 2156,
+              "4": 113
+            },
+            "unpaired_pixels": 0,
+            "unparsed_values": 0
+          },
           "qa_source_filename": "MCD64monthly.A2025182.Win18.061.ba_qa.tif",
           "qa_source_sha256": "b6909cf29c020911ca77877fad38138299e3cb28fd8776063fd703065a3e3d5d",
+          "same_day_spatial_comparison": {
+            "burn_dates_with_any_shared_1km_cell_by_source": {},
+            "burn_days_without_a_calendar_date": [],
+            "interpretation_limit": "Descriptive same-date spatial co-location only. A shared cell is not pixel-level agreement or independent validation; MCD64A1 uses cumulative MODIS active-fire maps to guide training-sample selection and prior probabilities. No same-day co-location does not establish absence of fire because overpass timing, cloud, and detection conditions differ.",
+            "method": "Same UTC date; QA-supported 500 m MCD64A1 cell centers and FIRMS detection centroids assigned to the common 1 km EPSG:6933 grid.",
+            "per_burn_date": [],
+            "shared_1km_cell_days_by_source": {},
+            "source_guide_url": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf"
+          },
           "source_filename": "MCD64monthly.A2025182.Win18.061.burndate.tif",
           "source_sha256": "5d3f776a813a96e5b06d4f12daa1bcf1f157cfd13bc5b6fbe3afe11fbf1e4424",
           "window": "Win18"
@@ -335,6 +1388,265 @@
       ]
     }
   },
-  "schema": "fireatlas-mcd64-corroboration-v1",
+  "same_day_comparison_interpretation": "A descriptive same-UTC-date spatial co-location on the common 1 km centroid-assigned grid; not pixel agreement or independent validation. MCD64A1 uses cumulative MODIS active-fire maps to guide training samples and prior probabilities. No co-location does not establish fire absence.",
+  "schema": "fireatlas-mcd64-corroboration-v2",
+  "source_inventory": [
+    {
+      "burn_date_file": "MCD64monthly.A2024183.Win03.061.burndate.tif",
+      "burn_date_sha256": "62ab309365ceaa8cc29fa5fc9a1d47763c4c7bce82ce8262b67bf8ca29450a9b",
+      "demo_areas_overlapped": [
+        "park-2024",
+        "grove-2025"
+      ],
+      "doy_token": "A2024183",
+      "month": "2024-07",
+      "qa_file": "MCD64monthly.A2024183.Win03.061.ba_qa.tif",
+      "qa_sha256": "9f1e0c4a66d72807c384fc956a3a6d7adce641e06691e761d6a9fdc6d1c08cc2",
+      "raster_bbox_wsen": [
+        -125.0,
+        23.0,
+        -65.0014648,
+        50.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "park-2024"
+      ],
+      "window": "Win03"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2024183.Win08.061.burndate.tif",
+      "burn_date_sha256": "ce885b3d9753e2eee0bb117c51b7fa34bc1f3e3ea273a74cfbacad386478cb61",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2024183",
+      "month": "2024-07",
+      "qa_file": "MCD64monthly.A2024183.Win08.061.ba_qa.tif",
+      "qa_sha256": "e046b1e4b2fe18a4ec82a9e533ad1d34f850892ee8f7aa4a7f12fe9471dafe9f",
+      "raster_bbox_wsen": [
+        -11.0,
+        32.9980469,
+        35.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win08"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2024183.Win15.061.burndate.tif",
+      "burn_date_sha256": "26e74a50ae40571775980f27c32c2911bc76dd296fe3b33b85a4f91f82f21e3b",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2024183",
+      "month": "2024-07",
+      "qa_file": "MCD64monthly.A2024183.Win15.061.ba_qa.tif",
+      "qa_sha256": "fda5171fdf8b0c7fbbe24f464c5595897f915b0c7b3a43b7cad43c47e9e308b1",
+      "raster_bbox_wsen": [
+        35.0,
+        32.9980469,
+        90.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win15"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2024183.Win18.061.burndate.tif",
+      "burn_date_sha256": "f6c17763dbd2b528cdfcf548a9ca27f2b112264debc8bc39593b8272f7a92263",
+      "demo_areas_overlapped": [
+        "punjab-haryana"
+      ],
+      "doy_token": "A2024183",
+      "month": "2024-07",
+      "qa_file": "MCD64monthly.A2024183.Win18.061.ba_qa.tif",
+      "qa_sha256": "01cbe616f695d418960560f0d099bb952fdc14f89a8e3e88cb1a6282d1857759",
+      "raster_bbox_wsen": [
+        60.0,
+        5.0009766,
+        92.9985352,
+        36.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "punjab-haryana"
+      ],
+      "window": "Win18"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2024214.Win03.061.burndate.tif",
+      "burn_date_sha256": "5dae40a783fdb00c72484518ae6c7483176c034c323309209699ad947579ab58",
+      "demo_areas_overlapped": [
+        "park-2024",
+        "grove-2025"
+      ],
+      "doy_token": "A2024214",
+      "month": "2024-08",
+      "qa_file": "MCD64monthly.A2024214.Win03.061.ba_qa.tif",
+      "qa_sha256": "791c631328db16bdc781a8d27173a1a2beae3bef8f9ee6f258d18b688fe87f98",
+      "raster_bbox_wsen": [
+        -125.0,
+        23.0,
+        -65.0014648,
+        50.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "park-2024"
+      ],
+      "window": "Win03"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2024214.Win08.061.burndate.tif",
+      "burn_date_sha256": "0e5605ccd3f91f40e1d409148e47017e10419973946c77b60f106a59003e8fd2",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2024214",
+      "month": "2024-08",
+      "qa_file": "MCD64monthly.A2024214.Win08.061.ba_qa.tif",
+      "qa_sha256": "5ed415cf6a5dd90845d786408288f8667226d9be504e96e1d38ff53a8535a248",
+      "raster_bbox_wsen": [
+        -11.0,
+        32.9980469,
+        35.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win08"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025182.Win03.061.burndate.tif",
+      "burn_date_sha256": "dd76c0f04a9d144a61016fd8c72b07e65b779f9e4bf10b9f787410bd0847aecc",
+      "demo_areas_overlapped": [
+        "park-2024",
+        "grove-2025"
+      ],
+      "doy_token": "A2025182",
+      "month": "2025-07",
+      "qa_file": "MCD64monthly.A2025182.Win03.061.ba_qa.tif",
+      "qa_sha256": "11edb36a9d3d2456d9ac15599ed548bea116c9aa1ef66a7e082a16c8350072e1",
+      "raster_bbox_wsen": [
+        -125.0,
+        23.0,
+        -65.0014648,
+        50.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "grove-2025"
+      ],
+      "window": "Win03"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025182.Win08.061.burndate.tif",
+      "burn_date_sha256": "0ca0e849645b9f373b958e00548934255aae458407c711a6cd56c6d4f3256c17",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2025182",
+      "month": "2025-07",
+      "qa_file": "MCD64monthly.A2025182.Win08.061.ba_qa.tif",
+      "qa_sha256": "188400e65812fc42017dca3a4ac9d7e3893c91c2af2d223a2dba0cfb976eef40",
+      "raster_bbox_wsen": [
+        -11.0,
+        32.9980469,
+        35.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win08"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025182.Win15.061.burndate.tif",
+      "burn_date_sha256": "1e8029e9c3daa602ae009c913401235379c3895791d030d6dbe8366cbd38060a",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2025182",
+      "month": "2025-07",
+      "qa_file": "MCD64monthly.A2025182.Win15.061.ba_qa.tif",
+      "qa_sha256": "9f31c62a7f7716a7fb54e4ffa87459b1ebee22b252d0b4a85fd254a84a13b3c3",
+      "raster_bbox_wsen": [
+        35.0,
+        32.9980469,
+        90.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win15"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025182.Win18.061.burndate.tif",
+      "burn_date_sha256": "5d3f776a813a96e5b06d4f12daa1bcf1f157cfd13bc5b6fbe3afe11fbf1e4424",
+      "demo_areas_overlapped": [
+        "punjab-haryana"
+      ],
+      "doy_token": "A2025182",
+      "month": "2025-07",
+      "qa_file": "MCD64monthly.A2025182.Win18.061.ba_qa.tif",
+      "qa_sha256": "b6909cf29c020911ca77877fad38138299e3cb28fd8776063fd703065a3e3d5d",
+      "raster_bbox_wsen": [
+        60.0,
+        5.0009766,
+        92.9985352,
+        36.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "punjab-haryana"
+      ],
+      "window": "Win18"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025213.Win03.061.burndate.tif",
+      "burn_date_sha256": "dbada417416ea7d691e829a1fd64b9eb94f122613495893fc34c9733f352579a",
+      "demo_areas_overlapped": [
+        "park-2024",
+        "grove-2025"
+      ],
+      "doy_token": "A2025213",
+      "month": "2025-08",
+      "qa_file": "MCD64monthly.A2025213.Win03.061.ba_qa.tif",
+      "qa_sha256": "d3bd2117f17773de83b154bcfd34838f715939927c02aa0265517899901ddbb9",
+      "raster_bbox_wsen": [
+        -125.0,
+        23.0,
+        -65.0014648,
+        50.0
+      ],
+      "scope_reason": "This raster pair is clipped and summarized for the listed regional case-month check.",
+      "status": "used-in-dated-corroboration",
+      "used_by_checks": [
+        "grove-2025"
+      ],
+      "window": "Win03"
+    },
+    {
+      "burn_date_file": "MCD64monthly.A2025213.Win08.061.burndate.tif",
+      "burn_date_sha256": "a1f10c7ac11162674fa4508636c5f981e8a7bfe8029a83f5695141266c0e7e4c",
+      "demo_areas_overlapped": [],
+      "doy_token": "A2025213",
+      "month": "2025-08",
+      "qa_file": "MCD64monthly.A2025213.Win08.061.ba_qa.tif",
+      "qa_sha256": "23fea3b392c147d04c23362de5e37951a242d549ea35eeffbb6dc9893a1fad21",
+      "raster_bbox_wsen": [
+        -11.0,
+        32.9980469,
+        35.0019531,
+        70.0
+      ],
+      "scope_reason": "The raster footprint does not intersect either current demo area, so it cannot support those dated case checks.",
+      "status": "outside-current-demo-footprints",
+      "used_by_checks": [],
+      "window": "Win08"
+    }
+  ],
   "status": "loaded"
 }

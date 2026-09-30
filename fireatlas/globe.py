@@ -71,6 +71,51 @@ def snapshot(db, *, source="all", day="all"):
             "note": "Imported snapshot. Counts are satellite detections; multiple satellites can observe the same fire. First observation is not ignition time. Activity after the last observation is unknown. Markers group detections in 1° cells, not burned-area boundaries."}
 
 
+def static_bundle(db):
+    """Return a compact, exact recent globe snapshot for a no-API static site.
+
+    Aggregates preserve source/day/cell counts and coordinate sums. The sample
+    stream keeps the newest 12 rows in each source/day/cell partition; taking
+    the newest 12 after any combination of those partitions therefore gives
+    the same evidence sample as the live detail query.
+    """
+    where, args, latest, start, end = selection(db, "all", "all")
+    db.create_function("valid_frp", 1, frp_number, deterministic=True)
+    aggregates = [dict(row) for row in db.execute(f"""SELECT o.source_id,
+        substr(o.acquisition_utc,1,10) AS date,{BIN_X} AS x,{BIN_Y} AS y,
+        SUM(o.lon) AS lon_sum,SUM(o.lat) AS lat_sum,COUNT(*) AS count,
+        MIN(o.acquisition_utc) AS first,MAX(o.acquisition_utc) AS last,
+        MAX(valid_frp(o.frp_raw)) AS max_frp_mw
+        FROM observations o JOIN batches b ON b.id=o.batch_id WHERE {where}
+        GROUP BY o.source_id,date,x,y ORDER BY o.source_id,date,x,y""", args)]
+    samples = [dict(row) for row in db.execute(f"""WITH ranked AS (
+        SELECT o.detection_id,o.source_id,substr(o.acquisition_utc,1,10) AS date,
+            {BIN_X} AS x,{BIN_Y} AS y,o.lon,o.lat,o.acquisition_utc,o.platform,
+            valid_frp(o.frp_raw) AS frp_mw,o.confidence_raw,o.daynight,b.file_sha256,
+            ROW_NUMBER() OVER (PARTITION BY o.source_id,substr(o.acquisition_utc,1,10),
+                {BIN_X},{BIN_Y} ORDER BY o.acquisition_utc DESC,o.detection_id) AS sample_rank
+        FROM observations o JOIN batches b ON b.id=o.batch_id WHERE {where}
+    ) SELECT detection_id,source_id,date,x,y,lon,lat,acquisition_utc,platform,
+        frp_mw,confidence_raw,daynight,file_sha256 FROM ranked WHERE sample_rank<=12
+        ORDER BY source_id,date,x,y,acquisition_utc DESC,detection_id""", args)]
+    input_hashes = [row[0] for row in db.execute(f"""SELECT DISTINCT b.file_sha256
+        FROM observations o JOIN batches b ON b.id=o.batch_id WHERE {where}
+        AND b.file_sha256 IS NOT NULL ORDER BY b.file_sha256""", args)]
+    return {
+        "schema": "fireatlas-globe-static-v1",
+        "data_class": "authentic",
+        "kind": "imported-thermal-detections",
+        "latest_observation": latest,
+        "window_start": str(start) if start else None,
+        "window_end": str(end) if end else None,
+        "sources": {source: label for source, label in SOURCES.items()},
+        "aggregates": aggregates,
+        "samples": samples,
+        "input_file_sha256": input_hashes,
+        "note": "Imported snapshot. Counts are satellite detections; multiple satellites can observe the same fire. First observation is not ignition time. Activity after the last observation is unknown. Markers group detections in 1° cells, not burned-area boundaries.",
+    }
+
+
 def detail(db, *, cell, source="all", day="all"):
     try:
         x, y = map(int, cell.split(":"))

@@ -27,6 +27,10 @@ def fmt(value: float | None, digits: int = 3) -> str:
     return f"{value:,.{digits}f}"
 
 
+def pctfmt(value: float | None, digits: int = 1) -> str:
+    return "—" if value is None else f"{fmt(100 * value, digits)}%"
+
+
 async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", default="http://127.0.0.1:8000")
@@ -64,15 +68,26 @@ async def main() -> None:
                   const stats = row.querySelectorAll('.calibration-model-stat strong');
                   return {
                     label: row.querySelector('.calibration-model-name strong').textContent,
+                    badge: row.querySelector('.calibration-model-name span').textContent,
                     error: stats[0].textContent,
                     annual: stats[1].textContent,
+                    nested: row.classList.contains('nested'),
                     selected: row.classList.contains('selected')
                   };
                 })"""
             )
-            assert len(actual_rows) == 3, f"{region}: expected three model comparisons"
+            assert len(actual_rows) == 4, f"{region}: expected nested result and three references"
+            nested = validation["nested_selected_pipeline"]
+            nested_row = actual_rows[0]
+            assert nested_row["nested"] and not nested_row["selected"], (region, nested_row)
+            assert nested_row["label"] == "Nested selected pipeline", (region, nested_row)
+            assert nested_row["badge"] == "NESTED HELD-OUT ESTIMATE", (region, nested_row)
+            assert nested_row["error"] == fmt(nested["median_absolute_log_error"]), (region, nested_row)
+            annual = nested["median_annual_absolute_percent_error"]
+            annual_expected = "—" if annual is None else f"{fmt(100 * annual, 1)}%"
+            assert nested_row["annual"] == annual_expected, (region, nested_row)
             seen = set()
-            for row in actual_rows:
+            for row in actual_rows[1:]:
                 key = LABELS[row["label"]]
                 seen.add(key)
                 model = validation["models"][key]
@@ -80,18 +95,61 @@ async def main() -> None:
                 annual = model["median_annual_absolute_percent_error"]
                 annual_expected = "—" if annual is None else f"{fmt(100 * annual, 1)}%"
                 assert row["annual"] == annual_expected, (region, key, row)
-                assert row["selected"] is (calibration["selected_model"] == key), (region, key, row)
+                assert not row["selected"], (region, "fixed reference styled as winner", row)
+                assert row["badge"] == "FIXED CANDIDATE REFERENCE", (region, key, row)
             assert seen == set(validation["models"]), f"{region}: missing model from the graphic"
+            context = await page.locator("#calibration-context").inner_text()
+            production_label = next(label for label, key in LABELS.items()
+                                    if key == calibration["selected_model"])
+            assert f"production calendar choice: {production_label.lower()}" in context.lower(), (region, context)
 
-            coverage = validation["monthly_interval_coverage"]
-            coverage_expected = "Not measured" if coverage is None else f"{fmt(100 * coverage, 1)}%"
+            benchmark = validation["daily_gap_benchmark"]
+            daily = benchmark["daily_metrics"]["selected_pipeline"]
+            daily_expected = (
+                f"{fmt(daily['median_absolute_log_error'])} median log error · "
+                f"{pctfmt(daily['median_absolute_percent_error_nonzero'])} median nonzero-day absolute percentage error"
+            )
+            daily_actual = await page.locator("#calibration-daily-value").inner_text()
+            assert daily_actual == daily_expected, (region, daily_actual, daily_expected)
+            gap_groups: dict[tuple[int, str], dict] = {}
+            for item in benchmark["contiguous_gap_contribution_metrics"]:
+                if item["model"] not in {"selected_pipeline", *validation["models"].keys()}:
+                    continue
+                key = (item["gap_duration_days"], item["season"])
+                gap_groups.setdefault(key, {})[item["model"]] = item
+            expected_gaps = [
+                {"gap_duration_days": key[0], "season": key[1], **value}
+                for key, value in sorted(gap_groups.items())
+            ]
+            actual_gaps = await page.locator("#calibration-gap-table tbody tr").evaluate_all(
+                "rows => rows.map(row => [...row.cells].map(cell => cell.textContent.trim()))"
+            )
+            assert len(actual_gaps) == len(expected_gaps) == 16, (region, len(actual_gaps), len(expected_gaps))
+            for actual, expected in zip(actual_gaps, expected_gaps):
+                gap_label = f"{expected['gap_duration_days']} day{'s' if expected['gap_duration_days'] != 1 else ''} · {expected['season']}"
+                count_source = (expected.get("selected_pipeline") or expected.get("monthly_ratio")
+                                or expected.get("annual_ratio") or expected.get("no_harmonization"))
+                gap_values = [
+                    gap_label,
+                    f"{count_source['window_count']:,}",
+                    fmt(expected["selected_pipeline"]["median_absolute_log_error"])
+                    if expected.get("selected_pipeline") else "—",
+                    fmt(expected["monthly_ratio"]["median_absolute_log_error"])
+                    if expected.get("monthly_ratio") else "—",
+                    fmt(expected["annual_ratio"]["median_absolute_log_error"])
+                    if expected.get("annual_ratio") else "—",
+                    fmt(expected["no_harmonization"]["median_absolute_log_error"])
+                    if expected.get("no_harmonization") else "—",
+                ]
+                assert actual == gap_values, (region, actual, gap_values)
+
+            interval = validation["prediction_interval"]
+            assert interval["status"] == "withheld-not-independently-calibrated", (region, interval)
+            assert interval["held_out_coverage"] is None and interval["median_width"] is None
             coverage_actual = await page.locator("#calibration-coverage-value").inner_text()
-            assert coverage_actual == coverage_expected, (region, coverage_actual, coverage_expected)
-            pairs = validation["monthly_interval_pairs"]
+            assert coverage_actual == "Withheld", (region, coverage_actual)
             coverage_note = await page.locator("#calibration-coverage-note").inner_text()
-            if coverage is not None:
-                expected_note = f"{round(coverage * pairs)} of {pairs} held-out month pairs fell inside the nominal 95% interval."
-                assert coverage_note == expected_note, (region, coverage_note, expected_note)
+            assert interval["reason"] in coverage_note and "No coverage or interval width is claimed." in coverage_note
 
             step = calibration.get("step_2012") or {}
             step_value = await page.locator("#calibration-step-value").inner_text()
@@ -128,8 +186,8 @@ async def main() -> None:
                 path=str(EVIDENCE / f"C10-T1-calibration-{region}.png")
             )
             print(
-                f"{region}: all three displayed model errors, annual errors, selected model, "
-                f"interval coverage ({pairs} pairs), and 2012 step state match the source JSON. PASS",
+                f"{region}: nested estimate, three fixed references, daily and seasonal-gap metrics, "
+                f"withheld prediction interval, and 2012 step state match the source JSON. PASS",
                 flush=True,
             )
 

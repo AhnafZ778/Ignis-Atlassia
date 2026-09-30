@@ -1,11 +1,12 @@
-# FireAtlas — NASA MODIS and VIIRS burning activity calendar
+# Ignis-Atlassia — NASA MODIS and VIIRS burning activity calendar
 
 **Challenge:** NASA Space Apps 2026 · Harmonization of MODIS and VIIRS Hot Spots
 
-FireAtlas is a research prototype for inspecting dated NASA FIRMS active-fire detections and counting distinct 1 km equal-area grid cell-days in UTC. The calendar variant includes FIRMS type 0 or missing, across confidence levels; other rows remain inspectable but are excluded from totals. The home page opens on the 3D globe; the calendar and source evidence are below it. A hotspot is a satellite thermal observation, not a fire perimeter, burned area, or proof that no fire occurred.
+Ignis-Atlassia is a research prototype for inspecting dated NASA FIRMS active-fire detections and counting distinct 1 km equal-area grid cell-days in UTC. The calendar variant includes FIRMS type 0 or missing, across confidence levels; other rows remain inspectable but are excluded from totals. The home page opens on the 3D globe; the calendar and source evidence are below it. A hotspot is a satellite thermal observation, not a fire perimeter, burned area, or proof that no fire occurred.
 
 **Public demo:** Not deployed from this checkout. Run locally at http://127.0.0.1:8000/.
 **Repository:** https://github.com/AhnafZ778/NASA-Spaceapps
+**Project handoff:** [FireAtlas Project Brief](docs/FireAtlas_Project_Brief.pdf) · [HTML source](docs/FireAtlas_Project_Brief.html)
 
 ## Run
 
@@ -35,7 +36,7 @@ uv run python scripts/export_static.py --db data/fireatlas.sqlite3 --output site
 python3 -m http.server 8000 --directory site-release
 ```
 
-The bundle includes precomputed 2006–2026 calendars, dated history, compressed source-row samples for both regions, and the Park/Grove validity reports with their checksum manifests, recount results, evidence ZIPs and blank native-review templates. The Data & Method page uses those files directly, so a judge can open the historical case, scrub UTC days, inspect source rows, run the displayed recount, and download the hash-bound reviewer form without credentials or a Python API. It does not copy the SQLite database or the raw `NASA_data/` archive. It is a dated, read-only evidence demo; data imports, the research API, and globe observation overlays still require the Python server. A GitHub Pages workflow is configured for the committed `site/` bundle, but no public deployment has been run or verified from this checkout.
+The bundle includes precomputed 2006–2026 calendars, dated history, compressed source-row samples for both regions, complete row-level observation archives split into deterministic sub-100 MB gzip parts, and the Park/Grove validity reports with their checksum manifests, recount results, evidence ZIPs and blank native-review templates. The Data & Method page uses those files directly, so a judge can open the historical case, scrub UTC days, inspect source rows, run the displayed recount, and download the hash-bound reviewer form without credentials or a Python API. It does not copy the SQLite database or the raw `NASA_data/` archive. It is a dated, read-only evidence demo; data imports, the research API, and globe observation overlays still require the Python server. A GitHub Pages workflow is configured for the committed `site/` bundle, but no public deployment has been run or verified from this checkout.
 
 The release checks are reproducible:
 
@@ -56,6 +57,6 @@ The static bundle is still a dated snapshot. Its source rows preserve NASA FIRMS
 
 The local app imports original FIRMS fields, preserves source provenance, assigns detection centroids to a shared 1 km grid, and renders UTC monthly/daily activity and source records. The primary calendar unit is VIIRS-equivalent active-fire cell-days; native MODIS (~1 km) and VIIRS (375 m) rows remain inspectable in the visible Sensor Bridge. Raw FRP is shown separately in MW/day and is not added across sensors. The region calendar can fit and hold out a transparent count ratio when version-matched overlap records are present; this is not a calibrated sensor-sensitivity model. Satellite pass and cloud coverage remain unknown; an empty detection day is not treated as proof of no fire. MCD64A1 corroboration is a documented pending input, not an invented overlay. The project has no validated spread forecast.
 
-FireAtlas is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.
+Ignis-Atlassia is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.
 
 See [data and methods](docs/NASA_ARCHIVE_IMPORT.md), [the Winning Plan and live scorecard](docs/winning-plan/SCORECARD.md), [AI use and numerical review status](docs/AI_USE.md), and [current validation limits](docs/VALIDITY_CASES.md).

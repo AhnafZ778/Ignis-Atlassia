@@ -6,7 +6,7 @@
       2.8010471204188483
     ],
     "bootstrap_replicates": 1000,
-    "calibration_id": "617d763cc149f41f2a9dabc09a2b294dbe78c6cc3efe8e983dee6fe33fa68a0d",
+    "calibration_id": "15c6af63fe83b9aaaa868ec9904551a1b68b5eef4d834dc1dab940e1b7a72609",
     "data_class": "authentic-imported",
     "eligible_months": [
       {
@@ -545,9 +545,9 @@
     ],
     "excluded_days": {
       "documented_viirs_processing_gap": 6,
-      "incomplete_source_export": 4414
+      "incomplete_source_export": 31
     },
-    "method_version": "monthly-ratio-loyo-bootstrap-1000-step2012-v2",
+    "method_version": "nested-year-selection-factor-bootstrap-1000-step2012-v3",
     "months": [
       {
         "basis": "month-of-year",
@@ -721,6 +721,1103 @@
     },
     "unit": "VIIRS-equivalent active-fire distinct 1 km centroid cell-days",
     "validation": {
+      "daily_gap_benchmark": {
+        "contiguous_gap_contribution_metrics": [
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.31145935787732476,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 205,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 330
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.29773397389930617,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 205,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 330
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5108256237659907,
+            "median_absolute_percent_error_nonzero": 0.8888888888888888,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 205,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 330
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.31145935787732476,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 205,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 330
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 251,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 300
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 251,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 300
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 0.8,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 251,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 300
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 251,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 300
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5732948558035835,
+            "median_absolute_percent_error_nonzero": 0.8794567160509652,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 337
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6039321887517616,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 337
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 0.7905701754385965,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 337
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5913973919915094,
+            "median_absolute_percent_error_nonzero": 0.8990849250563736,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 337
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5406453176377495,
+            "median_absolute_percent_error_nonzero": 0.6549350077109496,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 235,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 273
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5619422721177664,
+            "median_absolute_percent_error_nonzero": 0.7218045112781954,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 235,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 273
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 0.6666666666666666,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 235,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 273
+          },
+          {
+            "gap_duration_days": 1,
+            "median_absolute_log_error": 0.5369180471987942,
+            "median_absolute_percent_error_nonzero": 0.7202175738196889,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 235,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 273
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5432398322570418,
+            "median_absolute_percent_error_nonzero": 0.6128603778416138,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 261,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 308
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.609741724689093,
+            "median_absolute_percent_error_nonzero": 0.6991028295376123,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 261,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 308
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.9468905418101833,
+            "median_absolute_percent_error_nonzero": 0.8,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 261,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 308
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5636155574514462,
+            "median_absolute_percent_error_nonzero": 0.6540781853281853,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 261,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 308
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5225060992704536,
+            "median_absolute_percent_error_nonzero": 0.5077633911782088,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 278
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5671858467959681,
+            "median_absolute_percent_error_nonzero": 0.5696465696465697,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 278
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.8266785731844679,
+            "median_absolute_percent_error_nonzero": 0.6363636363636364,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 278
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5285609420729411,
+            "median_absolute_percent_error_nonzero": 0.5144730529345914,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 278
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.4923311292549601,
+            "median_absolute_percent_error_nonzero": 0.5314027830011282,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 299,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 315
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5061953553818282,
+            "median_absolute_percent_error_nonzero": 0.5509009009009009,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 299,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 315
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.7985076962177716,
+            "median_absolute_percent_error_nonzero": 0.6388888888888888,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 299,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 315
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.5174105023934747,
+            "median_absolute_percent_error_nonzero": 0.5324925910922542,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 299,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 315
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.40839466766263866,
+            "median_absolute_percent_error_nonzero": 0.43499436936936936,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 249,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 255
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.4626133865647293,
+            "median_absolute_percent_error_nonzero": 0.4634693821685692,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 249,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 255
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.8034952377288106,
+            "median_absolute_percent_error_nonzero": 0.5769230769230769,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 249,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 255
+          },
+          {
+            "gap_duration_days": 3,
+            "median_absolute_log_error": 0.4282501022873689,
+            "median_absolute_percent_error_nonzero": 0.4528716216216216,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 249,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 255
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.5540981019206082,
+            "median_absolute_percent_error_nonzero": 0.4985105800788404,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 264
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.5232930017188931,
+            "median_absolute_percent_error_nonzero": 0.5076228119706381,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 264
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 1.1679355353137562,
+            "median_absolute_percent_error_nonzero": 0.7643633540372672,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 264
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.5717315184903373,
+            "median_absolute_percent_error_nonzero": 0.5399133436145994,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 254,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 264
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.33724725692351265,
+            "median_absolute_percent_error_nonzero": 0.35663660731031044,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 238,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 238
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.39839932341692097,
+            "median_absolute_percent_error_nonzero": 0.41772135552059675,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 238,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 238
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.7967187855438296,
+            "median_absolute_percent_error_nonzero": 0.5661907852044127,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 238,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 238
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.31748886630268947,
+            "median_absolute_percent_error_nonzero": 0.3321246306741874,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 238,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 238
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.356098640706876,
+            "median_absolute_percent_error_nonzero": 0.3646307602442128,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 271
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.3825161751226197,
+            "median_absolute_percent_error_nonzero": 0.3978102189781022,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 271
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.8622235106038793,
+            "median_absolute_percent_error_nonzero": 0.6,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 271
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.35049163894281304,
+            "median_absolute_percent_error_nonzero": 0.36486486486486486,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 271,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 271
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.3031814113592647,
+            "median_absolute_percent_error_nonzero": 0.300543934549222,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 219,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 219
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.3818266151034938,
+            "median_absolute_percent_error_nonzero": 0.37581004204798424,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 219,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 219
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.8938178760220964,
+            "median_absolute_percent_error_nonzero": 0.6,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 219,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 219
+          },
+          {
+            "gap_duration_days": 7,
+            "median_absolute_log_error": 0.34795821190536386,
+            "median_absolute_percent_error_nonzero": 0.34123956017544915,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 219,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 219
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.5377239323592485,
+            "median_absolute_percent_error_nonzero": 0.4340075087804287,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 187,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 187
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.4804478672416517,
+            "median_absolute_percent_error_nonzero": 0.4296926095487247,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 187,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 187
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 1.2729656758128873,
+            "median_absolute_percent_error_nonzero": 0.7391304347826086,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 187,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 187
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.5652462005741854,
+            "median_absolute_percent_error_nonzero": 0.4767146270781433,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 187,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "DJF",
+            "window_count": 187
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.2630975083985263,
+            "median_absolute_percent_error_nonzero": 0.23970701481043702,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 168,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 168
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.34738856971754517,
+            "median_absolute_percent_error_nonzero": 0.33797763095612643,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 168,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 168
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.8232156890079878,
+            "median_absolute_percent_error_nonzero": 0.5715197956577267,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 168,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 168
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.28365491506631146,
+            "median_absolute_percent_error_nonzero": 0.27303075315333813,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 168,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "JJA",
+            "window_count": 168
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.2413995538932292,
+            "median_absolute_percent_error_nonzero": 0.24376000853845217,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 194,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 194
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.2592718352354424,
+            "median_absolute_percent_error_nonzero": 0.24907055335161157,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 194,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 194
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.9017269305219442,
+            "median_absolute_percent_error_nonzero": 0.6082693947144076,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 194,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 194
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.24457304352711112,
+            "median_absolute_percent_error_nonzero": 0.2505600238818071,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 194,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025,
+              2026
+            ],
+            "season": "MAM",
+            "window_count": 194
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.3021763762302436,
+            "median_absolute_percent_error_nonzero": 0.3296179904682467,
+            "model": "annual_ratio",
+            "nonzero_actual_windows": 156,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 156
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.32907670849487236,
+            "median_absolute_percent_error_nonzero": 0.35892160347953994,
+            "model": "monthly_ratio",
+            "nonzero_actual_windows": 156,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 156
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.9474650444064228,
+            "median_absolute_percent_error_nonzero": 0.6165952025851354,
+            "model": "no_harmonization",
+            "nonzero_actual_windows": 156,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 156
+          },
+          {
+            "gap_duration_days": 14,
+            "median_absolute_log_error": 0.29941858933310384,
+            "median_absolute_percent_error_nonzero": 0.3330709305421033,
+            "model": "selected_pipeline",
+            "nonzero_actual_windows": 156,
+            "outer_test_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "season": "SON",
+            "window_count": 156
+          }
+        ],
+        "daily_metrics": {
+          "annual_ratio": {
+            "median_absolute_log_error": 0.5600197764088827,
+            "median_absolute_percent_error_nonzero": 0.8794488700468389,
+            "n_days": 1240,
+            "n_nonzero_viirs_days": 945
+          },
+          "monthly_ratio": {
+            "median_absolute_log_error": 0.5900774645568818,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "n_days": 1240,
+            "n_nonzero_viirs_days": 945
+          },
+          "no_harmonization": {
+            "median_absolute_log_error": 0.6931471805599453,
+            "median_absolute_percent_error_nonzero": 0.7777777777777778,
+            "n_days": 1240,
+            "n_nonzero_viirs_days": 945
+          },
+          "selected_pipeline": {
+            "median_absolute_log_error": 0.5710489830334069,
+            "median_absolute_percent_error_nonzero": 1.0,
+            "n_days": 1240,
+            "n_nonzero_viirs_days": 945
+          }
+        },
+        "eligible_complete_months": [
+          "2023-01",
+          "2023-02",
+          "2023-03",
+          "2023-04",
+          "2023-05",
+          "2023-06",
+          "2023-07",
+          "2023-08",
+          "2023-09",
+          "2023-10",
+          "2023-11",
+          "2023-12",
+          "2024-01",
+          "2024-02",
+          "2024-03",
+          "2024-04",
+          "2024-05",
+          "2024-06",
+          "2024-07",
+          "2024-08",
+          "2024-09",
+          "2024-10",
+          "2024-11",
+          "2024-12",
+          "2025-01",
+          "2025-02",
+          "2025-03",
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-06"
+        ],
+        "eligible_days": 1240,
+        "excluded_daily_dates": {
+          "documented_viirs_processing_gap": 6,
+          "incompatible_or_ineligible_month": 184,
+          "incomplete_source_export": 31
+        },
+        "gap_durations_days": [
+          1,
+          3,
+          7,
+          14
+        ],
+        "model_selection_protocol": "For each outer test year, select among monthly ratio, annual ratio, and no harmonization using leave-one-year-out validation within outer-training years only. Fit the selected method on all outer-training months, then evaluate only on the held-out year.",
+        "outer_folds": [
+          {
+            "held_out_year": 2023,
+            "selected_model": "monthly_ratio",
+            "selection_status": "nested",
+            "training_years": [
+              2024,
+              2025,
+              2026
+            ]
+          },
+          {
+            "held_out_year": 2024,
+            "selected_model": "annual_ratio",
+            "selection_status": "nested",
+            "training_years": [
+              2023,
+              2025,
+              2026
+            ]
+          },
+          {
+            "held_out_year": 2025,
+            "selected_model": "annual_ratio",
+            "selection_status": "nested",
+            "training_years": [
+              2023,
+              2024,
+              2026
+            ]
+          },
+          {
+            "held_out_year": 2026,
+            "selected_model": "annual_ratio",
+            "selection_status": "nested",
+            "training_years": [
+              2023,
+              2024,
+              2025
+            ]
+          }
+        ],
+        "outer_years": [
+          2023,
+          2024,
+          2025,
+          2026
+        ],
+        "primary_metric": "median absolute log error abs(log((prediction+1)/(VIIRS+1)))",
+        "schema": "fireatlas-gap-benchmark-v1",
+        "season_definition": {
+          "DJF": "December\u2013February",
+          "JJA": "June\u2013August",
+          "MAM": "March\u2013May",
+          "SON": "September\u2013November"
+        },
+        "secondary_metrics": [
+          "median absolute percentage error on nonzero VIIRS totals",
+          "sample counts and outer test years"
+        ],
+        "status": "evaluated",
+        "versions": {
+          "MODIS_SP": "61.03",
+          "VIIRS_SNPP_SP": "2"
+        },
+        "window_protocol": "Evaluate every rolling contiguous window wholly inside each compatible complete UTC month in the outer held-out year. Windows overlap and are clustered by outer test year; window count is not an independent sample size."
+      },
+      "evaluation_protocol": "Nested leave-one-year-out. Candidate selection uses only outer-training years; reported fixed-model and selected-pipeline errors use outer-test years.",
       "models": {
         "annual_ratio": {
           "annual_error_years": [
@@ -750,8 +1847,266 @@
           "median_annual_absolute_percent_error": 0.5158478605388273
         }
       },
-      "monthly_interval_coverage": 0.4146341463414634,
-      "monthly_interval_pairs": 41,
+      "nested_selected_pipeline": {
+        "annual_error_years": [
+          2023,
+          2024,
+          2025
+        ],
+        "median_absolute_log_error": 0.30397331592197685,
+        "median_annual_absolute_percent_error": 0.25214051100852175,
+        "outer_evaluation_folds": 4
+      },
+      "outer_folds": [
+        {
+          "inner_selection": {
+            "folds": [
+              {
+                "fit_years": [
+                  2025,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.3878970403631262,
+                  "monthly_ratio": 0.37803721323357864,
+                  "no_harmonization": 0.787864253138608
+                },
+                "validation_year": 2024
+              },
+              {
+                "fit_years": [
+                  2024,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.3176151736076053,
+                  "monthly_ratio": 0.20100576491831326,
+                  "no_harmonization": 1.0356201951735398
+                },
+                "validation_year": 2025
+              },
+              {
+                "fit_years": [
+                  2024,
+                  2025
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.22785099025181907,
+                  "monthly_ratio": 0.1868715066960019,
+                  "no_harmonization": 1.022005167195913
+                },
+                "validation_year": 2026
+              }
+            ],
+            "scores": {
+              "annual_ratio": 0.3345831622286441,
+              "monthly_ratio": 0.23124690858223967,
+              "no_harmonization": 0.9966131207129881
+            },
+            "selected_model": "monthly_ratio",
+            "selection_rule": "lowest median absolute log error; lexical tie-break",
+            "years": [
+              2024,
+              2025,
+              2026
+            ]
+          },
+          "outer_test_year": 2023,
+          "outer_train_years": [
+            2024,
+            2025,
+            2026
+          ],
+          "selected_model": "monthly_ratio",
+          "selection_status": "nested"
+        },
+        {
+          "inner_selection": {
+            "folds": [
+              {
+                "fit_years": [
+                  2025,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.29959689399524914,
+                  "monthly_ratio": 0.372404453358511,
+                  "no_harmonization": 0.723719871377738
+                },
+                "validation_year": 2023
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.24775820070659077,
+                  "monthly_ratio": 0.24691767867827036,
+                  "no_harmonization": 1.0356201951735398
+                },
+                "validation_year": 2025
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2025
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.17063746276368788,
+                  "monthly_ratio": 0.22016274896685775,
+                  "no_harmonization": 1.022005167195913
+                },
+                "validation_year": 2026
+              }
+            ],
+            "scores": {
+              "annual_ratio": 0.2661301121577156,
+              "monthly_ratio": 0.29871458151969194,
+              "no_harmonization": 0.9752582079622708
+            },
+            "selected_model": "annual_ratio",
+            "selection_rule": "lowest median absolute log error; lexical tie-break",
+            "years": [
+              2023,
+              2025,
+              2026
+            ]
+          },
+          "outer_test_year": 2024,
+          "outer_train_years": [
+            2023,
+            2025,
+            2026
+          ],
+          "selected_model": "annual_ratio",
+          "selection_status": "nested"
+        },
+        {
+          "inner_selection": {
+            "folds": [
+              {
+                "fit_years": [
+                  2024,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.12038878834888422,
+                  "monthly_ratio": 0.3085426713986637,
+                  "no_harmonization": 0.723719871377738
+                },
+                "validation_year": 2023
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2026
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.24272021653862305,
+                  "monthly_ratio": 0.32821835850305425,
+                  "no_harmonization": 0.787864253138608
+                },
+                "validation_year": 2024
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2024
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.3420671039604468,
+                  "monthly_ratio": 0.3632665380224482,
+                  "no_harmonization": 1.022005167195913
+                },
+                "validation_year": 2026
+              }
+            ],
+            "scores": {
+              "annual_ratio": 0.22133837639448373,
+              "monthly_ratio": 0.3179478942243363,
+              "no_harmonization": 0.8562988212461797
+            },
+            "selected_model": "annual_ratio",
+            "selection_rule": "lowest median absolute log error; lexical tie-break",
+            "years": [
+              2023,
+              2024,
+              2026
+            ]
+          },
+          "outer_test_year": 2025,
+          "outer_train_years": [
+            2023,
+            2024,
+            2026
+          ],
+          "selected_model": "annual_ratio",
+          "selection_status": "nested"
+        },
+        {
+          "inner_selection": {
+            "folds": [
+              {
+                "fit_years": [
+                  2024,
+                  2025
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.13597643666814088,
+                  "monthly_ratio": 0.2956342780690363,
+                  "no_harmonization": 0.723719871377738
+                },
+                "validation_year": 2023
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2025
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.2713996616932015,
+                  "monthly_ratio": 0.2569329359817345,
+                  "no_harmonization": 0.787864253138608
+                },
+                "validation_year": 2024
+              },
+              {
+                "fit_years": [
+                  2023,
+                  2024
+                ],
+                "median_absolute_log_error": {
+                  "annual_ratio": 0.36213941049018006,
+                  "monthly_ratio": 0.3634891447256878,
+                  "no_harmonization": 1.0356201951735398
+                },
+                "validation_year": 2025
+              }
+            ],
+            "scores": {
+              "annual_ratio": 0.2871326547599575,
+              "monthly_ratio": 0.3078177708313016,
+              "no_harmonization": 0.88143250161417
+            },
+            "selected_model": "annual_ratio",
+            "selection_rule": "lowest median absolute log error; lexical tie-break",
+            "years": [
+              2023,
+              2024,
+              2025
+            ]
+          },
+          "outer_test_year": 2026,
+          "outer_train_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "selected_model": "annual_ratio",
+          "selection_status": "nested"
+        }
+      ],
       "partial_years_excluded_from_annual_error": [
         {
           "annual_error_used": false,
@@ -759,6 +2114,83 @@
           "year": 2026
         }
       ],
+      "prediction_interval": {
+        "evaluated_pairs": 0,
+        "held_out_coverage": null,
+        "median_width": null,
+        "nominal_coverage": 0.95,
+        "reason": "The available short paired record does not yet support independently calibrated prediction intervals.",
+        "status": "withheld-not-independently-calibrated"
+      },
+      "production_model_selection": {
+        "folds": [
+          {
+            "fit_years": [
+              2024,
+              2025,
+              2026
+            ],
+            "median_absolute_log_error": {
+              "annual_ratio": 0.14841539367607454,
+              "monthly_ratio": 0.319708779181407,
+              "no_harmonization": 0.723719871377738
+            },
+            "validation_year": 2023
+          },
+          {
+            "fit_years": [
+              2023,
+              2025,
+              2026
+            ],
+            "median_absolute_log_error": {
+              "annual_ratio": 0.27151865783395346,
+              "monthly_ratio": 0.27618759483447364,
+              "no_harmonization": 0.787864253138608
+            },
+            "validation_year": 2024
+          },
+          {
+            "fit_years": [
+              2023,
+              2024,
+              2026
+            ],
+            "median_absolute_log_error": {
+              "annual_ratio": 0.3192076223453447,
+              "monthly_ratio": 0.244281577170812,
+              "no_harmonization": 1.0356201951735398
+            },
+            "validation_year": 2025
+          },
+          {
+            "fit_years": [
+              2023,
+              2024,
+              2025
+            ],
+            "median_absolute_log_error": {
+              "annual_ratio": 0.25222704382693695,
+              "monthly_ratio": 0.28517140078396963,
+              "no_harmonization": 1.022005167195913
+            },
+            "validation_year": 2026
+          }
+        ],
+        "scores": {
+          "annual_ratio": 0.25578870867582715,
+          "monthly_ratio": 0.2904609871947346,
+          "no_harmonization": 0.9225866603309699
+        },
+        "selected_model": "annual_ratio",
+        "selection_rule": "lowest median absolute log error; lexical tie-break",
+        "years": [
+          2023,
+          2024,
+          2025,
+          2026
+        ]
+      },
       "selected_model": "annual_ratio",
       "selection_rule": "lowest median absolute log error; lexical tie-break",
       "years_held_out": [
@@ -782,7 +2214,7 @@
   "provenance": {
     "daily_bundle": "/samples/aggregates/norcal.json.gz",
     "daily_bundle_sha256": "6cc2d49eb7cb2b1deb803cfd68dcfa624231177c79c8b4c8580216a45f70982b",
-    "input_manifest_sha256": "673cc06c7e596d986fe70883c1810e530af0312bf258efe2eded2c486f02194b",
+    "input_manifest_sha256": "9f306e2fdf0b66fda7f48786e36f9b3a6048f7a23ac99bc8b7c45c1d1a4c66c3",
     "paired_complete_months": [
       "2022-07",
       "2022-08",

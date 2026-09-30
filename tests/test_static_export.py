@@ -41,6 +41,10 @@ class StaticCalendarExportTests(unittest.TestCase):
         self.assertIn("coverage ${coverageStates.map(readable)", script)
         self.assertIn("ACTIVE FIRE ONLY · pass/cloud coverage unknown", script)
         self.assertIn("function evidenceHref()", script)
+        self.assertIn('month.estimate_type === "mixed"', script)
+        self.assertIn("paired UTC dates", script)
+        self.assertIn("prediction interval withheld", script)
+        self.assertIn('id="harm-frp-unit"', html)
 
     def test_release_shell_exposes_persona_paths_and_pages_artifact(self):
         root = Path(__file__).parents[1]
@@ -73,6 +77,7 @@ class StaticCalendarExportTests(unittest.TestCase):
             static_source.mkdir()
             (static_source / "index.html").write_text(
                 '<!doctype html><html><head></head><body><a href="/">Home</a>'
+                '<a href="/data/v2/calendar/norcal/2010.json">Calendar evidence</a>'
                 '<link rel="stylesheet" href="/styles.css"><script src="/harmonized.js"></script>'
                 '</body></html>', encoding="utf-8")
             (static_source / "styles.css").write_text(".earth{background:url('/earth.svg')}", encoding="utf-8")
@@ -88,6 +93,11 @@ class StaticCalendarExportTests(unittest.TestCase):
             self.assertTrue((output / "data/v2/calendar/norcal/2010.json").is_file())
             self.assertTrue((output / "data/v2/calendar/punjab-haryana/2010.json").is_file())
             self.assertTrue((output / "data/v2/history/norcal.json").is_file())
+            globe = json.loads(gzip.decompress(
+                (output / "data/v2/globe/recent.json.gz").read_bytes()))
+            self.assertEqual(globe["schema"], "fireatlas-globe-static-v1")
+            self.assertEqual(globe["aggregates"], [])
+            self.assertIsNone(globe["latest_observation"])
             observations = json.loads(gzip.decompress(
                 (output / "data/v2/observations/norcal/2010.json.gz").read_bytes()))
             self.assertEqual(observations["schema"], "fireatlas-static-observations-v1")
@@ -95,6 +105,7 @@ class StaticCalendarExportTests(unittest.TestCase):
             html = (output / "index.html").read_text(encoding="utf-8")
             self.assertIn('name="fireatlas-static-data"', html)
             self.assertIn('href="./"', html)
+            self.assertIn('href="./data/v2/calendar/norcal/2010.json"', html)
             self.assertIn('href="./styles.css"', html)
             self.assertIn('src="./harmonized.js"', html)
             self.assertNotIn(".sqlite3", " ".join(str(path) for path in output.rglob("*")))
@@ -102,6 +113,9 @@ class StaticCalendarExportTests(unittest.TestCase):
             self.assertEqual(manifest["schema"], "fireatlas-static-site-v1")
             self.assertIn("Older reconstructed-row periods remain partial; missing dates are unknown.",
                           manifest["limitations"])
+            self.assertIn("The static globe is a checksummed eight-day imported snapshot, not a live FIRMS feed.",
+                          manifest["limitations"])
+            self.assertIn("data/v2/globe/recent.json.gz", {entry["path"] for entry in manifest["files"]})
             for entry in manifest["files"]:
                 content = (output / entry["path"]).read_bytes()
                 self.assertEqual(hashlib.sha256(content).hexdigest(), entry["sha256"], entry["path"])

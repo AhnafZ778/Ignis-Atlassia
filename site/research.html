@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Research Lab — FireAtlas</title>
+  <title>Research Lab — Ignis-Atlassia</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./vendor/leaflet.css"><link rel="stylesheet" href="./research.css">
-  <script src="./vendor/leaflet.js" defer></script><script src="./research.js" defer></script>
-  <link rel="stylesheet" href="./design.css">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./vendor/leaflet.css"><link rel="stylesheet" href="./research.css?v=ndvi-terrain-20260930">
+  <script src="./vendor/leaflet.js" defer></script><script src="./research.js?v=ndvi-terrain-20260930" defer></script>
+  <link rel="stylesheet" href="./design.css?v=ndvi-terrain-20260930">
   <script src="./ui.js" defer></script>
 <meta name="fireatlas-static-data" content="./data/v2/">
 <meta name="fireatlas-static-snapshot" content="2026-09-30">
@@ -14,7 +14,7 @@
 <body class="research-page">
   <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="topbar">
-    <a class="brand" href="./" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
+    <a class="brand" href="./" aria-label="Ignis-Atlassia home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a>
     <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><span></span><span></span><span class="menu-label">Menu</span></button>
     <nav id="site-navigation" aria-label="Project navigation"><a href="./">Overview</a><a href="./#atlas-section">Atlas</a><a href="./research.html" class="active" aria-current="page">Research lab</a><a href="./data.html">Data sources</a></nav>
     <span class="header-tag"><i></i> A NASA SPACE APPS PROJECT <span>↗</span></span>
@@ -49,7 +49,7 @@
       <section class="research-panel" aria-labelledby="candidates-title">
         <div class="research-panel-heading"><div><p class="eyebrow">02 / CANDIDATE TRACKING</p><h2 id="candidates-title">Where do the samples connect?</h2><p>Change the linking assumptions and inspect how the candidate groups change.</p></div><span class="state-tag">NOT CONFIRMED INCIDENTS</span></div>
         <div class="candidate-controls"><label>Maximum distance<select id="candidate-distance"><option value="0.5">0.5 km</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option></select></label><label>Maximum date gap<select id="candidate-gap"><option value="0">Same day only</option><option value="1" selected>1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="7">7 days</option></select></label><button id="rebuild-candidates" type="button">Apply assumptions ↗</button><span id="candidate-method">Geodesic distance between common-cell centers</span></div>
-        <div class="candidate-layout"><div class="candidate-map-wrap"><div id="candidate-map" aria-label="Candidate detection cell map"></div><span class="map-label">DETECTION CELL CENTERS · SCHEMATIC GRID</span><button id="fit-candidates" type="button">Fit selection ↗</button></div><aside class="candidate-list-wrap"><div class="candidate-list-heading"><h3>Candidate groups</h3><span id="candidate-count">—</span></div><div id="candidate-list" class="candidate-list"></div></aside></div>
+        <div class="candidate-layout"><div class="candidate-map-wrap"><div id="candidate-map" aria-label="Candidate groups over NASA MODIS 16-day Vegetation NDVI imagery on OpenStreetMap"></div><span class="map-label" id="candidate-map-label">NASA MODIS NDVI · VEGETATION CONTEXT</span><button id="fit-candidates" type="button">Fit selection ↗</button></div><aside class="candidate-list-wrap"><div class="candidate-list-heading"><h3>Candidate groups</h3><span id="candidate-count">—</span></div><div id="candidate-list" class="candidate-list"></div></aside></div>
         <div id="candidate-detail" class="candidate-detail" aria-live="polite">Select a group to inspect its membership.</div>
         <p class="research-note">Groups can merge through chains of nearby samples. Missing observations can split them. Candidate IDs change with membership; no perimeter, burned area, or fire-event count is inferred.</p>
       </section>

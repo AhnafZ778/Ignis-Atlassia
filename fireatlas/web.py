@@ -6,6 +6,7 @@ import argparse
 import csv
 import io
 import hashlib
+import re
 import zipfile
 import json
 import math
@@ -20,7 +21,7 @@ from datetime import date, timedelta, datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, quote, urlsplit
 
 from .core import SERIES, _complete_month, calendar, connect, ingest, validate_bbox
 from .fetch import FIRMS_SOURCES
@@ -40,6 +41,8 @@ from .regions import REGIONS
 STATIC = Path(__file__).with_name("static")
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EARTH_MODEL = PROJECT_ROOT / "earth.html"
+NATIVE_MASK_ROOT = PROJECT_ROOT / "NASA_data" / "fire_masks"
+NATIVE_MASK_INVENTORY = NATIVE_MASK_ROOT / "local_asset_inventory.csv"
 DOC_ASSETS = {
     "/docs/NASA_DATA_IMPORT.md": (PROJECT_ROOT / "docs" / "NASA_DATA_IMPORT.md", "text/markdown; charset=utf-8"),
     "/docs/DATA.md": (PROJECT_ROOT / "docs" / "DATA.md", "text/markdown; charset=utf-8"),
@@ -153,6 +156,17 @@ def handler_factory(database: Path):
     calendar_cache = {}
     calendar_prepared_cache = {}
     pilot_sync = PilotSync(database)
+    native_assets = {}
+    if NATIVE_MASK_INVENTORY.is_file():
+        with NATIVE_MASK_INVENTORY.open(newline="", encoding="utf-8") as handle:
+            for item in csv.DictReader(handle):
+                name = item.get("filename", "").strip()
+                path = NATIVE_MASK_ROOT / name
+                if (name and Path(name).name == name and Path(name).suffix.lower() in {".hdf", ".nc"}
+                        and path.is_file() and path.resolve().parent == NATIVE_MASK_ROOT.resolve()):
+                    native_assets[name] = {"path": path, "product": item.get("product", ""),
+                                           "version": item.get("version", ""), "role": item.get("role", ""),
+                                           "sha256": item.get("sha256", "")}
     class Handler(BaseHTTPRequestHandler):
         def _local_data_action(self, content_type):
             host = self.headers.get("Host", "")
@@ -253,8 +267,50 @@ def handler_factory(database: Path):
 
         def do_GET(self):
             url = urlsplit(self.path)
-            if url.path == "/earth.html":
-                if EARTH_MODEL.is_file():
+            if url.path == "/api/native-masks":
+                assets = []
+                for name, item in sorted(native_assets.items()):
+                    assets.append({"filename": name, "product": item["product"],
+                                   "version": item["version"], "role": item["role"],
+                                   "bytes": item["path"].stat().st_size, "sha256": item["sha256"],
+                                   "download_url": f"/api/native-masks/{quote(name, safe='')}"})
+                self._json({"asset_count": len(assets), "total_bytes": sum(asset["bytes"] for asset in assets),
+                            "assets": assets})
+                return
+            if url.path.startswith("/api/native-masks/"):
+                name = url.path.removeprefix("/api/native-masks/")
+                item = native_assets.get(name)
+                if not item or not re.fullmatch(r"[A-Za-z0-9._-]+", name):
+                    self._json({"error": "native asset not found in the local inventory"}, HTTPStatus.NOT_FOUND)
+                    return
+                path = item["path"]
+                try:
+                    source = path.open("rb")
+                except OSError:
+                    self._json({"error": "native asset could not be read"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+                    return
+                try:
+                    with source:
+                        size = path.stat().st_size
+                        self.send_response(HTTPStatus.OK)
+                        self.send_header("Content-Type", "application/octet-stream")
+                        self.send_header("Content-Length", str(size))
+                        self.send_header("Content-Disposition", f'attachment; filename="{name}"')
+                        self.send_header("Cache-Control", "no-store")
+                        self.send_header("X-Content-Type-Options", "nosniff")
+                        self.end_headers()
+                        while block := source.read(1024 * 1024):
+                            self.wfile.write(block)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+                except OSError:
+                    pass
+                return
+            if url.path in ("/earth.html", "/Globe.html", "/globe.html"):
+                target = (PROJECT_ROOT / "Globe.html") if url.path in ("/Globe.html", "/globe.html") else EARTH_MODEL
+                if target.is_file():
+                    self._respond(target.read_bytes(), "text/html; charset=utf-8")
+                elif EARTH_MODEL.is_file():
                     self._respond(EARTH_MODEL.read_bytes(), "text/html; charset=utf-8")
                 else:
                     self._json({"error": "Earth model file not found"}, HTTPStatus.NOT_FOUND)

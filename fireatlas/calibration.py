@@ -11,9 +11,10 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-METHOD_VERSION = "monthly-ratio-loyo-bootstrap-1000-step2012-v2"
+METHOD_VERSION = "nested-year-selection-factor-bootstrap-1000-step2012-v3"
 BOOTSTRAPS = 1000
 SEED = 20261114
+MODELS = ("monthly_ratio", "annual_ratio", "no_harmonization")
 
 
 def _percentile(values: list[float], fraction: float) -> float | None:
@@ -102,47 +103,119 @@ def _fit(rows: list[dict]) -> tuple[float | None, dict[int, dict]]:
     return annual, fits
 
 
+def _point_factors(rows: list[dict]) -> tuple[float | None, dict[int, float]]:
+    """Fit point factors without bootstrap work for nested model selection."""
+    annual = _ratio(rows)
+    if annual is None:
+        return None, {}
+    return annual, {month: _monthly_factor(rows, month, annual)[0]
+                    for month in range(1, 13)}
+
+
+def _factor_for(model: str, annual: float, monthly: dict[int, float], month: int) -> float:
+    if model == "monthly_ratio":
+        return monthly[month]
+    if model == "annual_ratio":
+        return annual
+    return 1.0
+
+
+def _inner_selection(rows: list[dict]) -> dict:
+    """Select a method by year-grouped CV inside the supplied training years."""
+    years = sorted({row["year"] for row in rows})
+    errors = {name: [] for name in MODELS}
+    folds = []
+    for validation_year in years:
+        fit_rows = [row for row in rows if row["year"] != validation_year]
+        held_out = [row for row in rows if row["year"] == validation_year]
+        if not fit_rows or not held_out:
+            continue
+        annual, monthly = _point_factors(fit_rows)
+        if annual is None:
+            continue
+        fold_errors = {name: [] for name in MODELS}
+        for row in held_out:
+            for name in MODELS:
+                predicted = row["modis"] * _factor_for(name, annual, monthly, row["month"])
+                error = abs(math.log((predicted + 1) / (row["viirs"] + 1)))
+                errors[name].append(error)
+                fold_errors[name].append(error)
+        folds.append({"validation_year": validation_year,
+                      "fit_years": sorted({row["year"] for row in fit_rows}),
+                      "median_absolute_log_error": {
+                          name: _percentile(values, .5)
+                          for name, values in fold_errors.items()}})
+    summaries = {name: _percentile(values, .5) for name, values in errors.items()}
+    candidates = [(score, name) for name, score in summaries.items() if score is not None]
+    selected = min(candidates)[1] if candidates else None
+    return {"selected_model": selected, "scores": summaries, "folds": folds,
+            "years": years, "selection_rule": "lowest median absolute log error; lexical tie-break"}
+
+
 def _held_out(rows: list[dict]) -> dict:
+    """Nested year-grouped evaluation: selection occurs inside each outer fold."""
     all_years = sorted({row["year"] for row in rows})
-    errors = {name: [] for name in ("monthly_ratio", "annual_ratio", "no_harmonization")}
+    errors = {name: [] for name in MODELS}
     annual_errors = {name: [] for name in errors}
     annual_error_years = {name: [] for name in errors}
     partial_years = []
-    interval_hits = total = 0
+    selected_errors = []
+    selected_annual_errors = []
+    selected_annual_years = []
+    selection_folds = []
     for held_out_year in all_years:
         train = [row for row in rows if row["year"] != held_out_year]
         test = [row for row in rows if row["year"] == held_out_year]
         if not train:
             continue
-        annual, monthly = _fit(train)
+        selection = _inner_selection(train)
+        annual, monthly = _point_factors(train)
         if annual is None:
             continue
-        predicted_year = defaultdict(float)
-        actual_year = defaultdict(float)
+        predicted_year = {name: defaultdict(float) for name in (*MODELS, "selected_pipeline")}
+        actual_year = {name: defaultdict(float) for name in (*MODELS, "selected_pipeline")}
+        fold_errors = {name: [] for name in (*MODELS, "selected_pipeline")}
         for row in test:
-            for name, factor in (("monthly_ratio", monthly[row["month"]]["ratio"]),
-                                 ("annual_ratio", annual), ("no_harmonization", 1.0)):
+            for name in MODELS:
+                factor = _factor_for(name, annual, monthly, row["month"])
                 predicted = row["modis"] * factor
                 actual = row["viirs"]
-                errors[name].append(abs(math.log((predicted + 1) / (actual + 1))))
-                predicted_year[name] += predicted
-                actual_year[name] += actual
-            lower, upper = monthly[row["month"]]["low"], monthly[row["month"]]["high"]
-            if lower is not None and upper is not None:
-                interval_hits += int(row["modis"] * lower <= row["viirs"] <= row["modis"] * upper)
-                total += 1
-        for name in errors:
-            actual = actual_year[name]
+                error = abs(math.log((predicted + 1) / (actual + 1)))
+                errors[name].append(error)
+                fold_errors[name].append(error)
+                predicted_year[name]["all"] += predicted
+                actual_year[name]["all"] += actual
+            if selection["selected_model"]:
+                name = selection["selected_model"]
+                predicted = row["modis"] * _factor_for(name, annual, monthly, row["month"])
+                error = abs(math.log((predicted + 1) / (row["viirs"] + 1)))
+                selected_errors.append(error)
+                fold_errors["selected_pipeline"].append(error)
+                predicted_year["selected_pipeline"]["all"] += predicted
+                actual_year["selected_pipeline"]["all"] += row["viirs"]
+        for name in (*MODELS, "selected_pipeline"):
+            actual = actual_year[name]["all"]
             if len(test) == 12:
                 if actual:
-                    annual_errors[name].append(abs(predicted_year[name] - actual) / actual)
-                    annual_error_years[name].append(held_out_year)
+                    annual_error = abs(predicted_year[name]["all"] - actual) / actual
+                    if name == "selected_pipeline":
+                        selected_annual_errors.append(annual_error)
+                        selected_annual_years.append(held_out_year)
+                    else:
+                        annual_errors[name].append(annual_error)
+                        annual_error_years[name].append(held_out_year)
                 else:
-                    annual_errors[name].append(None)
-            elif name == "monthly_ratio":
-                partial_years.append({"year": held_out_year,
-                                      "eligible_months": len(test),
-                                      "annual_error_used": False})
+                    if name != "selected_pipeline":
+                        annual_errors[name].append(None)
+        if len(test) != 12:
+            partial_years.append({"year": held_out_year,
+                                  "eligible_months": len(test),
+                                  "annual_error_used": False})
+        selection_folds.append({"outer_test_year": held_out_year,
+                                "outer_train_years": sorted({row["year"] for row in train}),
+                                "selected_model": selection["selected_model"],
+                                "selection_status": "nested" if selection["selected_model"] else "insufficient-inner-training",
+                                "inner_selection": selection})
     summaries = {}
     for name in errors:
         annual_values = [value for value in annual_errors[name] if value is not None]
@@ -151,16 +224,174 @@ def _held_out(rows: list[dict]) -> dict:
             "median_annual_absolute_percent_error": _percentile(annual_values, .5),
             "annual_error_years": annual_error_years[name],
         }
-    fitted = summaries["monthly_ratio"]["median_absolute_log_error"]
-    candidates = [(summary["median_absolute_log_error"], name) for name, summary in summaries.items()
-                  if summary["median_absolute_log_error"] is not None]
-    selected = min(candidates)[1] if candidates else None
+    selected_summary = {
+        "median_absolute_log_error": _percentile(selected_errors, .5),
+        "median_annual_absolute_percent_error": _percentile(selected_annual_errors, .5),
+        "annual_error_years": selected_annual_years,
+        "outer_evaluation_folds": len(selected_errors) and sum(
+            fold["selected_model"] is not None for fold in selection_folds),
+    }
+    production_selection = _inner_selection(rows)
     return {"years_held_out": all_years,
             "partial_years_excluded_from_annual_error": partial_years,
             "models": summaries,
-            "monthly_interval_coverage": interval_hits / total if total else None,
-            "monthly_interval_pairs": total, "selected_model": selected,
-            "selection_rule": "lowest median absolute log error; lexical tie-break"}
+            "nested_selected_pipeline": selected_summary,
+            "outer_folds": selection_folds,
+            "selected_model": production_selection["selected_model"],
+            "production_model_selection": production_selection,
+            "prediction_interval": {
+                "status": "withheld-not-independently-calibrated",
+                "nominal_coverage": 0.95,
+                "held_out_coverage": None,
+                "median_width": None,
+                "evaluated_pairs": 0,
+                "reason": "The available short paired record does not yet support independently calibrated prediction intervals.",
+            },
+            "selection_rule": production_selection["selection_rule"],
+            "evaluation_protocol": "Nested leave-one-year-out. Candidate selection uses only outer-training years; reported fixed-model and selected-pipeline errors use outer-test years."}
+
+
+def _season(month: int) -> str:
+    return {12: "DJF", 1: "DJF", 2: "DJF",
+            3: "MAM", 4: "MAM", 5: "MAM",
+            6: "JJA", 7: "JJA", 8: "JJA",
+            9: "SON", 10: "SON", 11: "SON"}[month]
+
+
+def _summary(values: list[float]) -> dict:
+    return {"sample_size": len(values), "median": _percentile(values, .5),
+            "p90": _percentile(values, .9)}
+
+
+def _daily_gap_benchmark(daily: dict, *, modis_version: str, viirs_version: str) -> dict:
+    """Evaluate daily predictions and contiguous artificial gaps with nested year splits."""
+    monthly_rows, _ = _rows(daily)
+    eligible_months = {(row["year"], row["month"]): row for row in monthly_rows
+                       if row["modis_versions"] == [modis_version]
+                       and row["viirs_versions"] == [viirs_version]}
+    excluded = defaultdict(int)
+    by_year_month = defaultdict(list)
+    for day in daily["days"]:
+        stamp = day["date_utc"]
+        modis = day["sources"]["MODIS_SP"]
+        viirs = day["sources"]["VIIRS_SNPP_SP"]
+        if not modis["export_complete"] or not viirs["export_complete"]:
+            excluded["incomplete_source_export"] += 1
+            continue
+        if viirs.get("availability", {}).get("status") == "documented_processing_gap":
+            excluded["documented_viirs_processing_gap"] += 1
+            continue
+        year, month = int(stamp[:4]), int(stamp[5:7])
+        if (year, month) not in eligible_months:
+            excluded["incompatible_or_ineligible_month"] += 1
+            continue
+        if modis["product_versions"] != [modis_version] or viirs["product_versions"] != [viirs_version]:
+            excluded["product_version_mismatch"] += 1
+            continue
+        if modis["detected_cell_days"] is None or viirs["detected_cell_days"] is None:
+            excluded["unknown_daily_total"] += 1
+            continue
+        by_year_month[(year, month)].append({
+            "date": stamp, "day": date.fromisoformat(stamp), "year": year, "month": month,
+            "modis": float(modis["detected_cell_days"]),
+            "viirs": float(viirs["detected_cell_days"]),
+        })
+
+    years = sorted({year for year, _ in eligible_months})
+    daily_errors = {name: [] for name in (*MODELS, "selected_pipeline")}
+    daily_ape = {name: [] for name in daily_errors}
+    daily_nonzero = defaultdict(int)
+    windows = defaultdict(lambda: {"log_error": [], "ape": [], "years": set(), "nonzero": 0})
+    folds = []
+    for held_out_year in years:
+        train_rows = [row for row in monthly_rows if row["year"] != held_out_year
+                      and row["modis_versions"] == [modis_version]
+                      and row["viirs_versions"] == [viirs_version]]
+        test_keys = sorted(key for key in by_year_month if key[0] == held_out_year)
+        selection = _inner_selection(train_rows)
+        annual, monthly = _point_factors(train_rows)
+        if annual is None:
+            folds.append({"held_out_year": held_out_year, "status": "no-training-factor"})
+            continue
+        folds.append({"held_out_year": held_out_year,
+                      "training_years": sorted({row["year"] for row in train_rows}),
+                      "selected_model": selection["selected_model"],
+                      "selection_status": "nested" if selection["selected_model"] else "insufficient-inner-training"})
+        for key in test_keys:
+            days = sorted(by_year_month[key], key=lambda item: item["date"])
+            for day in days:
+                model_factors = {name: _factor_for(name, annual, monthly, day["month"])
+                                 for name in MODELS}
+                if selection["selected_model"]:
+                    model_factors["selected_pipeline"] = _factor_for(
+                        selection["selected_model"], annual, monthly, day["month"])
+                for name, factor in model_factors.items():
+                    predicted = day["modis"] * factor
+                    actual = day["viirs"]
+                    daily_errors[name].append(abs(math.log((predicted + 1) / (actual + 1))))
+                    if actual > 0:
+                        daily_nonzero[name] += 1
+                        daily_ape[name].append(abs(predicted - actual) / actual)
+
+            for duration in (1, 3, 7, 14):
+                if len(days) < duration:
+                    continue
+                for start in range(len(days) - duration + 1):
+                    block = days[start:start + duration]
+                    if any((block[index]["day"] - block[index - 1]["day"]).days != 1
+                           for index in range(1, len(block))):
+                        continue
+                    actual = sum(item["viirs"] for item in block)
+                    season = _season(block[0]["month"])
+                    models = dict((name, _factor_for(name, annual, monthly, block[0]["month"]))
+                                  for name in MODELS)
+                    if selection["selected_model"]:
+                        name = selection["selected_model"]
+                        models["selected_pipeline"] = _factor_for(name, annual, monthly, block[0]["month"])
+                    for name, factor in models.items():
+                        predicted = sum(item["modis"] for item in block) * factor
+                        key = (duration, season, name)
+                        result = windows[key]
+                        result["years"].add(held_out_year)
+                        result["log_error"].append(abs(math.log((predicted + 1) / (actual + 1))))
+                        if actual > 0:
+                            result["nonzero"] += 1
+                            result["ape"].append(abs(predicted - actual) / actual)
+
+    window_results = []
+    for (duration, season, model), values in sorted(windows.items()):
+        window_results.append({"gap_duration_days": duration, "season": season, "model": model,
+                               "window_count": len(values["log_error"]),
+                               "nonzero_actual_windows": values["nonzero"],
+                               "outer_test_years": sorted(values["years"]),
+                               "median_absolute_log_error": _percentile(values["log_error"], .5),
+                               "median_absolute_percent_error_nonzero": _percentile(values["ape"], .5)})
+    daily_results = {}
+    for name in daily_errors:
+        daily_results[name] = {"n_days": len(daily_errors[name]),
+                               "n_nonzero_viirs_days": daily_nonzero[name],
+                               "median_absolute_log_error": _percentile(daily_errors[name], .5),
+                               "median_absolute_percent_error_nonzero": _percentile(daily_ape[name], .5)}
+    return {
+        "schema": "fireatlas-gap-benchmark-v1",
+        "status": "evaluated" if any(item["n_days"] for item in daily_results.values()) else "insufficient-compatible-daily-data",
+        "versions": {"MODIS_SP": modis_version, "VIIRS_SNPP_SP": viirs_version},
+        "eligible_complete_months": [f"{year}-{month:02d}" for year, month in sorted(eligible_months)],
+        "eligible_days": sum(len(items) for items in by_year_month.values()),
+        "outer_years": years,
+        "outer_folds": folds,
+        "gap_durations_days": [1, 3, 7, 14],
+        "season_definition": {"DJF": "December–February", "MAM": "March–May",
+                              "JJA": "June–August", "SON": "September–November"},
+        "primary_metric": "median absolute log error abs(log((prediction+1)/(VIIRS+1)))",
+        "secondary_metrics": ["median absolute percentage error on nonzero VIIRS totals",
+                              "sample counts and outer test years"],
+        "daily_metrics": daily_results,
+        "contiguous_gap_contribution_metrics": window_results,
+        "window_protocol": "Evaluate every rolling contiguous window wholly inside each compatible complete UTC month in the outer held-out year. Windows overlap and are clustered by outer test year; window count is not an independent sample size.",
+        "model_selection_protocol": "For each outer test year, select among monthly ratio, annual ratio, and no harmonization using leave-one-year-out validation within outer-training years only. Fit the selected method on all outer-training months, then evaluate only on the held-out year.",
+        "excluded_daily_dates": dict(sorted(excluded.items())),
+    }
 
 
 def _step_2012(rows: list[dict]) -> dict:
@@ -221,6 +452,8 @@ def calibrate(daily: dict, *, modis_version: str | None = None,
                 "method_version": METHOD_VERSION,
                 "data_class": "authentic-imported"}
     validation = _held_out(eligible)
+    validation["daily_gap_benchmark"] = _daily_gap_benchmark(
+        daily, modis_version=modis_version, viirs_version=viirs_version)
     months = [{"month": month, **monthly_fits[month],
                "n_years": sum(1 for row in eligible if row["month"] == month)}
               for month in range(1, 13)]
@@ -315,7 +548,7 @@ def write_artifacts(database: str | Path, output_dir: str | Path,
             # Match the calendar API's frozen archive horizon. The ratio fit
             # still admits only complete paired months, but its exclusion
             # ledger then agrees exactly with the visible calendar result.
-            first = date(2010, 7, 1)
+            first = date.fromisoformat(months[0] + "-01")
             month_end = date.fromisoformat(months[-1] + "-01")
             next_month = (month_end.replace(day=28) + timedelta(days=4)).replace(day=1)
             last = next_month - timedelta(days=1)
