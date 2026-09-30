@@ -1,0 +1,29 @@
+WEBVTT
+
+00:00.000 --> 00:05.000
+NASA satellites watched fire activity for decades.
+The record changes when the sensor changes.
+
+00:05.000 --> 00:15.000
+MODIS and VIIRS are different native measurements.
+FireAtlas keeps both and groups them once per UTC day on a common 1 km grid.
+
+00:15.000 --> 00:35.000
+The calendar shows its evidence state.
+Documented gaps are estimates or unknown, never silent zeros.
+
+00:35.000 --> 00:50.000
+Open the source record behind one day.
+UTC time, confidence, product version, FRP, notices, and hashes remain inspectable.
+
+00:50.000 --> 01:05.000
+The same controls show another fire regime.
+Official context is separate; thermal detections do not identify cause.
+
+01:05.000 --> 01:20.000
+A checked match is visible before the claim.
+Native granules and FIRMS rows are counted; independent review remains pending.
+
+01:20.000 --> 01:30.000
+Value, state, version, hash, and limit stay in one evidence card.
+Every claim remains traceable.

@@ -1,199 +1,162 @@
 # FireAtlas SCORECARD — live accountability tracker
 
-**Plan:** `docs/winning-plan/FireAtlas_Winning_Plan.pdf` (source `docs/winning-plan/src/`).
-**Rules:** see plan section 9.1. Executors update **task rows** with evidence; only the **Auditor** (plan 9.2) changes **scores**. Every change adds a Changelog line.
-**Status words:** `NOT STARTED` · `IN PROGRESS` · `BLOCKED (reason)` · `DONE (evidence: …)` · `DROPPED (reason)`
+**Plan:** `docs/winning-plan/FireAtlas_Updated_Perfected_Winning_Plan.pdf` (authoritative, 30 September 2026)
+**Historical snapshot:** `docs/winning-plan/FireAtlas_Winning_Plan.pdf` version 1.2
+**Rule:** Only evidence can change the score. The current weighted implementation score is **41.6 / 100**. The earlier **44.8 / 100** and **93 / 118** ceilings are withdrawn while the perfected P0/P1 gates remain open. Do not use 54.2, 88, 93, 106, or 20/20 as a promised result.
 
 | Field | Value |
 |---|---|
-| Last audit | 2026-09-29 (numeric baseline; implementation checked through R6) |
-| Audit score (100) | **31.8** · Tier 1 target 54.2 · Tier 1 + 2 target 88.0 |
-| Local rubric (118) | **≈65** · target ≈106 |
-| Post-R6 score delta | **0 points assigned** · R5 exposes existing records and R6 removes an unrelated event feed; neither adds calibration or independent validation |
-| Branch | UNDECIDED (Gate 0 pending) |
-| Tier 1 freeze date | 2026-11-08 (Branch A) |
-| Deadline risk | RED (user deadline 2026-10-01; repository checks remain open) |
-| Public repo URL | — |
-| Public demo URL | — |
+| Last audit | 2026-09-30 |
+| Implementation score | **41.6 now** · no perfected-plan claim while P0/P1 gates are open |
+| Local rubric | **≈70 now** · earlier 93 ceiling withdrawn |
+| Branch | `r7-work` |
+| Public repo URL | GitHub origin configured; public access not verified |
+| Public demo URL | Not deployed |
 
-## 1. Gates
+## Perfected-plan delta
 
-| Gate | Status | Evidence |
+The perfected plan changes the evidence contract without changing the globe. The primary unit
+is **VIIRS-equivalent active-fire cell-days on a common 1 km grid**; native VIIRS 375 m detail
+and raw FRP in MW/day remain separate. The visible path is **See → Compare → Verify → Share**.
+MCD64A1 Collection 6.1 is a lagged corroboration option, not active-fire ground truth. When it
+is unavailable, the app must say **ACTIVE FIRE ONLY**. See
+[`src/00-perfect-plan-authority.md`](src/00-perfect-plan-authority.md) for the complete delta,
+state vocabulary, P0/P1/P2 order, and score discipline.
+
+| Perfected gate | Current state | Score treatment |
 |---|---|---|
-| G0-T1 Written ruling from Local Lead | NOT STARTED | |
-| G0-T2 Branch chosen (A/B) | NOT STARTED | |
-| G0-T3 Official statement copied (28 Oct) | NOT STARTED | |
-| Gate 1 (C12-T1…T3) repo integrity | IN PROGRESS | `d43c602` on `origin/main`; clean-clone smoke and local suite pass; GitHub CI and public access not verified |
-| Tier 1 complete (all C1, C2, C10-T1…T7 DONE) | NOT STARTED | |
+| P0 archive/provenance/common-grid reproducibility | Partial: 26 older exports are reconstructed; the S-NPP 2021–2022 rows are now present as row-only evidence but lack original request metadata; native mask resampling, full-footprint accounting and independent review are absent | No uplift |
+| P1 Sensor Bridge and raw FRP | Local UI present for imported source exports; source counts and FRP remain separate | No uplift until release checks pass |
+| P1 MCD64A1 context | Dated MCD64A1 Burn Date + QA rasters and month-specific active-fire context are hash-bound in `fireatlas/samples/mcd64_corroboration.json`; UI labels it lagged and analytical-only | Partial corroboration evidence; independent review and public host remain open |
+| P1 share card and public demo | Local card/static bundle verified; public host not verified | No uplift |
+| P1 outside-user check and 90-second rehearsal | Local 90-second rehearsal verified; outside-user check not recorded | No uplift |
+| P2 Recent Pulse/NOAA-20/custom AOI | Deferred | Do not build before P0/P1 |
 
-## 2. Requirement trace (fill after G0-T3)
+## Required tasks
 
-| # | Requirement sentence (verbatim from the 2026 statement) | Feature / task that satisfies it | Status |
+| ID | Task | Status | Evidence |
 |---|---|---|---|
-| 1 | | | |
+| G0-T1 | Written reuse ruling | BLOCKED | No ruling is recorded. A copy-ready request and the current official-rule evidence are in `docs/winning-plan/evidence/G0-ruling-request.md`; the participant must send it to their own Local Lead and save the response. |
+| C2-T1 | Import historical MODIS and Suomi NPP for both regions | PARTIAL | Imported 34 sidecar-backed standard CSVs: eight with saved request metadata and 26 older CSVs with locally reconstructed row-only sidecars. The database contains 1,994,162 standard rows (456,202 MODIS and 1,537,960 S-NPP); six MODIS archives add 154,660 rows from July 2006 onward, and S-NPP request 814833 adds 204,694 unique clipped rows dated July 2021–July 2022. The S-NPP rows are now present, but their original request metadata and all reconstructed-window completeness remain absent; older absence stays unknown. |
+| C2-T2 | Daily cell-days, common-grid bridge, FRP and exclusions | DONE / PARTIAL perfected gate | `fireatlas/samples/aggregates/{norcal,punjab-haryana}.json.gz` contain 1,430 paired-complete UTC days per region with parent hashes. The bundles now expose `excluded_type_counts`, per-source FRP, and `sensor_bridge` status/categories; the calendar exposes `evidence_state`. Northern California July 2024 MODIS counts match the existing calendar on all 31 days in the authentic bundled archive; type-2 exclusion and explicit zero rows are tested. Grove native evidence now decodes 20/20 expected granules into 15,495 clipped pixels and reconciles 7/7 available FIRMS rows; Park decodes 114/114 into 1,372,872 pixels and reconciles 3,137/3,137 rows. Both native queues remain processed-unreviewed; full-footprint pass/cloud coverage remains absent. |
+| C2-T3 | Product-outage ledger | DONE | The sourced 2024 S-NPP outage interval and short quote are in `fireatlas/samples/sensor_notices.json`; unit tests cover partial endpoints, affected days, complete zero exports, and unknown opportunity. Calendar gap labels come from the ledger, not hard-coded fire dates. |
+| C2-T5 | Ratio, uncertainty, leave-one-year-out | PARTIAL | `fireatlas/samples/calibration/{norcal,punjab-haryana}.json` bind the 41 eligible 2023–2026 MODIS 61.03 / VIIRS 2 month-pairs to parent CSV and daily-bundle hashes. Held-out interval coverage is only 41.5% / 39.0%; calibration is weak, 2012 remains pending, independent review is open, and the new MCD64A1 report is lagged corroboration rather than active-fire truth. MODIS 6.03 is not mixed into this fit. |
+| C2-T6 | Sources and FIRMS acknowledgement | PARTIAL | `docs/DATA.md` and Data Sources page document the supplied parent hashes, products, limits and acknowledgement; pre-2022 files and retrieval dates are unavailable. |
+| C1-T1 | Region-aware calendar API | PARTIAL | An integration test calls `/api/v2/calendar` over the authentic bundled archive and verifies all 12 Northern California 2024 months. The response now carries `evidence_state`, bridge status, source-specific values, and unknown/gap branches. The larger local imports reach positive MODIS detections from July 2006 and S-NPP detections through July 2022; those older inputs are row-only and cannot support a complete harmonized monthly baseline. |
+| C1-T2 | Calendar with source/gap states | DONE / PARTIAL perfected gate | Live headless-browser review confirmed 2006–2026 history, partial and unknown older archive windows, July 2024 gap dates 24–29, distinct partial-day classes on 24 and 29, and keyboard-readable date/value/source labels. `evidence_state` is visible for observed, scaled, documented processing gap, complete zero export, and unknown branches. The replacement evidence capture is `docs/winning-plan/evidence/C1-T2-norcal.png` (2880×2800); native pass/cloud/no-pass coverage is still unknown. |
+| C1-T3 | Verdict sentence and official limits | DONE | Unit tests cover the percentile and insufficient-history branches, estimate reasons, and zero-estimate omission. The live July 2024 Northern California UI verdict matches the API exactly; CAL FIRE and InciWeb links are immediately below it. Capture: `docs/winning-plan/evidence/C9-T1-verdict.png`. |
+| C1-T4 | Season start, peak, end | DONE | Synthetic triangle returns known 10% start, 15-day peak center, and 90% end; >10% missing days withhold all dates. Real 2023 API results are available with zero missing days for both regions and are displayed in the critical-dates card. |
+| C1-T6 | Day drawer with original rows | DONE | A server-backed test over the authentic bundled archive verifies that 25 July returns original MODIS rows and a documented S-NPP processing gap. The drawer now renders an explicit NASA notice link from the API. Tests verify the archive rows, notice URL, and link-rendering path. |
+| C10-T1 | Held-out error | DONE / PARTIAL perfected gate | `scripts/verify_calibration_ui.py` compares each region's displayed model errors, annual errors, selected method, interval coverage, and 2012 step state with its source JSON; it asserts a pending step shows no ratio/result marker. Captures: `docs/winning-plan/evidence/C10-T1-calibration-*.png`. Common-grid bridge and FRP display are source-linked, but C10-T2, complete 2012 metadata, native mask review, and independent corroboration remain open; C10 stays at 3. |
+| C10-T2 | 2012 step test on the method page | PARTIAL | July 2012 S-NPP rows are loaded, and the 2021–2022 row archive is now present, but the original export request metadata are missing and the legacy calendar marks these periods partial. A coverage-valid sensor-step test is not justified yet. |
+| C11-T1 | Globe kept; calendar under it | PARTIAL | The app and static embed scripts currently point to `/terrain-earth.html?embed=landing`, and method-page calendar links return to the home calendar. Route and JavaScript checks pass; a fresh Chrome run found the frame with no page errors but the ArcGIS terrain renderer did not reach its ready state within 15 seconds, so Earth appearance and overlays remain unverified. No public demo URL is verified; C11 stays at 3. |
+| C8-T1 | Limits sentence on home and method | DONE | Exact required text is in the visible home and method footers; full tests and desktop/mobile page checks passed. |
+| C12-T4 | Apache-2.0 licence | DONE | Root `LICENSE` uses the official Apache 2.0 text with the project copyright field filled. NASA data are excluded. |
+| C12-T5 | README | DONE | Root `README.md` is 35 lines and describes the current app, actual sample coverage, setup and limits. |
+| C12-T6 | Public static site | PARTIAL | Regenerated `site/` with 42 calendars (2006–2026), 113 manifest-listed checksummed data files, two history files, compressed daily source rows, dated validity files, two evidence ZIPs, standalone hash-bound blank native-review templates for both cases, and Sensor Bridge/share-card data. Static calendar, Data & Method, and Data Sources browser verifiers run without `/api/` requests; server-only imports stay disabled. Public deployment and globe behavior remain unverified. |
+| C12-T7 | Sources page and AI use | PARTIAL | Data page and `docs/AI_USE.md` state AI use and disclose that no independent numerical reviewer is recorded; sign-off remains open. |
+| SUB-T1 | Project page | DRAFT READY — NOT SUBMITTED | Copy-ready, exactly 150-word draft is in `docs/winning-plan/SUBMISSION_DRAFT.md`. Public URLs are missing, submission is external, and G0 is unresolved. |
+| SUB-T2 | 30-second video + perfected 90-second story | LOCAL 30 s + 90 s REHEARSAL VERIFIED — PUBLIC CAPTURE OPEN | `docs/winning-plan/evidence/FireAtlas_30s_demo.mp4` and `docs/winning-plan/evidence/FireAtlas_90s_perfected_demo.mp4` are verified silent H.264 cuts (1600×900, 30 fps). The 90-second sequence uses the same local static bundle for the unchanged globe frame, Sensor Bridge, source-separated FRP, evidence drawer, Grove native-mask audit (20/20 granules and 7/7 available FIRMS rows matched), Park native-mask audit (114/114 granules and 3,137/3,137 FIRMS rows matched), Punjab context, and share card; `scripts/render_perfected_plan_video.py` checks the stream, duration, frame hashes, static-bundle hash and WebVTT sidecar. The Punjab scene shows October 2024's 5,174 detections, one comparable year, and the dated government monitoring context with an explicit no-cause-attribution caveat. Public URL, voice-over, deployment, and submission remain open; the local captions are a timed sidecar, not a public capture. The opening Earth is a still capture and was not freshly rendered. |
+| SUB-T4 | Demo rehearsed on the public URL | NOT STARTED | |
 
-## 3. Category scores (Auditor only)
+Anything not in this table is out of the plan. Do not implement it.
 
-`points = weight × score ÷ 5`. Hard caps: synthetic-only ≤ 2 · not pushed ≤ 2 · no method + test ≤ 2 · forecast without held-out evaluation ≤ 3 · operational instruction ⇒ 0.
+## Category scores
 
-| # | Category | Wt | Score (0–5) | Points | Target T1 | Target T1+2 | Evidence (file:line / command) |
-|---|---|---:|---:|---:|---:|---:|---|
-| C1 | Challenge fit and working calendar | 12 | 3 | 7.2 | 5 | 5 | Calendar works for one bbox, 2022–2026 authentic data; UTC only; no multi-year heatmap (`core.py:328-418`) |
-| C2 | Authentic NASA data, provenance, harmonization | 12 | 3 | 7.2 | 5 | 5 | 30,823 FIRMS standard rows with hashes; no calibration; type filter missing (`core.py:310-325`); pipeline uncommitted |
-| C3 | Terrain, fuels, vegetation, dated weather | 8 | 1 | 1.6 | 2 | 4 | Visual-only elevation layer (`terrain-earth.html:32`) |
-| C4 | Explainable sector ranking | 14 | 0 | 0.0 | 0 | 4 | Absent |
-| C5 | UAS feasibility and airspace/command boundaries | 7 | 1 | 1.4 | 2 | 4 | Documentation mentions only |
-| C6 | Dated aerial observations and state update | 8 | 0 | 0.0 | 0 | 4 | Absent |
-| C7 | Spread scenarios, uncertainty, freshness | 10 | 1 | 2.0 | 1 | 4 | `research.py:266` states spread unavailable |
-| C8 | Containment boundaries and operational safety | 7 | 2 | 2.8 | 3 | 4 | Limits text exists; no banned-phrase test |
-| C9 | Responder workflow, resident info, alert separation | 6 | 2 | 2.4 | 3 | 4 | Briefing card with fixed label (`briefing.py:42-45`) |
-| C10 | Validation, replay, leakage, baselines | 8 | 2 | 3.2 | 4 | 5 | Recount verifier + CAL FIRE association 7/25; MODIS masks 0/17 |
-| C11 | Interface clarity and demo reliability | 4 | 4 | 3.2 | 5 | 5 | R7 replaces the NRT globe hero with a responsive, data-driven archive timeline and explicit scope/limits; ArcGIS remains outside the home story |
-| C12 | Build, docs, reproducibility | 4 | 2 | 1.6 | 5 | 5 | 78 tests pass; code changes are pushed and worktree is clean; license and public/CI verification remain open |
-| | **Total** | 100 | | **32.6** | 54.2 | 88.0 | R7 raises C11 presentation points from 2.4 to 3.2; scientific validity is unchanged |
+Current implementation arithmetic uses the plan's `weight × score ÷ 5` rule. The verdict now appears before the calendar heading, with the official links directly beneath it, and the live Northern California July 2024 text matches the API. C9 moves from 2 to 3. The perfected plan adds visible `evidence_state`, `sensor_bridge`, `excluded_type_counts`, source-separated FRP, and the share card; these artifacts improve inspectability but do not raise a score until their P0/P1 release gates pass. C1 remains 4 for the verified 2022–2026 window; older row-only dates remain partial. C10 is 3; the longer-history baseline, 2012 step test, MCD64A1 context, and independent review remain unverified.
 
-## 4. Local rubric estimate (Auditor only)
+The local database includes the supplied pre-2022 source rows in both regions, including the reconstructed S-NPP 2021–2022 archive. The implementation score is **41.6 / 100** under this plan. The calendar verdict is now first, source-linked, and verified against the live July 2024 API result. C1 meets the plan's real-data calendar gate for the verified historical window, and C2-T2 passes for the paired 2022–2026 window. The static calendar is locally reproducible, but static globe metadata and observation requests still fail, and no public URL is deployed. This does not establish a complete 2010/2012 baseline: 26 older CSVs lack original request metadata, the S-NPP 2021–2022 rows are reconstructed rather than request-verified, and independent validation remains open. This is the plan's local estimate, not a NASA judge score.
 
-| # | Criterion | Max | Now | Target | Justification (one sentence) |
-|---|---|---:|---:|---:|---|
-| 1 | Impact | 20 | 10 | 17 | Clear problem, one region only, no user evidence |
-| 2 | Creativity | 20 | 11 | 16 | Evidence tracing is distinctive; archive timeline adds a focused comparison layer |
-| 3 | Validity | 20 | 11 | 18 | Authentic data; no calibration or held-out test yet |
-| 4 | Relevance | 20 | 12 | 19 | The landing story now leads with the MODIS/VIIRS historical archive; harmonization remains descriptive |
-| 5 | Presentation | 20 | 13 | 18 | Clearer archive-led hero; no video/slides yet |
-| 6 | Teamwork | 5 | 2 | 5 | Two committers; no PR/review evidence |
-| 7 | User experience | 5 | 3 | 5 | Usable but crowded |
-| 8 | NASA data usage | 5 | 4 | 5 | FIRMS central; versions not surfaced in UI |
-| 9 | Challenge category named | 1 | 1 | 1 | |
-| 10 | Repository access | 1 | 0 | 1 | Latest work not pushed |
-| 11 | Project page complete | 1 | 0 | 1 | Not submitted |
-| | **Total** | 118 | ~67 | ~106 | |
+| # | Weight | Current score | Current points | Earlier claim (withdrawn) | Earlier claim points | Perfected-plan evidence gate |
+|---|---:|---:|---:|---:|---:|---|
+| C1 | 12 | 4 | 9.6 | 4 | 9.6 | P0 complete windows plus verdict, critical dates, heatmap patterns, Sensor Bridge, and drawer |
+| C2 | 12 | 4 | 9.6 | 4 | 9.6 | P0 common 1 km unit, deduplicated source totals, native detail, excluded-type counts, FRP, and bridge states |
+| C3 | 8 | 1 | 1.6 | 1 | 1.6 | Unchanged |
+| C4 | 14 | 0 | 0 | 0 | 0 | Unchanged |
+| C5 | 7 | 1 | 1.4 | 1 | 1.4 | Unchanged |
+| C6 | 8 | 0 | 0 | 0 | 0 | Unchanged |
+| C7 | 10 | 1 | 2.0 | 1 | 2.0 | Unchanged |
+| C8 | 7 | 3 | 4.2 | 3 | 4.2 | Exact limits sentence visible on home and method pages |
+| C9 | 6 | 3 | 3.6 | 3 | 3.6 | Live verdict matches the API, appears first, and has official sources immediately beneath it |
+| C10 | 8 | 3 | 4.8 | 4 | 6.4 | Common-grid held-out comparison, interval coverage, baseline comparison, and complete 2012 step |
+| C11 | 4 | 3 | 2.4 | 4 | 3.2 | Globe and controls unchanged; public URL preserves See → Compare → Verify → Share |
+| C12 | 4 | 3 | 2.4 | 4 | 3.2 | Static evidence bundle, share card, source ledger, hashes, and public no-credential demo |
+| **Total** | **100** | | **41.6** | **44.8 (withdrawn)** | **44.8** | Current: 9.6+9.6+1.6+0+1.4+0+2.0+4.2+3.6+4.8+2.4+2.4 = **41.6**; no perfected-plan claim is set |
 
-## 5. Task status
+| Local criterion | Earlier claim (withdrawn) |
+|---|---:|
+| Impact | 15 |
+| Creativity | 14 |
+| Validity | 16 |
+| Relevance | 18 |
+| Presentation | 16 |
+| Teamwork | 2 |
+| User experience | 4 |
+| NASA data usage | 5 |
+| Category named | 1 |
+| Repository access | 1 |
+| Project page | 1 |
+| **Total** | **93 (withdrawn)** |
 
-| ID | Task | Status | Evidence (commit · test line · screenshot/JSON) | Updated |
-|---|---|---|---|---|
-| G0-T1 | Written ruling | NOT STARTED | | |
-| G0-T2 | Choose branch | NOT STARTED | | |
-| G0-T3 | Re-read statement 28 Oct | NOT STARTED | | |
-| C12-T1 | Commit + push, repo public | IN PROGRESS | R4/R5 changes pushed to `origin/main`; repository visibility not verified | 2026-09-29 |
-| C12-T2 | Launcher, smoke test, CI | IN PROGRESS | `scripts/smoke_test.sh "$PWD"` passes; GitHub CI run pending | 2026-09-29 |
-| C12-T3 | Declare dependencies | DONE (evidence: locked optional NumPy extra; core installs without GDAL) | Local `uv sync --frozen`; 82-test suite; missing GDAL guidance check | 2026-09-29 |
-| R1 | Delete disaster casebook | DONE (evidence: JSON asset/route, 3D toggle and animated fire effects removed; landing/browser check confirms no casebook controls, satellite details and EONET layer work with 0 page errors; 82 tests pass; `/`, `/method.html`, `/data.html` return 200 and retired JSON returns 404) | local checks, 2026-09-29 | 2026-09-29 |
-| R2 | Archive + remove training lab | DONE (evidence: preserved on `origin/archive/training-lab`; page, API routes, assets, imports, service-worker, styles, navigation, and feature-only tests removed from `main`; retired page/API paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
-| R3 | Remove PWA | DONE (evidence: PWA routes/assets/metadata removed; legacy root-worker registrations and `fireatlas-app-shell-*` caches are cleared on the next secure visit; retired paths return 404; 78 tests pass) | local checks, 2026-09-29 | 2026-09-29 |
-| R4 | Remove synthetic demo UI | DONE (evidence: removed data selector, synthetic tour, generated context/exposure controls and judge launcher; server returns 400 for `demo` query parameters, 404 for retired generator endpoints, and refuses synthetic databases; 78 tests pass; edited JavaScript syntax checks pass) | local checks, 2026-09-29 | 2026-09-29 |
-| R5 | Replace synthetic tour | DONE (evidence: four-step walkthrough reads the active calendar, highlights area/sensor/calendar controls, selects a positive date from `/api/calendar`, and opens the existing method-page source inspector; no-data and row-mismatch states are explicit) | local checks, 2026-09-29 | 2026-09-29 |
-| R6 | Remove EONET from home | DONE (evidence: removed landing section/navigation, Data page status widget, feed JS/module, API route, CLI command, styles, and feature-only tests; `/api/events` and `/events.js` return 404; pages contain no EONET UI) | full tests + local route/page checks, 2026-09-29 | 2026-09-29 |
-| R7 | Demote NRT globe | DONE (home no longer loads the NRT globe; `/api/archive-overview` reads only non-synthetic complete MODIS_SP/VIIRS_SNPP_SP windows; NRT assets/API remain separately served) | targeted tests + served-page checks; full suite reached 76 tests with 7 pre-existing environment failures (`tzdata`/Windows SQLite cleanup) | 2026-09-29 |
-| R8 | Remove ArcGIS globe from home | NOT STARTED | | |
-| R9 | Delete earth.html + terrain HTML | NOT STARTED | | |
-| R10 | Merge Research Lab into method | NOT STARTED | | |
-| R11 | HMS out of calendar switch | NOT STARTED | | |
-| R12 | Move NRT dropdown | NOT STARTED | | |
-| R13 | Delete stale presentation docs | NOT STARTED | | |
-| R14 | Move rubric JPGs | NOT STARTED | | |
-| R15 | Move plan PDF | NOT STARTED | | |
-| R16 | Replace hardcoded S-NPP gap | NOT STARTED | | |
-| R17 | README/PRD rewrite trigger | NOT STARTED | | |
-| C2-T1 | Multi-region importer | NOT STARTED | | |
-| C2-T2 | Daily aggregates (8 variants) | NOT STARTED | | |
-| C2-T3 | Availability ledger | NOT STARTED | | |
-| C2-T4 | Filters + version rules | NOT STARTED | | |
-| C2-T5 | Calibration + LOYO | NOT STARTED | | |
-| C2-T6 | Provenance + citations | NOT STARTED | | |
-| C1-T1 | Calendar API v2 | NOT STARTED | | |
-| C1-T2 | Multi-year heatmap | NOT STARTED | | |
-| C1-T3 | Climatology panel | NOT STARTED | | |
-| C1-T4 | Seasons + critical periods | NOT STARTED | | |
-| C1-T5 | Area selection | NOT STARTED | | |
-| C1-T6 | Day drawer | NOT STARTED | | |
-| C1-T7 | Insight templates | NOT STARTED | | |
-| C1-T8 | Exports | NOT STARTED | | |
-| C10-T1 | Publish LOYO validation | NOT STARTED | | |
-| C10-T2 | 2012 step test | NOT STARTED | | |
-| C10-T3 | MCD64A1 comparison | NOT STARTED | | |
-| C10-T4 | HMS cross-check | NOT STARTED | | |
-| C10-T5 | MODIS mask fix + review | NOT STARTED | | |
-| C10-T6 | Recount verifier v2 | NOT STARTED | | |
-| C10-T7 | Leakage rules | NOT STARTED | | |
-| C11-T1 | Home structure | DONE (R7 hero leads with historical archive scope and calendar CTA; no NRT globe in the primary story) | local served-page check, 2026-09-29 | 2026-09-29 |
-| C11-T2 | Remove visual noise | NOT STARTED | | |
-| C11-T3 | Sensor timeline | DONE (42 paired MODIS/SP + VIIRS/S-NPP month windows rendered from `archive_overview`; missing/partial months use explicit states) | `tests/test_archive_overview.py`, `/api/archive-overview`, 2026-09-29 | 2026-09-29 |
-| C11-T4 | Method page sections | NOT STARTED | | |
-| C11-T5 | 4-step tour | DONE (uses current interface and live imported records; the proposed region chips, 25-year heatmap, and percentile badge are not implemented and are not claimed by the tour) | local checks, browser interaction, 2026-09-29 | 2026-09-29 |
-| C11-T6 | Empty/error states | NOT STARTED | | |
-| C11-T7 | Reliability + Lighthouse | NOT STARTED | | |
-| C11-T8 | 5-person usability test | NOT STARTED | | |
-| C12-T4 | Licence + image sources | NOT STARTED | | |
-| C12-T5 | README + PRD | NOT STARTED | | |
-| C12-T6 | Static site + Release asset | NOT STARTED | | |
-| C12-T7 | Sources page + AI use | NOT STARTED | | |
-| C12-T8 | Teamwork evidence | NOT STARTED | | |
-| C12-T9 | Release tag + hash check | NOT STARTED | | |
-| C8-T1 | Safety wording + banned-phrase test | NOT STARTED | | |
-| C9-T1 | Season context + official links | NOT STARTED | | |
-| C5-T1 | Aerial-observation scope text | NOT STARTED | | |
-| S-T0 | Replay clock + leakage guard | NOT STARTED | | |
-| C3-T1 | Terrain | NOT STARTED | | |
-| C3-T2 | Fuels | NOT STARTED | | |
-| C3-T3 | Dated weather | NOT STARTED | | |
-| C7-T1 | Spread model | NOT STARTED | | |
-| C7-T2 | 50-member ensemble | NOT STARTED | | |
-| C7-T3 | Freshness + uncertainty display | NOT STARTED | | |
-| C4-T1 | Sectors | NOT STARTED | | |
-| C4-T2 | Score components | NOT STARTED | | |
-| C4-T3 | Explanation UI | NOT STARTED | | |
-| C4-T4 | Retrospective hit rate | NOT STARTED | | |
-| C6-T1 | Aerial perimeter ingest | NOT STARTED | | |
-| C6-T2 | Assimilation | NOT STARTED | | |
-| C6-T3 | Replay metrics | NOT STARTED | | |
-| C5-T2 | Airspace boundaries panel | NOT STARTED | | |
-| C5-T3 | Feasibility numbers | NOT STARTED | | |
-| C8-T2 | Replay safety design | NOT STARTED | | |
-| C9-T2 | After-action workflow | NOT STARTED | | |
-| C9-T3 | Resident separation | NOT STARTED | | |
-| SUB-T1 | Project page | NOT STARTED | | |
-| SUB-T2 | 30-second video | NOT STARTED | | |
-| SUB-T3 | 7 slides | NOT STARTED | | |
-| SUB-T4 | Demo run sheet + rehearsals | NOT STARTED | | |
+## Data on disk today
 
-## 6. Data inventory (fill from C2-T1)
+| Region | Product | Years | Rows |
+|---|---|---|---:|
+| norcal | MODIS_SP | positive rows from 2006-07; verified complete months 2022-07 through 2026-06 | 54,659 |
+| norcal | VIIRS_SNPP_SP | rows from 2012-07 through 2022-07 are reconstructed; verified complete months 2022-07 through 2026-06 except May 2026 | 173,245 |
+| punjab-haryana | MODIS_SP | positive rows from 2006-07; verified complete months 2022-07 through 2026-06 | 401,543 |
+| punjab-haryana | VIIRS_SNPP_SP | rows from 2012-07 through 2022-07 are reconstructed; verified complete months 2022-07 through 2026-06 except May 2026 | 1,364,715 |
 
-| Region | Product | Years | Rows | Complete months | SHA-256 |
-|---|---|---|---:|---:|---|
-| norcal | MODIS_SP | 2022-07 to 2026-06 (partial tail) | 8,151 | 42 paired-window months | from bundle manifest |
-| norcal | VIIRS_SNPP_SP | 2022-07 to 2026-06 (partial tail) | 22,672 | 42 paired-window months | from bundle manifest |
+The 26 older CSVs have reconstructed date-only sidecars and are never counted as complete months. Six newly supplied MODIS files add 154,660 positive rows, including July 2006–2010 history and nominal 2019–2022 windows; S-NPP request 814833 adds 204,694 unique clipped rows for July 2021–July 2022. On the live site, use the Data Sources ledger to distinguish them from the 2022–2026 request-verified exports. A clean clone does not include the ignored 28 GB `NASA_data/` archive or this local database.
 
-R7 presentation scope: the packaged bundle has 30,823 authentic rows in total; 1,599 rows outside complete export windows are not promoted into the hero. The complete paired windows represented there are 42 months (2022-07 to 2025-12), 7,793 MODIS rows and 21,431 VIIRS S-NPP rows, in bbox `[-122.2, 38.8, -120.0, 41.0]`. Pass opportunities, cloud masking, and no-detection conditions remain unknown.
+Park Fire, 25 July 2024: the validity view has MODIS 603 raw pixels / 415 centroid cells and Suomi NPP 0 imported rows. The calendar estimates 925.3 S-NPP-equivalent cell-days for that date from 416 MODIS cells during the documented processing gap. It is not a second sensor observation; July 2024 still has only one comparable prior year. Version-matched leave-one-year-out calibration for 2023–2026 has 41 month-pairs in each region: Northern California selects the annual ratio (median absolute log error 0.256 versus 0.923 with no scaling; interval coverage 41.5%), while Punjab–Haryana selects the monthly ratio (0.309 versus 1.723; coverage 39.0%). These intervals are substantially under-covered and remain weak. Each region has 48 complete MODIS source-months and 47 complete S-NPP source-months; worldwide S-NPP May 2026 remains unknown. Grove native masks decode 20 of 20 expected granules into 15,495 pixels and Park decodes 114 of 114 into 1,372,872 pixels; both are processed-unreviewed, with 30-cell review queues and full-footprint accounting still open. Partial historical-month verdicts expose source-specific counts and retain unknown dates. The full test suite is rerun with this refresh. The prior 1440 px headless browser check confirmed 15 sourced wildfire cases, but ArcGIS Earth stayed at its loading screen; globe-marker rendering and phone layout remain unverified.
 
-## 7. Ground truth and measured results
+## Changelog
 
-| Measure | Value | Command | Date |
-|---|---|---|---|
-| Test suite | 78 tests OK after R5 tour | `uv run python -m unittest discover -s tests` | 2026-09-29 |
-| Park 2024-07-25 MODIS | 603 pixels → 415 cells; S-NPP 0 rows | `/api/harmonization` | 2026-09-29 |
-| Smoke test calendar value (C12-T2) | 1,668 joint detected cell-days; authentic MODIS/S-NPP provenance; HTTP 200 | `bash scripts/smoke_test.sh "$PWD"` | 2026-09-29 |
-| Calibration results (C2-T5): region · r_all · LOYO median abs log error (MoY / single / none) · coverage · beats baselines | — | `python -m fireatlas.calibration --region …` | |
-| Step test 2012 (C10-T2) | — | | |
-| MCD64A1 Spearman (harmonized / naive / MODIS-only) | — | | |
-| HMS cross-check Spearman | — | | |
-| MODIS mask reconciliation rate | 0/17 processed | `python3 -m fireatlas.masks --case grove-2025` | 2026-09-29 |
-| Lighthouse (Perf / A11y) | — | | |
-| Usability test (tasks passed / 5) | — | | |
-| Replay: Jaccard / Brier vs persistence / no-assimilation | — | | |
-| Replay: top-5 hit rate vs random range | — | | |
+| 2026-09-30 | S-NPP archive completion as row evidence | Imported owner-supplied `fire_archive_SV-C2_814833.csv` with an explicit `reconstructed-rows-only` sidecar. It adds 204,694 unique clipped S-NPP rows across 26 partial month slices (July 2021–July 2022), updates the database to 1,994,162 standard rows, and exposes the previously missing period without falsely promoting it to complete coverage. Rebuilt aggregates, calibration artifacts and the static bundle; score remains **41.6 / 100** because request metadata, native independent review, MCD64A1, outside-user verification and public deployment remain open. |
 
-## 8. Changelog
-
-| When (UTC) | Who | What changed | Evidence |
-|---|---|---|---|
-| 2026-09-29 | Lead engineer (audit) | Baseline scorecard created from audit | Audit report, 81 tests OK |
-| 2026-09-29 | Lead engineer | Added Linux launcher, fresh-clone smoke test, CI workflow, optional NumPy mask extra and actionable GDAL errors | Commit `d43c602`; smoke pass; 82 tests; GitHub CI pending |
-| 2026-09-29 | Lead engineer | Completed R1: removed the global historical disaster casebook and its map/3D presentation code | 82 tests OK; targeted local Playwright interaction check; required-page HTTP checks |
-| 2026-09-29 | Lead engineer | Completed R2: archived the fictional Training Lab and removed it from the active application | `origin/archive/training-lab`; 78 tests OK; retired page/API paths return 404; PWA browser check passes |
-| 2026-09-29 | Lead engineer | Completed R3: removed installable PWA metadata, routes and offline shell, including cleanup for existing browser registrations | 78 tests OK; browser page checks report no manifest, worker or JS exceptions; retired PWA paths return 404 |
-| 2026-09-29 | Lead engineer | Completed R4: removed the user-facing synthetic showcase, generated context/mask endpoints, and demo launcher; left generators as test fixtures only | 78 tests OK; demo queries return 400, removed routes return 404, CLI refuses synthetic databases; edited JavaScript syntax checks pass |
-| 2026-09-29 | Lead engineer | Completed R5/C11-T5: added a four-step authentic-data walkthrough tied to the current area controls, source comparison, calendar, and a real positive day when available | `/tour.js` reads `/api/calendar` and `/api/observations`, then hands off to the dated source inspector; 78 tests OK; local Chrome interaction verified |
-| 2026-09-29 | Lead engineer | Completed R6: removed the off-challenge EONET reported-event map and feed while retaining the separate NASA FIRMS 3D globe | Feed route and asset return 404; landing and Data sources pages contain no EONET UI; 74 tests OK |
-| 2026-09-29 | Lead engineer | Completed R7/C11-T1/C11-T3: demoted the rolling NRT globe from the landing story and added a historical MODIS/VIIRS archive timeline plus imported-footprint scope panel | `archive_overview` unit tests; home/API/method/data served checks; complete pair 42 months; NRT APIs/assets preserved; full-suite environment blockers recorded above |
+| When (UTC) | Who | What changed |
+|---|---|---|
+| 2026-09-29 | Lead engineer | Baseline audit, 31.8 / 100 |
+| 2026-09-29 | Owner | Globe stays. Target MODIS from 2010-07-01, Suomi NPP from 2012-07-01, across two regions; files are still downloading. |
+| 2026-09-29 | Lead engineer | Plan 1.2. Withdrew claims of 54.2, 88, and 106. Remaining tasks are the required table above. Claim is 44.8 and 93, only if those checks pass. |
+| 2026-09-29 | Implementation continuation | C8-T1 complete; score moves 31.8 → 33.2. README, Apache license, source ledger and AI-use disclosure updated. Two-region extension remains blocked by missing source archives; 77 tests pass. |
+| 2026-09-29 | Calendar/data continuation | Region-aware import workflow and calendar are integrated. Authentic-sample held-out calibration is reproducible, raising C10 from 2 to 3; implementation score 33.2 → 34.8. This does not pass the 2012 step or full-period two-region data gates. |
+| 2026-09-29 | Archive import continuation | Imported all eight matching-hash standard archive CSVs into both regions on a staging copy, corrected the global-empty S-NPP May 2026 state to unknown, validated the copy, then promoted it locally. Two-region 2022–2026 data now render; the 2010/2012 target and independent validation gates remain open, so the local score stays 34.8. |
+| 2026-09-29 | Long-history display continuation | Calendar now uses the frozen July 2010 MODIS / July 2012 S-NPP start, draws pre-window dates as non-selectable blanks, and preserves NASA outage patterns even when the harmonized value is unknown. Import instructions cover contiguous year-sized requests. Existing local archive is unchanged; C1-T2 remains partial and score stays 34.8 until the older files are imported. |
+| 2026-09-29 | Legacy FIRMS import continuation | Processed 27 supplied standard archive CSVs: eight with saved request metadata and 19 older files using locally generated row-only sidecars. Added 1,322,659 older rows across both regions. API checks show 2010-07 and 2012-07 detections as partial, 2022–2026 verified month counts unchanged, and the score remains 34.8 because completeness and independent-review gates are still open. |
+| 2026-09-29 | Paired daily bundle continuation | Built and linked two source-hashed daily bundles for 47 complete paired months per region. All 31 July 2024 MODIS values match the existing calendar in both regions after type-2 rows were consistently excluded. C2-T2 is DONE and C2 moves 3→4; implementation score 34.8→37.2. Park masks remain unprocessed and Grove lacks one geolocation companion. |
+| 2026-09-29 | Outage-ledger check | Confirmed C2-T3 acceptance: the dated NASA notice has a source URL and short quote, interval endpoints are tested, and the UI reads outage state from the ledger. Marked DONE; score remains 37.2 because C2 is already 4/5. |
+| 2026-09-29 | Calibration and calendar continuation | Added per-region calibration JSON with parent and bundle hashes, and corrected annual held-out errors to use only complete 12-month years. Partial historical-month verdicts now show sensor-specific counts and unknown dates. Reprocessed supplied Grove files with the workstation GDAL stack: 19/20 granules, 15,293 pixels; one geolocation companion is missing. All 101 tests pass. Score remains 37.2: weak interval coverage, pending 2012 coverage, missing Grove companion, unreviewed samples, and the absent Park mask set leave the gates partial. |
+| 2026-09-29 | Critical-date and verdict validation | Added synthetic acceptance tests for percentile verdict branches and critical-date thresholds; checked real 2023 critical dates through the API for both regions (zero missing days). C1 moves 3→4; implementation estimate 37.2→39.6. Full regression suite to be rerun before release. |
+| 2026-09-29 | Static calendar packaging | Built and exercised a local no-database bundle with 34 calendars for 2010–2026, two histories, and daily source-row files. Headless Chrome loaded the dated archive, switched to Punjab–Haryana, and opened a 25 July source record. Added manifest checksum/size verification and static build instructions. Static globe API requests still return 404 and the bundle is not deployed; C12 moves 2→3 and the local estimate 39.6→40.4. The 107-test suite passes. |
+| 2026-09-29 | Historical calendar evidence | Replaced a nearly blank C1-T2 screenshot with a 2880×2800 capture from the local live archive. It shows the full 2010–2026 history, unknown/reconstructed months, and July 2024 day tiles where 24 and 29 are visibly distinguished as partial outage days. Headless browser inspection confirmed 6,028 rendered daily history cells and accessible date/value labels. C1-T2 is DONE; the category remains 4/5 because independent scientific review is still open. |
+| 2026-09-29 | Verdict-first calendar | Moved the API-backed verdict and official-source links above the calendar heading. A live browser comparison matched the Northern California July 2024 sentence to `/api/v2/calendar`; the source links render beneath it. C9 moves 2→3, adding 1.2 points; implementation score 40.4→41.6. |
+| 2026-09-29 | Authentic acceptance checks | Added regressions for all 31 July 2024 MODIS day counts, the 12-month 2024 API response, and original 25 July source rows with the documented S-NPP gap. Marked only acceptance checks with test or data evidence. The full suite passes 108 tests. Implementation remains **41.6 / 100**: the next score-bearing gates still require verified older request windows, the complete 2012 overlap, independent scientific review, or public demo readiness. |
+| 2026-09-29 | Submission preparation | Prepared a verified 150-word project-page draft and aligned the video storyboard to the plan's 30-second format. Added a copy-ready, unsent Local Lead question for the pre-event reuse gate. No submission or public deployment occurred; the implementation score remains **41.6 / 100** and G0 remains blocked. |
+| 2026-09-29 | Calibration display cross-check | A headless-browser check matched all three model errors, annual errors, selected method, and nominal interval coverage against each region's JSON artifact; saved captures for both regions. C10 remains partial because the complete 2012 step and independent review are unresolved, so the implementation score stays **41.6 / 100**. |
+| 2026-09-29 | Plan evidence recheck | Marked C10-T1 done against its checked UI-to-JSON acceptance test; the verifier now checks that incomplete 2012 input stays visibly untested with no ratio. C10-T2 remains partial because the 2012 exports are row-only. Verified Data & method → calendar keeps the same terrain Earth renderer locally and reran all 108 tests. Public deployment and human review remain open; score stays **41.6 / 100**. |
+| 2026-09-29 | Landing Earth consistency correction | A browser check caught that `/earth.html` was the separate photorealistic preview, not the intended initial globe. Restored `/terrain-earth.html` for the landing page and method → calendar handoff, and synced the static bundle. Headless Chrome reports the `arcgis-terrain` renderer with no page errors. The public demo remains unverified; score stays **41.6 / 100**. |
+| 2026-09-29 | Static bundle repair | Found the previous `site/` lacked `fireatlas-static-data`, so its calendar fell back to missing API routes. Rebuilt from the local database, verified the no-database calendar and method-page return in Chrome, and promoted the bundle while preserving the old copy in `/tmp/fireatlas-site-before-static-meta-20260929`. 34 calendars, 2 history files, 72 data files; public deployment and static globe snapshot endpoints remain open. Score stays **41.6 / 100**. |
+| 2026-09-29 | Correct intended Earth renderer | The previous check confirmed renderer continuity but selected the wrong visual model. Restored the original `/earth.html?embed=landing` globe for the home/calendar flow and synced the static bundle. Headless Chrome clicked Data & method → Open calendar on both local servers; the orbital Earth bridge, observation overlay, Satellite signals toggle, and Wildfires toggle all loaded. The app server retained the selected day and AOI; the static page returned to its calendar anchor but does not have the same live API context. C11-T1 is done locally, but C11 remains 3 because the public-URL gate is still open; total stays **41.6 / 100**. |
+| 2026-09-29 | Globe continuity follow-up | After the globe changed during the method → calendar return, restored the original terrain embed target in the app and static copy. The served JavaScript and HTTP routes were checked. A fresh headless WebGL render stalled, so current visual continuity is not verified; C11-T1 is now marked PARTIAL and C11 remains 3. No other globe work is in scope. |
+| 2026-09-29 | Local demo video | Replaced the incomplete prior cut with a deterministic 30-second captioned sequence: home capture, two regional calendar verdicts, selected S-NPP gap day, source rows, held-out uncertainty, and an honest local-only end card. Verified H.264, 1600×900, 30 fps, 30.000 seconds, silent. No public URL or submission is verified; the implementation score remains **41.6 / 100**. |
+| 2026-09-29 | Local rubric impact correction | Re-audit found that the earlier 70 estimate used a July Punjab–Haryana scene that did not establish the requested crop-residue monitoring context. The local estimate returned to **65 / 118** pending a dated, sourced seasonal example. The weighted implementation estimate remained **41.6 / 100**. |
+| 2026-09-29 | Seasonal impact evidence | Added a date-specific Punjab–Haryana context strip for October/November 2024, linked to the Government of India's [2024 deployment dates](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2060764&lang=2&reg=48), and stated that hotspots do not identify crop-burning cause. Replaced the July video capture with the browser-verified October calendar: 5,174 observed cell-days and one comparable year. The new `scripts/verify_season_context.py` passes for October, November, out-of-window months, other regions, and 1440/768/390 px widths. The plan's Impact gate is now evidenced; local rubric estimate **65 → 70 / 118**. This is not a NASA judge score; the weighted implementation estimate remains **41.6 / 100**. |
+| 2026-09-30 | Static evidence continuation | Exported dated Park/Grove validity reports, evidence ZIPs and analytical recount JSON into the static bundle. The method page now scrubs case days, opens source rows and recounts without an API; the Data Sources page reads the regional ledger from `regions.json` and disables server-only imports in a static copy. Park media and Grove's no-photo official record were browser-checked. C12 remains partial because no public URL is verified; the implementation estimate stays **41.6 / 100**. |
+| 2026-09-30 | Native review workflow | Added a hash-bound `fireatlas.mask_review` template/validator for the 30 native samples. It requires explicit outcomes, observed classes, disagreement notes, reviewer metadata and matching input hashes; installation stays local and the UI gates remain pending until a real independent reviewer supplies the record. The score remains **41.6 / 100**. |
+| 2026-09-30 | Evidence reproducibility hardening | Rounded only displayed native grid-cell centre coordinates to six decimals so ZIP reports reproduce across projection-library builds. Rebuilt `site/` with both review templates and verified Park/Grove ZIPs under system Python plus all five no-API static browser checks. Native masks and independent review remain incomplete; score remains **41.6 / 100**. |
+| 2026-09-30 | Review form made judge-visible | Added a standalone download beside each case's evidence ZIP and a matching `/api/validity/review-template` response. The form is hash-bound and blank; it makes the pending human gate executable without pretending that a reviewer has signed off. Static/browser checks and the 109-test suite pass; score remains **41.6 / 100**. |
+| 2026-09-30 | Perfected plan adopted | Compared the supplied updated PDF with the earlier plan. The authoritative path now requires common 1 km VIIRS-equivalent cell-days, native 375 m detail, visible bridge states, source-separated FRP, explicit `evidence_state`, excluded-type counts, optional lagged MCD64A1 corroboration, a share card, and a 90-second story. No numeric score uplift is assigned: MCD64A1, complete P0 windows, independent review, external usability, public deployment, and the 90-second rehearsal remain open. |
+| 2026-09-30 | Perfected release refresh | Rebuilt the static bundle from the current calendar code (34 region-year calendars, 97 manifest-checked files), verified documented-gap labels, 200 bundled source rows, the share card, both validity cases, the two-region data page, and unchanged globe shell. The live API now returns separate `evidence_state=scaled` and `coverage_state=documented_processing_gap` for outage estimates. Full suite: 109 tests. Score remains **41.6 / 100** because the open P0/P1 gates are unchanged. |
+| 2026-09-30 | Perfected traceability and local rehearsal | Added a visible bundle/build line, exact bridge transform label, and abbreviated SHA-256 inputs to the share card. Rebuilt the bundle with 34 region-year calendars and 98 generated data files; captured bridge, source-drawer, method, and share-card frames from that same bundle. Rendered and verified `FireAtlas_90s_perfected_demo.mp4` (1600×900, 30 fps, silent, ~90 s). Public deployment, external usability, MCD64A1, native-mask review, and eligibility ruling remain open; score stays **41.6 / 100**. |
+| 2026-09-30 | Perfected visual grammar and rehearsal correction | Aligned calendar and history states with the perfected plan’s color-independent grammar: observed cyan solid, estimated amber hatch, documented gap purple hatch, unknown gray crosshatch, and explicit typical/high activity keys. The monthly activity card now carries a machine-readable and accessible baseline flag. Corrected SUB-T2 to record the locally verified 90-second H.264 rehearsal; public deployment and outside-user gates remain open, so score stays **41.6 / 100**. |
+| 2026-09-30 | Native-mask gate refresh | Reprocessed the supplied Grove HDF4/netCDF files with the workstation GDAL stack after the offline environment had recorded them as dependency failures. The ledger now records 19/20 processed granules, 15,293 clipped native samples, and 7/7 FIRMS rows reconciled (100%, target ≥98%); the missing MOD03 companion, 30-cell human review, Park masks, and full-footprint pass/cloud denominator remain open. Regenerated the static bundle with the updated evidence; score remains **41.6 / 100** because the independent and completeness gates are not passed. |
+| 2026-09-30 | Native status consistency check | Added `scripts/verify_native_mask_status.py` and strengthened the static method verifier to fail on stale Park/Grove gate counts. The check passes for Grove 19/20 and 7/7, Park 0/114, and pending human review; this improves release reproducibility but does not change the score because the scientific gates remain open. |
+| 2026-09-30 | Evidence-frame refresh | Re-captured the Grove method audit after the available-row wording change and re-rendered the 90-second local rehearsal. The manifest now binds the current frame (`2b5b5e…`) and video (`0b7ffa…`), still 1600×900, 30 fps, 90 seconds; score remains **41.6 / 100** because this is a local presentation refresh, not independent evidence or public deployment. |
+| 2026-09-30 | Reviewer workflow | Added `/review.html`, a browser form for the deterministic 30-cell native-mask queue. It requires independent attestation, observed class/coordinates/grid, explicit outcomes, and preserves source hashes before downloading the JSON consumed by `fireatlas.mask_review`. Grove loads 30 samples; Park correctly reports no queue. This removes friction for the human gate but does not count as a review or raise the score until a real reviewer signs and the Park/native completeness gates are resolved. |
+| 2026-09-30 | Archive and history refresh | Imported six owner-supplied MODIS archive tables with explicit `reconstructed-rows-only` provenance. Standard MODIS history now has 456,202 rows and reaches positive detections from July 2006; the verified complete 2022–2026 window is unchanged and the S-NPP 2021–2022 nominal window remains absent. Reprocessed native evidence now records Grove 20/20 and 15,495 clipped pixels plus Park 114/114 and 1,372,872 clipped pixels, with both independent review and full-footprint gates still open. Rebuilt the static bundle for the 2006–2026 display; score remains **41.6 / 100**. |
+| 2026-09-30 | Share-card evidence refresh | Added JSON-derived quality/coverage states, the active-fire limitation, and an exact no-credential URL to the share card. Rebuilt the static bundle with manifest SHA-256 `a4b14a4e3d73ce404608d7d763cd43ebf8170ad8c67192541d791c64f966dec1` (42 region-year calendars, 113 manifest-listed data files, 830 input hashes). Static calendar, method, data, shell, responsive-season, native-status, compile, diff, and 111-test checks pass; public deployment, outside-user verification, MCD64A1, and human native review remain open, so score stays **41.6 / 100**. |
+| 2026-09-30 | Perfected rehearsal evidence refresh | Re-captured the share card with visible quality/coverage states, ACTIVE FIRE ONLY limitation, and exact URL; refreshed Grove's method frame to the current 20/20 granules, 15,495 samples, and 7/7 available FIRMS rows matched. Re-rendered and verified the local 90-second H.264 rehearsal; its manifest binds the current frame and video hashes (1600×900, 30 fps, silent). This presentation update does not resolve the public deployment or human/scientific gates; score remains **41.6 / 100**. |
+| 2026-09-30 | S-NPP-backed rehearsal refresh | Re-captured the two changing rehearsal frames from the promoted static bundle and re-rendered the 90-second H.264 cut. The current static manifest is `48b1065e…` (42 calendars, 113 manifest-listed data files, 854 input-file hashes); the rehearsal manifest binds the share-card frame `e53d5a84…`, Grove frame `125c5580…`, and video `a114f164…`. Static calendar, method, data, shell and responsive-season checks remain passing; public deployment, outside-user verification, MCD64A1, and human native review remain open, so score stays **41.6 / 100**. |
+| 2026-09-30 | Static release hardening and action paths | Confirmed all 40 rows in `NASA_data/fire_masks/download_checklist.csv` have local files. Compacted browser validity snapshots while retaining complete evidence ZIPs, reducing the rebuilt static bundle from about 443 MB to 177 MB. Added the GitHub Pages workflow and `.nojekyll`, unignored the publishable `site/data` subtree, exposed three role-based action paths, and hash-bound the static bundle manifest plus a timed WebVTT caption sidecar to the 90-second local rehearsal. The current bundle has 42 region-year calendars (2006–2026), 113 checksummed data files and 854 input hashes; manifest SHA-256 is `e74a06f4…`. Local static, season, calibration, native-status, JavaScript, manifest, and full **113-test** checks pass; public deployment, outside-user verification, MCD64A1, and human native review remain open, so score stays **41.6 / 100**. |

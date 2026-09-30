@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import date, timedelta
 
-from .core import GRID_VERSION, SERIES, SOURCES, calendar, validate_bbox
+from .core import GRID_VERSION, SERIES, SOURCES, calendar, calendar_row_included, validate_bbox
 
 
 def month_audit(db, *, year: int, month: int, series: str,
@@ -29,18 +29,20 @@ def month_audit(db, *, year: int, month: int, series: str,
     versions = {source: set() for source in sources}
     placeholders = ",".join("?" for _ in sources)
     records = db.execute(f"""
-        SELECT source_id, acquisition_utc, grid_x, grid_y, product_version
+        SELECT source_id, acquisition_utc, grid_x, grid_y, product_version, raw_json
         FROM observations
         WHERE source_id IN ({placeholders}) AND acquisition_utc>=? AND acquisition_utc<?
           AND lon>=? AND lon<=? AND lat>=? AND lat<=?
     """, (*sources, start.isoformat(), end.isoformat(), bbox[0], bbox[2], bbox[1], bbox[3]))
     for row in records:
         source = row["source_id"]
+        versions[source].add(row["product_version"])
+        if not calendar_row_included(row["raw_json"]):
+            continue
         raw[source] += 1
         stamp_day = row["acquisition_utc"][:10]
         raw_by_day[(source, stamp_day)] += 1
         marks[source][stamp_day].add((row["grid_x"], row["grid_y"]))
-        versions[source].add(row["product_version"])
 
     rows = []
     day = start

@@ -1,0 +1,24 @@
+.hero-tour-link{pointer-events:auto;border:1px solid #ff865c65;background:#10171ccc;color:#ffc09f;border-radius:7px;padding:13px 16px;font-size:11px;font-weight:600;letter-spacing:.02em;cursor:pointer}
+.hero-tour-link:hover:not(:disabled){background:#ff865c18;border-color:var(--accent);color:#fff}
+.hero-tour-link:disabled{opacity:.65;cursor:wait}
+.calendar-tour{position:fixed;right:clamp(14px,3vw,38px);bottom:clamp(14px,3vh,32px);z-index:3000;width:min(390px,calc(100vw - 28px));padding:22px 24px 18px;border:1px solid #8bc5bc8c;border-radius:12px;background:linear-gradient(145deg,#142025f5,#0d151af5);box-shadow:0 18px 70px #000b,0 0 42px #8bc5bc12;backdrop-filter:blur(22px);color:var(--text)}
+.calendar-tour-top{display:flex;justify-content:space-between;align-items:center;color:var(--teal);font:600 10px var(--sans);letter-spacing:.16em}
+.calendar-tour-top button{width:29px;height:29px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:50%;background:transparent;color:var(--text);font-size:20px;line-height:1;cursor:pointer}
+.calendar-tour-top button:hover{border-color:var(--accent);color:var(--accent)}
+.calendar-tour-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:13px 0 22px}
+.calendar-tour-progress i{height:3px;border-radius:5px;background:#ffffff21}
+.calendar-tour-progress i.complete{background:var(--accent);box-shadow:0 0 10px #ff865c50}
+.calendar-tour>.eyebrow{margin:0 0 8px;font-size:8px}
+.calendar-tour h2{margin:0 0 9px;font-size:24px;line-height:1.15;letter-spacing:-.035em}
+.calendar-tour h2:focus{outline:1px solid #8bc5bc;outline-offset:3px;border-radius:2px}
+.calendar-tour>p[aria-live]{min-height:76px;margin:0;color:#b6c2c6;font-size:12px;line-height:1.7}
+.calendar-tour-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.calendar-tour-actions>div{display:flex;gap:8px}
+.calendar-tour-actions button{min-height:37px;padding:8px 12px;border:1px solid var(--line-strong);border-radius:6px;background:#ffffff05;color:var(--text);font-size:11px;cursor:pointer}
+.calendar-tour-actions button:hover:not(:disabled){border-color:var(--teal);background:#8bc5bc12}
+.calendar-tour-actions #calendar-tour-next{border-color:var(--accent);background:var(--accent);color:#161c20;font-weight:700}
+.calendar-tour-actions #calendar-tour-next:hover:not(:disabled){background:#ffa47f}
+.calendar-tour-actions button:disabled{opacity:.45;cursor:not-allowed}
+.tour-target{position:relative;z-index:1;outline:2px solid var(--accent)!important;outline-offset:5px!important;box-shadow:0 0 0 8px #ff865c18,0 0 32px #ff865c22!important;border-radius:8px}
+@media(max-width:760px){.hero-tour-link{padding:11px 12px;font-size:10px}.calendar-tour{right:12px;bottom:12px;width:min(390px,calc(100% - 24px));padding:17px 18px 14px}.calendar-tour h2{font-size:21px}.calendar-tour>p[aria-live]{min-height:0;font-size:11px}.calendar-tour-actions{margin-top:13px}}
+@media(prefers-reduced-motion:reduce){.tour-target{scroll-behavior:auto;transition:none}}

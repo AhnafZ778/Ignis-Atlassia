@@ -1,5 +1,16 @@
 // A shared view carries a selection; a study bundle freezes its evidence.
 let calendarRequest = 0, dayRequest = 0, studyToolsInitialized = false;
+// Keep an explicitly selected landing Earth mode when navigating away and back.
+const initialLiteEarth = new URLSearchParams(location.search).get("lite") === "1";
+
+function preserveEarthMode(link) {
+  if (!initialLiteEarth || !link) return;
+  const url = new URL(link.href, location.origin);
+  url.searchParams.set("lite", "1");
+  link.href = `${url.pathname}${url.search}${url.hash}`;
+}
+
+document.querySelectorAll('a[href*="/method.html"]').forEach(preserveEarthMode);
 
 function validateView(input) {
   const year = Number(input.year), month = Number(input.month);
@@ -22,12 +33,14 @@ function viewConfig() {
 function viewUrl() {
   const url = new URL("/", location.origin);
   url.search = new URLSearchParams(viewConfig()); url.hash = "calendar-section";
+  if (initialLiteEarth) url.searchParams.set("lite", "1");
   return url.href;
 }
 
 function methodUrl() {
   const url = new URL("/method.html", location.origin);
   url.search = new URLSearchParams({...viewConfig(), context: "calendar"});
+  if (initialLiteEarth) url.searchParams.set("lite", "1");
   url.hash = "source-records";
   return url.href;
 }
@@ -37,6 +50,7 @@ function syncView() {
   const url = new URL(viewUrl()); url.hash = location.hash;
   history.replaceState(null, "", url);
   document.querySelectorAll("[data-method-link]").forEach(link => link.href = methodUrl());
+  document.querySelectorAll('a[href*="/method.html"]').forEach(preserveEarthMode);
   if ($("#share-fallback") && !$("#share-fallback").hidden) $("#share-url").value = viewUrl();
   document.querySelectorAll("[data-series]").forEach(el => el.classList.toggle("selected", el.dataset.series === state.series));
   document.querySelectorAll("[data-layer]").forEach(el => el.classList.toggle("selected", el.dataset.layer === contextChoice));

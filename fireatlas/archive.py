@@ -16,10 +16,13 @@ import json
 import re
 import tempfile
 import zipfile
+from calendar import monthrange
 from contextlib import ExitStack
+from datetime import date
 from pathlib import Path
 
-from .core import SERIES, connect, ingest, validate_bbox
+from .core import REQUIRED_COLUMNS, SERIES, connect, ingest, validate_bbox
+from .regions import PRODUCTS, REGIONS, contains_bbox, intersects_bbox
 
 SCHEMA = "fireatlas-firms-archive-slice-v1"
 SAMPLE = Path(__file__).with_name("samples") / "nasa_firms_northern_california_2022_2026.zip"
@@ -191,6 +194,159 @@ def import_bundle(database: str | Path, bundle_path: str | Path = SAMPLE) -> dic
                 "slices": len(manifest["slices"]), "complete_month_slices": sum(item["complete_export"] for item in manifest["slices"])}
 
 
+def _month_ids(start: date, end: date):
+    month = date(start.year, start.month, 1)
+    while month <= end:
+        yield f"{month.year:04d}-{month.month:02d}"
+        month = date(month.year + (month.month == 12), month.month % 12 + 1, 1)
+
+
+def import_requests(database: str | Path, request_root: str | Path) -> dict:
+    """Import FIRMS archive CSVs accompanied by explicit request metadata.
+
+    Each input directory must contain one ``request.json`` and one CSV, or
+    ``request.json`` may name the standard CSV with ``csv_filename`` when an
+    NRT companion is beside it. The CSV stays outside the repository; this
+    routine clips it into the two declared study regions, records parent and
+    request hashes in provenance, and records a complete month only when the
+    requested date range and bbox fully contain that month and region. Empty
+    months are retained as valid zero-detection exports when covered.
+    """
+    root, database = Path(request_root), Path(database)
+    request_files = sorted(root.rglob("request.json"))
+    if not request_files:
+        raise ValueError(f"no request.json files found under {root}")
+    imported_rows = skipped_slices = complete_month_slices = unverified_month_slices = request_count = 0
+    with connect(database) as db:
+        if db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone():
+            raise ValueError("FIRMS archive cannot be imported into a synthetic database")
+        with tempfile.TemporaryDirectory(prefix="fireatlas-request-import-") as temporary:
+            temp_root = Path(temporary)
+            for request_path in request_files:
+                folder = request_path.parent
+                csv_files = sorted(path for path in folder.glob("*.csv") if path.is_file())
+                try:
+                    request = json.loads(request_path.read_text(encoding="utf-8"))
+                    source = request["product"]
+                    start = date.fromisoformat(request["start_date"])
+                    end = date.fromisoformat(request["end_date"])
+                    bbox = tuple(float(value) for value in request["bbox"])
+                    coverage_basis = request.get("coverage_basis", "request-metadata")
+                except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+                    raise ValueError(f"invalid FIRMS request metadata in {request_path}") from exc
+                if not isinstance(coverage_basis, str) or coverage_basis not in {"request-metadata", "reconstructed-rows-only"}:
+                    raise ValueError(f"{request_path}: unsupported coverage_basis")
+                named_csv = request.get("csv_filename")
+                if named_csv is not None:
+                    if not isinstance(named_csv, str) or Path(named_csv).name != named_csv or Path(named_csv).suffix.lower() != ".csv":
+                        raise ValueError(f"{request_path}: csv_filename must be a local CSV basename")
+                    csv_path = folder / named_csv
+                    if not csv_path.is_file():
+                        raise ValueError(f"{request_path}: selected CSV does not exist")
+                elif len(csv_files) == 1:
+                    csv_path = csv_files[0]
+                else:
+                    raise ValueError(f"{folder} must contain exactly one FIRMS CSV or name csv_filename")
+                if source not in PRODUCTS:
+                    raise ValueError(f"{request_path}: product must be MODIS_SP or VIIRS_SNPP_SP; NRT is not accepted")
+                request_id = request.get("request_id")
+                if request_id is not None and not re.fullmatch(r"[A-Za-z0-9_-]{1,40}", str(request_id)):
+                    raise ValueError(f"{request_path}: request_id must be a short identifier")
+                if end < start:
+                    raise ValueError(f"{request_path}: end_date precedes start_date")
+                validate_bbox(bbox)
+                parent_hash, request_hash = _sha256(csv_path), _sha256(request_path)
+                touched = list(_month_ids(start, end))
+                selected_regions = [item for item in REGIONS.values() if intersects_bbox(bbox, item["bbox"])]
+                if not selected_regions:
+                    raise ValueError(f"{request_path}: request area does not intersect either study region")
+                request_count += 1
+                with csv_path.open(newline="", encoding="utf-8-sig") as stream:
+                    reader = csv.DictReader(stream)
+                    if reader.fieldnames is None or not set(REQUIRED_COLUMNS - {"instrument"}).issubset(reader.fieldnames):
+                        raise ValueError(f"{csv_path}: missing required FIRMS columns")
+                    writers = {}
+                    output_paths = {}
+                    versions_by_month = {month: set() for month in touched}
+                    row_counts_by_month = {month: 0 for month in touched}
+                    for region in selected_regions:
+                        for month in touched:
+                            key = (region["id"], month)
+                            path = temp_root / f"{request_count}_{region['id']}_{month}.csv"
+                            output_paths[key] = path
+                            output = path.open("w", newline="", encoding="utf-8")
+                            writer = csv.DictWriter(output, fieldnames=reader.fieldnames)
+                            writer.writeheader()
+                            writers[key] = (output, writer)
+                    rows_read = 0
+                    try:
+                        for line_number, row in enumerate(reader, 2):
+                            rows_read += 1
+                            try:
+                                observed_day = date.fromisoformat(row["acq_date"])
+                                lat, lon = float(row["latitude"]), float(row["longitude"])
+                            except (KeyError, TypeError, ValueError) as exc:
+                                raise ValueError(f"{csv_path}: invalid date or coordinates on line {line_number}") from exc
+                            if not start <= observed_day <= end:
+                                raise ValueError(f"{csv_path}: row date falls outside request window on line {line_number}")
+                            if not (bbox[0] <= lon <= bbox[2] and bbox[1] <= lat <= bbox[3]):
+                                raise ValueError(f"{csv_path}: row falls outside declared request bbox on line {line_number}")
+                            if "NRT" in row.get("version", "").upper() or "URT" in row.get("version", "").upper():
+                                raise ValueError(f"{csv_path}: near-real-time row on line {line_number}; standard archive required")
+                            month = f"{observed_day.year:04d}-{observed_day.month:02d}"
+                            row_counts_by_month[month] += 1
+                            if row.get("version", "").strip():
+                                versions_by_month[month].add(row["version"].strip())
+                            for region in selected_regions:
+                                w, south, east, north = region["bbox"]
+                                if w <= lon <= east and south <= lat <= north:
+                                    writers[(region["id"], month)][1].writerow(row)
+                    finally:
+                        for stream, _writer in writers.values():
+                            stream.close()
+                for region in selected_regions:
+                    for month in touched:
+                        month_start = date.fromisoformat(month + "-01")
+                        month_end = date(month_start.year, month_start.month, monthrange(month_start.year, month_start.month)[1])
+                        worldwide_empty_month = (bbox == (-180.0, -90.0, 180.0, 90.0)
+                                                  and row_counts_by_month[month] == 0)
+                        full_request = (coverage_basis == "request-metadata"
+                                        and start <= month_start and end >= month_end
+                                        and contains_bbox(bbox, region["bbox"])
+                                        and not worldwide_empty_month)
+                        path = output_paths[(region["id"], month)]
+                        versions = sorted(versions_by_month[month])
+                        if not versions and request.get("product_version"):
+                            declared = request["product_version"]
+                            versions = sorted({str(item).strip() for item in declared}) if isinstance(declared, list) else [str(declared).strip()]
+                        uri = (f"urn:fireatlas:firms-archive:{source}:request-id:{request_id or 'unspecified'}"
+                               f":parent-sha256:{parent_hash}"
+                               f":request-sha256:{request_hash}:region:{region['id']}")
+                        result = ingest(db, path, source, source_uri=uri,
+                                        complete_month=month if full_request else None,
+                                        bbox=region["bbox"] if full_request else None,
+                                        batch_key=f"{region['id']}:{month}:{request_hash}")
+                        db.execute("""
+                            INSERT OR REPLACE INTO source_exports(
+                              batch_id,region_id,source_id,month,request_start,request_end,
+                              west,south,east,north,complete_export,coverage_basis,product_versions_json,
+                              parent_sha256,request_sha256)
+                            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                        """, (result["batch_id"], region["id"], source, month,
+                              start.isoformat(), end.isoformat(), *bbox, int(full_request), coverage_basis,
+                              json.dumps(versions), parent_hash, request_hash))
+                        imported_rows += result["rows_inserted"]
+                        skipped_slices += int(result["already_imported"])
+                        complete_month_slices += int(full_request)
+                        unverified_month_slices += int(coverage_basis == "reconstructed-rows-only")
+    return {"requests": request_count, "imported_rows": imported_rows,
+            "already_imported_slices": skipped_slices,
+            "complete_month_slices": complete_month_slices,
+            "reconstructed_row_only_month_slices": unverified_month_slices,
+            "regions": [item["id"] for item in REGIONS.values()],
+            "note": "Complete means request date and bbox cover the region; satellite pass and cloud coverage remain unknown."}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -200,8 +356,16 @@ def main():
     ingest_command = commands.add_parser("import", help="import a verified compact bundle")
     ingest_command.add_argument("--db", type=Path, default=Path("data/fireatlas.sqlite3"))
     ingest_command.add_argument("--bundle", type=Path, default=SAMPLE)
+    requests = commands.add_parser("import-requests", help="import user-downloaded archive CSVs with request.json sidecars")
+    requests.add_argument("request_root", type=Path)
+    requests.add_argument("--db", type=Path, default=Path("data/fireatlas.sqlite3"))
     args = parser.parse_args()
-    result = build_bundle(args.archive_root, args.output) if args.command == "build" else import_bundle(args.db, args.bundle)
+    if args.command == "build":
+        result = build_bundle(args.archive_root, args.output)
+    elif args.command == "import":
+        result = import_bundle(args.db, args.bundle)
+    else:
+        result = import_requests(args.db, args.request_root)
     print(json.dumps(result, indent=2))
 
 

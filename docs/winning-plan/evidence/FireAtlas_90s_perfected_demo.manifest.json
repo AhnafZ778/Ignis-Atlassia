@@ -1,0 +1,68 @@
+{
+  "captions": {
+    "format": "WebVTT",
+    "path": "docs/winning-plan/evidence/FireAtlas_90s_perfected_demo.vtt",
+    "sha256": "e2f78646118dde5a0304f949f20a5cec331bf57d0a283b43f841c8204c94171e",
+    "timed_to_scenes": true
+  },
+  "frames": [
+    {
+      "duration_seconds": 5,
+      "label": "01 / SEE \u00b7 EXISTING GLOBE + CONTROLS",
+      "path": "docs/winning-plan/evidence/video-frames/01-globe-home.png",
+      "sha256": "d63dce5bf1cf662509009313fcaf3baea4f08291d21b03e17c9994cfeb6904e3"
+    },
+    {
+      "duration_seconds": 10,
+      "label": "02 / COMPARE \u00b7 VISIBLE SENSOR BRIDGE",
+      "path": "docs/winning-plan/evidence/video-frames/07-norcal-bridge.png",
+      "sha256": "07fbb08bb39b3f7efe401405d03c7f99c2d4cc711a51f8b502734b6805527a6c"
+    },
+    {
+      "duration_seconds": 20,
+      "label": "03 / NORTHERN CALIFORNIA \u00b7 JULY 2024",
+      "path": "docs/winning-plan/evidence/video-frames/02-norcal-calendar.png",
+      "sha256": "fbb39583b1141b32915d465977dfbe1763aeb8e5e7db843ad9b24abfc7b26a97"
+    },
+    {
+      "duration_seconds": 15,
+      "label": "04 / VERIFY \u00b7 ORIGINAL NASA ROWS",
+      "path": "docs/winning-plan/evidence/video-frames/08-norcal-source-drawer.png",
+      "sha256": "011217cde0f7ce14644b92b217ed253850d628ed860d855c8ba8d27f3dc6f244"
+    },
+    {
+      "duration_seconds": 15,
+      "label": "05 / COMPARE \u00b7 PUNJAB\u2013HARYANA",
+      "path": "docs/winning-plan/evidence/video-frames/05-punjab-calendar.png",
+      "sha256": "b84df94df4b9a9d1425a1cd18effa3d89461091d5b7550eefdd749b51351b4fa"
+    },
+    {
+      "duration_seconds": 15,
+      "label": "06 / VALIDATE \u00b7 NATIVE MASK AUDIT",
+      "path": "docs/winning-plan/evidence/video-frames/10-grove-method-audit.png",
+      "sha256": "125c5580279816b7e52a760d5d965b0b9ec201e162eaad8ae6c9d59322aaa1f4"
+    },
+    {
+      "duration_seconds": 10,
+      "label": "07 / SHARE \u00b7 TRACEABLE EVIDENCE",
+      "path": "docs/winning-plan/evidence/video-frames/09-norcal-share-card.png",
+      "sha256": "e53d5a84e6c0a437978dc83854945c7c13f932ee3829321157b70435f46e231a"
+    }
+  ],
+  "globe": "existing frame retained; this script does not render or edit globe assets",
+  "schema": "fireatlas-video-rehearsal-v1",
+  "scope": "local static-bundle rehearsal with a timed WebVTT sidecar; public URL, voice-over, and outside-user review remain open",
+  "static_bundle": {
+    "path": "site/data/v2/manifest.json",
+    "sha256": "e74a06f4e144b84fb15baa4d2917419a069d37a127d0315ef25fcabbaa71a3c2"
+  },
+  "video": {
+    "audio": false,
+    "duration_seconds": 90,
+    "fps": 30,
+    "height": 900,
+    "path": "docs/winning-plan/evidence/FireAtlas_90s_perfected_demo.mp4",
+    "sha256": "a114f164ce8d0d963400bab99aae894fb8a7320626c52663efdc3359d7e75335",
+    "width": 1600
+  }
+}

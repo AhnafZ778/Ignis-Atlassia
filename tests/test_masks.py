@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from fireatlas.granules import load
 from fireatlas.masks import (METHOD, SCHEMA, native_layer, pass_state, paired_observations, timestamp,
                             expected_pairs, process, read_evidence, summarize, reconcile)
+from fireatlas.mask_review import make_template, validate_review
 from fireatlas.mask_download import checklist
 from fireatlas.core import TO_GRID
 import math
@@ -70,6 +71,35 @@ class MaskBoundaryTests(unittest.TestCase):
             self.assertEqual(result['no_pass_status'], 'not-derived-without-verified-footprints')
             self.assertFalse(result['reconciliation']['passes_target'])
             self.assertEqual(result['raw_mask_review']['reviewed_samples'], 0)
+
+    def test_native_review_requires_every_hash_bound_sample_and_preserves_disagreement(self):
+        evidence = {
+            'case_id': 'grove-2025',
+            'inventory': [{'producer_id': 'm', 'source_id': 'MODIS_SP', 'status': 'processed',
+                           'file_sha256': 'a' * 64, 'geo_sha256': 'b' * 64}],
+            'pixels': [{'producer_id': 'm', 'line': index, 'sample': 0, 'lat': 39.4,
+                        'lon': -121.4, 'mask_class': 8, 'grid_x': -1, 'grid_y': 1}
+                       for index in range(30)],
+        }
+        review = make_template('grove-2025', evidence)
+        review['reviewer'].update(name='Reviewer', affiliation='Independent lab',
+                                  reviewed_utc='2026-09-30T00:00:00Z', independent=True)
+        review['interpretation'] = 'The sampled classes and cell assignments were checked against the native files.'
+        for index, sample in enumerate(review['samples']):
+            sample['outcome'] = 'disagree' if index == 0 else 'agree'
+            sample['observed_mask_class'] = 7 if index == 0 else 8
+            sample['observed_lat'] = 39.4
+            sample['observed_lon'] = -121.4
+            sample['observed_grid_x'] = -1
+            sample['observed_grid_y'] = 1
+            sample['notes'] = 'Native class differs; retained for audit.' if index == 0 else ''
+        result = validate_review(review, evidence)
+        self.assertEqual(result['reviewed_samples'], 30)
+        self.assertTrue(result['independent_signoff'])
+        self.assertEqual(result['disagreements'], 1)
+        review['samples'].pop()
+        with self.assertRaisesRegex(ValueError, 'exactly 30 sample records'):
+            validate_review(review, evidence)
 
     def test_native_grid_assignment_is_recomputed(self):
         lon, lat = -121.4, 39.4

@@ -32,10 +32,11 @@ CASES = {
                      "start_local": "2024-07-24T14:52:00", "timezone": "America/Los_Angeles",
                      "lon": -121.76168, "lat": 39.7789},
         "source_notice": {"source_id": "VIIRS_SNPP_SP", "start_utc": "2024-07-24",
-                          "end_utc": "2024-07-28", "partial_first_day": True,
-                          "type": "documented-processing-outage",
-                          "url": "https://firms.modaps.eosdis.nasa.gov/notifications/firms/outages.html",
-                          "description": "NASA reported S-NPP processing stopped at 05:28 UTC on July 24 and remained unresolved through July 28. This is not a cell-level pass or cloud mask."},
+                          "end_utc": "2024-07-29", "partial_first_day": True,
+                          "partial_last_day": True, "start_time_utc": "05:24", "end_time_utc": "15:18",
+                          "type": "documented-product-processing-gap",
+                          "url": "https://landweb.modaps.eosdis.nasa.gov/displayissue?id=716",
+                          "description": "NASA's LDOPE record gives the final S-NPP science-product outage as 24 July 05:24 UTC through 29 July 15:18 UTC, inclusive. The two endpoint days are partial; this does not establish a cell-level pass or cloud mask."},
     },
     "grove-2025": {
         "title": "Grove Fire · July 2025", "year": 2025, "month": 7,
@@ -169,8 +170,10 @@ def _summarize(case_id: str, rows: list[dict], *, selected_date: str | None = No
                      "detected_cell_days": {SOURCES[0]: len(modis), SOURCES[1]: len(viirs)},
                      "joint_detected_cell_days": len(modis | viirs),
                      "co_detected_cell_days": len(modis & viirs),
-                     "documented_source_notice": ("partial-day" if day == case.get("source_notice", {}).get("start_utc")
-                                                   else "processing-outage")
+                     "documented_source_notice": ("partial-day-notice" if (
+                                                   (day == case.get("source_notice", {}).get("start_utc") and case["source_notice"].get("partial_first_day"))
+                                                   or (day == case.get("source_notice", {}).get("end_utc") and case["source_notice"].get("partial_last_day")))
+                                                   else "documented-processing-gap")
                          if case.get("source_notice") and case["source_notice"]["start_utc"] <= day <= case["source_notice"]["end_utc"]
                          else None,
                      "satellite_observation_coverage": "unknown"})
@@ -207,14 +210,18 @@ def _add_native_evidence(result: dict, rows: list[dict], inventory: dict, native
     result["native_masks"] = summarize(result["case_id"], rows, native, inventory,
                                        result["selected_date_utc"])
     masks = result["native_masks"]
+    review = masks["raw_mask_review"]
+    samples_complete = review["reviewed_samples"] >= review["required_samples"] and review["status"] == "complete"
     result["validation_gates"] = [
         {"id": "inventory", "label": "Native masks", "status": "passed" if masks["inventory_complete"] else "pending",
          "actual": masks["processed_fire_granules"], "required": masks["expected_fire_granules"], "unit": "granules"},
         {"id": "reconciliation", "label": "Match NASA rows", "status": "passed" if masks["reconciliation"]["passes_target"] else "pending",
          "actual": masks["reconciliation"]["matched"], "required": masks["reconciliation"]["total_firms_pixels"],
          "unit": "rows", "target_fraction": .98},
-        {"id": "samples", "label": "Inspect raw cells", "status": "pending", "actual": 0, "required": 30, "unit": "reviewed samples"},
-        {"id": "review", "label": "Independent review", "status": "pending", "actual": 0, "required": 1, "unit": "reviewer sign-offs"},
+        {"id": "samples", "label": "Inspect raw cells", "status": "passed" if samples_complete else "pending",
+         "actual": review["reviewed_samples"], "required": review["required_samples"], "unit": "reviewed samples"},
+        {"id": "review", "label": "Independent review", "status": "passed" if samples_complete and review.get("independent_signoff") else "pending",
+         "actual": 1 if samples_complete and review.get("independent_signoff") else 0, "required": 1, "unit": "reviewer sign-offs"},
     ]
 
 
@@ -268,11 +275,17 @@ def build_evidence(db: sqlite3.Connection, case_id: str) -> bytes:
         "README.txt": ("FireAtlas historical detection evidence v1. Run: uv run python -m fireatlas.validity FILE.zip\n"
                        "This ZIP reproduces FIRMS detection cell-day counts and a dated CAL FIRE nearby-point association check."
                        " It does not contain fire-mask coverage, an independently validated fire truth set,"
-                       " or proof of no fire on blank days."
+                       " or proof of no fire on blank days. native_review_template.json is a blank"
+                       " hash-bound form; it is not a completed scientific review."
                        " source_uri records the original archive request and parent hash; file_sha256 identifies the clipped source slice.\n").encode(),
     }
     from .masks import read_evidence
-    payloads["native_masks.json"] = json.dumps(read_evidence(case_id), sort_keys=True).encode()
+    from .mask_review import make_template
+    native = read_evidence(case_id)
+    payloads["native_masks.json"] = json.dumps(native, sort_keys=True).encode()
+    payloads["native_review_template.json"] = json.dumps(
+        make_template(case_id, native), sort_keys=True, indent=2
+    ).encode()
     manifest = {"schema": BUNDLE_SCHEMA, "case_id": case_id,
                 "files": {name: hashlib.sha256(body).hexdigest() for name, body in payloads.items()}}
     payloads["manifest.json"] = json.dumps(manifest, sort_keys=True, indent=2).encode()
@@ -286,7 +299,8 @@ def build_evidence(db: sqlite3.Connection, case_id: str) -> bytes:
 def verify_evidence(path: str | Path | io.BytesIO) -> dict:
     with zipfile.ZipFile(path) as archive:
         expected = {"case.json", "observations.json", "cmr_inventory.json", "incident_cohort.json",
-                    "incident_candidates.json", "method.json", "README.txt", "manifest.json"}
+                    "incident_candidates.json", "method.json", "README.txt", "manifest.json",
+                    "native_review_template.json"}
         if "native_masks.json" in archive.namelist():
             expected.add("native_masks.json")
         if set(archive.namelist()) != expected:
@@ -303,6 +317,7 @@ def verify_evidence(path: str | Path | io.BytesIO) -> dict:
         incident_cohort = json.loads(archive.read("incident_cohort.json"))
         incident_candidates = json.loads(archive.read("incident_candidates.json"))
         native = json.loads(archive.read("native_masks.json")) if "native_masks.json" in expected else None
+        review_template = json.loads(archive.read("native_review_template.json"))
     if audit.get("case_id") != manifest["case_id"] or audit.get("schema") != SCHEMA:
         raise ValueError("validity case identity mismatch")
     reproduced = _summarize(manifest["case_id"], rows, selected_date=audit["selected_date_utc"],
@@ -311,6 +326,9 @@ def verify_evidence(path: str | Path | io.BytesIO) -> dict:
     reproduced["cmr_inventory"] = summary(cmr_inventory, manifest["case_id"])
     if native is not None:
         _add_native_evidence(reproduced, rows, cmr_inventory, native)
+        from .mask_review import make_template
+        if review_template != make_template(manifest["case_id"], native):
+            raise ValueError("Native review template does not reproduce from frozen samples")
     from .incidents import evaluate
     reproduced["independent_incidents"] = evaluate(incident_cohort, candidates=incident_candidates)
     if reproduced != audit:

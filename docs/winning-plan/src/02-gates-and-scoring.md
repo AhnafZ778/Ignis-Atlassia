@@ -1,139 +1,70 @@
-# 1. Gate 0 — Eligibility and timeline (do this before any code)
+# 1. Gate 0 — Eligibility (human step, before the event)
 
-**Problem.** The official Space Apps FAQ says: *"Teams are not allowed to begin working on the challenges prior to the hackathon."* At submission, teams confirm *"all of your work is original."* This repository's first commit is 27 Sep 2026; the hackathon is 14–15 Nov 2026.
+The Space Apps FAQ says teams may not begin working on the challenges before the hackathon (14–15 Nov 2026). This repo started on 27 Sep 2026. Ask the Local Lead, in writing, whether this code may be reused and whether that reuse must be disclosed. Save the reply, with email addresses removed, in `docs/winning-plan/evidence/G0-ruling.txt`. If reuse is not allowed, do not submit this repository. The scores below apply only to an eligible submission.
 
-### G0-T1 — Get a written ruling
+On 28 Oct 2026, copy the official challenge statement into `docs/winning-plan/evidence/challenge-statement-2026.md`. If it adds a requirement this plan does not cover, stop and tell the owner. Do not invent extra features to cover it.
 
-- **Goal:** know, in writing, whether existing code may be reused.
-- **Steps:**
-  1. Find your Local Event page on spaceappschallenge.org and the Local Lead's contact.
-  2. Send the message produced by the prompt below. Also post the question in the official Space Apps help channel if your event uses one.
-  3. Save the reply as `docs/winning-plan/evidence/G0-ruling.txt` (do not commit personal emails; redact addresses).
-- **Acceptance checks:**
-  - [ ] A written reply exists and is saved.
-  - [ ] `SCORECARD.md` → "Gate 0" row set to `Branch A (reuse allowed)` or `Branch B (rebuild at event)`.
+# 2. The scores these tasks earn
 
-**Master prompt (for any LLM, to draft the message):**
+The supplied `FireAtlas_Updated_Perfected_Winning_Plan.pdf` is now authoritative. Its NASA
+judging alignment is Impact, Creativity, Validity, Relevance, and Presentation. The weighted
+100-point table below remains an internal engineering tracker, not a NASA judge score. The
+earlier plan's claim numbers are retained only as a historical arithmetic record and are
+explicitly withdrawn until the perfected P0/P1 gates pass.
 
-```text
-Draft a short, polite email (under 180 words) to my NASA Space Apps 2026 Local Lead.
-Facts: our team explored NASA FIRMS MODIS/VIIRS data and built a prototype web app in
-late September 2026, before the challenge statements (28 Oct) and the hackathon
-(14-15 Nov). The FAQ says teams may not begin working on challenges before the hackathon.
-Ask: (1) May we reuse this prior code, data-processing scripts, or only ideas/notes?
-(2) If reuse is allowed, must we disclose it on the project page, and how?
-(3) If not allowed, may we keep the public datasets we downloaded?
-Do not claim anything else about the project. Neutral tone. No marketing language.
-```
+`points = weight × score ÷ 5`. A category stays at the "Now" score until its check passes. Do
+not raise a category because a diagram or a plan exists. The old targets of 54.2, 88.0, 93,
+and ≈106 are withdrawn.
 
-### G0-T2 — Choose the branch
+## 2.1 Implementation score — current **41.6 / 100** · no perfected-plan claim yet
 
-| Ruling | Branch | What it means for this plan |
+| # | Category | Wt | Now | Earlier claim (withdrawn) | Points | Perfected-plan evidence gate |
+|---|---|---:|---:|---:|---:|---|
+| C1 | Calendar | 12 | 4 | 4 | 9.6 | P0 archive completeness plus visible verdict, critical dates, heatmap state patterns, Sensor Bridge, and evidence drawer; older row-only history stays partial |
+| C2 | Harmonized NASA data | 12 | 4 | 4 | 9.6 | P0 common 1 km aggregation, within-sensor/day deduplication, raw 375 m detail, FRP separation, source hashes, and reproducible state classification |
+| C3 | Terrain, fuels, weather | 8 | 1 | 1 | 1.6 | No work. Do not raise |
+| C4 | Sector ranking | 14 | 0 | 0 | 0 | No work |
+| C5 | Aerial framing | 7 | 1 | 1 | 1.4 | No work |
+| C6 | Aerial observations | 8 | 0 | 0 | 0 | No work |
+| C7 | Spread scenarios | 10 | 1 | 1 | 2.0 | No work |
+| C8 | Safety wording | 7 | 3 | 3 | 4.2 | The limits sentence in section 6 is on the home page and the method page |
+| C9 | Season verdict for a manager | 6 | 3 | 3 | 3.6 | Live verdict matches the API, appears first in the calendar panel, and official sources are directly beneath it; no unsupported unusual-fire claim |
+| C10 | Held-out test | 8 | 3 | 4 | 4.8 | Held-out comparison includes common-grid, ratio/no-correction baselines, interval coverage, and the 2012 step only when complete request metadata exist |
+| C11 | Interface | 4 | 3 | 4 | 2.4 | Globe and controls remain unchanged; public URL opens the calendar and preserves See → Compare → Verify → Share |
+| C12 | Repo and demo access | 4 | 3 | 4 | 2.4 | Local static bundle plus evidence card, source ledger, hash-bound exports, and public no-credential demo |
+| | **Total** | 100 | **41.6** | **44.8 (withdrawn)** | **41.6** | Current: 9.6+9.6+1.6+0+1.4+0+2.0+4.2+3.6+4.8+2.4+2.4 = 41.6. No perfected-plan claim is set. |
+
+C1 and C2 remain at 4. Dated MCD64A1 corroboration is now hash-bound, but archive completeness, native-mask independent review, and outside-user checks remain open. A UI card cannot substitute for those gates.
+
+### Perfected-plan gates (status at 30 September 2026)
+
+| Gate | Required evidence | Current status |
 |---|---|---|
-| Reuse allowed (with disclosure) | **Branch A** | Execute sections 3–8 on this repository. Disclose prior work on the project page (section 8). |
-| Reuse not allowed | **Branch B** | Freeze this repository as a private research notebook. Until 14 Nov, only write **design notes, data-download lists and this plan** (ideas are not code). At the event, create a new repository and rebuild Tier 1 from sections 6–7 using the master prompts. Budget: 36 working hours for Tier 1 only; skip Tier 2. |
-| No answer by 25 Oct | Branch B by default | Safer option. |
+| P0 archive and provenance | Complete requested windows, metadata, hashes, UTC/type rules, and no fabricated rows | **OPEN** — 26 older exports are reconstructed row-only inputs; the S-NPP 2021–2022 rows are present, but their original request metadata and complete-window evidence are absent |
+| P0 common-grid reproducibility | VIIRS 375 m aggregated to the common 1 km grid, native detail retained, deduplicated daily totals reproduced independently | **PARTIAL** — imported FIRMS centroid transform is documented; native mask resampling and independent review are absent |
+| P1 Sensor Bridge and FRP | MODIS-only / VIIRS-only / both / gap states plus source-separated FRP MW/day | **LOCAL UI PRESENT** — counts are tied to imported exports; complete historical coverage is not established |
+| P1 independent corroboration | MCD64A1 Collection 6.1 or separately documented official context, with dates and limits | **PARTIAL** — dated MCD64A1 Burn Date + QA rasters are hash-bound in `fireatlas/samples/mcd64_corroboration.json`; independent review is pending |
+| P1 share card | Value, state, versions, hashes, limitations, and public URL all reproduce the selected result | **LOCAL ONLY** — public host not verified |
+| P1 usability and deployment | Outside-user check, public no-credential URL, globe and mobile rehearsal | **OPEN** |
+| P2 rapid mode | Separate Recent Pulse data mode, calibration, and limits | **DEFERRED** |
 
-### G0-T3 — Re-read the official statement on 28 Oct
+## 2.2 Local rubric — current **≈70 / 118** · earlier **93 / 118 withdrawn**
 
-- [ ] Copy the official challenge statement text into `docs/winning-plan/evidence/challenge-statement-2026.md` (with URL and retrieval date).
-- [ ] For each requirement sentence, add a row to `SCORECARD.md → Requirement trace` with the feature that satisfies it.
-- [ ] If the statement adds or removes a requirement (for example "global AOI", "fire weather", "download"), update section 6 tasks before continuing.
+| Criterion | Max | Now | Earlier claim (withdrawn) | Perfected-plan evidence gate |
+|---|---:|---:|---:|---|
+| Impact | 20 | 15 | 15 | The video shows the same one-year-limited verdict in a California fire-season case and Punjab–Haryana's official [2024 paddy-harvest monitoring window](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2060764&lang=2&reg=48), names local planners, and states hotspots do not establish crop-burning cause |
+| Creativity | 20 | 11 | 14 | Visible common-grid Sensor Bridge, mismatch categories, uncertainty hatching, and retained 375 m detail |
+| Validity | 20 | 11 | 16 | Held-out error, baseline comparison, interval coverage, archive hashes, and MCD64A1 context or explicit active-fire-only state |
+| Relevance | 20 | 11 | 18 | The calendar is the feature the challenge names. Training lab, synthetic demo, and EONET are not on the judged path |
+| Presentation | 20 | 12 | 16 | Globe remains, public link works, and both 30-second and 90-second evidence paths are rehearsed |
+| Teamwork | 5 | 2 | 2 | This plan adds no teamwork tasks, so this box stays 2 |
+| User experience | 5 | 3 | 4 | Pick an area, read the sentence, open one hatched day, inspect the bridge, and share the evidence card; outside-user check required for 4 |
+| NASA data usage | 5 | 4 | 5 | Sources page lists MODIS C6.1, VIIRS S-NPP, FIRMS acknowledgement, and any MCD64A1 input with version, retrieval, and hash |
+| Category named | 1 | 1 | 1 | Challenge name is on the home page |
+| Repository access | 1 | 0 | 1 | Public repo matches the running site |
+| Project page | 1 | 0 | 1 | Space Apps project page submitted |
+| **Total** | **118** | **≈70** | **93 (withdrawn)** | Current: 15+11+11+11+12+2+3+4+1+0+0 = **70**; no perfected-plan claim is set |
 
----
-
-# 2. The two scoring systems
-
-You are graded twice: by the **audit implementation score** (my 100-point system, which measures what actually works) and by **Space Apps judges**. Track both in `SCORECARD.md`.
-
-## 2.1 Audit implementation score (100 points)
-
-Score each category 0–5, then `points = weight × score ÷ 5`.
-
-| Score | Meaning | Evidence required before you may claim it |
-|---|---|---|
-| 0 | No artifact | — |
-| 1 | Idea or documentation only | A document describing it |
-| 2 | Mockup, hardcoded output, isolated experiment | Screenshot or script |
-| 3 | Functional component; integration, authentic data or verification missing | Working code + unit tests |
-| 4 | End-to-end on real historical data with reproducible checks | Authentic-data run + reproducible command + tests + screenshot |
-| 5 | Plus independent validation, clear limits, reliable demo | Validation report file with metrics vs a baseline + public demo link + limits text |
-
-**Hard caps (the auditor LLM must apply these):**
-
-- Any category using only synthetic data: **max 2**.
-- Any category whose code is not committed and pushed: **max 2**.
-- Any model/ranking without a stated method and a test: **max 2**.
-- Any forecast without evaluation against held-out observations: **max 3**.
-- Any output that could be read as an operational instruction (flight path, ignition line, evacuation zone): **category = 0** until removed.
-
-| # | Category | Wt | Now | Target (Tier 1 only) | Target (Tier 1 + 2) |
-|---|---|---:|---:|---:|---:|
-| C1 | Challenge fit and working calendar | 12 | 3 | 5 | 5 |
-| C2 | Authentic NASA data, provenance, harmonization | 12 | 3 | 5 | 5 |
-| C3 | Terrain, fuels, vegetation, dated weather | 8 | 1 | 2 | 4 |
-| C4 | Explainable ranking of observation sectors | 14 | 0 | 0 | 4 |
-| C5 | UAS feasibility framing and airspace/command boundaries | 7 | 1 | 2 | 4 |
-| C6 | Dated aerial-observation analysis and state update | 8 | 0 | 0 | 4 |
-| C7 | Spread scenarios, uncertainty, input freshness | 10 | 1 | 1 | 4 |
-| C8 | Containment boundaries and operational safety | 7 | 2 | 3 | 4 |
-| C9 | Responder workflow, resident info, official-alert separation | 6 | 2 | 3 | 4 |
-| C10 | Validation, replay, leakage control, baselines | 8 | 2 | 4 | 5 |
-| C11 | Interface clarity and judge-demo reliability | 4 | 3 | 5 | 5 |
-| C12 | Build, docs, data access, reproducibility | 4 | 2 | 5 | 5 |
-| | **Total points** | 100 | **31.8** | **54.2** | **88.0** |
-
-Arithmetic. Tier 1 only: 12 + 12 + 3.2 + 0 + 2.8 + 0 + 2.0 + 4.2 + 3.6 + 6.4 + 4 + 4 = **54.2**. Tier 1 + 2: 12 + 12 + 6.4 + 11.2 + 5.6 + 6.4 + 8.0 + 5.6 + 4.8 + 8.0 + 4 + 4 = **88.0**.
-
-**Important:** the audit score weights FireAtlas Scout heavily (C3–C9 = 60 points), but Space Apps judges weight **challenge relevance**. A Tier-1-only project scoring 54/100 here can still win the challenge; a project with half-built Scout features and a weak calendar cannot. Never trade Tier 1 quality for Tier 2 breadth.
-
-## 2.2 Space Apps judging (what actually wins)
-
-**Official criteria (2025 wording; 2026 guide due 13 Nov):** Impact, Creativity, Validity, Relevance, Presentation, each scored 1–5 by local judges. **Global awards** are chosen later by NASA subject-matter experts (Best Use of Science, Best Use of Data, Best Use of Technology, Galactic Impact, Best Mission Concept, Most Inspirational, Best Use of Storytelling, Global Connection, Art & Technology, Local Impact).
-
-**Local-event rubric supplied by the team (screenshots in the repo root, source unverified — confirm with your Local Lead):**
-
-| # | Criterion | Points | What it measures | Estimate now | Target |
-|---|---|---:|---|---:|---:|
-| 1 | Impact | 1–20 | Scale/significance of problem, reach | 10 | 17 |
-| 2 | Creativity | 1–20 | Originality of idea and execution | 11 | 16 |
-| 3 | Validity | 1–20 | Scientific soundness, feasibility, usability | 11 | 18 |
-| 4 | Relevance | 1–20 | Alignment to challenge; NASA data at the core | 11 | 19 |
-| 5 | Presentation | 1–20 | Clarity, structure, storytelling, reach | 12 | 18 |
-| 6 | Teamwork | 1–5 | Evidence of collaboration | 2 | 5 |
-| 7 | User experience | 1–5 | 5 = anyone can use it | 3 | 5 |
-| 8 | NASA data usage | 1–5 | NASA open data + other sources clearly shown | 4 | 5 |
-| 9 | Challenge category identified | 0/1 | 2026 category named | 1 | 1 |
-| 10 | Repository access | 0/1 | Public working link | 0 | 1 |
-| 11 | Project page complete | 0/1 | NASA project page submitted | 0 | 1 |
-| — | Women participation bonus | +5 % | Team composition | — | — |
-| | **Total** | **118** | | **≈65** | **≈106** |
-
-## 2.3 What past winners had in common (use as a checklist)
-
-Sources: Space Apps awards pages 2019–2025, NASA winner announcements, winning teams' repositories.
-
-- [ ] **Named NASA data at the centre** (for example FIRMS MCD14ML / VNP14IMGML, not "satellite data").
-- [ ] **A working public demo link** plus a public repository (c.a.w.s.t.o.n. 2019, Team I.O. GROW 2024).
-- [ ] **One clearly defined user and one plain question** the tool answers (farmers, fire authorities, event planners).
-- [ ] **Evidence of validity:** statistical test, expert interview or real user test (Starflock 2022 used 20 million FIREX-AQ rows and a statistical finding; GROW 2024 tested with a fire-affected farm owner).
-- [ ] **Explanatory visuals** instead of raw maps.
-- [ ] **Honest limits** (c.a.w.s.t.o.n. labelled their mockups as mockups).
-- [ ] **Competitor awareness:** another 2026 team (IGNIS) already published a 26-year, 9-region harmonized calendar using an overlap-ratio method. FireAtlas must beat it on **validity** (sensor-availability accounting, held-out validation, uncertainty, evidence tracing) and **presentation**, not just match it.
-
-## 2.4 The winning story (memorize this; every screen must support it)
-
-> **"MODIS is ending and Suomi NPP stopped delivering on 1 November 2026. Twenty-five years of NASA fire records are split across sensors that see fire differently. FireAtlas harmonizes MODIS and VIIRS into one burning-activity calendar for any study area, shows which days a sensor was missing, puts every number next to its uncertainty, and lets anyone trace a result back to the original NASA pixel."**
-
-**Primary user:** a land manager or fire-season planner comparing this season to the historical record.
-**Secondary users:** researchers and educators (method + evidence); responders (historical review brief, Tier 2 replay).
-**The one question:** *"Is this period unusual for this place, and can I trust the comparison across sensors?"*
-
-## 2.5 Things to highlight in every demo, slide and page
-
-1. The **multi-year calendar heatmap** (years × days) for one area (C1).
-2. **Sensor timeline with outages and mission ends** (C2): Terra 2000–, Aqua 2002–Aug 2026, S-NPP 2012–Nov 2026, NOAA-20 2020–, NOAA-21 2024–.
-3. **The calibration and its held-out error** (C2/C10): "VIIRS sees about N× more 1 km cell-days than MODIS here; predicted within X % on years we held out" (N and X come from your own run — never from this document).
-4. **"No detection ≠ no fire"** and **"degraded day"** markers (C2).
-5. **Trace a day to its original pixels** (existing evidence drawer and recount) (C10).
-6. Park Fire 2024 as the concrete story, and one contrasting area (crop burning or savanna) for global impact.
+A judge can still score a box lower if the sentence is buried or the demo fails. The earlier
+93-point row is a withdrawn planning ceiling, not a prediction. Re-score only after the perfected
+gates are independently evidenced.

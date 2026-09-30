@@ -1,0 +1,17 @@
+{
+  "schema": "fireatlas-sensor-notices-v1",
+  "notices": [
+    {
+      "id": "snpp-2024-07-cdp-outage",
+      "source_id": "VIIRS_SNPP_SP",
+      "start_utc": "2024-07-24T05:24:00Z",
+      "end_utc": "2024-07-29T15:18:00Z",
+      "kind": "documented_product_processing_gap",
+      "url": "https://landweb.modaps.eosdis.nasa.gov/displayissue?id=716",
+      "published_by": "NASA Land Processes Distributed Active Archive Center / LDOPE",
+      "retrieved_date": "2026-09-29",
+      "quote": "Final outage range: 7/24/24 05:24 through 7/29/24 15:18 (inclusive).",
+      "scope_note": "A documented S-NPP science-product outage, not evidence of a ground-level no-fire condition. Days intersecting this interval are flagged as affected; satellite pass and cloud exposure remain unknown."
+    }
+  ]
+}

@@ -1,0 +1,882 @@
+{
+  "calibration": {
+    "annual_ratio": 2.224169028600876,
+    "annual_ratio_95_interval": [
+      1.9745341614906833,
+      2.8010471204188483
+    ],
+    "bootstrap_replicates": 1000,
+    "calibration_id": "617d763cc149f41f2a9dabc09a2b294dbe78c6cc3efe8e983dee6fe33fa68a0d",
+    "data_class": "authentic-imported",
+    "eligible_months": [
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 43,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 80,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 30,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 129,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 22,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 46,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 123,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 306,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 90,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 187,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 125,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 201,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 51,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 110,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 42,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 148,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 78,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 185,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 274,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 519,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 242,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 402,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 102,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 211,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 17,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 71,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 29,
+        "modis_cell_days": 13,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 65,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 96,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 183,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 94,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 238,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 64,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 181,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 50,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 97,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 25,
+        "modis_cell_days": 241,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 348,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 461,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 669,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 106,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 184,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 177,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 461,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 157,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 285,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 37,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 116,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 81,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 242,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 39,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 107,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 43,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 125,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 114,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 268,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 47,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 132,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 46,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 109,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 197,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 415,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 20,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 90,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 48,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 181,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 134,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 357,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 54,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 194,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 32,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 147,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 37,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 114,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 54,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 148,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 112,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 313,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 42,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 155,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 46,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 113,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      }
+    ],
+    "excluded_days": {
+      "documented_viirs_processing_gap": 6,
+      "incomplete_source_export": 4414
+    },
+    "method_version": "monthly-ratio-loyo-bootstrap-1000-step2012-v2",
+    "months": [
+      {
+        "basis": "month-of-year",
+        "high": 3.446969696969697,
+        "low": 2.1301369863013697,
+        "month": 1,
+        "n_years": 4,
+        "ratio": 2.848314606741573
+      },
+      {
+        "basis": "month-of-year",
+        "high": 4.511627906976744,
+        "low": 2.7419354838709675,
+        "month": 2,
+        "n_years": 4,
+        "ratio": 3.301470588235294
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.825806451612903,
+        "low": 1.9406779661016949,
+        "month": 3,
+        "n_years": 4,
+        "ratio": 2.4432234432234434
+      },
+      {
+        "basis": "month-of-year",
+        "high": 3.0963855421686746,
+        "low": 2.3898379698135543,
+        "month": 4,
+        "n_years": 4,
+        "ratio": 2.5924932975871315
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.828125,
+        "low": 2.077777777777778,
+        "month": 5,
+        "n_years": 3,
+        "ratio": 2.487562189054726
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.4130434782608696,
+        "low": 1.6470588235294117,
+        "month": 6,
+        "n_years": 4,
+        "ratio": 1.9475655430711611
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.156862745098039,
+        "low": 1.4439834024896265,
+        "month": 7,
+        "n_years": 3,
+        "ratio": 1.7852760736196318
+      },
+      {
+        "basis": "month-of-year",
+        "high": 4.5,
+        "low": 1.4511930585683297,
+        "month": 8,
+        "n_years": 3,
+        "ratio": 1.7342256214149139
+      },
+      {
+        "basis": "month-of-year",
+        "high": 3.7708333333333335,
+        "low": 1.7358490566037736,
+        "month": 9,
+        "n_years": 3,
+        "ratio": 2.3706896551724137
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.6641791044776117,
+        "low": 1.8941605839416058,
+        "month": 10,
+        "n_years": 3,
+        "ratio": 2.2854700854700853
+      },
+      {
+        "basis": "month-of-year",
+        "high": 3.5925925925925926,
+        "low": 1.6611570247933884,
+        "month": 11,
+        "n_years": 3,
+        "ratio": 1.944812362030905
+      },
+      {
+        "basis": "month-of-year",
+        "high": 4.59375,
+        "low": 2.0686274509803924,
+        "month": 12,
+        "n_years": 3,
+        "ratio": 2.7719298245614037
+      }
+    ],
+    "overlap_months": [
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-06"
+    ],
+    "random_seed": 20261114,
+    "region": {
+      "bbox": [
+        -122.2,
+        38.8,
+        -120.0,
+        41.0
+      ],
+      "id": "norcal",
+      "name": "Northern California"
+    },
+    "schema": "fireatlas-calibration-v1",
+    "selected_model": "annual_ratio",
+    "status": "calibrated",
+    "step_2012": {
+      "interval_95": [
+        null,
+        null
+      ],
+      "months_used": [],
+      "ratio": null,
+      "reference_years": [
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "status": "awaiting-2012-standard-exports",
+      "within_interval": null
+    },
+    "unit": "VIIRS-equivalent active-fire distinct 1 km centroid cell-days",
+    "validation": {
+      "models": {
+        "annual_ratio": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 0.25578870867582715,
+          "median_annual_absolute_percent_error": 0.25214051100852175
+        },
+        "monthly_ratio": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 0.2904609871947346,
+          "median_annual_absolute_percent_error": 0.24391247193689708
+        },
+        "no_harmonization": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 0.9225866603309699,
+          "median_annual_absolute_percent_error": 0.5158478605388273
+        }
+      },
+      "monthly_interval_coverage": 0.4146341463414634,
+      "monthly_interval_pairs": 41,
+      "partial_years_excluded_from_annual_error": [
+        {
+          "annual_error_used": false,
+          "eligible_months": 5,
+          "year": 2026
+        }
+      ],
+      "selected_model": "annual_ratio",
+      "selection_rule": "lowest median absolute log error; lexical tie-break",
+      "years_held_out": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    "versions": {
+      "MODIS_SP": "61.03",
+      "VIIRS_SNPP_SP": "2"
+    },
+    "years_used": [
+      2023,
+      2024,
+      2025,
+      2026
+    ]
+  },
+  "provenance": {
+    "daily_bundle": "/samples/aggregates/norcal.json.gz",
+    "daily_bundle_sha256": "6cc2d49eb7cb2b1deb803cfd68dcfa624231177c79c8b4c8580216a45f70982b",
+    "input_manifest_sha256": "673cc06c7e596d986fe70883c1810e530af0312bf258efe2eded2c486f02194b",
+    "paired_complete_months": [
+      "2022-07",
+      "2022-08",
+      "2022-09",
+      "2022-10",
+      "2022-11",
+      "2022-12",
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-06"
+    ],
+    "parent_files": [
+      {
+        "filename": "fire_archive_M-C61_814031.csv",
+        "sha256": "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165"
+      },
+      {
+        "filename": "fire_archive_M-C61_814038.csv",
+        "sha256": "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+      },
+      {
+        "filename": "fire_archive_M-C61_814040.csv",
+        "sha256": "1b20952ad260b42521502217829c52b7231b12634b696e734fdade40d9e642e4"
+      },
+      {
+        "filename": "fire_archive_M-C61_814042.csv",
+        "sha256": "79311ac9ef6aa2c76caf850985c98c2b9d4fc3a9b1f6dbeb0bc8beb4c2a5b3fc"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814034.csv",
+        "sha256": "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814039.csv",
+        "sha256": "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814041.csv",
+        "sha256": "7c2804b73b4a1698c82f6d5f3eb99e95acecce654b346456c9e2b2f7198469fe"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814043.csv",
+        "sha256": "339067de2db9cf136fa1da1acabac5410c5e45e2719351744bbd438f9982bcde"
+      }
+    ],
+    "reproduction": "Recompute from the listed paired daily bundle with the method version recorded in the calibration object."
+  },
+  "region": {
+    "bbox": [
+      -122.2,
+      38.8,
+      -120.0,
+      41.0
+    ],
+    "id": "norcal",
+    "name": "Northern California"
+  },
+  "schema": "fireatlas-calibration-artifact-v1"
+}

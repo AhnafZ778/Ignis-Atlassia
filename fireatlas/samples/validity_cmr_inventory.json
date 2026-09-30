@@ -2009,7 +2009,7 @@
       "start_utc": "2024-07-17"
     }
   },
-  "interpretation": "Public CMR candidate granule metadata only; raw files and geolocation have not been downloaded, matched, or decoded. No ground-cell pass/cloud state follows from this list.",
+  "interpretation": "Public CMR candidate granule metadata only; these candidate files have not been downloaded or decoded by the CMR inventory step. Native-file download and decoding are reported separately in the case native_masks ledger. This list alone does not establish a ground-cell pass, cloud, or no-pass state.",
   "retrieved_utc": "2026-09-28T21:51:54.799307Z",
   "schema": "fireatlas-cmr-inventory-v1"
 }

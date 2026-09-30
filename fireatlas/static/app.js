@@ -43,7 +43,23 @@ async function loadMeta() {
       ? ((meta.source_counts?.MODIS_SP || 0) + (meta.source_counts?.VIIRS_SNPP_SP || 0)).toLocaleString()
       : (meta.source_counts?.NOAA_HMS_VIIRS || 0).toLocaleString();
     note.querySelector(".real-source-unit").textContent = meta.standard_pair_ready ? "IMPORTED DETECTIONS" : "VIIRS FIRE POINTS";
-    note.querySelector("p").textContent = meta.standard_pair_ready ? "July 2022–June 2026 regional archive. 2026 imports are partial." : "Four complete July archives. One Northern California window.";
+    const norcal = meta.archive_status?.regions?.find(region => region.id === "norcal");
+    const products = norcal?.products || {};
+    const archiveSpan = source => {
+      const item = products[source];
+      const months = [...(item?.reconstructed_row_only_months || []), ...(item?.complete_months || [])].sort();
+      if (!months.length) return `${source === "MODIS_SP" ? "MODIS" : "S-NPP"}: awaiting imports`;
+      const verified = item.complete_month_count
+        ? `${item.first_complete_month}–${item.last_complete_month} complete request months`
+        : "no complete request months";
+      const inferred = item.reconstructed_row_only_month_count
+        ? `; ${item.reconstructed_row_only_month_count} reconstructed row-only months`
+        : "";
+      return `${source === "MODIS_SP" ? "MODIS" : "S-NPP"} rows ${months[0]}–${months.at(-1)}; ${verified}${inferred}`;
+    };
+    note.querySelector("p").textContent = meta.standard_pair_ready
+      ? `${archiveSpan("MODIS_SP")}. ${archiveSpan("VIIRS_SNPP_SP")}. Reconstructed files show detections only; missing dates stay unknown.`
+      : "Authentic data are loaded; see the archive ledger for verified date windows and gaps.";
   }
   document.querySelectorAll('[data-series="hms-viirs"]').forEach(button => { button.hidden = !meta.available_sources?.includes("NOAA_HMS_VIIRS"); });
   const extraSources = {"viirs-noaa20": ["VIIRS_NOAA20_SP", "VIIRS NOAA-20 · standard"], "viirs-noaa20-nrt": ["VIIRS_NOAA20_NRT", "VIIRS NOAA-20 · near real time"], "viirs-noaa21-nrt": ["VIIRS_NOAA21_NRT", "VIIRS NOAA-21 · near real time"], "viirs-snpp-nrt": ["VIIRS_SNPP_NRT", "VIIRS S-NPP · near real time"], "modis-nrt": ["MODIS_NRT", "MODIS · near real time"]};
@@ -124,7 +140,7 @@ function renderInsight(month) {
   if (month.export_window_complete && rawModis && rawViirs && comparison?.detected_cell_days) {
     const ratio = rawViirs / rawModis;
     title.textContent = `${monthName} shows why FireAtlas compares sensors.`;
-    body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many raw pixels as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}). Grouping their detection centroids by UTC day and shared 1 km cell yields ${comparison.detected_cell_days.toLocaleString()} joint cell-days. This removes repeat counts in a cell; it does not equalize sensor sensitivity.`;
+    body.textContent = `VIIRS recorded ${ratio.toFixed(1)}× as many eligible FIRMS rows as MODIS (${rawViirs.toLocaleString()} vs ${rawModis.toLocaleString()}). Grouping their detection centroids by UTC day and shared 1 km cell yields ${comparison.detected_cell_days.toLocaleString()} joint cell-days. This removes repeat counts in a cell; it does not equalize sensor sensitivity.`;
     source.textContent = `Imported source records · ${monthName} ${state.year} · same AOI and UTC window`;
   } else if (month.anomaly_cell_days !== null && month.baseline_median !== null) {
     const direction = month.anomaly_cell_days >= 0 ? "above" : "below";
@@ -189,7 +205,7 @@ function renderHarmonizationAudit(data) {
     const row = document.createElement("article");
     const title = document.createElement("strong"); title.textContent = source.source_id.replaceAll("_", " ");
     const details = document.createElement("span");
-    details.textContent = `${source.processing_level} · ${Number(source.raw_pixels).toLocaleString()} raw pixels · ${Number(source.detected_cell_days).toLocaleString()} source cell-days · ${source.full_month_export ? "complete export" : "incomplete export"} · version ${source.product_versions.join(", ") || "unknown"}`;
+    details.textContent = `${source.processing_level} · ${Number(source.raw_pixels).toLocaleString()} eligible FIRMS rows · ${Number(source.detected_cell_days).toLocaleString()} source cell-days · ${source.full_month_export ? "complete export" : "incomplete export"} · version ${source.product_versions.join(", ") || "unknown"}`;
     row.append(title, details); container.append(row);
   }
   const versionReading = {
@@ -269,16 +285,16 @@ function renderSourceComparison() {
     $(`#compare-${name}-bar`).style.width = known ? `${Math.max(6, counts[name] / scale * 100)}%` : "12%";
   }
   const sensorTips = {
-    modis: `MODIS (Terra & Aqua) · 1 km thermal pixels. ${known ? modis.toLocaleString() + " raw pixels this month." : "Complete export needed."} Click to view MODIS only.`,
-    "viirs-snpp": `VIIRS (Suomi NPP) · 375 m pixels, detects smaller hotspots. ${known ? viirs.toLocaleString() + " raw pixels this month." : "Complete export needed."} Click to view VIIRS only.`,
+    modis: `MODIS (Terra & Aqua) · 1 km thermal pixels. ${known ? modis.toLocaleString() + " eligible FIRMS rows this month." : "Complete export needed."} Counts use type 0 or missing. Click to view MODIS only.`,
+    "viirs-snpp": `VIIRS (Suomi NPP) · 375 m pixels, detects smaller hotspots. ${known ? viirs.toLocaleString() + " eligible FIRMS rows this month." : "Complete export needed."} Counts use type 0 or missing. Click to view VIIRS only.`,
     joint: `Joint view · Both sensors on a shared 1 km grid. Each cell counted once per UTC day. ${known ? (month.detected_cell_days || 0).toLocaleString() + " cell-days." : "Complete export needed."} Not a sensitivity ranking.`
   };
   $("#source-compare-note").textContent = known
     ? `${monthNames[state.month]} ${state.year} · Raw pixels retain each sensor’s detections; joint cell-days count each shared grid cell once per UTC day. These are different measures, not a sensitivity ranking.`
-    : `${monthNames[state.month]} ${state.year} · A complete export for both sources is needed before comparing the raw pixels with joint cell-days.`;
+    : `${monthNames[state.month]} ${state.year} · A complete export for both sources is needed before comparing eligible FIRMS rows with joint cell-days.`;
   if (reading) {
     reading.textContent = known && modis && viirs
-      ? `This selection contains ${modis.toLocaleString()} MODIS and ${viirs.toLocaleString()} VIIRS raw pixels. VIIRS is ${(viirs / modis).toFixed(1)}× higher in raw detections here; pixel scale and overpasses differ, so this is not a ratio of fires. The joint grouping yields ${month.detected_cell_days?.toLocaleString() || "—"} shared 1 km cell-days, without calibrating sensor sensitivity.`
+      ? `This selection contains ${modis.toLocaleString()} MODIS and ${viirs.toLocaleString()} VIIRS eligible FIRMS rows. VIIRS is ${(viirs / modis).toFixed(1)}× higher in raw detections here; pixel scale and overpasses differ, so this is not a ratio of fires. The joint grouping yields ${month.detected_cell_days?.toLocaleString() || "—"} shared 1 km cell-days, without calibrating sensor sensitivity.`
       : "The source export is incomplete, so the sensor counts cannot support a like-for-like interpretation yet. Gray or missing days mean unknown coverage, not zero fire.";
   }
   document.querySelectorAll("[data-source-target]").forEach(button => {
@@ -331,11 +347,11 @@ function calendarHeat(value, maximum) {
 
 function renderDays() {
   const data = state.data, month = data.monthly[state.month];
-  const snppGapMonth = state.year === 2024 && state.month === 6 && data.sources.includes("VIIRS_SNPP_SP");
   const days = new Date(Date.UTC(state.year, state.month + 1, 0)).getUTCDate();
   const rows = data.daily.filter(row => Number(row.date_utc.slice(5, 7)) === state.month + 1);
   const byDate = new Map(rows.map(row => [row.date_utc, row]));
   const positive = rows.filter(row => row.detected_cell_days > 0);
+  const snppGapMonth = rows.some(row => row.availability_by_source?.VIIRS_SNPP_SP?.status === "documented_processing_gap");
   const maximum = Math.max(0, ...positive.map(row => row.detected_cell_days));
   const scaleMaximum = Math.max(0, ...data.daily.map(row => row.detected_cell_days || 0));
   $("#days-title").textContent = `${monthNames[state.month]} ${state.year}`;
@@ -346,7 +362,7 @@ function renderDays() {
   $("#calendar-month-summary").textContent = month.export_window_complete
     ? `${days}/${days} export days complete · ${positive.length} days with detections${maximum ? ` · Peak ${maximum.toLocaleString()} cells on ${(peakDates.length > 3 ? peakDates.length + " dates" : peakDates.map(day => day + " " + shortMonths[state.month]).join(", "))}` : ""}`
     : `${month.partial_import_detected_cell_days > 0 ? "Partial records available" : "No complete export loaded"} · Full-month activity unknown`;
-  if (snppGapMonth) $("#calendar-month-summary").textContent += " · NASA S-NPP processing gap 24–28 Jul; pass/cloud unknown";
+  if (snppGapMonth) $("#calendar-month-summary").textContent += " · a documented S-NPP product gap intersects this month; pass/cloud unknown";
   const grid = $("#day-grid"); grid.replaceChildren();
   const offset = (new Date(Date.UTC(state.year, state.month, 1)).getUTCDay() + 6) % 7;
   for (let i = 0; i < offset; i++) {const blank = document.createElement("span"); blank.className = "day blank"; blank.setAttribute("aria-hidden", "true"); grid.append(blank);}
@@ -359,13 +375,13 @@ function renderDays() {
     const button = document.createElement("button"); button.type = "button";
     button.dataset.date = stamp;
     button.className = `day ${partial ? "partial-export" : value === null ? "unloaded" : value > 0 ? "detected" : "clear-export"}${stamp === state.day ? " chosen" : ""}${peak ? " day-peak" : ""}`;
-    const snppGapDay = snppGapMonth && dayNumber >= 24 && dayNumber <= 28;
+    const snppGapDay = item.availability_by_source?.VIIRS_SNPP_SP?.status === "documented_processing_gap";
     if (snppGapDay) button.classList.add("source-gap");
     button.tabIndex = stamp === (state.day || `${state.year}-${String(state.month + 1).padStart(2,"0")}-01`) ? 0 : -1;
     button.setAttribute("aria-pressed", String(stamp === state.day));
-    const raw = Object.entries(item.raw_pixels_by_sensor || {}).map(([sensor, count]) => `${sensor}: ${count.toLocaleString()} raw pixels`).join("; ");
+    const raw = Object.entries(item.raw_pixels_by_sensor || {}).map(([sensor, count]) => `${sensor}: ${count.toLocaleString()} eligible rows`).join("; ");
     const status = partial ? `At least ${countValue.toLocaleString()} detected cells, partial export` : value === null ? "Activity unknown, source export incomplete" : `${value.toLocaleString()} detected ${value === 1 ? "cell" : "cells"}, complete export`;
-    button.setAttribute("aria-label", `${stamp} UTC · ${status}${raw ? " · " + raw : ""}${peak ? " · Highest count this month" : ""}${snppGapDay ? " · NASA S-NPP processing gap; observation coverage unknown" : ""}. Inspect source records.`);
+    button.setAttribute("aria-label", `${stamp} UTC · ${status}${raw ? " · " + raw : ""}${peak ? " · Highest count this month" : ""}${snppGapDay ? " · documented NASA S-NPP product gap intersects this UTC day; pass and cloud coverage unknown" : ""}. Inspect source records.`);
     button.title = button.getAttribute("aria-label");
     if (value > 0) {const heat = calendarHeat(value, scaleMaximum); button.style.setProperty("--day-heat", heat.color); button.classList.toggle("dark-ink", heat.dark);}
     const number = document.createElement("span"); number.className = "day-number"; number.textContent = dayNumber;
@@ -402,9 +418,9 @@ function renderDays() {
   summary.hidden = !selected;
   if (selected) {
     const count = selected.detected_cell_days;
-    const sensors = Object.entries(selected.raw_pixels_by_sensor || {}).map(([sensor, n]) => `${sensor}: ${n.toLocaleString()} pixels`).join(" · ");
+    const sensors = Object.entries(selected.raw_pixels_by_sensor || {}).map(([sensor, n]) => `${sensor}: ${n.toLocaleString()} eligible rows`).join(" · ");
     summary.textContent = `${state.day} UTC · ${count === null ? selected.partial_import_detected_cell_days > 0 ? "≥" + selected.partial_import_detected_cell_days.toLocaleString() + " cells (partial export)" : "Unknown activity (incomplete export)" : count.toLocaleString() + ` distinct detected ${count === 1 ? "cell" : "cells"}`}${sensors ? " · " + sensors : ""}`;
-    if (snppGapMonth && Number(state.day.slice(8)) >= 24 && Number(state.day.slice(8)) <= 28) summary.textContent += " · NASA S-NPP processing gap; pass/cloud unknown";
+    if (selected.availability_by_source?.VIIRS_SNPP_SP?.status === "documented_processing_gap") summary.textContent += " · documented NASA S-NPP product gap intersects this day; pass/cloud unknown";
     const link = document.createElement("a");
     link.href = methodUrl(); link.textContent = "Inspect this day’s source records ↗";
     link.className = "calendar-evidence-link"; summary.append(link);
@@ -731,6 +747,25 @@ function render() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // A static release contains a complete, prebuilt harmonized calendar, but
+  // not the live AOI/map APIs used by this older study workspace. Keep the
+  // static path honest and quiet: the calendar stays available above, while
+  // the server-backed workspace and its tour are omitted from that build.
+  if (document.querySelector('meta[name="fireatlas-static-data"]')) {
+    const workspace = document.getElementById("study-workspace");
+    if (workspace) {
+      const note = document.createElement("aside");
+      note.className = "static-calendar-note";
+      note.setAttribute("role", "note");
+      note.innerHTML = '<span class="static-calendar-note-kicker">STATIC ARCHIVE</span><p>The dated calendar above runs from bundled NASA records. The interactive area-study map requires the local server.</p>';
+      workspace.before(note);
+      workspace.hidden = true;
+    }
+    const tourButton = document.getElementById("start-calendar-tour");
+    if (tourButton) tourButton.hidden = true;
+    return;
+  }
+
   initMap();
   const workspace = document.getElementById("study-workspace");
   if (workspace?.tagName === "DETAILS") workspace.addEventListener("toggle", () => {

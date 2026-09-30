@@ -9,5 +9,10 @@ data/
 .env.*
 *.key
 
+# The generated static evidence bundle is intentionally publishable.  Re-include
+# its data subtree after the repository-wide local `data/` rule above.
+!site/
+!site/**
+
 # User-downloaded NASA source files remain local; hashes are stored on import.
 NASA_data/

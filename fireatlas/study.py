@@ -11,7 +11,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 from statistics import median
 
-from .core import GRID_VERSION, SERIES, SOURCES, calendar
+from .core import GRID_VERSION, SERIES, SOURCES, calendar, calendar_row_included
 from .harmonization import month_audit
 
 SCHEMA = "fireatlas-study-v2"
@@ -86,7 +86,7 @@ def build_bundle(db, *, year, month, series, bbox, day=None, layer="none"):
         "the selected year and all qualifying prior same-month baseline inputs, with untouched\n"
         "source rows, normalized fields and assigned grid cells. export-windows.json records\n"
         "complete source exports covering this AOI. batches.json retains file hashes and provenance.\n\n"
-        "Count distinct (grid_x, grid_y) per UTC date across the selected source cohort. Sum daily\n"
+        "Count distinct (grid_x, grid_y) per UTC date across type-0-or-missing FIRMS records. Sum daily\n"
         "counts by month; use the median of at least three prior complete same-month years.\n"
         "An incomplete month has a null official count. Verify with the project command:\n"
         "  uv run python -m fireatlas.study path/to/study.zip\n\n"
@@ -132,10 +132,12 @@ def _verify_harmonization(audit, selection, summary, rows, windows):
         source = row["source_id"]
         if source not in sources:
             raise ValueError("harmonization audit contains an unexpected source")
+        versions[source].add(row["product_version"])
+        if not calendar_row_included(row["raw"]):
+            continue
         raw[source] += 1
         raw_by_day[(source, day)] += 1
         marks[source][day].add((row["grid_x"], row["grid_y"]))
-        versions[source].add(row["product_version"])
 
     by_source = [{"source_id": source, "sensor": SOURCES[source][0],
                   "processing_level": SOURCES[source][1], "raw_pixels": raw[source],
@@ -242,6 +244,8 @@ def verify_bundle(path):
         windows = json.loads(archive.read("export-windows.json"))
     cells = defaultdict(set)
     for row in rows:
+        if not calendar_row_included(row.get("raw")):
+            continue
         cells[row["acquisition_utc"][:10]].add((row["grid_x"], row["grid_y"]))
     totals = defaultdict(int)
     for stamp, marks in cells.items():

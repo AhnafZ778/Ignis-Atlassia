@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research Lab — FireAtlas</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./vendor/leaflet.css"><link rel="stylesheet" href="./research.css">
+  <script src="./vendor/leaflet.js" defer></script><script src="./research.js" defer></script>
+  <link rel="stylesheet" href="./design.css">
+  <script src="./ui.js" defer></script>
+<meta name="fireatlas-static-data" content="./data/v2/">
+<meta name="fireatlas-static-snapshot" content="2026-09-30">
+</head>
+<body class="research-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><span></span><span></span><span class="menu-label">Menu</span></button>
+    <nav id="site-navigation" aria-label="Project navigation"><a href="./">Overview</a><a href="./#atlas-section">Atlas</a><a href="./research.html" class="active" aria-current="page">Research lab</a><a href="./data.html">Data sources</a></nav>
+    <span class="header-tag"><i></i> A NASA SPACE APPS PROJECT <span>↗</span></span>
+  </header>
+  <main class="research-shell" id="main-content">
+    <div class="research-heading"><div><p class="eyebrow">RESEARCH LAB / EVIDENCE FIRST</p><h1>Look closer.<br><em>Question everything.</em></h1><p>Compare sensors. Inspect the gaps. Test what the evidence can support.</p></div><span class="research-badge">EXPLORATORY RESEARCH</span></div>
+    <form id="research-form" class="study-controls">
+      <label>YEAR<select id="research-year" required><option>2015</option></select></label>
+      <label>MONTH<select id="research-month"></select></label>
+      <label class="study-aoi">AREA OF INTEREST <span>W, S, E, N</span><input id="research-bbox" value="-122,39,-120,41" required aria-label="Study bounding box west south east north"></label>
+      <label>ACQUISITION CUTOFF<input id="research-cutoff" type="date" value="2015-07-31" required></label>
+      <button class="study-run" type="submit" id="run-study">Run analysis ↗</button>
+    </form>
+    <div id="research-error" class="research-error" role="alert" hidden></div>
+    <div class="study-status" role="status"><span id="study-kind">LOADING STUDY</span><p id="study-status-text">Reading imported observations…</p><button id="export-study" type="button" disabled>↓ Export study</button></div>
+    <div id="study-results" aria-busy="true">
+      <section class="research-metrics" aria-label="Study summary">
+        <article><span>IMPORTED PIXELS</span><strong id="research-pixels">—</strong><small>Original records from both sources</small></article>
+        <article><span>SHARED CELL-DAYS</span><strong id="research-shared">—</strong><small>Same grid cell · same UTC date</small></article>
+        <article><span>VIIRS / MODIS</span><strong id="research-ratio">—</strong><small>Ratio of detected cell-days</small></article>
+        <article><span>CANDIDATE GROUPS</span><strong id="research-groups">—</strong><small>Connected samples · unvalidated</small></article>
+      </section>
+
+      <section class="research-panel overlap-panel" aria-labelledby="overlap-title">
+        <div class="research-panel-heading"><div><p class="eyebrow">01 / SENSOR OVERLAP</p><h2 id="overlap-title">Two sensors. One common grid.</h2><p>MODIS standard processing + VIIRS S-NPP standard processing · 1 km EPSG:6933 cells</p></div><span class="state-tag" id="comparison-status">CHECKING EXPORTS</span></div>
+        <div class="overlap-layout"><div class="daily-chart-wrap"><div class="chart-legend"><span><i class="modis-key"></i> MODIS only</span><span><i class="shared-key"></i> Both sensors</span><span><i class="viirs-key"></i> VIIRS only</span></div><div id="daily-chart" class="daily-chart" role="img" aria-label="Daily sensor overlap chart"></div><p class="chart-footnote">Detected cell-days by UTC date. Empty columns reflect imported records; coverage is a separate measurement.</p></div>
+        <aside class="overlap-summary"><span class="small-label">CO-OCCURRENCE</span><strong id="overlap-percent">—</strong><p>Shared / union of detected cell-days</p><div id="overlap-breakdown" class="overlap-breakdown"></div><div class="band-summary"><span class="small-label">EXPLORATORY RATIO BAND</span><strong id="ratio-band">—</strong><p id="band-reason">Waiting for evidence.</p></div></aside></div>
+        <details class="method-details"><summary>What this comparison can establish</summary><p>Same-day detections may come from different overpasses. Counts are not calibrated sensor sensitivity. The optional ratio band resamples paired UTC days 1,000 times with seed 42 and reports the 2.5–97.5 percentiles; it requires complete exports, one product version per source and at least 10 active days. It does not model temporal dependence or correct missing exposure.</p><p><a href="https://lpdaac.usgs.gov/documents/1005/MOD14_User_Guide_V61.pdf" target="_blank" rel="noopener noreferrer">MODIS active-fire product guide ↗</a> · <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html" target="_blank" rel="noopener noreferrer">Paired bootstrap method reference ↗</a></p></details>
+        <details class="data-details"><summary>Inspect daily counts and source versions</summary><div class="table-scroll"><table><thead><tr><th>UTC date</th><th>MODIS</th><th>VIIRS</th><th>Both</th><th>Union</th></tr></thead><tbody id="daily-table"></tbody></table></div><p id="source-versions"></p></details>
+      </section>
+
+      <section class="research-panel" aria-labelledby="candidates-title">
+        <div class="research-panel-heading"><div><p class="eyebrow">02 / CANDIDATE TRACKING</p><h2 id="candidates-title">Where do the samples connect?</h2><p>Change the linking assumptions and inspect how the candidate groups change.</p></div><span class="state-tag">NOT CONFIRMED INCIDENTS</span></div>
+        <div class="candidate-controls"><label>Maximum distance<select id="candidate-distance"><option value="0.5">0.5 km</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option></select></label><label>Maximum date gap<select id="candidate-gap"><option value="0">Same day only</option><option value="1" selected>1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="7">7 days</option></select></label><button id="rebuild-candidates" type="button">Apply assumptions ↗</button><span id="candidate-method">Geodesic distance between common-cell centers</span></div>
+        <div class="candidate-layout"><div class="candidate-map-wrap"><div id="candidate-map" aria-label="Candidate detection cell map"></div><span class="map-label">DETECTION CELL CENTERS · SCHEMATIC GRID</span><button id="fit-candidates" type="button">Fit selection ↗</button></div><aside class="candidate-list-wrap"><div class="candidate-list-heading"><h3>Candidate groups</h3><span id="candidate-count">—</span></div><div id="candidate-list" class="candidate-list"></div></aside></div>
+        <div id="candidate-detail" class="candidate-detail" aria-live="polite">Select a group to inspect its membership.</div>
+        <p class="research-note">Groups can merge through chains of nearby samples. Missing observations can split them. Candidate IDs change with membership; no perimeter, burned area, or fire-event count is inferred.</p>
+      </section>
+
+      <section class="research-panel" aria-labelledby="coverage-title">
+        <div class="research-panel-heading"><div><p class="eyebrow">03 / OBSERVATION EXPOSURE</p><h2 id="coverage-title">A denominator you can inspect.</h2><p>Measure detected cell-days only against explicit, source-specific observation masks.</p></div><span class="state-tag" id="coverage-state">MASK REQUIRED</span></div>
+        <div class="coverage-layout"><div class="coverage-input"><h3>Bring the observation mask</h3><p>Import a prepared JSON file with source, grid cell, UTC date and mask status. Its AOI and date range must match this study.</p><label class="mask-upload" for="coverage-file">↑ Import coverage JSON<input type="file" accept=".json,application/json" id="coverage-file"></label><div class="coverage-actions"><button id="clear-mask" type="button" disabled>Clear mask</button></div><p id="mask-message" role="status">No mask supplied. Observation coverage remains unknown.</p><button id="download-mask" class="text-button" type="button" disabled>↓ Download current mask</button></div><div id="coverage-output" class="coverage-output"><div class="coverage-empty"><span>—</span><h3>Exposure is unknown</h3><p>A complete FIRMS export does not establish cloud-free satellite coverage. No rate is calculated until a mask is supplied.</p></div></div></div>
+        <details class="method-details"><summary>Mask contract and rate definition</summary><p>Use <code>fireatlas-coverage-v1</code>, the <code>ease6933-centroid-1km-v1</code> grid, matching <code>bbox</code>, <code>start_date</code>, <code>end_date</code>, a Boolean <code>synthetic</code> flag, and explicit <code>provenance</code> and derivation <code>method</code>. Each <code>cells</code> row has <code>source_id</code>, <code>date</code>, integer <code>grid_x</code>/<code>grid_y</code> and <code>status</code>: observed, cloud, no_pass or unknown.</p><p>The rate is 100 × detected cell-days within the observed mask / observed cell-days in the supplied mask. Missing rows are unknown. Cloud, no-pass and unknown rows contribute no exposure. A detection in an explicitly unobserved cell is rejected as a conflict. A cell-day is observed only when the upstream mask processing establishes usable observation of that cell; a partial footprint or a FIRMS hotspot alone is insufficient. Upload validation checks consistency, not scientific provenance. No full-AOI or joint exposure is inferred.</p></details>
+      </section>
+
+      <section class="validation-section" aria-labelledby="validation-title"><div class="research-panel-heading"><div><p class="eyebrow">04 / VALIDATION REGISTER</p><h2 id="validation-title">What still needs evidence.</h2><p>These gates keep exploratory analysis separate from validated research claims.</p></div></div><div class="validation-grid"><article><span>01 / CALIBRATION</span><h3>Source sensitivity</h3><p>Matched overpasses, observation masks, reference labels and independent holdout validation.</p><strong>Awaiting an overlap study</strong></article><article><span>02 / OPTIONAL RADAR</span><h3>Dated change evidence</h3><p>Co-registered SAR scenes, quality masks and a dated optical cross-check for a selected region.</p><strong>No SAR scenes imported</strong></article><article><span>03 / OPTIONAL ENSEMBLE</span><h3>Spread &amp; arrival times</h3><p>A regional fuel and terrain model, weather scenarios, and independent arrival observations.</p><strong>No validated regional model</strong></article></div></section>
+      <details class="provenance-details"><summary>Study provenance <span id="study-hash-short"></span></summary><p id="study-hash"></p><p id="study-temporal-note"></p><div id="study-provenance"></div></details>
+    </div>
+    <footer><span>✦ FIREATLAS / RESEARCH LAB</span><p>Exploratory methods. Traceable assumptions. No operational forecasts.</p><a href="./#atlas-section">Return to atlas ↗</a></footer>
+  </main>
+</body>
+</html>

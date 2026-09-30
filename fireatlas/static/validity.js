@@ -41,9 +41,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   };
   const viewParams=new URLSearchParams(location.search);
+  const liteEarth=viewParams.get('lite')==='1';
   let caseId=['park-2024','grove-2025'].includes(viewParams.get('case'))?viewParams.get('case'):'park-2024',scene=captureFrame?'timeline':'sensors',selectedDate=null,report=null,request=0,maskSource='all';
   const cache=new Map();
   const mobile=()=>matchMedia('(max-width: 760px)').matches;
+  const staticDataRoot=document.querySelector('meta[name="fireatlas-static-data"]')?.content;
 
   function el(tag,attrs={},parent=svg,content){
     const item=document.createElementNS(NS,tag);
@@ -68,6 +70,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     const cloud=el('pattern',{id:'validity-cloud',patternUnits:'userSpaceOnUse',width:8,height:8},defs);
     el('rect',{width:8,height:8,fill:'#38505a'},cloud);
     el('path',{d:'M0 0L8 8M8 0L0 8',stroke:'#acc3cf','stroke-width':1},cloud);
+    const unknown=el('pattern',{id:'validity-unknown',patternUnits:'userSpaceOnUse',width:10,height:10},defs);
+    el('rect',{width:10,height:10,fill:'#303943'},unknown);
+    el('path',{d:'M0 0L10 10M10 0L0 10',stroke:'#68767d','stroke-width':1},unknown);
     el('stop',{offset:'0%','stop-color':'#21414a'},glow);el('stop',{offset:'100%','stop-color':'#081822'},glow);
     el('rect',{width:mobile()?390:960,height:mobile()?360:540,fill:'url(#validity-glow)'});
   }
@@ -106,13 +111,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     :[100+(lon-west)/(east-west)*760,74+(north-lat)/(north-south)*390];}
   function mapFrame(unknown){
     if(mobile()){
-      rounded(35,48,320,266,unknown?'url(#validity-hatch)':'#102a34','#54727c',7);
+      rounded(35,48,320,266,unknown?'url(#validity-unknown)':'#102a34','#54727c',7);
       for(let i=1;i<5;i++){const x=35+i*320/5,y=48+i*266/5;line(x,49,x,313,'#66838b55',1,'3 6');line(36,y,354,y,'#66838b55',1,'3 6');}
       label(35,35,`${report.bbox[0].toFixed(2)}° W`,{size:12,fill:'#a3bfca'});
       label(355,35,`${report.bbox[2].toFixed(2)}° W`,{size:12,fill:'#a3bfca',anchor:'end'});
       return;
     }
-    rounded(94,68,772,401,unknown?'url(#validity-hatch)':'#102a34','#54727c',10);
+    rounded(94,68,772,401,unknown?'url(#validity-unknown)':'#102a34','#54727c',10);
     for(let i=1;i<5;i++){const x=94+i*772/5,y=68+i*401/5;line(x,69,x,468,'#66838b55',1,'4 7');line(95,y,865,y,'#66838b55',1,'4 7');}
     const [west,south,east,north]=report.bbox;
     label(98,52,`${west.toFixed(2)}° W`,{size:12,fill:'#85a9b5'});
@@ -127,7 +132,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       for(const cell of report.native_masks.selected_day_cells){
         if(maskSource!=='all'&&cell.source_id!==maskSource)continue;
         const [x,y]=mapPosition(cell.lon,cell.lat);
-        const fill=cell.state==='detected'?'#ef9f71':cell.state==='observed-without-detection'?'#77c8c0':cell.state==='cloud-obscured'?'url(#validity-cloud)':'url(#validity-hatch)';
+        const fill=cell.state==='detected'?'#ef9f71':cell.state==='observed-without-detection'?'#77c8c0':cell.state==='cloud-obscured'?'url(#validity-cloud)':'url(#validity-unknown)';
         const mark=el('rect',{x:x-3,y:y-3,width:6,height:6,fill,stroke:'#93acb5','stroke-width':.35,tabindex:'0',role:'button','aria-label':`${sourceNames[cell.source_id]} native centroid samples: ${cell.state}. Inspect granule references.`});
         const inspect=()=>showMaskCell(cell);
         mark.addEventListener('click',inspect);
@@ -242,7 +247,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       const mark=document.createElement('span');mark.className='validation-step-mark';mark.textContent=gate.status==='passed'?'✓':'○';mark.setAttribute('aria-hidden','true');
       const name=document.createElement('strong');name.textContent=gate.label;
       const count=document.createElement('b');count.textContent=`${format(gate.actual)} / ${format(gate.required)}`;
-      const state=document.createElement('small');state.textContent=`${gate.unit} · ${gate.status}${gate.target_fraction?' · target ≥98%':''}`;
+      const state=document.createElement('small');state.textContent=`${gate.unit} · ${gate.status}${gate.target_fraction?' · target ≥98% of available rows':''}`;
       step.append(mark,name,count,state);path.append(step);
     }
     target.append(path);
@@ -252,7 +257,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       :'Native files are not loaded. Download the exact files from NASA with Earthdata Login; detection CSVs alone cannot establish clear or cloud observations.';
     target.append(summary);
     if(masks?.processed_fire_granules){
-      const limits=document.createElement('p');limits.textContent=`${format(masks.reconciliation.total_firms_pixels-masks.reconciliation.matched)} unreconciled rows · ${format(masks.reconciliation.confidence_disagreements)} confidence disagreements. All exceptions and the 30-cell review queue are included in the ZIP. No-pass and full footprint coverage remain unknown.`;target.append(limits);
+      const limits=document.createElement('p');limits.textContent=`${format(masks.reconciliation.total_firms_pixels-masks.reconciliation.matched)} unreconciled rows · ${format(masks.reconciliation.confidence_disagreements)} confidence disagreements. The match target applies only to available FIRMS rows; it is not a completeness claim. All exceptions and the 30-cell review queue are included in the ZIP. No-pass and full footprint coverage remain unknown.`;target.append(limits);
     }
     const legend=document.createElement('div');legend.className='validity-mask-legend';
     for(const [kind,text] of [['fire','Native fire'],['clear','Sampled non-fire'],['cloud','Cloud samples'],['unknown','Unknown']]){
@@ -324,7 +329,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       const gallery=document.createElement('div');gallery.className='validity-media-gallery';
       for(const item of media.images){
         const figure=document.createElement('figure');figure.className='validity-media-tile';
-        const image=document.createElement('img');image.src=item.src;image.alt=item.alt;image.loading='lazy';image.decoding='async';
+        // Evidence media is behind the deliberate "Inspect evidence" disclosure,
+        // so load it eagerly once that panel is opened. Lazy loading leaves the
+        // visible gallery as empty black tiles because the gallery is below the
+        // fold and can be hidden when the method page first renders.
+        const image=document.createElement('img');image.src=item.src;image.alt=item.alt;image.loading='eager';image.decoding='async';
         const caption=document.createElement('figcaption');caption.textContent=item.label||'Official incident context';
         figure.append(image,caption);gallery.append(figure);
       }
@@ -382,13 +391,25 @@ document.addEventListener('DOMContentLoaded',()=>{
       :report.sources.every(source=>source.full_month_export)
         ?'Authentic standard FIRMS exports · pass/cloud coverage still unknown.'
         :'Selected month lacks a complete paired standard export; counts may be partial.';
-    const c=new URLSearchParams({lite:'1',series:'joint',year:report.selected_date_utc.slice(0,4),month:String(Number(report.selected_date_utc.slice(5,7))),day:report.selected_date_utc,bbox:report.bbox.join(',')});
+    const c=new URLSearchParams({series:'joint',year:report.selected_date_utc.slice(0,4),month:String(Number(report.selected_date_utc.slice(5,7))),day:report.selected_date_utc,bbox:report.bbox.join(',')});
+    if(liteEarth)c.set('lite','1');
     $('#validity-open-calendar').href=`/?${c}#calendar-section`;
     $('#validity-official-link').href=report.official_reference.url;
     $('#validity-source-notice').hidden=!report.source_notice;
     $('#validity-notice-link').hidden=!report.source_notice;
     if(report.source_notice){$('#validity-source-notice').textContent=report.source_notice.description;$('#validity-notice-link').href=report.source_notice.url;}
-    $('#validity-download').href=`/api/validity/export?case=${encodeURIComponent(caseId)}`;
+    $('#validity-download').href=staticDataRoot
+      ? new URL(`validity/${caseId}.zip`,new URL(staticDataRoot,document.baseURI)).href
+      : `/api/validity/export?case=${encodeURIComponent(caseId)}`;
+    const reviewTemplate=$('#validity-review-template');
+    if(reviewTemplate){
+      reviewTemplate.href=staticDataRoot
+        ? new URL(`validity/${caseId}-review-template.json`,new URL(staticDataRoot,document.baseURI)).href
+        : `/api/validity/review-template?case=${encodeURIComponent(caseId)}`;
+      reviewTemplate.download=`fireatlas_${caseId}_native_mask_review_template.json`;
+    }
+    const reviewUi=$('#validity-review-ui');
+    if(reviewUi)reviewUi.href=`/review.html?case=${encodeURIComponent(caseId)}`;
     const first=report.first_detection_within_5km_after_reported_start;
     $('#validity-detail-summary').textContent=first
       ?`The official record gives a local start time of ${report.official_reference.start_local.replace('T',' ')}. The first imported detection within 5 km after that interpreted time was ${first.acquisition_utc} (${sourceNames[first.source_id]}, ${first.distance_km} km from the reported start). This is a spatial and temporal association, not proof of the fire perimeter.`
@@ -418,7 +439,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     const key=`${id}:${date||'default'}`;
     try{
       let next=cache.get(key);
-      if(!next){const qs=new URLSearchParams({case:id,...(date?{date}:{})});const response=await fetch(`/api/validity?${qs}`);next=await response.json();if(!response.ok)throw new Error(next.error||'Study unavailable');cache.set(key,next);}
+      if(!next){
+        const url=staticDataRoot
+          ? new URL(`validity/${id}${date?`/${date}`:''}.json`,new URL(staticDataRoot,document.baseURI)).href
+          : `/api/validity?${new URLSearchParams({case:id,...(date?{date}:{})})}`;
+        const response=await fetch(url);next=await response.json();if(!response.ok)throw new Error(next.error||'Study unavailable');cache.set(key,next);
+      }
       if(current!==request)return;
       report=next;selectedDate=next.selected_date_utc;render();
       window.dispatchEvent(new CustomEvent('fireatlas:validity-report',{detail:next}));
@@ -426,7 +452,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(sync)window.dispatchEvent(new CustomEvent('fireatlas:validity-day',{detail:{date:selectedDate,bbox:next.bbox,year:Number(selectedDate.slice(0,4)),month:Number(selectedDate.slice(5,7))}}));
     }catch(error){if(current!==request)return;report=null;svg.replaceChildren();$('#validity-status').textContent=`Authentic case unavailable: ${error.message}. Select a case to retry.`;$('#validity-graphic-date').textContent='SOURCE DATA UNAVAILABLE';$('#validity-readout-value').textContent='—';$('#validity-day-buttons').replaceChildren();
       for(const id of ['validity-detail-summary','validity-record-detail','validity-sensitivity','validity-cmr','validity-incidents','validity-validation','validity-evidence-media','validity-incident-context'])$('#'+id)?.replaceChildren();
-      $('#validity-source-notice').hidden=true;$('#validity-notice-link').hidden=true;$('#validity-selected-day').textContent='—';$('#validity-official-link').removeAttribute('href');$('#validity-download').removeAttribute('href');
+      $('#validity-source-notice').hidden=true;$('#validity-notice-link').hidden=true;$('#validity-selected-day').textContent='—';$('#validity-official-link').removeAttribute('href');$('#validity-download').removeAttribute('href');$('#validity-review-template').removeAttribute('href');$('#validity-review-ui').removeAttribute('href');
       window.dispatchEvent(new CustomEvent('fireatlas:validity-error',{detail:{message:error.message}}));
     }
   }

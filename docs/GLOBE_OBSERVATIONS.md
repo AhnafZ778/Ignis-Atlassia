@@ -117,12 +117,17 @@ authentic imported NASA FIRMS snapshot: 866,956 observations in 7,307 one-degree
 groups, dated September 20–27, 2026. This is an imported snapshot, not a live
 stream. Groups retain their detection count and last-observed date in the panel.
 
-The 3D Earth panel is now limited to satellite evidence. The historical
-casebook endpoint, fire textures, picker, and death-count summaries have been
-removed. The FIRMS snapshot remains an imported historical snapshot; it is not
-labelled as a live observation stream. The map loads as it approaches the
-viewport, preserving lazy loading on the landing page.
+The landing Earth now has two independent visibility controls. **Satellite
+signals** continues to show the imported NASA FIRMS snapshot described above.
+**Wildfires** loads a separate curated casebook of selected historical events
+from `/documented-fires.json` and draws their approximate affected-area
+locations as glowing orange-red heat marks. The casebook is not exhaustive, is not derived from
+the NASA observations, and does not represent current fire conditions,
+ignition points, perimeters, or exact affected boundaries. The currently
+rendered layer includes a case selector; selecting a mark or case reveals the
+reported time window, place, summary, and source links. A visible caption and
+the Earth details legend state the limits.
 
-R1 automated and served-page checks passed on 29 September 2026. Historical
-browser notes above describe the prior casebook version and are not current
-feature claims.
+R1 automated and served-page checks passed on 29 September 2026. The older
+browser notes above describe the prior NASA-only layer and are not current
+claims about the independent historical casebook toggle.

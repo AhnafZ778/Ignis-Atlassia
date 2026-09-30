@@ -1,0 +1,882 @@
+{
+  "calibration": {
+    "annual_ratio": 4.281310856864654,
+    "annual_ratio_95_interval": [
+      4.132316614756739,
+      4.401281771174714
+    ],
+    "bootstrap_replicates": 1000,
+    "calibration_id": "c69f2a28fe1a3a2b275c258c433328fb8f85e3c5029181be6af585950c630ef9",
+    "data_class": "authentic-imported",
+    "eligible_months": [
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 79,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 336,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 111,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 659,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 110,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 417,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 105,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 611,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 2136,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 20019,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 154,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 1314,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 46,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 316,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 27,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 72,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 31,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 443,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 1911,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 8540,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 7735,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 22046,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 208,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 1117,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2023
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 147,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 821,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 29,
+        "modis_cell_days": 76,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 603,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 81,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 502,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 103,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 512,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 4524,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 25633,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 705,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 3453,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 25,
+        "modis_cell_days": 38,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 196,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 23,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 61,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 98,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 759,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 969,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 5174,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 3945,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 7648,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 191,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 973,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2024
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 124,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 699,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 84,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 624,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 146,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 652,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 727,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 2321,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 2949,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 5,
+        "viirs_cell_days": 19758,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 160,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 1361,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 13,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 7,
+        "viirs_cell_days": 99,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 3,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 8,
+        "viirs_cell_days": 16,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 48,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 9,
+        "viirs_cell_days": 319,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 1268,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 10,
+        "viirs_cell_days": 3868,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 2675,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 11,
+        "viirs_cell_days": 3825,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 36,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 12,
+        "viirs_cell_days": 390,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2025
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 43,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 1,
+        "viirs_cell_days": 373,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 28,
+        "modis_cell_days": 89,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 2,
+        "viirs_cell_days": 590,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 31,
+        "modis_cell_days": 71,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 3,
+        "viirs_cell_days": 419,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 554,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 4,
+        "viirs_cell_days": 1263,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      },
+      {
+        "eligible_utc_days": 30,
+        "modis_cell_days": 321,
+        "modis_versions": [
+          "61.03"
+        ],
+        "month": 6,
+        "viirs_cell_days": 1899,
+        "viirs_versions": [
+          "2"
+        ],
+        "year": 2026
+      }
+    ],
+    "excluded_days": {
+      "documented_viirs_processing_gap": 6,
+      "incomplete_source_export": 4414
+    },
+    "method_version": "monthly-ratio-loyo-bootstrap-1000-step2012-v2",
+    "months": [
+      {
+        "basis": "month-of-year",
+        "high": 7.028985507246377,
+        "low": 4.763020833333333,
+        "month": 1,
+        "n_years": 4,
+        "ratio": 5.67175572519084
+      },
+      {
+        "basis": "month-of-year",
+        "high": 7.66875,
+        "low": 6.237410071942446,
+        "month": 2,
+        "n_years": 4,
+        "ratio": 6.877777777777778
+      },
+      {
+        "basis": "month-of-year",
+        "high": 6.059210526315789,
+        "low": 4.164588528678304,
+        "month": 3,
+        "n_years": 4,
+        "ratio": 4.877450980392157
+      },
+      {
+        "basis": "month-of-year",
+        "high": 5.610047846889952,
+        "low": 2.490096208262592,
+        "month": 4,
+        "n_years": 4,
+        "ratio": 3.1611820013431835
+      },
+      {
+        "basis": "month-of-year",
+        "high": 9.372191011235955,
+        "low": 5.666003536693192,
+        "month": 5,
+        "n_years": 3,
+        "ratio": 6.807159954209595
+      },
+      {
+        "basis": "month-of-year",
+        "high": 8.519108280254777,
+        "low": 5.144557073600705,
+        "month": 6,
+        "n_years": 4,
+        "ratio": 5.990298507462686
+      },
+      {
+        "basis": "month-of-year",
+        "high": 7.615384615384615,
+        "low": 5.157894736842105,
+        "month": 7,
+        "n_years": 3,
+        "ratio": 6.298969072164948
+      },
+      {
+        "basis": "month-of-year",
+        "high": 5.333333333333333,
+        "low": 2.652173913043478,
+        "month": 8,
+        "n_years": 3,
+        "ratio": 2.811320754716981
+      },
+      {
+        "basis": "month-of-year",
+        "high": 14.290322580645162,
+        "low": 6.645833333333333,
+        "month": 9,
+        "n_years": 3,
+        "ratio": 8.59322033898305
+      },
+      {
+        "basis": "month-of-year",
+        "high": 5.339525283797729,
+        "low": 3.050473186119874,
+        "month": 10,
+        "n_years": 3,
+        "ratio": 4.238669238187078
+      },
+      {
+        "basis": "month-of-year",
+        "high": 2.8501616031027797,
+        "low": 1.4299065420560748,
+        "month": 11,
+        "n_years": 3,
+        "ratio": 2.335005224660397
+      },
+      {
+        "basis": "month-of-year",
+        "high": 10.833333333333334,
+        "low": 5.0942408376963355,
+        "month": 12,
+        "n_years": 3,
+        "ratio": 5.7011494252873565
+      }
+    ],
+    "overlap_months": [
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-06"
+    ],
+    "random_seed": 20261114,
+    "region": {
+      "bbox": [
+        73.8,
+        29.5,
+        77.6,
+        32.6
+      ],
+      "id": "punjab-haryana",
+      "name": "Punjab\u2013Haryana"
+    },
+    "schema": "fireatlas-calibration-v1",
+    "selected_model": "monthly_ratio",
+    "status": "calibrated",
+    "step_2012": {
+      "interval_95": [
+        null,
+        null
+      ],
+      "months_used": [],
+      "ratio": null,
+      "reference_years": [
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "status": "awaiting-2012-standard-exports",
+      "within_interval": null
+    },
+    "unit": "VIIRS-equivalent active-fire distinct 1 km centroid cell-days",
+    "validation": {
+      "models": {
+        "annual_ratio": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 0.3654955488590328,
+          "median_annual_absolute_percent_error": 0.04999961711866098
+        },
+        "monthly_ratio": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 0.3088578070420303,
+          "median_annual_absolute_percent_error": 0.2633151906743542
+        },
+        "no_harmonization": {
+          "annual_error_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "median_absolute_log_error": 1.7227665977411035,
+          "median_annual_absolute_percent_error": 0.7647566634293731
+        }
+      },
+      "monthly_interval_coverage": 0.3902439024390244,
+      "monthly_interval_pairs": 41,
+      "partial_years_excluded_from_annual_error": [
+        {
+          "annual_error_used": false,
+          "eligible_months": 5,
+          "year": 2026
+        }
+      ],
+      "selected_model": "monthly_ratio",
+      "selection_rule": "lowest median absolute log error; lexical tie-break",
+      "years_held_out": [
+        2023,
+        2024,
+        2025,
+        2026
+      ]
+    },
+    "versions": {
+      "MODIS_SP": "61.03",
+      "VIIRS_SNPP_SP": "2"
+    },
+    "years_used": [
+      2023,
+      2024,
+      2025,
+      2026
+    ]
+  },
+  "provenance": {
+    "daily_bundle": "/samples/aggregates/punjab-haryana.json.gz",
+    "daily_bundle_sha256": "ecea89bc4e635429d53b315b7bd73ee5936d1545711cfe0e95ddd7c6b0b67629",
+    "input_manifest_sha256": "47590e3bf4af2ca1d821f18351c446df1dae23ad42e7ce95c7d54ff09a5a4cd2",
+    "paired_complete_months": [
+      "2022-07",
+      "2022-08",
+      "2022-09",
+      "2022-10",
+      "2022-11",
+      "2022-12",
+      "2023-01",
+      "2023-02",
+      "2023-03",
+      "2023-04",
+      "2023-05",
+      "2023-06",
+      "2023-07",
+      "2023-08",
+      "2023-09",
+      "2023-10",
+      "2023-11",
+      "2023-12",
+      "2024-01",
+      "2024-02",
+      "2024-03",
+      "2024-04",
+      "2024-05",
+      "2024-06",
+      "2024-07",
+      "2024-08",
+      "2024-09",
+      "2024-10",
+      "2024-11",
+      "2024-12",
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-06"
+    ],
+    "parent_files": [
+      {
+        "filename": "fire_archive_M-C61_814031.csv",
+        "sha256": "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165"
+      },
+      {
+        "filename": "fire_archive_M-C61_814038.csv",
+        "sha256": "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+      },
+      {
+        "filename": "fire_archive_M-C61_814040.csv",
+        "sha256": "1b20952ad260b42521502217829c52b7231b12634b696e734fdade40d9e642e4"
+      },
+      {
+        "filename": "fire_archive_M-C61_814042.csv",
+        "sha256": "79311ac9ef6aa2c76caf850985c98c2b9d4fc3a9b1f6dbeb0bc8beb4c2a5b3fc"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814034.csv",
+        "sha256": "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814039.csv",
+        "sha256": "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814041.csv",
+        "sha256": "7c2804b73b4a1698c82f6d5f3eb99e95acecce654b346456c9e2b2f7198469fe"
+      },
+      {
+        "filename": "fire_archive_SV-C2_814043.csv",
+        "sha256": "339067de2db9cf136fa1da1acabac5410c5e45e2719351744bbd438f9982bcde"
+      }
+    ],
+    "reproduction": "Recompute from the listed paired daily bundle with the method version recorded in the calibration object."
+  },
+  "region": {
+    "bbox": [
+      73.8,
+      29.5,
+      77.6,
+      32.6
+    ],
+    "id": "punjab-haryana",
+    "name": "Punjab\u2013Haryana"
+  },
+  "schema": "fireatlas-calibration-artifact-v1"
+}

@@ -108,6 +108,21 @@ def native_layer(path, names):
         normalize = lambda s: re.sub(r'[^a-z0-9]', '', s.lower())
         if any(normalize(candidate) in {normalize(label), normalize(descriptive)} for candidate in names):
             layers.append((uri, gdal.Open(uri)))
+    # GDAL's MODIS HDF4 driver lists the scan-angle datasets from MOD03 but
+    # omits the swath geolocation arrays from GetSubDatasets(). They are still
+    # addressable by their documented EOS swath names. Open those exact native
+    # layers explicitly; never derive or resample geolocation from another
+    # dataset.
+    if not layers and driver == 'HDF4':
+        normalize = lambda s: re.sub(r'[^a-z0-9]', '', s.lower())
+        geo_names = {normalize(candidate) for candidate in names}
+        if geo_names & {'latitude', 'longitude'}:
+            for name in ('Latitude', 'Longitude'):
+                if normalize(name) in geo_names:
+                    uri = f'HDF4_EOS:EOS_SWATH:"{Path(path)}":MODIS_Swath_Type_GEO:{name}'
+                    layer = gdal.Open(uri)
+                    if layer is not None:
+                        layers.append((uri, layer))
     if len(layers) != 1:
         raise ValueError(f'Expected one {names} layer, found {len(layers)}; refusing inferred alignment')
     return layers[0]
@@ -222,7 +237,20 @@ def load_evidence(case_id, path, modified):
 def read_evidence(case_id, path=STORE):
     if not Path(path).exists():
         return {'schema': SCHEMA, 'case_id': case_id, 'method': METHOD, 'inventory': [], 'pixels': []}
-    return load_evidence(case_id, str(path), Path(path).stat().st_mtime_ns)
+    evidence = load_evidence(case_id, str(path), Path(path).stat().st_mtime_ns)
+    # Reviews are deliberately a separate ignored sidecar.  They are loaded
+    # only when present, so a clean clone remains visibly pending rather than
+    # receiving a generated or implicit sign-off.
+    review_path = Path(path).parent / 'validity_mask_reviews' / f'{case_id}.json'
+    if review_path.exists():
+        try:
+            review = json.loads(review_path.read_text())
+        except (OSError, json.JSONDecodeError) as error:
+            raise ValueError(f'Could not read native-mask review sidecar: {review_path}') from error
+        if not isinstance(review, dict):
+            raise ValueError(f'Native-mask review sidecar must be an object: {review_path}')
+        evidence = {**evidence, 'review': review}
+    return evidence
 
 
 def pass_state(counts):
@@ -366,8 +394,13 @@ def summarize(case_id, rows, evidence, inventory, selected_date):
         state = 'detected' if 'detected' in states else next(iter(states)) if complete[source] and len(states) == 1 else 'unknown'
         counts[day][state] += 1
         if day == selected_date:
+            # Cell-centre coordinates are display/provenance coordinates, not
+            # native geolocation measurements.  Round them so an evidence ZIP
+            # reproduces across pyproj/GDAL builds whose inverse projection
+            # differs by a few nanodegrees.
             lon, lat = FROM_GRID.transform((x + .5) * GRID_METERS, (y + .5) * GRID_METERS)
-            cells.append({'source_id': source, 'grid_x': x, 'grid_y': y, 'lon': lon, 'lat': lat,
+            cells.append({'source_id': source, 'grid_x': x, 'grid_y': y,
+                          'lon': round(float(lon), 6), 'lat': round(float(lat), 6),
                           'state': state, 'granules': [p['producer_id'] for p in observations],
                           'class_counts': {str(code): count for code, count in sum((Counter(p['class_counts']) for p in observations), Counter()).items()}})
     matches = reconcile(rows, evidence)
@@ -375,19 +408,23 @@ def summarize(case_id, rows, evidence, inventory, selected_date):
     processed = sum(g['status'] == 'processed' for g in records.values())
     matched = sum(m['status'] == 'matched' for m in matches)
     # Samples are a deterministic review queue, never an automatic human sign-off.
-    strata = defaultdict(list)
-    for pixel in evidence['pixels']:
-        source = records[pixel['producer_id']]['source_id']
-        strata[(source, pixel['mask_class'])].append(pixel)
-    samples = []
-    for bucket in strata.values():
-        bucket.sort(key=lambda p: hashlib.sha256(f"{p['producer_id']}:{p['line']}:{p['sample']}".encode()).hexdigest())
-    while len(samples) < 30 and any(strata.values()):
-        for key in sorted(strata):
-            if strata[key] and len(samples) < 30:
-                samples.append(strata[key].pop())
+    from .mask_review import sample_queue, validate_review
+    samples = sample_queue(evidence)
+    raw_review = {'required_samples': 30, 'reviewed_samples': 0,
+                  'status': 'pending-independent-human-review', 'samples': samples}
+    review = evidence.get('review')
+    review_result = None
+    if review is not None:
+        review_result = validate_review(review, evidence)
+        reviewed = {(item['producer_id'], item['line'], item['sample']): item
+                    for item in review_result['samples']}
+        raw_review.update({key: value for key, value in review_result.items() if key != 'samples'})
+        raw_review['samples'] = [
+            {**sample, 'review': reviewed[(sample['producer_id'], sample['line'], sample['sample'])]}
+            for sample in samples
+        ]
     return {
-        'status': 'not-loaded' if not processed else 'processed-unreviewed',
+        'status': 'not-loaded' if not processed else ('processed-reviewed' if review_result else 'processed-unreviewed'),
         'spatial_validation': 'centroid-sampling-only; footprint coverage not established',
         'method': METHOD, 'expected_fire_granules': len(expected), 'processed_fire_granules': processed,
         'inventory_complete': all(complete.values()), 'complete_sources': complete,
@@ -401,7 +438,7 @@ def summarize(case_id, rows, evidence, inventory, selected_date):
         'paired_observations': {'sample_size': len(paired), 'pairs': paired,
                                 'agreement': sum(p['modis_state'] == p['viirs_state'] for p in paired),
                                 'interpretation': 'descriptive usable centroid-sampled pairs; no sensitivity calibration or full-cell exposure'},
-        'raw_mask_review': {'required_samples': 30, 'reviewed_samples': 0, 'status': 'pending-independent-human-review', 'samples': samples},
+        'raw_mask_review': raw_review,
         'no_pass_status': 'not-derived-without-verified-footprints',
     }
 

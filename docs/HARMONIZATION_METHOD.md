@@ -1,5 +1,12 @@
 # MODIS–VIIRS harmonization method
 
+The perfected plan names the primary unit **VIIRS-equivalent active-fire cell-days on a
+common 1 km grid**. “VIIRS-equivalent” identifies the selected reference scale; it is not a
+claim that the two instruments have equal detection probability. Native source detail remains
+available: MODIS is represented as approximately 1 km source pixels and the imported Suomi NPP
+record as 375 m VIIRS source pixels. The landing page’s Sensor Bridge shows the transformation
+and keeps sensor-only, shared, and gap days separate.
+
 FireAtlas exposes a month-level method audit at `/api/harmonization` and on the
 Data & Method page (`/method.html#harmonization-audit`). The audit is intentionally descriptive: it makes the
 comparison reproducible without claiming that the two instruments have equal
@@ -15,6 +22,10 @@ detection probability.
 - MODIS and VIIRS are assigned to the common 1 km EPSG:6933 equal-area grid by
   detection centroid. The grid implementation is versioned as
   `ease6933-centroid-1km-v1`.
+- The calendar variant includes FIRMS `type` 0 or a missing type value, at all
+  source confidence levels. Other types remain in inspectable source rows but
+  do not contribute to the displayed calendar, harmonization audit, or daily
+  aggregate bundle.
 
 ## Calculation
 
@@ -38,6 +49,14 @@ verified complete export remains unknown; partial records are shown as a lower
 bound. Prior-year medians require at least three complete same-month exports for
 the same source cohort and AOI.
 
+The local archive now contains positive records from older annual files back
+to July 2006 MODIS and July 2012 S-NPP. Their original FIRMS request metadata
+were unavailable, so those inputs are marked `reconstructed-rows-only`: their
+detection days are visible as partial, and their non-detection days cannot
+enter a monthly harmonized value or baseline. The request-verified joint
+monthly comparison starts in July 2022; S-NPP May 2026 remains unknown because
+the supplied worldwide S-NPP export had no rows for that month.
+
 ## Interpretation limits
 
 This is not a burned-area product, fire perimeter, fire count, or sensor
@@ -46,6 +65,16 @@ overpasses or the same physical fire. FIRMS point exports alone do not provide
 the pass and cloud masks needed to say that a zero-detection day was observed
 fire-free. MODIS and VIIRS era changes must therefore be interpreted with the
 source cohort and processing level visible in the audit.
+
+## Raw FRP and independent corroboration
+
+Daily aggregates retain each source’s raw FIRMS Fire Radiative Power sum in MW/day as
+secondary context. FRP is displayed per sensor and is never added to the harmonized
+cell-day measure. The perfected plan calls for MCD64A1 Collection 6.1 burned-area context
+as a lagged, independent product. Dated Burn Date and QA rasters are now hash-bound in
+`fireatlas/samples/mcd64_corroboration.json`; the UI shows mapped counts for matching months
+as separate context. It does not treat them as active-fire truth, a pass/cloud mask, or a
+perimeter, and independent review remains pending.
 
 NASA advises scientific users to use standard processing when available; the
 importer rejects rows labelled NRT/RT/URT under a standard source. NRT products

@@ -9,8 +9,12 @@
   const state = {
     data: null,
     points: [],
+    wildfires: null,
+    wildfireReviewedOn: null,
+    wildfireLoading: null,
     visible: [],
     selected: null,
+    selectedWildfire: null,
     details: null,
     bridge: null,
     frame: null,
@@ -91,6 +95,68 @@
     $("globe-reveal-status").hidden = !text;
   }
 
+  async function toggleWildfires() {
+    const toggle = $("globe-wildfires"), note = $("globe-wildfire-note");
+    if (!toggle.checked) {
+      note.hidden = true;
+      $("globe-wildfire-browser").hidden = true;
+      if (state.selectedWildfire) clearSelection();
+      draw(state.bridge?.view);
+      return;
+    }
+    note.hidden = false;
+    note.textContent = "Loading selected historical examples…";
+    try {
+      if (!state.wildfires) {
+        state.wildfireLoading ||= (async () => {
+          const embedded = $("globe-wildfire-data")?.textContent.trim();
+          let data;
+          if (embedded) {
+            data = JSON.parse(embedded);
+          } else {
+            const response = await fetch("/documented-fires.json");
+            data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Historical casebook unavailable.");
+          }
+          if (data.kind !== "selected-global-wildfire-casebook" || !Array.isArray(data.events)) {
+            throw new Error("Historical casebook format was not recognized.");
+          }
+          const safeSources = sources => (Array.isArray(sources) ? sources : []).filter(source => {
+            if (!source || typeof source.publisher !== "string" || typeof source.label !== "string" || typeof source.url !== "string") return false;
+            try { return ["https:", "http:"].includes(new URL(source.url).protocol); } catch { return false; }
+          });
+          const events = data.events.filter(event => event && typeof event.id === "string" &&
+            typeof event.name === "string" && typeof event.place === "string" &&
+            typeof event.period === "string" && typeof event.summary === "string" &&
+            Number.isFinite(event.lat) && event.lat >= -90 && event.lat <= 90 &&
+            Number.isFinite(event.lon) && event.lon >= -180 && event.lon <= 180 &&
+            safeSources(event.sources).length > 0).map(event => ({...event, sources: safeSources(event.sources)}));
+          if (!events.length) throw new Error("No valid historical locations were found.");
+          return {events: events.map(event => ({...event, historicalCase: true, vector: FireGlobeMath.vector(event.lon, event.lat)})), reviewedOn: data.reviewed_on, excluded: data.events.length - events.length};
+        })().catch(error => {
+          state.wildfireLoading = null;
+          throw error;
+        });
+        const loaded = await state.wildfireLoading;
+        state.wildfires = loaded.events;
+        state.wildfireReviewedOn = loaded.reviewedOn;
+        const select = $("globe-wildfire-location");
+        select.replaceChildren(new Option("Choose a case…", ""), ...state.wildfires.map(item => new Option(`${item.name} · ${item.period}`, item.id)));
+        $("globe-wildfire-browser").hidden = false;
+        $("globe-wildfire-browser").dataset.excluded = String(loaded.excluded);
+        state.wildfireLoading = null;
+      }
+      const skipped = Number($("globe-wildfire-browser").dataset.excluded || 0);
+      note.textContent = `${state.wildfires.length} sourced historical cases loaded${skipped ? ` · ${skipped} incomplete records skipped` : ""} · approximate locations, not live or perimeters.`;
+      $("globe-wildfire-browser").hidden = false;
+      draw(state.bridge?.view);
+    } catch (error) {
+      toggle.checked = false;
+      note.textContent = `Historical wildfire examples unavailable: ${error.message}`;
+      draw(state.bridge?.view);
+    }
+  }
+
   function syncControls() {
     document.querySelectorAll("[data-globe-region],#globe-rotate,#globe-zoom-in,#globe-zoom-out,#globe-reset").forEach(b => b.disabled = state.revealing || state.failedEarth);
     $("globe-source").disabled = state.revealing || !!state.loading || !state.data?.sources.length;
@@ -164,19 +230,29 @@
 
   function openEarthDetails() {
     const dialog = $("earth-details-dialog");
+    const console = document.querySelector(".globe-console");
+    const historical = Boolean(state.selectedWildfire);
+    $("globe-evidence-tools").hidden = historical;
+    $("globe-wildfire-browser").hidden = !state.wildfires?.length || !$("globe-wildfires").checked;
+    if (historical) $("globe-evidence-tools").open = false;
+    console.classList.toggle("has-historical-selection", historical);
     if (!dialog.open) dialog.showModal();
     document.documentElement.classList.add("earth-details-visible");
   }
 
   function selectedLocation() {
-    return state.points.find(point => point.id === state.selected);
+    return state.selectedWildfire
+      ? state.wildfires?.find(item => item.id === state.selectedWildfire)
+      : state.points.find(point => point.id === state.selected);
   }
 
   function showPointCallout(record) {
     closeEarthDetails();
-    $("point-callout-kind").textContent = "NASA satellite group";
-    $("point-callout-title").textContent = `${format(record.count)} detections`;
-    $("point-callout-meta").textContent = `${coords(record.lon, record.lat)} · Last observed ${observationDate(record.last, true)}`;
+    $("point-callout-kind").textContent = record.historicalCase ? "Historical wildfire case" : "NASA satellite group";
+    $("point-callout-title").textContent = record.historicalCase ? record.name : `${format(record.count)} detections`;
+    $("point-callout-meta").textContent = record.historicalCase
+      ? `${record.place} · ${record.period} · approximate area`
+      : `${coords(record.lon, record.lat)} · Last observed ${observationDate(record.last, true)}`;
     $("point-callout-zoom").disabled = state.failedEarth;
     positionPointCallout(state.bridge?.view);
   }
@@ -184,7 +260,10 @@
   function positionPointCallout(view) {
     const callout = $("globe-point-callout"), record = selectedLocation();
     const point = record && view && FireGlobeMath.project(record.vector, view);
-    if (!point || !state.frame || !$("globe-markers").checked || !state.revealed) {
+    const visibleLayer = state.selectedWildfire
+      ? $("globe-wildfires").checked
+      : $("globe-markers").checked && state.revealed;
+    if (!point || !state.frame || !visibleLayer) {
       callout.hidden = true;
       return;
     }
@@ -278,6 +357,7 @@
     setRotationUI(view.playing);
     updateZoomUI(view);
     const showDetections = $("globe-markers").checked && state.revealed;
+    const showWildfires = $("globe-wildfires").checked;
     const markerScale = Math.min(1, Math.max(0.58, view.width / 1000));
     const latest = state.data?.daily.at(-1)?.date;
     for (const item of showDetections ? state.points : []) {
@@ -315,6 +395,40 @@
         ctx.stroke();
       }
       state.visible.push({x: point.x, y: point.y, radius, id: item.id});
+    }
+    // Historical case locations are independent of NASA signal filters.
+    // Hotspot halos are approximate affected-area locations, never boundaries.
+    for (const item of showWildfires ? state.wildfires || [] : []) {
+      const point = FireGlobeMath.project(item.vector, view);
+      if (!point) continue;
+      const radius = 5.8 * markerScale;
+      const glow = ctx.createRadialGradient(point.x, point.y, radius * 0.25, point.x, point.y, radius * 2.5);
+      glow.addColorStop(0, "rgba(255, 214, 72, .52)");
+      glow.addColorStop(0.42, "rgba(255, 82, 26, .35)");
+      glow.addColorStop(1, "rgba(255, 54, 12, 0)");
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#e63b19";
+      ctx.fill();
+      ctx.lineWidth = 1.5 * markerScale;
+      ctx.strokeStyle = "#ffd83e";
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, radius * 0.45, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffba28";
+      ctx.fill();
+      if (item.id === state.selectedWildfire) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, radius + 4, 0, Math.PI * 2);
+        ctx.strokeStyle = "#fff4b5";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      }
+      state.visible.push({x: point.x, y: point.y, radius: radius * 2, id: item.id, kind: "wildfire"});
     }
     // Exact coordinates from the selected cell's latest observation sample.
     for (const row of showDetections ? state.details?.observations || [] : []) {
@@ -357,7 +471,7 @@
         e.preventDefault(); e.stopImmediatePropagation();
       }
     }, true);
-    surface.setAttribute("aria-label", "Interactive Earth with NASA satellite observations. Drag or use arrow keys to rotate. Select a detection group for source details.");
+    surface.setAttribute("aria-label", "Interactive Earth. NASA satellite signals and selected historical wildfire cases have separate controls; historical markers are approximate locations. Drag or use arrow keys to rotate. Select a marker for details.");
     let down = null;
     const pointers = new Set();
     surface.addEventListener("pointerdown", e => {
@@ -381,11 +495,12 @@
       down = null;
       const target = state.visible.map(p => ({...p, d: Math.hypot(p.x - e.clientX, p.y - e.clientY)}))
         .filter(p => p.d <= (e.pointerType === "touch" ? 13 : 8)).sort((a, b) => a.d - b.d)[0];
-      if (target) select(target.id);
+      if (target) target.kind === "wildfire" ? selectWildfire(target.id) : select(target.id);
     });
     draw(bridge.view);
     const pendingZoom = state.pendingZoom;
-    if(state.selected){const selected=state.points.find(p=>p.id===state.selected);if(selected)focus(selected.lon,selected.lat);}
+    const selected = selectedLocation();
+    if (selected) focus(selected.lon, selected.lat);
     if (pendingZoom) zoomToLocation(pendingZoom.lon, pendingZoom.lat, pendingZoom.altitude);
     state.pendingZoom = null;
     if ($("globe-markers").checked) revealDetections();
@@ -403,17 +518,24 @@
     state.detailController?.abort();
     state.detailRequest++;
     state.selected = null;
+    state.selectedWildfire = null;
     state.details = null;
     $("globe-point-callout").hidden = true;
     $("globe-selection").hidden = true;
+    $("globe-wildfire-location").value = "";
+    $("globe-wildfire-browser").hidden = !state.wildfires?.length || !$("globe-wildfires").checked;
     $("globe-console-title").textContent = "Satellite evidence";
     $("globe-source-label").textContent = "NASA FIRMS";
     $("globe-data-kind").textContent = "Imported snapshot";
+    $("globe-layer-label").textContent = "NASA SATELLITE EVIDENCE";
+    $("globe-layer-icon").style.display = "";
+    $("globe-evidence-tools").hidden = false;
     const sourceLink = document.querySelector(".globe-console-head > a");
     sourceLink.href = "/data.html";
+    sourceLink.hidden = false;
     sourceLink.setAttribute("aria-label", "Inspect NASA data sources");
     sourceLink.title = "Inspect NASA data sources";
-    document.querySelector(".globe-console").classList.remove("has-selection");
+    document.querySelector(".globe-console").classList.remove("has-selection", "has-historical-selection");
     $("globe-location").value = "";
     updateLayerStamp();
   }
@@ -596,7 +718,9 @@
     state.detailController?.abort();
     state.detailController = new AbortController();
     state.selected = id;
+    state.selectedWildfire = null;
     state.details = null;
+    $("globe-wildfire-location").value = "";
     focus(item.lon, item.lat);
     if (![...$("globe-location").options].some(o => o.value === id)) $("globe-location").add(new Option(coords(item.lon, item.lat), id));
     $("globe-location").value = id;
@@ -605,10 +729,15 @@
     $("globe-console-title").textContent="Satellite evidence";
     $("globe-source-label").textContent="NASA FIRMS";
     $("globe-data-kind").textContent="Imported snapshot";
+    $("globe-layer-label").textContent = "NASA SATELLITE EVIDENCE";
+    $("globe-layer-icon").style.display = "";
+    $("globe-evidence-tools").hidden = false;
     const sourceLink = document.querySelector(".globe-console-head > a");
     sourceLink.href="/data.html";
+    sourceLink.hidden = false;
     sourceLink.setAttribute("aria-label", "Inspect NASA data sources");
     sourceLink.title="Inspect NASA data sources";
+    document.querySelector(".globe-console").classList.remove("has-historical-selection");
     document.querySelector(".globe-console").classList.add("has-selection");
     panel.replaceChildren(element("p", "Loading source evidence…"));
     showPointCallout(item);
@@ -652,6 +781,53 @@
     } catch (error) {
       if (request === state.detailRequest) panel.replaceChildren(element("p", `Evidence unavailable: ${error.message}. Close this view and select the group again to retry.`));
     }
+  }
+
+  function selectWildfire(id) {
+    const item = state.wildfires?.find(event => event.id === id);
+    if (!item) return;
+    clearSelection();
+    state.selectedWildfire = id;
+    focus(item.lon, item.lat);
+    $("globe-wildfire-location").value = id;
+    $("globe-wildfire-browser").hidden = false;
+    $("globe-selection").hidden = false;
+    $("globe-console-title").textContent = "Historical wildfire context";
+    $("globe-source-label").textContent = "Historical casebook";
+    $("globe-data-kind").textContent = state.wildfireReviewedOn ? `Reviewed ${state.wildfireReviewedOn}` : "Selected examples";
+    $("globe-layer-label").textContent = "HISTORICAL WILDFIRE CASE";
+    $("globe-layer-icon").style.display = "none";
+    $("globe-evidence-tools").hidden = true;
+    const sourceLink = document.querySelector(".globe-console-head > a");
+    sourceLink.hidden = true;
+    const console = document.querySelector(".globe-console");
+    console.classList.add("has-selection", "has-historical-selection");
+
+    const panel = $("globe-selection");
+    panel.replaceChildren(
+      element("span", "HISTORICAL WILDFIRE CASE", "globe-kicker"),
+      element("h3", item.name),
+      locationActions(item.lon, item.lat, 450000),
+      element("p", `${item.place} · ${item.period}`, "globe-times"),
+      element("p", item.summary),
+      element("p", "Approximate reported affected-area location. This record is not a live fire status, ignition point, or perimeter.", "globe-condition")
+    );
+    const sources = element("details", undefined, "globe-wildfire-sources");
+    sources.append(element("summary", `${item.sources.length} linked source${item.sources.length === 1 ? "" : "s"}`));
+    const list = element("ol");
+    for (const source of item.sources) {
+      const li = element("li");
+      const link = element("a", `${source.publisher}: ${source.label} ↗`);
+      link.href = source.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      li.append(link);
+      if (source.published) li.append(element("small", `Published ${source.published}`));
+      list.append(li);
+    }
+    sources.append(list);
+    panel.append(sources);
+    showPointCallout(item);
   }
 
   window.addEventListener("earth-ready", event => attach(event.detail.frame));
@@ -724,8 +900,10 @@
     window.addEventListener("resize", () => positionPointCallout(state.bridge?.view));
     const dialog = $("earth-details-dialog");
     $("earth-details-open").addEventListener("click", () => {
-      $("globe-evidence-tools").hidden = false;
-      $("globe-evidence-tools").open = true;
+      if (!state.selectedWildfire) {
+        $("globe-evidence-tools").hidden = false;
+        $("globe-evidence-tools").open = true;
+      }
       openEarthDetails();
     });
     $("earth-details-close").addEventListener("click", closeEarthDetails);
@@ -733,6 +911,12 @@
     dialog.addEventListener("click", event => {if(event.target===dialog){const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)closeEarthDetails();}});
     $("globe-markers").checked = false;
     $("globe-markers").addEventListener("change", revealDetections);
+    $("globe-wildfires").checked = false;
+    $("globe-wildfires").addEventListener("change", toggleWildfires);
+    $("globe-wildfire-location").addEventListener("change", event => {
+      if (event.target.value) selectWildfire(event.target.value);
+      else if (state.selectedWildfire) clearSelection();
+    });
     setupTooltips();
     $("globe-date").addEventListener("change", load);
     $("globe-source").addEventListener("change", load);

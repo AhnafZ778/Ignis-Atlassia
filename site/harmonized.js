@@ -1,0 +1,717 @@
+(() => {
+  const $ = (selector) => document.querySelector(selector);
+  const regionSelect = $("#harm-region"), yearSelect = $("#harm-year"), monthSelect = $("#harm-month");
+  const staticDataRoot = document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+  const staticSnapshot = document.querySelector('meta[name="fireatlas-static-snapshot"]')?.content;
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  let regions = [], current = null, selectedDate = null, requestToken = 0;
+  const staticCache = new Map();
+
+  async function getJson(url) {
+    if (staticDataRoot) {
+      const request = new URL(url, document.baseURI);
+      let file;
+      if (request.pathname.endsWith("/api/v2/regions")) {
+        file = "regions.json";
+      } else if (request.pathname.endsWith("/api/v2/calendar")) {
+        const region = request.searchParams.get("region"), year = request.searchParams.get("year");
+        if (!/^(norcal|punjab-haryana)$/.test(region || "") || !/^20\d{2}$/.test(year || "")) {
+          throw new Error("This static calendar selection is unavailable.");
+        }
+        file = `calendar/${region}/${year}.json`;
+      } else if (request.pathname.endsWith("/api/observations")) {
+        const region = regionSelect.value, stamp = request.searchParams.get("date") || "";
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(stamp)) throw new Error("A UTC date is required.");
+        file = `observations/${region}/${stamp.slice(0, 4)}.json.gz`;
+      } else {
+        throw new Error("This endpoint is not included in the static study bundle.");
+      }
+      const root = new URL(staticDataRoot, document.baseURI);
+      const target = new URL(file, root);
+      if (!staticCache.has(target.href)) {
+        const response = await fetch(target);
+        if (!response.ok) throw new Error(`Static study file unavailable (${response.status}).`);
+        let payload;
+        if (file.endsWith(".gz")) {
+          if (typeof DecompressionStream !== "function") throw new Error("This browser cannot open the compressed source-row bundle.");
+          const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
+          payload = JSON.parse(await new Response(stream).text());
+        } else {
+          payload = await response.json();
+        }
+        staticCache.set(target.href, payload);
+      }
+      const payload = staticCache.get(target.href);
+      if (file === "regions.json") return payload;
+      if (file.startsWith("observations/")) {
+        return payload.days[request.searchParams.get("date")] || {
+          date_utc: request.searchParams.get("date"), observations: [], truncated: false,
+        };
+      }
+      if (request.searchParams.get("history") === "1") {
+        const historyUrl = new URL(`history/${request.searchParams.get("region")}.json`, root);
+        if (!staticCache.has(historyUrl.href)) {
+          const response = await fetch(historyUrl);
+          if (!response.ok) throw new Error(`Static history file unavailable (${response.status}).`);
+          staticCache.set(historyUrl.href, await response.json());
+        }
+        payload.history = staticCache.get(historyUrl.href);
+      }
+      return payload;
+    }
+    const response = await fetch(url);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+    return data;
+  }
+
+  function n(value, digits = 1) {
+    return value === null || value === undefined ? "—" : Number(value).toLocaleString(undefined, {maximumFractionDigits: digits});
+  }
+
+  function corroborationFor(monthKey) {
+    const byMonth = current?.meta?.corroboration_by_month?.[monthKey];
+    if (byMonth) return byMonth;
+    const selected = current?.meta?.corroboration;
+    return selected?.month === monthKey ? selected : {};
+  }
+
+  function ordinal(value) {
+    const number = Math.round(Number(value));
+    const suffix = number % 100 >= 11 && number % 100 <= 13 ? "th" : ({1: "st", 2: "nd", 3: "rd"}[number % 10] || "th");
+    return `${number}${suffix}`;
+  }
+
+  function setStatus(message) { $("#harm-status").textContent = message; }
+
+  function sourceHashSummary() {
+    const hashes = new Set();
+    for (const input of current?.meta?.inputs || []) {
+      const digest = input.file_sha256 || input.parent_sha256 || input.sha256;
+      if (typeof digest === "string" && /^[a-f0-9]{64}$/i.test(digest)) hashes.add(digest.toLowerCase());
+    }
+    const values = [...hashes].sort();
+    return {count: values.length, sample: values.slice(0, 2).map(value => value.slice(0, 10)).join(" / ")};
+  }
+
+  function renderBuildMeta() {
+    const target = $("#harm-build-meta");
+    if (!target || !current) return;
+    const hashes = sourceHashSummary();
+    const snapshot = staticSnapshot ? `bundle built ${staticSnapshot}` : "live API ledger";
+    const method = current.meta.bridge_method_version || "common-grid method version unavailable";
+    target.textContent = `${snapshot} · ${hashes.count || "no"} SHA-256 source hash${hashes.count === 1 ? "" : "es"} · ${method}`;
+    target.title = hashes.sample ? `Source hash sample: ${hashes.sample}` : "Source hashes are unavailable for this selection.";
+  }
+
+  function monthBridge(monthKey) {
+    const days = current?.days?.filter((item) => item.date.startsWith(monthKey)) || [];
+    const availability = new Map((current?.availability || []).filter((item) => item.date.startsWith(monthKey)).map((item) => [item.date, item.sources || {}]));
+    const totals = {};
+    for (const source of ["MODIS_SP", "VIIRS_SNPP_SP"]) {
+      const values = days.map((day) => availability.get(day.date)?.[source]).filter(Boolean);
+      const complete = values.filter((item) => item.export_complete && item.availability?.status !== "documented_processing_gap");
+      const partial = values.filter((item) => !item.export_complete);
+      totals[source] = {
+        rows: complete.reduce((sum, item) => sum + (item.raw_pixel_count || 0), 0),
+        cells: complete.reduce((sum, item) => sum + (item.detected_cell_days || 0), 0),
+        excluded: complete.reduce((sum, item) => sum + (item.excluded_row_count || 0), 0),
+        excludedTypes: complete.reduce((counts, item) => {
+          for (const [type, count] of Object.entries(item.excluded_type_counts || {})) counts[type] = (counts[type] || 0) + Number(count || 0);
+          return counts;
+        }, {}),
+        frp: complete.reduce((sum, item) => sum + (item.frp_sum_mw === null || item.frp_sum_mw === undefined ? 0 : Number(item.frp_sum_mw)), 0),
+        frpKnownDays: complete.filter((item) => item.frp_sum_mw !== null && item.frp_sum_mw !== undefined).length,
+        partialRows: partial.reduce((sum, item) => sum + (item.partial_raw_pixel_count || 0), 0),
+        partialCells: partial.reduce((sum, item) => sum + (item.partial_detected_cell_days || 0), 0),
+        partialExcluded: partial.reduce((sum, item) => sum + (item.partial_excluded_row_count || 0), 0),
+        partialFrp: partial.reduce((sum, item) => sum + (item.partial_frp_sum_mw === null || item.partial_frp_sum_mw === undefined ? 0 : Number(item.partial_frp_sum_mw)), 0),
+        partialFrpKnownDays: partial.filter((item) => item.partial_frp_sum_mw !== null && item.partial_frp_sum_mw !== undefined).length,
+        completeDays: complete.length,
+        gapDays: values.filter((item) => item.availability?.status === "documented_processing_gap").length,
+      };
+    }
+    const bridged = days.filter((item) => item.sensor_bridge?.status === "complete" && item.viirs_status !== "documented_processing_gap");
+    const gaps = days.length - bridged.length;
+    const mismatch = bridged.reduce((sum, item) => {
+      const bridge = item.sensor_bridge || {};
+      sum.modis += Number(bridge.modis_only_cell_days) || 0;
+      sum.both += Number(bridge.co_detected_cell_days) || 0;
+      sum.viirs += Number(bridge.viirs_only_cell_days) || 0;
+      return sum;
+    }, {modis: 0, both: 0, viirs: 0});
+    return {days, totals, bridgedDays: bridged.length, gaps, mismatch, month: monthKey};
+  }
+
+  function renderBridge(month) {
+    const key = month?.month;
+    if (!key || !current) return;
+    const bridge = monthBridge(key), modis = bridge.totals.MODIS_SP, viirs = bridge.totals.VIIRS_SNPP_SP;
+    const max = Math.max(modis.cells, viirs.cells, Number(month.value) || 0, 1);
+    const set = (id, value) => { const element = $(id); if (element) element.textContent = value; };
+    set("#harm-bridge-modis", bridge.bridgedDays ? n(modis.cells, 0) : "—");
+    set("#harm-bridge-viirs", bridge.bridgedDays ? n(viirs.cells, 0) : "—");
+    set("#harm-bridge-result", month.value === null ? "UNKNOWN" : n(month.value, 1));
+    const excludedNote = (value) => value.excluded ? ` · ${n(value.excluded, 0)} filtered` : "";
+    set("#harm-bridge-modis-note", `${n(modis.rows, 0)} eligible rows${excludedNote(modis)} · ${modis.completeDays} usable UTC days`);
+    set("#harm-bridge-viirs-note", `${n(viirs.rows, 0)} eligible rows${excludedNote(viirs)} · 375 m detail retained`);
+    set("#harm-bridge-result-note", month.value === null ? "No complete reference value" : `${month.estimate_type === "observed" ? "Observed VIIRS" : "MODIS scaled estimate"} · never summed`);
+    [["#harm-bridge-modis-bar", modis.cells], ["#harm-bridge-viirs-bar", viirs.cells], ["#harm-bridge-result-bar", month.value || 0]].forEach(([id, value]) => $(id)?.style.setProperty("--bridge-fill", String(Math.min(1, Number(value || 0) / max))));
+    const gapLabel = bridge.gaps ? `${bridge.bridgedDays}/${bridge.days.length} usable days · ${bridge.gaps} gap/unknown` : `${bridge.bridgedDays} paired UTC days`;
+    set("#harm-bridge-state", gapLabel);
+    set("#harm-bridge-days", `${bridge.days.length} days`);
+    const bridgeMethod = current.meta.bridge_method_version;
+    const bridgeLabel = bridgeMethod === "common-1km-bridge-frp-v1"
+      ? "Common 1 km EASE-Grid · raw FRP separate"
+      : bridgeMethod
+        ? bridgeMethod.replaceAll("-", " ")
+        : "Common-grid transform";
+    set("#harm-bridge-method", `${bridgeLabel} · centroids grouped once per UTC day`);
+    const mismatchTotal = bridge.mismatch.modis + bridge.mismatch.both + bridge.mismatch.viirs;
+    const barMax = Math.max(mismatchTotal, 1);
+    [["#harm-mismatch-modis", bridge.mismatch.modis], ["#harm-mismatch-both", bridge.mismatch.both], ["#harm-mismatch-viirs", bridge.mismatch.viirs]].forEach(([id, value]) => set(id, bridge.bridgedDays ? n(value, 0) : "—"));
+    [["#harm-mismatch-modis-bar", bridge.mismatch.modis], ["#harm-mismatch-both-bar", bridge.mismatch.both], ["#harm-mismatch-viirs-bar", bridge.mismatch.viirs]].forEach(([id, value]) => $(id)?.style.setProperty("--mismatch-size", `${Math.max(4, Math.round(48 * Number(value || 0) / barMax))}px`));
+    set("#harm-mismatch-gap", bridge.gaps ? n(bridge.gaps, 0) : "0");
+    $("#harm-mismatch-gap-bar")?.style.setProperty("--mismatch-size", `${Math.max(4, Math.round(48 * bridge.gaps / Math.max(bridge.days.length, 1)))}px`);
+    set("#harm-bridge-note", bridge.bridgedDays
+      ? `${n(bridge.mismatch.both, 0)} common-grid cell-days were reported by both sensors; ${n(bridge.mismatch.modis + bridge.mismatch.viirs, 0)} were sensor-specific. Raw pixels are never added together.`
+      : "No paired clear export is available for this month; mismatch values stay unknown.");
+    const frp = (value) => {
+      if (value.completeDays && value.frpKnownDays === value.completeDays) return n(value.frp, 1);
+      if (value.completeDays && value.frpKnownDays) return `${n(value.frp, 1)} · partial`;
+      if (value.partialFrpKnownDays) return `≥${n(value.partialFrp, 1)} · partial`;
+      return "unknown";
+    };
+    set("#harm-frp-value", `${frp(modis)} / ${frp(viirs)}`);
+    set("#harm-frp-note", `MODIS / VIIRS raw MW/day · ${bridge.gaps ? `${bridge.gaps} gap/unknown days excluded` : "source rows summed separately"}; missing FRP stays unknown`);
+    const corroboration = corroborationFor(key);
+    set("#harm-corroboration-state", corroboration.status === "loaded" ? "MCD64A1 LAGGED" : "ACTIVE FIRE ONLY");
+    set("#harm-corroboration-note", corroboration.status === "loaded"
+      ? `${n(corroboration.burned_pixels_in_bbox, 0)} mapped Burn Date pixels${corroboration.burn_date_min ? ` · day ${corroboration.burn_date_min}–${corroboration.burn_date_max}` : ""}. Lagged context is separate from active-fire detections; review is analytical only.`
+      : "No dated MCD64A1 check is bundled for this month; the calendar uses active-fire detections only.");
+    updateShareCard(month, bridge);
+    renderBuildMeta();
+  }
+
+  function updateShareCard(month, bridge) {
+    if (!month || !current || !$("#harm-share-card")) return;
+    const sourceVersions = new Set();
+    for (const item of current.availability || []) {
+      if (!item.date.startsWith(month.month)) continue;
+      for (const source of Object.values(item.sources || {})) for (const version of source.product_versions || []) sourceVersions.add(version);
+    }
+    const state = month.value === null ? "UNKNOWN" : month.estimate_type === "observed" ? "OBSERVED" : "ESTIMATED";
+    const readable = (value) => String(value || "unknown").replaceAll("_", " ");
+    const evidenceStates = [...new Set(bridge.days.map((day) => day.evidence_state).filter(Boolean))];
+    const coverageStates = [...new Set(bridge.days.map((day) => day.coverage_state).filter(Boolean))];
+    $("#harm-share-card-case").textContent = current.meta.region.name.toUpperCase();
+    $("#harm-share-card-title").textContent = `${monthNames[Number(month.month.slice(5, 7)) - 1]} ${month.month.slice(0, 4)} · ${state}`;
+    $("#harm-share-card-subtitle").textContent = "VIIRS-equivalent activity on a common 1 km grid · UTC";
+    $("#harm-share-card-value").textContent = month.value === null ? "Unknown" : `${n(month.value, 1)} cell-days`;
+    $("#harm-share-card-state").textContent = `${state} · ${bridge.gaps} gap/unknown day(s)`;
+    $("#harm-share-card-quality").textContent = `${evidenceStates.map(readable).join(" / ") || "unknown"} · coverage ${coverageStates.map(readable).join(" / ") || "unknown"}`;
+    const hashes = sourceHashSummary();
+    const hashText = hashes.count ? `${hashes.count} SHA-256 · ${hashes.sample}` : "hash unavailable";
+    $("#harm-share-card-inputs").textContent = `${sourceVersions.size ? [...sourceVersions].join(" / ") : "versions unknown"} · ${current.meta.inputs?.length || 0} ledger inputs · ${hashText}`;
+    const corroboration = corroborationFor(month.month);
+    $("#harm-share-card-limit").textContent = corroboration.status === "loaded"
+      ? "MCD64A1 lagged context · pass/cloud coverage unknown"
+      : "ACTIVE FIRE ONLY · pass/cloud coverage unknown";
+    const url = evidenceHref();
+    const urlElement = $("#harm-share-card-url");
+    urlElement.href = url;
+    urlElement.textContent = url;
+    urlElement.title = url;
+  }
+
+  function evidenceHref() {
+    const url = new URL(location.href);
+    url.search = new URLSearchParams({harm_region: regionSelect.value, harm_year: yearSelect.value, harm_month: monthSelect.value}).toString();
+    url.hash = "harmonized-calendar";
+    return url.href;
+  }
+
+  async function shareEvidence() {
+    if (!current) return;
+    const href = evidenceHref();
+    $("#harm-share-card").hidden = false;
+    try {
+      if (navigator.share) await navigator.share({title: "FireAtlas evidence", text: `${current.meta.region.name} · ${monthNames[Number(monthSelect.value) - 1]} ${yearSelect.value}`, url: href});
+      else if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(href);
+      else { const input = document.createElement("textarea"); input.value = href; document.body.append(input); input.select(); document.execCommand("copy"); input.remove(); }
+      $("#harm-share-status").textContent = "Evidence link copied · card below is ready to brief or review.";
+    } catch (error) { $("#harm-share-status").textContent = error.name === "AbortError" ? "Share cancelled." : "Evidence card ready below; copy the URL from your browser."; }
+  }
+
+  function renderOfficialLinks() {
+    const region = regionSelect.value;
+    const links = $("#harm-official-links");
+    links.replaceChildren();
+    const sources = region === "norcal"
+      ? [
+          ["CAL FIRE incident records", "https://www.fire.ca.gov/incidents"],
+          ["InciWeb incident records", "https://inciweb.wildfire.gov"],
+        ]
+      : [["NASA FIRMS observations", "https://firms.modaps.eosdis.nasa.gov/"]];
+    for (const [label, href] of sources) {
+      const link = document.createElement("a");
+      link.href = href; link.target = "_blank"; link.rel = "noopener noreferrer";
+      link.textContent = `${label} ↗`; links.append(link);
+    }
+    const note = document.createElement("span");
+    note.textContent = region === "norcal"
+      ? "Thermal detections are not a fire perimeter."
+      : "Thermal detections do not identify crop-burning cause.";
+    links.append(note);
+    renderSeasonContext();
+  }
+
+  function renderSeasonContext() {
+    const context = $("#harm-season-context");
+    if (!context) return;
+    context.replaceChildren();
+    const paddyWindow = regionSelect.value === "punjab-haryana"
+      && yearSelect.value === "2024"
+      && [10, 11].includes(Number(monthSelect.value));
+    context.hidden = !paddyWindow;
+    if (!paddyWindow) return;
+
+    const label = document.createElement("strong");
+    label.textContent = "2024 paddy-harvest monitoring";
+    const dates = document.createElement("span");
+    dates.textContent = "1 Oct–30 Nov";
+    const source = document.createElement("a");
+    source.href = "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2060764&lang=2&reg=48";
+    source.target = "_blank";
+    source.rel = "noopener noreferrer";
+    source.textContent = "Official context ↗";
+    const limit = document.createElement("small");
+    limit.textContent = "Hotspots show heat; they do not confirm crop-residue fires.";
+    context.append(label, dates, source, limit);
+  }
+
+  function fillMonths() {
+    monthSelect.replaceChildren(...monthNames.map((label, index) => new Option(label, String(index + 1))));
+    monthSelect.value = "7";
+  }
+
+  function fillYears() {
+    const region = regions.find((item) => item.id === regionSelect.value);
+    const latest = Math.max(2025, ...((region?.products ? Object.values(region.products) : [])
+      .map((item) => item.last_complete_month ? Number(item.last_complete_month.slice(0, 4)) : 0)));
+    yearSelect.replaceChildren();
+    const firstYear = Number(region?.history_start?.slice(0, 4) || 2010);
+    for (let year = firstYear; year <= latest; year += 1) yearSelect.add(new Option(String(year), String(year)));
+    yearSelect.value = "2024";
+  }
+
+  function displaySourceStatus() {
+    const region = regions.find((item) => item.id === regionSelect.value);
+    const container = $("#harm-source-status");
+    container.replaceChildren();
+    if (!region) return;
+    const labels = {MODIS_SP: "MODIS · Terra + Aqua", VIIRS_SNPP_SP: "VIIRS · Suomi NPP"};
+    for (const source of ["MODIS_SP", "VIIRS_SNPP_SP"]) {
+      const product = region.products[source];
+      const row = document.createElement("article"); row.className = "harm-source-row";
+      const title = document.createElement("strong"); title.textContent = labels[source];
+      const state = document.createElement("span");
+      state.textContent = product.complete_month_count
+        ? `${product.first_complete_month} → ${product.last_complete_month}` : "AWAITING EXPORTS";
+      const note = document.createElement("small");
+      const firstDetection = product.first_detection_utc
+        ? ` · detections from ${product.first_detection_utc.slice(0, 10)}` : "";
+      const reconstructed = product.reconstructed_row_only_month_count
+        ? ` · ${product.reconstructed_row_only_month_count.toLocaleString()} months contain detections from date-reconstructed files; other days remain unknown`
+        : "";
+      note.textContent = product.complete_month_count
+        ? `${product.complete_month_count.toLocaleString()} complete source-months · ${product.imported_detection_rows.toLocaleString()} imported rows${firstDetection}${reconstructed} · target window begins ${product.planned_start}`
+        : `${product.imported_detection_rows.toLocaleString()} imported rows, but no complete source-month yet${firstDetection}${reconstructed}. Target window begins ${product.planned_start}.`;
+      row.append(title, state, note); container.append(row);
+    }
+  }
+
+  function setValueSummary(month) {
+    $("#harm-value").textContent = month.value === null ? "Unknown" : n(month.value);
+    const baselineCard = $("#harm-percentile")?.closest(".harm-summary-card");
+    if (baselineCard) {
+      baselineCard.dataset.activity = month.flag || "unknown-month";
+      baselineCard.setAttribute("aria-label", month.flag === "unusually-high"
+        ? "Monthly activity is unusually high compared with the comparable baseline"
+        : month.flag === "unusually-low"
+          ? "Monthly activity is unusually low compared with the comparable baseline"
+          : month.flag === "typical"
+            ? "Monthly activity is typical compared with the comparable baseline"
+            : "Monthly activity baseline is insufficient or unknown");
+    }
+    const observedDays = current.days.filter((item) => item.date.startsWith(month.month) && item.estimate_type === "observed").length;
+    const estimateDays = current.days.filter((item) => item.date.startsWith(month.month) && item.estimate_type === "scaled").length;
+    const partialDays = month.partial_detection_days || 0;
+    const partialModis = month.partial_modis_cell_days || 0;
+    const partialViirs = month.partial_viirs_cell_days || 0;
+    $("#harm-value-note").textContent = month.value === null
+      ? partialDays ? `${partialDays} UTC dates · partial source counts: MODIS ${n(partialModis, 0)} cell-days, S-NPP ${n(partialViirs, 0)} · other dates unknown` : "No complete harmonized month; missing dates are unknown, not zero"
+      : `${observedDays} VIIRS-observed days · ${estimateDays} MODIS-estimated days · ${month.degraded_days} degraded days`;
+    $("#harm-years").textContent = String(month.n_years);
+    $("#harm-percentile").textContent = month.percentile_rank === null
+      ? "Percentile withheld" : `${ordinal(month.percentile_rank)} percentile · ${month.flag.replaceAll("-", " ")}`;
+    const season = current.meta.season || {};
+    $("#harm-season").textContent = season.season_status === "available"
+      ? `${season.season_start?.slice(5)} · ${season.season_peak?.slice(5)} · ${season.season_end?.slice(5)}`
+      : season.season_status === "no-detected-activity" ? "No detections" : "Unavailable";
+    $("#harm-season-note").textContent = season.season_status === "available"
+      ? `Start · 15-day peak center · end · ${yearSelect.value} UTC` : `${season.missing_days ?? "—"} unknown days; season dates withheld`;
+    const calibration = current.meta.calibration_status;
+    const model = current.meta.calibration_model;
+    $("#harm-model").textContent = model ? model.replaceAll("_", " ") : "Not validated";
+    const check = current.meta.calibration_validation?.models?.[model];
+    $("#harm-model-note").textContent = check?.median_absolute_log_error === null || check?.median_absolute_log_error === undefined
+      ? `${calibration.replaceAll("-", " ")} · no held-out comparison supports scaling`
+      : `Held-out median absolute log error ${n(check.median_absolute_log_error, 3)} · ${current.calibration?.versions?.MODIS_SP || "MODIS version unknown"} / ${current.calibration?.versions?.VIIRS_SNPP_SP || "VIIRS version unknown"}`;
+    $("#harm-verdict").textContent = month.verdict;
+    $("#harm-month-total").textContent = month.value === null ? "UNKNOWN MONTH" : `${n(month.value)} VIIRS-equivalent cell-days`;
+    renderBridge(month);
+  }
+
+  function dayClass(item) {
+    if (!item) return "unknown";
+    if (item.coverage_state === "documented_processing_gap") return item.viirs_gap_partial_day ? "documented-gap partial-gap-day" : "documented-gap";
+    if (item.evidence_state === "complete_zero_export") return "zero";
+    if (item.evidence_state === "scaled") return "estimated";
+    if (item.evidence_state === "observed") return "observed";
+    if (item.viirs_status === "documented_processing_gap") return item.viirs_gap_partial_day ? "documented-gap partial-gap-day" : "documented-gap";
+    if (item.quality === "degraded") return "estimated";
+    if (item.quality === "good" && item.value === 0) return "zero";
+    if (item.quality === "good") return "observed";
+    if ((item.partial_modis_cell_days || 0) > 0 || (item.partial_viirs_cell_days || 0) > 0) return "partial-observations";
+    return "unknown";
+  }
+
+  function renderCalendar() {
+    if (!current) return;
+    const year = Number(yearSelect.value), month = Number(monthSelect.value);
+    const monthKey = `${year}-${String(month).padStart(2, "0")}`;
+    const summary = current.months.find((item) => item.month === monthKey);
+    if (!summary) return;
+    setValueSummary(summary);
+    const grid = $("#harm-day-grid"); grid.replaceChildren();
+    const firstWeekday = (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+    const dayCount = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const byDate = new Map(current.days.map((item) => [item.date, item]));
+    const values = Array.from({length: dayCount}, (_, index) => byDate.get(`${monthKey}-${String(index + 1).padStart(2, "0")}`));
+    const maximum = Math.max(0, ...values.map((item) => item?.value ?? 0));
+    for (let i = 0; i < firstWeekday; i += 1) {
+      const blank = document.createElement("span"); blank.className = "harm-day blank"; blank.setAttribute("aria-hidden", "true"); grid.append(blank);
+    }
+    values.forEach((item, index) => {
+      const number = index + 1, stamp = `${monthKey}-${String(number).padStart(2, "0")}`;
+      const button = document.createElement("button"); button.type = "button";
+      button.className = `harm-day ${dayClass(item)}`; button.dataset.date = stamp;
+      button.setAttribute("aria-pressed", String(stamp === selectedDate));
+      const partialModis = item?.partial_modis_cell_days || 0;
+      const partialViirs = item?.partial_viirs_cell_days || 0;
+      const hasPartial = (item?.value === null || !item) && (partialModis > 0 || partialViirs > 0);
+      const count = item?.value === null || !item ? hasPartial ? "+" : "—" : n(item.value, 1);
+      const label = hasPartial ? "partial detections" : item?.coverage_state === "documented_processing_gap" ? (item.viirs_gap_partial_day ? `partial gap · ${item.evidence_state === "scaled" ? "scaled estimate" : "unknown"}` : `gap · ${item.evidence_state === "scaled" ? "scaled estimate" : "unknown"}`)
+        : item?.evidence_state === "complete_zero_export" ? "complete zero"
+        : item?.evidence_state === "observed" ? "observed VIIRS" : item?.evidence_state === "scaled" ? "scaled estimate"
+        : item?.quality === "good" ? item.value === 0 ? "zero" : "VIIRS"
+        : item?.quality === "degraded" ? item.reason === "documented-processing-gap" ? (item.viirs_gap_partial_day ? "partial gap · MODIS" : "gap · MODIS") : "MODIS est."
+          : item?.viirs_status === "documented_processing_gap" ? (item.viirs_gap_partial_day ? "partial gap · unknown" : "gap · unknown") : "unknown";
+      const dateNode = document.createElement("span"); dateNode.className = "harm-date"; dateNode.textContent = String(number);
+      const countNode = document.createElement("strong"); countNode.className = "harm-count"; countNode.textContent = count;
+      const kindNode = document.createElement("small"); kindNode.className = "harm-kind"; kindNode.textContent = label;
+      button.append(dateNode, countNode, kindNode);
+      const aria = hasPartial
+        ? `${stamp} UTC · partial detections: MODIS ${n(partialModis, 0)} centroid cell-days, VIIRS S-NPP ${n(partialViirs, 0)} centroid cell-days · harmonized total unknown because archive coverage is incomplete · pass and cloud coverage unknown`
+        : `${stamp} UTC · ${count} VIIRS-equivalent cell-days · ${label}${item?.reason ? ` · ${item.reason.replaceAll("-", " ")}` : ""} · pass and cloud coverage unknown`;
+      button.setAttribute("aria-label", aria); button.title = aria;
+      if (item?.value > 0 && maximum > 0) {
+        const t = Math.log1p(item.value) / Math.log1p(maximum);
+        const hue = item.quality === "good" ? 20 : 155;
+        button.style.setProperty("--harm-heat", `hsl(${hue} ${Math.round(38 + t * 27)}% ${Math.round(28 + t * 18)}%)`);
+      }
+      button.addEventListener("click", () => { selectedDate = stamp; renderCalendar(); loadEvidence(stamp); });
+      button.addEventListener("keydown", (event) => {
+        const delta = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7}[event.key];
+        if (!delta) return;
+        event.preventDefault();
+        const next = Math.min(dayCount, Math.max(1, number + delta));
+        grid.querySelector(`[data-date="${monthKey}-${String(next).padStart(2, "0")}"]`)?.focus();
+      });
+      grid.append(button);
+    });
+    $("#harm-days-title").textContent = `${monthNames[month - 1]} ${year} · select a UTC day`;
+    const download = $("#harm-download");
+    download.href = staticDataRoot
+      ? new URL(`calendar/${regionSelect.value}/${year}.json`, new URL(staticDataRoot, document.baseURI)).href
+      : `/api/v2/calendar?${new URLSearchParams({region: regionSelect.value, year, month})}`;
+    download.download = `fireatlas_${regionSelect.value}_${year}_calendar.json`;
+    if (!selectedDate || !selectedDate.startsWith(monthKey)) {
+      selectedDate = null;
+      $("#harm-day-title").textContent = "Choose a day to inspect its evidence.";
+      $("#harm-day-summary").textContent = "The raw NASA record will be shown separately from the harmonized estimate.";
+      $("#harm-day-source-status").replaceChildren();
+      $("#harm-records").replaceChildren();
+    }
+  }
+
+  function historyClass(item) {
+    if (item?.coverage_state === "documented_processing_gap") return item.partial_gap_day ? "documented-gap partial-gap-day" : "documented-gap";
+    if (item?.evidence_state === "scaled") return "estimated";
+    if (item?.evidence_state === "complete_zero_export") return "zero";
+    if (item?.evidence_state === "observed") return "observed";
+    if (item?.viirs_status === "documented_processing_gap") return item.partial_gap_day ? "documented-gap partial-gap-day" : "documented-gap";
+    if (!item) return "unknown";
+    if (item.quality === "degraded") return "estimated";
+    if (item.quality === "good" && Number(item.value) === 0) return "zero";
+    if ((item.partial_modis_cell_days || 0) > 0 || (item.partial_viirs_cell_days || 0) > 0) return "partial-observations";
+    if (item.quality === "unknown" || item.value === null) return "unknown";
+    return "observed";
+  }
+
+  function selectHistoryDay(stamp) {
+    const [year, month] = stamp.split("-").map(Number);
+    if (Number(yearSelect.value) !== year) {
+      yearSelect.value = String(year);
+      monthSelect.value = String(month);
+      loadCalendar({includeHistory: true, selectDate: stamp});
+      return;
+    }
+    monthSelect.value = String(month);
+    selectedDate = stamp;
+    renderHistory(current?.history);
+    renderCalendar();
+    loadEvidence(stamp);
+    $("#harm-day-title").scrollIntoView({block: "nearest", behavior: "smooth"});
+  }
+
+  function renderHistory(history) {
+    const grid = $("#harm-history-grid");
+    if (!grid) return;
+    grid.replaceChildren();
+    if (!history?.days?.length) {
+      grid.append(Object.assign(document.createElement("p"), {
+        className: "harm-history-loading", textContent: "No dated history is available for this selection.",
+      }));
+      $("#harm-history-range").textContent = "History unavailable";
+      return;
+    }
+    const firstDate = history.start || "2010-01-01";
+    const lastDate = history.end || `${yearSelect.value}-12-31`;
+    const latestYear = Math.max(2006, Number(lastDate.slice(0, 4)));
+    const firstYear = Number(firstDate.slice(0, 4));
+    const byDate = new Map(history.days.map((item) => [item.date, item]));
+    const buttonByDate = new Map();
+    const rows = [];
+    let maximum = 0;
+    for (const item of history.days) {
+      if (item.value !== null && Number(item.value) > maximum) maximum = Number(item.value);
+    }
+    for (let year = firstYear; year <= latestYear; year += 1) {
+      const row = document.createElement("div"); row.className = "harm-history-year-row"; row.setAttribute("role", "row");
+      const yearLabel = document.createElement("span"); yearLabel.className = "harm-history-year";
+      yearLabel.setAttribute("role", "rowheader"); yearLabel.textContent = String(year);
+      const days = document.createElement("div"); days.className = "harm-history-days";
+      let cursor = new Date(Date.UTC(year, 0, 1));
+      for (let position = 0; position < 366; position += 1) {
+        const stamp = cursor.toISOString().slice(0, 10);
+        const leapSlot = stamp.slice(5) === "02-29";
+        if (cursor.getUTCFullYear() !== year) {
+          const blank = document.createElement("span"); blank.className = "harm-history-empty"; blank.setAttribute("aria-hidden", "true"); days.append(blank);
+          continue;
+        }
+        if (leapSlot && !((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0)) {
+          const blank = document.createElement("span"); blank.className = "harm-history-empty"; blank.setAttribute("aria-hidden", "true"); days.append(blank);
+          cursor = new Date(Date.UTC(year, 2, 1));
+          continue;
+        }
+        if (stamp < firstDate || stamp > lastDate) {
+          const blank = document.createElement("span"); blank.className = "harm-history-empty outside-window"; blank.setAttribute("aria-hidden", "true"); days.append(blank);
+          cursor = new Date(Date.UTC(year, cursor.getUTCMonth(), cursor.getUTCDate() + 1));
+          continue;
+        }
+        const item = byDate.get(stamp);
+        const button = document.createElement("button"); button.type = "button"; button.className = `harm-history-day ${historyClass(item)}`;
+        button.dataset.date = stamp; button.setAttribute("role", "gridcell");
+        button.tabIndex = stamp === firstDate ? 0 : -1;
+        button.setAttribute("aria-pressed", String(stamp === selectedDate));
+        const partialModis = item?.partial_modis_cell_days || 0;
+        const partialViirs = item?.partial_viirs_cell_days || 0;
+        const hasPartial = (item?.value === null || !item) && (partialModis > 0 || partialViirs > 0);
+        const label = hasPartial ? `Partial detections · MODIS ${n(partialModis, 0)} · S-NPP ${n(partialViirs, 0)}` : item?.value === null || !item ? "Unknown" : item.coverage_state === "documented_processing_gap"
+          ? `Documented processing gap${item.evidence_state === "scaled" ? " · MODIS estimate" : ""}` : item.evidence_state === "complete_zero_export"
+            ? "Complete export, zero detections" : item.evidence_state === "observed" ? "VIIRS observed" : item.evidence_state === "scaled" ? "MODIS estimate"
+            : item.quality === "good" ? "Observed" : "Unknown";
+        const value = hasPartial ? "incomplete archive coverage" : item?.value === null || !item ? "no value" : `${n(item.value, 1)} VIIRS-equivalent cell-days`;
+        const reason = item?.reason ? ` · ${item.reason.replaceAll("-", " ")}` : "";
+        const accessible = `${stamp} UTC · ${label} · ${value}${reason} · pass, cloud and no-fire status unknown`;
+        button.setAttribute("aria-label", accessible); button.title = accessible;
+        if (item?.quality === "good" && item.value > 0 && maximum > 0) {
+          const t = Math.log1p(item.value) / Math.log1p(maximum);
+          button.style.setProperty("--history-color", `hsl(20 ${Math.round(40 + t * 25)}% ${Math.round(27 + t * 26)}%)`);
+        }
+        button.addEventListener("click", () => selectHistoryDay(stamp));
+        button.addEventListener("keydown", (event) => {
+          if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          let next = stamp;
+          const day = new Date(`${stamp}T00:00:00Z`);
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            day.setUTCDate(day.getUTCDate() + (event.key === "ArrowLeft" ? -1 : 1)); next = day.toISOString().slice(0, 10);
+          } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+            const nextYear = year + (event.key === "ArrowUp" ? -1 : 1);
+            const lastDay = new Date(Date.UTC(nextYear, month, 0)).getUTCDate();
+            next = `${nextYear}-${stamp.slice(5, 7)}-${String(Math.min(Number(stamp.slice(8, 10)), lastDay)).padStart(2, "0")}`;
+          } else {
+            next = `${year}-${event.key === "Home" ? "01-01" : "12-31"}`;
+          }
+          const target = buttonByDate.get(next);
+          if (target) { button.tabIndex = -1; target.tabIndex = 0; target.focus(); }
+        });
+        buttonByDate.set(stamp, button); days.append(button);
+        cursor = new Date(Date.UTC(year, cursor.getUTCMonth(), cursor.getUTCDate() + 1));
+      }
+      row.append(yearLabel, days); rows.push(row); grid.append(row);
+    }
+    const earliestAvailable = history.days.find((item) => item.quality !== "unknown")?.date;
+    const earliestPartial = history.days.find((item) => item.partial_modis_cell_days > 0 || item.partial_viirs_cell_days > 0)?.date;
+    const selectedRegion = regions.find((item) => item.id === regionSelect.value);
+    const exportEnd = ["MODIS_SP", "VIIRS_SNPP_SP"]
+      .map((source) => `${source} ${selectedRegion?.products?.[source]?.last_complete_month || "awaiting exports"}`)
+      .join(" · ");
+    $("#harm-history-range").textContent = `Window starts ${firstDate} · ${exportEnd} · year rows ${firstYear}–${latestYear}`;
+    $("#harm-history-note").textContent = earliestAvailable
+      ? `Earliest day with a complete source value: ${earliestAvailable}${earliestPartial ? ` · reconstructed-file detections also begin ${earliestPartial}` : ""}. Arrow keys move by day or year; press Enter to open a date. Blank periods remain unknown, not fire-free.`
+      : earliestPartial
+        ? `Dated detections from files with reconstructed coverage begin ${earliestPartial}; hatched days show positive rows only. Other dates stay unknown. No complete source values are present in this loaded history.`
+        : "No complete source values are present in the loaded history. Blank periods remain unknown, not fire-free.";
+  }
+
+  function availabilityMessage(item) {
+    const status = item.availability?.status;
+    if (status === "documented_processing_gap") return "NASA notice documents a product outage during this UTC day; pass/cloud conditions remain unknown.";
+    if (status === "unknown_export") {
+      const cells = item.partial_detected_cell_days || 0, rows = item.partial_raw_pixel_count || 0;
+      const reconstructed = item.coverage_basis?.includes("reconstructed-rows-only");
+      const excluded = item.partial_excluded_row_count || 0;
+      return cells || rows || excluded
+        ? `${n(cells, 0)} detected 1 km centroid cell-day(s) from ${n(rows, 0)} eligible rows${excluded ? ` · ${n(excluded, 0)} filtered` : ""}${reconstructed ? " in a file with reconstructed date coverage" : " in an incomplete source export"}; other observations are unknown.`
+        : "No complete source-month export is loaded; zero detections cannot be inferred.";
+    }
+    if (status === "zero_detections_exported") return "Complete export has zero eligible detection rows; satellite pass and cloud coverage remain unknown.";
+    const excluded = item.excluded_row_count || 0;
+    return `${item.raw_pixel_count ?? 0} eligible FIRMS row(s) in the complete export${excluded ? ` · ${excluded} filtered by type` : ""} · version ${item.product_versions.join(", ") || "unknown"}.`;
+  }
+
+  async function loadEvidence(stamp) {
+    if (!current) return;
+    const item = current.days.find((row) => row.date === stamp);
+    const detail = current.availability.find((row) => row.date === stamp)?.sources || {};
+    const verdict = item?.value === null || !item ? "Harmonized value unknown. The product export does not cover this date." : item.estimate_type === "observed"
+      ? `${n(item.value)} observed VIIRS cell-days; no scaling was applied.`
+      : `${n(item.value)} estimated VIIRS-equivalent cell-days from ${n(item.modis_cell_days)} MODIS common-grid cell-days × ${n(item.scale_factor, 3)} (95% factor range ${n(item.scale_interval?.[0], 3)}–${n(item.scale_interval?.[1], 3)}).`;
+    $("#harm-day-title").textContent = `${stamp} UTC · ${item?.quality || "unknown"}`;
+    $("#harm-day-summary").textContent = `${verdict} Satellite pass, cloud and fire-free status are not inferred.`;
+    const sourceContainer = $("#harm-day-source-status");
+    sourceContainer.replaceChildren();
+    for (const [source, title] of [["MODIS_SP", "MODIS · Terra + Aqua"], ["VIIRS_SNPP_SP", "VIIRS · Suomi NPP"]]) {
+      const state = detail[source];
+      const row = document.createElement("article"); row.className = "harm-source-row";
+      const name = document.createElement("strong"); name.textContent = title;
+      const status = document.createElement("span"); status.textContent = (state?.availability?.status || "unknown").replaceAll("_", " ").toUpperCase();
+      const note = document.createElement("small"); note.textContent = state ? availabilityMessage(state) : "No daily source record is available.";
+      row.append(name, status, note); sourceContainer.append(row);
+      for (const notice of state?.availability?.notices || []) {
+        if (!notice.url?.startsWith("https://")) continue;
+        const link = document.createElement("a");
+        link.className = "harm-source-notice";
+        link.href = notice.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Open NASA product notice ↗";
+        link.setAttribute("aria-label", `${notice.published_by || "NASA"} product notice (opens in a new tab)`);
+        row.append(link);
+      }
+    }
+    try {
+      const region = regions.find((entry) => entry.id === regionSelect.value);
+      const bbox = region.bbox.join(",");
+      const params = new URLSearchParams({date: stamp, series: "joint", bbox});
+      const result = await getJson(`/api/observations?${params}`);
+      if (selectedDate !== stamp) return;
+      const container = $("#harm-records"); container.replaceChildren();
+      if (!result.observations.length) {
+        const note = document.createElement("small"); note.textContent = "No eligible source rows returned for this UTC day. This does not establish no fire, no pass, or clear sky."; container.append(note);
+      }
+      for (const observation of result.observations) {
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        const type = String(observation.raw?.type ?? "").trim();
+        const included = !type || type === "0";
+        const name = document.createElement("strong"); name.textContent = `${observation.sensor} · ${observation.platform} · ${included ? "included in calendar" : `excluded type ${type}`}`;
+        const time = document.createElement("span"); time.textContent = observation.acquisition_utc.slice(11, 16) + " UTC";
+        summary.append(name, time);
+        const pre = document.createElement("pre"); pre.textContent = JSON.stringify(observation.raw, null, 2);
+        details.append(summary, pre); container.append(details);
+      }
+      if (result.truncated) {
+        const note = document.createElement("small"); note.textContent = "More than 200 records matched; narrow the day or review the source export."; container.append(note);
+      }
+    } catch (error) {
+      if (selectedDate !== stamp) return;
+      const container = $("#harm-records"); container.textContent = `Source records unavailable: ${error.message}`;
+    }
+  }
+
+  async function loadCalendar({includeHistory = false, selectDate = null} = {}) {
+    const token = ++requestToken;
+    selectedDate = selectDate;
+    renderSeasonContext();
+    displaySourceStatus();
+    setStatus("Loading the selected authentic archive window…");
+    $("#harm-records").replaceChildren();
+    try {
+      const params = new URLSearchParams({region: regionSelect.value, year: yearSelect.value, month: monthSelect.value});
+      if (includeHistory) params.set("history", "1");
+      const data = await getJson(`/api/v2/calendar?${params}`);
+      if (token !== requestToken) return;
+      current = data;
+      setStatus(data.meta.data_class === "no-authentic-imports"
+        ? "No authentic records imported for this region yet; values stay unknown."
+        : `Imported FIRMS archive · latest detection ${data.meta.period.actual_latest_detection || "not present"} · UTC${staticSnapshot ? ` · static snapshot ${staticSnapshot}` : ""}`);
+      if (includeHistory || data.history) renderHistory(data.history);
+      renderCalendar();
+      renderBuildMeta();
+      if (selectedDate) loadEvidence(selectedDate);
+    } catch (error) {
+      if (token === requestToken) setStatus(`Calendar unavailable: ${error.message}`);
+    }
+  }
+
+  async function init() {
+    if (!regionSelect) return;
+    fillMonths();
+    renderOfficialLinks();
+    try {
+      const status = await getJson("/api/v2/regions");
+      regions = status.regions;
+      const sharedRegion = new URLSearchParams(location.search).get("harm_region");
+      if (regions.some((item) => item.id === sharedRegion)) regionSelect.value = sharedRegion;
+      fillYears();
+      const sharedYear = Number(new URLSearchParams(location.search).get("harm_year"));
+      const sharedMonth = Number(new URLSearchParams(location.search).get("harm_month"));
+      if (sharedYear >= 2006 && sharedYear <= 2026 && [...yearSelect.options].some((option) => Number(option.value) === sharedYear)) yearSelect.value = String(sharedYear);
+      if (sharedMonth >= 1 && sharedMonth <= 12) monthSelect.value = String(sharedMonth);
+      renderOfficialLinks();
+      displaySourceStatus();
+      await loadCalendar({includeHistory: true});
+    } catch (error) { setStatus(`Archive status unavailable: ${error.message}`); }
+    regionSelect.addEventListener("change", () => { fillYears(); renderOfficialLinks(); displaySourceStatus(); loadCalendar({includeHistory: true}); });
+    yearSelect.addEventListener("change", () => loadCalendar({includeHistory: true}));
+    monthSelect.addEventListener("change", () => { selectedDate = null; renderSeasonContext(); renderCalendar(); });
+    $("#harm-share")?.addEventListener("click", shareEvidence);
+  }
+
+  init();
+})();

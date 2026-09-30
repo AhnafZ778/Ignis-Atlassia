@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import gzip
 import io
 import json
 import tempfile
@@ -38,23 +39,127 @@ class WebMvpTests(unittest.TestCase):
         with urlopen(self.base + path) as response:
             return response.headers, response.read()
 
+    def test_winning_plan_safety_and_data_disclosures(self):
+        limit = b"FireAtlas is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool."
+        _, home = self.get("/")
+        self.assertIn(limit, home)
+        _, method = self.get("/method.html")
+        self.assertIn(limit, method)
+        _, sources = self.get("/data.html")
+        self.assertIn(b"archive-coverage", sources)
+        self.assertIn(b"Source versions, request dates and file fingerprints", sources)
+        self.assertIn(b"/docs/DATA.md", sources)
+        self.assertIn(b"AI assistance helped with code and documentation", sources)
+        self.assertIn(b"No independent scientific reviewer is recorded yet", sources)
+
+    def test_native_review_form_is_served_and_hash_bound_template_is_available(self):
+        _, page = self.get("/review.html?case=grove-2025")
+        self.assertIn(b"id=\"review-samples\"", page)
+        self.assertIn(b"Download review JSON", page)
+        _, script = self.get("/review.js")
+        self.assertIn(b"input_hashes", script)
+        _, template_body = self.get("/api/validity/review-template?case=grove-2025")
+        template = json.loads(template_body)
+        self.assertEqual(template["schema"], "fireatlas-native-mask-review-v1")
+        self.assertEqual(template["case_id"], "grove-2025")
+        self.assertIn("input_hashes", template)
+
+    def test_live_region_archive_ledger_is_served(self):
+        _, body = self.get("/api/v2/regions")
+        status = json.loads(body)
+        self.assertEqual([item["id"] for item in status["regions"]], ["norcal", "punjab-haryana"])
+        for region in status["regions"]:
+            for product in region["products"].values():
+                self.assertIn("complete_months", product)
+                self.assertIn("missing_months", product)
+        _, page = self.get("/data.html")
+        self.assertIn(b'id="archive-region-list"', page)
+        self.assertIn(b"Which months are actually loaded?", page)
+
+    def test_paired_daily_evidence_bundles_download_from_data_page(self):
+        _, page = self.get("/data.html")
+        self.assertIn(b"Reproducible daily bundles", page)
+        for region in ("norcal", "punjab-haryana"):
+            headers, compressed = self.get(f"/samples/aggregates/{region}.json.gz")
+            self.assertEqual(headers["Content-Type"], "application/gzip")
+            evidence = json.loads(gzip.decompress(compressed))
+            self.assertEqual(evidence["schema"], "fireatlas-daily-aggregates-v1")
+            self.assertEqual(evidence["region"]["id"], region)
+            self.assertEqual(len(evidence["days"]), 1430)
+            self.assertEqual(len(evidence["inputs"]), 8)
+
+    def test_calibration_artifacts_are_downloadable_and_method_page_uses_them(self):
+        _, page = self.get("/method.html")
+        self.assertIn(b'id="calibration-download"', page)
+        self.assertIn(b'id="calibration-provenance"', page)
+        _, script = self.get("/calibration-validation.js")
+        self.assertIn(b"/samples/calibration/", script)
+        self.assertNotIn(b"/api/v2/calendar?", script)
+        for region in ("norcal", "punjab-haryana"):
+            headers, body = self.get(f"/samples/calibration/{region}.json")
+            self.assertIn("application/json", headers["Content-Type"])
+            artifact = json.loads(body)
+            self.assertEqual(artifact["schema"], "fireatlas-calibration-artifact-v1")
+            self.assertEqual(artifact["region"]["id"], region)
+            self.assertEqual(len(artifact["provenance"]["paired_complete_months"]), 47)
+
     def test_calendar_map_observations_and_exports(self):
         _, home = self.get("/")
         self.assertIn(b"Burning activity calendar", home)
-        self.assertIn(b"archive-timeline", home)
-        self.assertNotIn(b"earth-frame-host", home)
-        _, archive_script = self.get("/archive-hero.js")
-        self.assertIn(b"/api/archive-overview", archive_script)
-        _, overview = self.get("/api/archive-overview")
-        self.assertEqual(json.loads(overview)["status"], "unavailable")
+        self.assertIn(b"NASA SPACE APPS 2026", home)
+        self.assertIn(b'id="harm-official-links"', home)
+        _, calendar_script = self.get("/harmonized.js")
+        self.assertIn(b"state?.availability?.notices", calendar_script)
+        self.assertIn(b"Open NASA product notice", calendar_script)
+        self.assertIn(b"harm-season-context", home)
+        self.assertIn(b"2024 paddy-harvest monitoring", calendar_script)
+        self.assertIn(b"PRID=2060764", calendar_script)
+        self.assertIn(b"do not confirm crop-residue fires", calendar_script)
+        self.assertIn(b"VISIBLE SENSOR BRIDGE", home)
+        self.assertIn(b"RAW FRP CONTEXT", home)
+        self.assertIn(b"MCD64A1", home)
+        self.assertIn(b'id="harm-share-card"', home)
+        self.assertIn(b'id="harm-build-meta"', home)
+        self.assertIn(b'id="harm-bridge-method"', home)
+        self.assertIn(b"INPUTS + HASH", home)
+        self.assertIn(b"cyan solid", home)
+        self.assertIn(b"purple hatch", home)
+        self.assertIn(b"gray crosshatch", home)
+        _, validity_script = self.get("/validity.js")
+        self.assertIn(b"validity-unknown", validity_script)
+        _, validity_style = self.get("/validity.css")
+        self.assertIn(b"same state grammar", validity_style)
+        calendar_panel = home.split(b'<section id="harmonized-calendar"', 1)[1]
+        verdict_index = calendar_panel.index(b'id="harm-verdict"')
+        links_index = calendar_panel.index(b'id="harm-official-links"')
+        heading_index = calendar_panel.index(b'class="harmonized-heading"')
+        self.assertLess(verdict_index, links_index)
+        self.assertLess(links_index, heading_index)
+        self.assertNotIn(b"archive-timeline", home)
+        self.assertIn(b"earth-frame-host", home)
+        self.assertIn(b'id="globe-markers"', home)
+        self.assertIn(b'id="globe-wildfires"', home)
+        self.assertIn(b"/globe.js", home)
+        headers, wildfire_data = self.get("/documented-fires.json")
+        self.assertIn("application/json", headers["Content-Type"])
+        casebook = json.loads(wildfire_data)
+        embedded_casebook = json.loads(home.split(b'<script id="globe-wildfire-data" type="application/json">', 1)[1].split(b'</script>', 1)[0])
+        self.assertEqual(embedded_casebook, casebook)
+        self.assertEqual(casebook["kind"], "selected-global-wildfire-casebook")
+        self.assertEqual(len(casebook["events"]), 15)
+        self.assertTrue(all(-90 <= event["lat"] <= 90 and -180 <= event["lon"] <= 180 for event in casebook["events"]))
+        self.assertTrue(all(event["id"] and event["name"] and event["place"] and event["period"] and event["summary"] and event["sources"] for event in casebook["events"]))
         _, earth = self.get("/earth.html")
         self.assertIn(b"Earth \xe2\x80\x94 An orbital portrait", earth)
+        self.assertIn(b"window.fireAtlasEarth", earth)
         self.assertGreater(len(earth), 10_000_000)
         _, terrain = self.get("/terrain-earth.html")
         self.assertIn(b"world-elevation", terrain)
         self.assertIn(b"window.fireAtlasEarth", terrain)
         _, embed = self.get("/earth-embed.js")
         self.assertIn(b"/terrain-earth.html?embed=landing", embed)
+        self.assertNotIn(b"/earth.html?embed=landing", embed)
+        self.assertIn(b"native projection bridge", embed)
         query = "year=2015&series=joint&bbox=-122,39,-120,41"
         _, body = self.get("/api/calendar?" + query)
         result = json.loads(body)
@@ -120,6 +225,39 @@ class WebMvpTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as caught:
             urlopen(request)
         self.assertEqual(caught.exception.code, 403)
+
+    def test_region_calendar_api_is_named_scoped_and_never_fabricates_empty_data(self):
+        _, body = self.get("/api/v2/regions")
+        status = json.loads(body)
+        self.assertEqual({item["id"] for item in status["regions"]}, {"norcal", "punjab-haryana"})
+        _, body = self.get("/api/v2/calendar?region=norcal&year=2024&month=7")
+        data = json.loads(body)
+        self.assertEqual(data["schema"], "fireatlas-calendar-v2")
+        self.assertEqual(data["meta"]["data_class"], "no-authentic-imports")
+        self.assertEqual(data["meta"]["period"]["selected_month"], 7)
+        self.assertIn("common 1 km grid", data["meta"]["primary_measure"])
+        self.assertEqual(data["meta"]["corroboration"]["status"], "not-loaded")
+        self.assertEqual(data["days"][0]["sensor_bridge"]["status"], "partial")
+        self.assertIn("July 2024", data["meta"]["verdict"])
+        self.assertEqual(len(data["days"]), 366)
+        self.assertEqual(len(data["months"]), 12)
+        self.assertTrue(all(item["value"] is None for item in data["days"]))
+        _, body = self.get("/api/v2/calendar?region=norcal&year=2024&month=7&history=1")
+        history = json.loads(body)["history"]
+        self.assertEqual(history["start"], "2010-07-01")
+        self.assertEqual(history["days"][0]["date"], "2010-07-01")
+        self.assertIsNone(history["days"][0]["value"])
+        with self.assertRaises(HTTPError) as caught:
+            self.get("/api/v2/calendar?region=world&year=2024")
+        self.assertEqual(caught.exception.code, 400)
+
+    def test_linked_data_import_documents_are_served(self):
+        for route, expected in (("/docs/NASA_DATA_IMPORT.md", b"Import the longer NASA FIRMS archive"),
+                                ("/docs/DATA.md", b"July 2010"),
+                                ("/docs/AI_USE.md", b"AI")):
+            headers, body = self.get(route)
+            self.assertEqual(headers.get_content_type(), "text/markdown")
+            self.assertIn(expected, body)
 
     def test_synthetic_mode_and_showcase_routes_are_retired(self):
         real = Path(self.temp.name) / "authentic.sqlite3"
@@ -222,7 +360,10 @@ if __name__ == "__main__":
 
 class CsvImportTests(unittest.TestCase):
     def test_local_import_is_atomic_idempotent_and_preserves_partial_state(self):
-        from test_phase1 import row, write_csv
+        try:
+            from .test_phase1 import row, write_csv
+        except ImportError:
+            from tests.test_phase1 import row, write_csv
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             database = root / 'real.sqlite3'

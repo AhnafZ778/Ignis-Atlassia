@@ -51,7 +51,7 @@ def query(case_id: str, product: str, version: str, role: str) -> dict:
 def refresh() -> dict:
     result = {"schema": "fireatlas-cmr-inventory-v1",
               "retrieved_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-              "interpretation": "Public CMR candidate granule metadata only; raw files and geolocation have not been downloaded, matched, or decoded. No ground-cell pass/cloud state follows from this list.",
+              "interpretation": "Public CMR candidate granule metadata only; these candidate files have not been downloaded or decoded by the CMR inventory step. Native-file download and decoding are reported separately in the case native_masks ledger. This list alone does not establish a ground-cell pass, cloud, or no-pass state.",
               "cases": {}}
     for case_id in CASES:
         result["cases"][case_id] = {"bbox": CASES[case_id]["bbox"],
@@ -79,7 +79,8 @@ def summary(inventory: dict, case_id: str) -> dict:
                               if granule["start_utc"] in geolocation_times[companion[item["product"]]])
                               if item["role"] == "fire-mask" else None}
                          for item in case["products"]],
-            "interpretation": inventory["interpretation"]}
+            "interpretation": inventory["interpretation"],
+            "native_processing_is_separate": True}
 
 
 if __name__ == "__main__":

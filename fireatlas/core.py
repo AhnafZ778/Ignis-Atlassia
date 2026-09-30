@@ -20,6 +20,7 @@ from statistics import median
 from urllib.parse import urlsplit, urlunsplit
 
 from pyproj import Transformer
+from .availability import source_status
 
 GRID_METERS = 1000
 GRID_VERSION = "ease6933-centroid-1km-v1"
@@ -130,7 +131,28 @@ def connect(path: str | Path) -> Connection:
             west REAL NOT NULL, south REAL NOT NULL,
             east REAL NOT NULL, north REAL NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS source_exports (
+            batch_id INTEGER PRIMARY KEY REFERENCES batches(id),
+            region_id TEXT NOT NULL,
+            source_id TEXT NOT NULL,
+            month TEXT NOT NULL,
+            request_start TEXT NOT NULL,
+            request_end TEXT NOT NULL,
+            west REAL NOT NULL, south REAL NOT NULL,
+            east REAL NOT NULL, north REAL NOT NULL,
+            complete_export INTEGER NOT NULL CHECK(complete_export IN (0,1)),
+            coverage_basis TEXT NOT NULL DEFAULT 'request-metadata',
+            product_versions_json TEXT NOT NULL,
+            parent_sha256 TEXT NOT NULL,
+            request_sha256 TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS source_exports_lookup
+            ON source_exports(region_id,source_id,month,complete_export);
     """)
+    # Keep existing local databases usable when provenance fields are added.
+    export_columns = {row[1] for row in db.execute("PRAGMA table_info(source_exports)")}
+    if "coverage_basis" not in export_columns:
+        db.execute("ALTER TABLE source_exports ADD COLUMN coverage_basis TEXT NOT NULL DEFAULT 'request-metadata'")
     return db
 
 
@@ -138,6 +160,18 @@ def validate_bbox(bbox: tuple[float, float, float, float]) -> None:
     w, s, e, n = bbox
     if not (-180 <= w < e <= 180 and -90 <= s < n <= 90):
         raise ValueError("bbox must be west,south,east,north without date-line crossing")
+
+
+def calendar_row_included(raw: str | dict) -> bool:
+    """One calendar variant: FIRMS vegetation-fire type 0 or missing type."""
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except (TypeError, json.JSONDecodeError):
+            return False
+    if not isinstance(raw, dict):
+        return False
+    return str(raw.get("type") or "").strip() in ("", "0")
 
 
 def _safe_source_uri(uri: str) -> str:
@@ -222,6 +256,7 @@ def ingest(
     bbox: tuple[float, float, float, float] | None = None,
     demo: bool = False,
     exclude_outside_grid: bool = False,
+    batch_key: str | None = None,
 ) -> dict:
     if source_id not in SOURCES:
         raise ValueError(f"unsupported source: {source_id}")
@@ -238,7 +273,7 @@ def ingest(
         for chunk in iter(lambda: binary.read(1024 * 1024), b""):
             digest.update(chunk)
         file_hash = digest.hexdigest()
-    window_key = json.dumps([complete_month, bbox])
+    window_key = json.dumps([complete_month, bbox] if batch_key is None else [complete_month, bbox, batch_key])
     uri = _safe_source_uri(source_uri or csv_path.resolve().as_uri())
     retrieved = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     tx = db.transaction() if hasattr(db, "transaction") else db
@@ -313,12 +348,17 @@ def _counts(db: sqlite3.Connection, year: int, sources: tuple[str, ...], bbox: t
     raw_counts: dict[str, Counter] = defaultdict(Counter)
     placeholders = ",".join("?" for _ in sources)
     records = db.execute(f"""
-        SELECT acquisition_utc, grid_x, grid_y, sensor, platform
+        SELECT acquisition_utc, grid_x, grid_y, sensor, platform, raw_json
         FROM observations
         WHERE source_id IN ({placeholders}) AND acquisition_utc>=? AND acquisition_utc<?
           AND lon>=? AND lon<=? AND lat>=? AND lat<=?
     """, (*sources, f"{year}-01-01", f"{year+1}-01-01", w, e, s, n))
     for row in records:
+        # The predeclared harmonized variant includes vegetation-fire type 0
+        # and legacy records without a type; other thermal anomalies remain
+        # inspectable in raw evidence but do not enter the calendar.
+        if not calendar_row_included(row["raw_json"]):
+            continue
         day = row["acquisition_utc"][:10]
         marks[day].add((row["grid_x"], row["grid_y"]))
         raw_counts[day][row["sensor"]] += 1
@@ -376,6 +416,13 @@ def calendar(db: sqlite3.Connection, *, bbox: tuple[float, float, float, float],
     while day.year == year:
         stamp = day.isoformat()
         complete = monthly[day.month - 1]["export_window_complete"]
+        availability = {}
+        for source in sources:
+            sensor = "MODIS" if source.startswith("MODIS") else "VIIRS"
+            source_complete = _complete_month(db, stamp[:7], (source,), bbox)
+            availability[source] = source_status(
+                stamp, source, complete_export=source_complete,
+                detection_count=raw_counts[stamp].get(sensor, 0))
         daily.append({
             "date_utc": stamp,
             "detected_cell_days": len(marks[stamp]) if complete else None,
@@ -383,6 +430,7 @@ def calendar(db: sqlite3.Connection, *, bbox: tuple[float, float, float, float],
             "raw_pixels_by_sensor": dict(raw_counts[stamp]),
             "export_window_complete": complete,
             "satellite_observation_coverage": "unknown",
+            "availability_by_source": availability,
         })
         day += timedelta(days=1)
     placeholders = ",".join("?" for _ in sources)

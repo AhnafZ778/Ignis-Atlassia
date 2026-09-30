@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FireAtlas — MODIS + VIIRS burning activity calendar</title>
+  <meta name="description" content="Explore a dated Northern California burning activity calendar built from authentic NASA FIRMS MODIS and VIIRS hotspot records. Compare sources, inspect original observations, and see data limits.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <script src="./vendor/leaflet.js" defer></script>
+  <script src="./app.js" defer></script>
+  <script src="./study-ui.js" defer></script>
+  <script src="./earth-embed.js" defer></script>
+  <script src="./globe-math.js" defer></script>
+  <script src="./globe.js" defer></script>
+  <link rel="stylesheet" href="./design.css">
+  <link rel="stylesheet" href="./globe.css">
+  <link rel="stylesheet" href="./vendor/ui-primitives.css">
+  <link rel="stylesheet" href="./landing.css">
+  <link rel="stylesheet" href="./harmonized.css">
+  <link rel="stylesheet" href="./tour.css">
+  <script src="./ui.js" defer></script>
+  <script src="./landing.js" defer></script>
+  <script src="./tour.js" defer></script>
+  <script src="./harmonized.js" defer></script>
+<meta name="fireatlas-static-data" content="./data/v2/">
+<meta name="fireatlas-static-snapshot" content="2026-09-30">
+</head>
+<body class="atlas-page landing-overhaul">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="topbar floating-header">
+    <a class="brand" href="./" aria-label="FireAtlas home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"/><circle class="logo-dot" cx="25" cy="8" r="2"/></svg></span><span class="brand-word">fire<span>atlas</span></span></a>
+    <div class="navigation-glass">
+    <button class="nav-toggle" type="button" aria-controls="site-navigation" aria-expanded="false"><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#menu"></use></svg><span class="menu-label">Menu</span></button>
+    <nav id="site-navigation" aria-label="Project navigation"><a href="#top" class="active">Overview</a><a href="./method.html">Data &amp; method</a><a href="#harmonized-calendar">Fire calendar</a><details class="nav-resources"><summary>Labs &amp; sources <svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#chevron-down"></use></svg></summary><div><a href="./research.html">Research lab</a><a href="./data.html">Data sources</a></div></details></nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero globe-hero" id="top" aria-label="Interactive NASA fire observation globe">
+      <div class="hero-copy">
+        <p class="eyebrow hero-challenge-label">NASA FIRMS · THERMAL OBSERVATIONS</p>
+        <h1><span>Explore satellite</span> <em>signals.</em></h1>
+        <p class="intro">Turn on the layer to explore an imported NASA FIRMS snapshot. Points show detected heat, not a fire perimeter or confirmed wildfire.</p>
+        <div class="hero-actions">
+          <a class="hero-primary ui-button ui-button-primary" href="#harmonized-calendar">Explore the harmonized calendar <svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#arrow-right"></use></svg></a>
+          <button id="start-calendar-tour" class="hero-tour-link" type="button" aria-controls="calendar-tour" disabled>Preparing data tour…</button>
+          <a class="hero-data-link" href="./method.html">See how it works ↗</a>
+        </div>
+        <p class="hero-scope">Separate dated snapshot · distinct from the regional calendar archive</p>
+      </div>
+      <div class="hero-art earth-hero">
+        <div class="earth-fallback" aria-hidden="true"></div>
+        <div id="earth-frame-host" class="earth-frame-host" aria-label="Interactive three-dimensional Earth"></div>
+        <div id="globe-reveal-status" class="globe-reveal-status" role="status" hidden></div>
+        <div class="earth-controls"><span id="earth-caption">GLOBE: SEPARATE DATED NASA NRT SNAPSHOT · DRAG TO ROTATE</span><a href="./terrain-earth.html" target="_blank" rel="noopener noreferrer">Explore terrain Earth ↗</a></div>
+      </div>
+      <div id="globe-point-callout" class="globe-point-callout" hidden>
+        <svg class="point-callout-connector" aria-hidden="true"><defs><marker id="point-callout-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8"/></marker></defs><path id="point-callout-line" marker-end="url(#point-callout-arrow)"/></svg>
+        <section class="point-callout-card" aria-label="Selected Earth location" aria-live="polite" aria-atomic="true">
+          <button id="point-callout-close" type="button" aria-label="Dismiss selected location">×</button>
+          <span id="point-callout-kind" class="point-callout-kind"></span>
+          <h2 id="point-callout-title"></h2>
+          <p id="point-callout-meta"></p>
+          <div class="point-callout-actions"><button id="point-callout-details" type="button" aria-haspopup="dialog" aria-controls="earth-details-dialog">Details ↗</button><button id="point-callout-zoom" type="button">Zoom</button><button id="point-callout-back" type="button" aria-label="Back to full Earth" hidden>← Full Earth</button></div>
+        </section>
+      </div>
+
+      <div class="globe-flight-dock lean-earth-controls" aria-label="Earth layers and navigation">
+        <div class="earth-layer-controls" role="group" aria-label="Earth layers">
+          <label class="globe-toggle-label" for="globe-markers"><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#satellite"></use></svg><span class="thermal-toggle-copy"><strong>Satellite signals</strong></span><input id="globe-markers" type="checkbox" aria-label="Show NASA satellite signals on Earth"></label>
+          <label class="globe-toggle-label wildfire-toggle-label" for="globe-wildfires" title="Selected historical wildfire examples at approximate affected-area locations. Not live conditions, ignition points, or fire boundaries."><span class="wildfire-toggle-mark" aria-hidden="true"></span><span class="thermal-toggle-copy"><strong>Wildfires</strong><small>Historical cases</small></span><input id="globe-wildfires" type="checkbox" aria-label="Show selected historical wildfire locations on Earth" aria-describedby="globe-wildfire-note"></label>
+          <button id="earth-details-open" class="earth-details-open" type="button" aria-haspopup="dialog" aria-controls="earth-details-dialog">Details <svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#arrow-up-right"></use></svg></button>
+        </div>
+        <div class="globe-tools" role="group" aria-label="Earth camera controls">
+          <button id="globe-rotate" type="button" aria-pressed="false" aria-label="Pause Earth rotation" title="Pause or resume Earth rotation">Ⅱ</button>
+          <button id="globe-zoom-in" type="button" aria-label="Zoom into Earth">+</button>
+          <button id="globe-zoom-out" type="button" aria-label="Zoom out of Earth">−</button>
+          <button id="globe-reset" type="button" aria-label="Return to full Earth" title="Full Earth">↺</button>
+        </div>
+        <span id="globe-wildfire-note" class="globe-wildfire-note" role="status" hidden>Selected past fires · approximate locations, not perimeters</span>
+      </div>
+
+      <aside class="orbital-note" aria-label="Observation sources"><span class="orbital-kicker">HISTORICAL SENSOR PAIR</span><div class="orbital-diagram" aria-hidden="true"><svg viewBox="0 0 180 130"><circle cx="90" cy="65" r="30"/><ellipse cx="90" cy="65" rx="78" ry="24" transform="rotate(-30 90 65)"/><ellipse cx="90" cy="65" rx="67" ry="37" transform="rotate(40 90 65)"/><path d="M60 65h60M90 35c-20 15-20 45 0 60 20-15 20-45 0-60"/><circle class="sat-dot" cx="151" cy="32" r="4"/><circle class="sat-dot secondary" cx="45" cy="26" r="3"/></svg></div><div class="sensor-caption"><span>01</span><strong>MODIS<small>TERRA + AQUA</small></strong><i></i></div><div class="sensor-caption"><span>02</span><strong>VIIRS<small>SUOMI NPP</small></strong><i></i></div><p>Original pixels retained.<br>Shared grid for the calendar.</p></aside>
+      <aside class="orbital-note real-source-note" id="real-source-note" aria-label="Authentic satellite data" hidden><span class="orbital-kicker">NASA FIRMS / REGIONAL ARCHIVE</span><strong id="hero-real-count">—</strong><span class="real-source-unit">IMPORTED DETECTIONS</span><div class="real-source-rule"></div><p>Reading the local archive ledger…</p><a href="./data.html">Inspect provenance ↗</a></aside>
+      <div class="hero-bottom"><a class="hero-atlas-link" href="./method.html"><span aria-hidden="true">↓</span> FOLLOW THE DATA</a></div>
+    </section>
+    <dialog id="earth-details-dialog" class="earth-details-dialog" aria-labelledby="globe-console-title">
+      <aside class="globe-console" aria-labelledby="globe-console-title">
+        <div class="console-source"><span class="console-source-label"><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#satellite"></use></svg><span id="globe-source-label">NASA FIRMS</span></span><span id="globe-data-kind" class="console-snapshot-badge">Imported snapshot</span></div>
+        <div class="globe-console-head"><button id="earth-details-close" class="earth-details-close" type="button" aria-label="Close Earth details">×</button><h2 id="globe-console-title">Satellite evidence</h2><a href="./data.html" aria-label="Inspect NASA data sources" title="Inspect NASA data sources"><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#arrow-up-right"></use></svg></a></div>
+        <div class="globe-console-body">
+          <div class="hero-coordinate"><span class="hero-snapshot-label"><svg class="ui-icon" aria-hidden="true"><use id="globe-layer-icon" href="./vendor/lucide-icons.svg#satellite"></use></svg><span id="globe-layer-label">NASA SATELLITE EVIDENCE</span></span><span id="globe-stamp">DRAG TO EXPLORE</span></div>
+        <div id="globe-selection" hidden aria-live="polite"></div>
+        <label id="globe-wildfire-browser" class="globe-wildfire-browser" hidden>Inspect a historical case<select id="globe-wildfire-location"><option value="">Choose a case…</option></select></label>
+        <details id="globe-evidence-tools" class="globe-evidence-tools">
+          <summary><span><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#satellite"></use></svg><strong id="globe-total">—</strong> satellite detections</span><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#chevron-down"></use></svg></summary>
+          <p class="globe-reading-definition">NASA FIRMS heat observations support the wider picture. Repeated detections can describe one fire, and some heat sources are not wildfires.</p>
+          <small id="globe-cell-count">Preparing mapped groups…</small>
+          <dl id="globe-period" class="globe-period"><div><dt>Observed</dt><dd>Loading dates…</dd></div><div><dt>Last detected</dt><dd>—</dd></div></dl>
+          <div class="globe-filters">
+            <label>Observation date<select id="globe-date" disabled><option value="all">All dates</option></select></label>
+            <label>Satellite sensor<select id="globe-source" disabled><option value="all">All satellites</option></select></label>
+          </div>
+          <label class="globe-browse">Inspect satellite evidence<select id="globe-location" disabled><option value="">Browse largest groups…</option></select></label>
+          <p id="globe-status" role="status">Detections are hidden.</p>
+          <button id="globe-retry" type="button" hidden>Retry data</button>
+          <a class="globe-method" href="https://www.earthdata.nasa.gov/data/tools/firms/faq" target="_blank" rel="noopener noreferrer">How NASA detects fires ↗</a>
+        </details>
+        <div class="globe-dock-sub">
+          <div class="globe-legend" role="group" aria-label="Detection legend">
+            <button type="button" data-tooltip="Amber marks groups whose last observation is before the latest day in this selection. Color shows recency, not fire intensity."><span class="legend-dot earlier" aria-hidden="true"></span> Earlier</button>
+            <button id="globe-latest-key" type="button" data-tooltip="Gold marks groups observed on the latest day in this selection. It does not mean a fire is still burning."><span class="legend-dot latest" aria-hidden="true"></span> Latest</button>
+            <button type="button" data-tooltip="Larger dots contain more satellite detections in a 1° geographic cell. Multiple detections may describe the same fire; size is not burned area or severity.">Size ⓘ</button>
+          </div>
+          <div class="globe-wildfire-legend"><span><i class="fire-spot-symbol" aria-hidden="true"></i> Historical wildfire case</span><small>Selected examples · approximate affected areas · not live conditions or fire boundaries</small></div>
+          <div id="globe-imprint" class="globe-imprint" aria-label="Daily observation profile">
+            <div class="imprint-meta">
+              <span class="imprint-label">Detections by day · UTC</span>
+              <button id="imprint-reset" type="button" class="imprint-reset-btn" hidden>All dates</button>
+            </div>
+            <div id="globe-imprint-bars" class="imprint-bars" role="group" aria-label="Daily detection counts"></div>
+          </div>
+        </div><details class="earth-region-options"><summary>Go to a region</summary><div class="globe-regions" role="group" aria-label="Look at a region">
+            <button type="button" data-globe-region="20,10" data-region-key="world">World</button>
+            <button type="button" data-globe-region="15,50" data-region-key="europe">Europe</button>
+            <button type="button" data-globe-region="20,-5" data-region-key="africa">Africa</button>
+            <button type="button" data-globe-region="-60,-12" data-region-key="south-america">S. America</button>
+            <button type="button" data-globe-region="-110,40" data-region-key="north-america">N. America</button>
+            <button type="button" data-globe-region="100,25" data-region-key="asia">Asia</button>
+            <button type="button" data-globe-region="135,-25" data-region-key="oceania">Australia</button>
+          </div></details>
+        </div>
+      </aside>
+    </dialog>
+    <div class="shell">
+    <section id="harmonized-calendar" class="harmonized-calendar" aria-labelledby="harmonized-title">
+      <p id="harm-verdict" class="harm-verdict" aria-live="polite">Checking the selected month against comparable imported records…</p>
+      <nav id="harm-official-links" class="harm-official-links" aria-label="Official data and incident sources"></nav>
+      <div id="harm-season-context" class="harm-season-context" role="note" aria-live="polite" hidden></div>
+      <div class="harmonized-heading">
+        <div><p class="eyebrow">NASA SPACE APPS 2026 · HARMONIZATION OF MODIS AND VIIRS HOT SPOTS</p><h2 id="harmonized-title">One calendar. Two satellite records.</h2><p>VIIRS-equivalent active-fire cell-days on a common 1 km grid. Native MODIS and 375 m VIIRS rows stay inspectable; FIRMS type 0 or missing rows enter the calendar.</p></div>
+        <div class="harm-heading-actions"><button id="harm-share" class="harm-share" type="button" aria-describedby="harm-share-status">Share evidence ↗</button><a id="harm-download" class="harm-download" href="/api/v2/calendar?region=norcal&amp;year=2024&amp;month=7" download>Download data ↗</a><span id="harm-share-status" class="harm-share-status" role="status" aria-live="polite"></span></div>
+      </div>
+      <div class="harm-controls" aria-label="Harmonized calendar selection">
+        <label>AREA<select id="harm-region"><option value="norcal">Northern California</option><option value="punjab-haryana">Punjab–Haryana</option></select></label>
+        <label>YEAR<select id="harm-year" aria-label="Select calendar year"></select></label>
+        <label>MONTH<select id="harm-month" aria-label="Select calendar month"></select></label>
+        <span id="harm-status" role="status">Loading imported NASA record…</span>
+      </div>
+      <p id="harm-build-meta" class="harm-build-meta" role="status">Evidence bundle: loading source hashes…</p>
+      <div class="harm-summary-grid">
+        <article class="harm-summary-card"><span>HARMONIZED CELL-DAYS</span><strong id="harm-value">—</strong><small id="harm-value-note">Unknown until source exports are complete</small></article>
+        <article class="harm-summary-card"><span>COMPARABLE YEARS</span><strong id="harm-years">—</strong><small id="harm-percentile">No baseline loaded</small></article>
+        <article class="harm-summary-card"><span>CRITICAL DATES</span><strong id="harm-season">—</strong><small id="harm-season-note">Cumulative activity and 15-day peak window</small></article>
+        <article class="harm-summary-card harm-model-card"><span>CALIBRATION CHECK</span><strong id="harm-model">Awaiting data</strong><small id="harm-model-note">Held-out comparison controls whether scaling is used</small></article>
+      </div>
+      <section class="harm-bridge-panel" aria-labelledby="harm-bridge-title">
+        <div class="harm-panel-title"><div><p class="eyebrow">VISIBLE SENSOR BRIDGE</p><h3 id="harm-bridge-title">Same grid. Separate evidence.</h3><p id="harm-bridge-method" class="harm-bridge-method">Centroid → EASE-Grid 1 km · source rows retained</p></div><span id="harm-bridge-state">Loading bridge state…</span></div>
+        <div class="harm-bridge-flow" aria-label="Sensor bridge from native pixels to common grid">
+          <article class="harm-bridge-sensor modis"><span>MODIS · NATIVE ~1 KM</span><strong id="harm-bridge-modis">—</strong><small id="harm-bridge-modis-note">Common-grid cell-days</small><i id="harm-bridge-modis-bar" aria-hidden="true"></i></article>
+          <div class="harm-bridge-arrow" aria-hidden="true"><b>→</b><small>DEDUPLICATE<br>1 KM GRID</small></div>
+          <article class="harm-bridge-sensor viirs"><span>VIIRS S-NPP · NATIVE 375 M</span><strong id="harm-bridge-viirs">—</strong><small id="harm-bridge-viirs-note">Common-grid cell-days</small><i id="harm-bridge-viirs-bar" aria-hidden="true"></i></article>
+          <div class="harm-bridge-arrow" aria-hidden="true"><b>→</b><small>REFERENCE<br>OBSERVATION</small></div>
+          <article class="harm-bridge-sensor result"><span>VIIRS-EQUIVALENT CALENDAR</span><strong id="harm-bridge-result">—</strong><small id="harm-bridge-result-note">The selected source is counted once</small><i id="harm-bridge-result-bar" aria-hidden="true"></i></article>
+        </div>
+        <div class="harm-bridge-detail-grid">
+          <div class="harm-mismatch-card"><div class="harm-mini-heading"><span>DAILY MISMATCH · COMMON GRID</span><small id="harm-bridge-days">—</small></div><div class="harm-mismatch-bars"><span><i class="modis-only" id="harm-mismatch-modis-bar"></i><b id="harm-mismatch-modis">—</b><small>MODIS only</small></span><span><i class="both" id="harm-mismatch-both-bar"></i><b id="harm-mismatch-both">—</b><small>Both</small></span><span><i class="viirs-only" id="harm-mismatch-viirs-bar"></i><b id="harm-mismatch-viirs">—</b><small>VIIRS only</small></span><span><i class="gap" id="harm-mismatch-gap-bar"></i><b id="harm-mismatch-gap">—</b><small>Gap / unknown</small></span></div><p id="harm-bridge-note">Both sensors are retained; their raw pixels are never added together.</p></div>
+          <div class="harm-frp-card"><div class="harm-mini-heading"><span>RAW FRP CONTEXT</span><small>MW / UTC day</small></div><strong id="harm-frp-value">—</strong><p id="harm-frp-note">Fire Radiative Power is shown separately from activity cell-days.</p></div>
+          <div class="harm-corroboration-card"><div class="harm-mini-heading"><span>DATED CORROBORATION</span><small id="harm-corroboration-state">ACTIVE FIRE ONLY</small></div><strong>MCD64A1 · C6.1</strong><p id="harm-corroboration-note">Select a dated calendar month to inspect the hash-bound burned-area check.</p><a href="/data/v2/validity/mcd64-corroboration.json" target="_blank" rel="noopener noreferrer">Evidence report ↗</a> · <a href="https://doi.org/10.5067/MODIS/MCD64A1.061" target="_blank" rel="noopener noreferrer">NASA product record ↗</a></div>
+        </div>
+        <div id="harm-share-card" class="harm-share-card" hidden aria-live="polite"><div><span class="harm-share-kicker">EVIDENCE CARD · <span id="harm-share-card-case">—</span></span><strong id="harm-share-card-title">—</strong><small id="harm-share-card-subtitle">—</small></div><dl><div><dt>CALENDAR</dt><dd id="harm-share-card-value">—</dd></div><div><dt>STATE</dt><dd id="harm-share-card-state">—</dd></div><div><dt>QUALITY</dt><dd id="harm-share-card-quality">—</dd></div><div><dt>INPUTS + HASH</dt><dd id="harm-share-card-inputs">—</dd></div><div><dt>LIMIT</dt><dd id="harm-share-card-limit">ACTIVE FIRE ONLY · pass/cloud coverage unknown</dd></div><div class="harm-share-card-url"><dt>URL</dt><dd><a id="harm-share-card-url" href="#harmonized-calendar">—</a></dd></div></dl></div>
+      </section>
+      <div class="harm-content-grid">
+        <section class="harm-panel harm-calendar-panel" aria-labelledby="harm-days-title">
+          <div class="harm-panel-title"><div><p class="eyebrow">DAILY EVIDENCE</p><h3 id="harm-days-title">Select a UTC day</h3></div><span id="harm-month-total">—</span></div>
+          <div class="harm-weekdays" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div id="harm-day-grid" class="harm-day-grid" role="group" aria-label="Daily harmonized satellite observations"></div>
+          <div class="harm-legend" aria-label="Calendar legend"><span><i class="observed"></i>VIIRS observed · cyan solid</span><span><i class="estimated"></i>MODIS estimate · amber hatch</span><span><i class="outage"></i>Documented gap · purple hatch</span><span><i class="partial"></i>Partial UTC day</span><span><i class="archive-detections"></i>Partial detections · export incomplete</span><span><i class="unknown"></i>Unknown · gray crosshatch</span><span><i class="zero"></i>Complete export · zero detections</span></div>
+          <p class="harm-limit-note">A zero in a complete FIRMS export means zero records in that export. It does not prove a clear satellite pass, cloud-free sky, or no fire.</p>
+        </section>
+        <aside class="harm-panel harm-evidence-panel" aria-labelledby="harm-source-title">
+          <div class="harm-panel-title"><div><p class="eyebrow">SOURCE STATUS</p><h3 id="harm-source-title">What supports this result?</h3></div></div>
+          <div id="harm-source-status" class="harm-source-status"></div>
+          <div class="harm-divider"></div>
+          <p id="harm-day-title" class="harm-day-title">Choose a day to inspect its evidence.</p>
+          <p id="harm-day-summary" class="harm-day-summary">No data is being fabricated for missing downloads.</p>
+          <div id="harm-day-source-status" class="harm-source-status"></div>
+          <div id="harm-records" class="harm-records" aria-live="polite"></div>
+          <a class="harm-method-link" href="./method.html">Method, provenance and limitations ↗</a>
+        </aside>
+      </div>
+      <section class="harm-history-panel" aria-labelledby="harm-history-title">
+        <div class="harm-panel-title"><div><p class="eyebrow">HISTORICAL DAILY VIEW</p><h3 id="harm-history-title">One row per year. One cell per UTC day.</h3></div><span id="harm-history-range">Loading dated archive…</span></div>
+        <div class="harm-history-scroll" tabindex="0" aria-label="Scrollable historical daily activity heatmap">
+          <div class="harm-history-axis" aria-hidden="true"><span></span><div class="harm-history-months"><span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span><span>SEP</span><span>OCT</span><span>NOV</span><span>DEC</span></div></div>
+          <div id="harm-history-grid" role="grid" aria-label="Daily harmonized observations by historical year"><p class="harm-history-loading">History displays only imported results; missing dates stay unknown.</p></div>
+        </div>
+        <div class="harm-history-legend" aria-label="Historical heatmap legend"><span><i class="observed"></i>VIIRS observed</span><span><i class="estimated"></i>MODIS estimate</span><span><i class="archive-detections"></i>Partial detections · export incomplete</span><span><i class="zero"></i>Complete export · zero detections</span><span><i class="outage"></i>NASA product gap</span><span><i class="unknown"></i>Unknown export</span></div>
+        <p id="harm-history-note" class="harm-history-note">Select a day to open that month and inspect its source rows. This archive records detections; it does not establish satellite pass, cloud, or no-fire status.</p>
+      </section>
+    </section>
+    <section id="decision-paths" class="harm-persona-panel" aria-labelledby="decision-paths-title">
+      <div class="harm-persona-heading">
+        <div><p class="eyebrow">04 / USE THE RESULT</p><h3 id="decision-paths-title">Three ways to work with the same evidence</h3></div>
+        <p>Choose a review path. Every path keeps the sensor identity, date, source rows, and coverage limit visible.</p>
+      </div>
+      <div class="harm-persona-grid">
+        <article class="harm-persona-card">
+          <span class="harm-persona-kicker">EMERGENCY PLANNER</span>
+          <h4>Find dates to review</h4>
+          <ol><li>Choose the year and area.</li><li>Open the verdict and critical dates.</li><li>Export the evidence card for a human review brief.</li></ol>
+          <small>Historical triage aid · never a dispatch or evacuation order.</small>
+        </article>
+        <article class="harm-persona-card">
+          <span class="harm-persona-kicker">LAND MANAGER</span>
+          <h4>Compare seasons without a false pass</h4>
+          <ol><li>Compare the selected month with its prior-year baseline.</li><li>Separate observed, estimated, gap, and unknown days.</li><li>Inspect the source rows before interpreting a change.</li></ol>
+          <small>Activity detections do not identify cause, perimeter, or burned area.</small>
+        </article>
+        <article class="harm-persona-card">
+          <span class="harm-persona-kicker">SCIENTIST / EDUCATOR</span>
+          <h4>Reproduce the count</h4>
+          <ol><li>Open Data &amp; method for the 1 km grid rule.</li><li>Trace a cell to its original NASA row and hash.</li><li>Download the evidence ZIP and recount locally.</li></ol>
+          <small>Unknown pass and cloud coverage stays unknown until verified masks are supplied.</small>
+        </article>
+      </div>
+    </section>
+    <section id="study-workspace" class="landing-workspace" aria-labelledby="workspace-title">
+      <div class="landing-workspace-content">
+        <div class="workspace-introduction"><div><p class="eyebrow">02 / INTERACTIVE HISTORICAL STUDY</p><h2 id="workspace-title">Explore the burning activity calendar.</h2></div></div>
+    <nav class="workspace-nav" aria-label="Observation workspace"><a class="current" href="#atlas-section"><span>01</span> Geographic atlas</a><a href="#calendar-section"><span>02</span> Activity calendar</a><a href="./method.html" data-method-link><span>03</span> Data &amp; method</a></nav>
+    <a class="dataset-status" id="dataset-status" href="./data.html">NASA FIRMS · data sources ↗</a>
+    <div class="demo-alert" id="data-alert"><strong>● CHECKING SOURCE DATA</strong><span>Loading imported observations and export completeness for this selection.</span></div>
+
+    <section class="atlas-section" id="atlas-section" aria-label="Geographic atlas">
+      <div class="section-heading"><div><p class="eyebrow">01 / LOCATE</p><h2>Regional study atlas</h2><p>Select an area, choose a context layer, and replay its daily observations.</p></div><span class="ui-badge"><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#scan-eye"></use></svg> Observations, not boundaries</span></div>
+      <div class="atlas-panel">
+        <div class="map-toolbar"><div class="layer-buttons" role="group" aria-label="Map context layer"><button data-layer="none" type="button">Hotspots</button><button data-layer="ndvi" class="selected" type="button">Vegetation NDVI</button><button data-layer="landcover" type="button">Land cover</button><button data-layer="fwi" type="button" aria-disabled="true">Fire weather · unavailable</button></div><button id="use-map-aoi" class="map-action" type="button">Study this map area <svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#arrow-right"></use></svg></button></div>
+        <div id="map" role="application" aria-label="FireAtlas map with imported fire observations"><div id="map-replay-annotations" class="map-replay-annotations" hidden aria-live="polite"></div></div>
+        <aside id="map-legend" class="map-legend" aria-label="Map legend"><div class="map-legend-head"><span>MAP LEGEND</span><b id="map-legend-badge">NASA / FIRMS</b></div><div class="map-legend-block"><small>CONTEXT LAYER</small><div class="map-legend-context-row"><i id="map-legend-context-swatch" class="map-legend-swatch none" aria-hidden="true"></i><strong id="map-legend-context-title">No context overlay</strong></div><div id="map-legend-context-range" class="map-legend-context-range none"><i aria-hidden="true"></i><span>Only satellite detections</span></div></div><div class="map-legend-block"><small>POINTS ON MAP</small><div class="map-legend-items"><span><i class="map-legend-swatch modis" aria-hidden="true"></i><b>MODIS</b> thermal detection</span><span><i class="map-legend-swatch viirs" aria-hidden="true"></i><b>VIIRS S-NPP</b> thermal detection</span><span><i class="map-legend-swatch aoi" aria-hidden="true"></i> Study area boundary</span></div><p id="map-legend-observation-note" class="map-legend-observation-note">Imported NASA FIRMS detection records.</p></div><p id="map-legend-note">The map shows dated detection locations. A point is not a fire perimeter.</p></aside>
+        <div class="map-footer"><span id="map-status">Loading imported observations…</span><span id="layer-status">Map points show dated satellite detection locations.</span></div>
+        <div class="map-timeline" aria-label="Replay selected month of satellite detections"><div class="map-timeline-top"><div><span>REPLAY THE ARCHIVE</span><strong id="map-timeline-title">Select a month to begin</strong></div><div class="map-timeline-actions"><button id="map-play" type="button">▶ Play month</button><button id="map-all" type="button" disabled>Show all dates</button></div></div><div id="map-timeline-bars" class="map-timeline-bars" role="group" aria-label="Select an acquisition day"></div><input id="map-day" type="range" min="1" max="31" value="1" aria-label="Acquisition day of selected month"><p>Drag through the daily detections. Each frame shows observed pixels from that date, not a predicted fire perimeter.</p><div id="map-replay-guide" class="map-replay-guide" hidden aria-live="polite"><article data-guide="map"><b>01 · Read the map</b><span>Dots are observed satellite detection cells for the selected UTC day.</span></article><article data-guide="timeline"><b>02 · Follow the date</b><span>Playback advances one day at a time so the pattern is easy to compare.</span></article><article data-guide="bars"><b>03 · Read the bars</b><span>Bar height shows detected cell-days; incomplete exports are marked as unknown.</span></article></div></div>
+      </div>
+      <details class="map-context-note"><summary>About these context layers <svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#chevron-down"></use></svg></summary><p class="map-note">Low zoom groups pixels for browsing; zoom in to inspect individual detections. Vegetation and land-cover overlays are dated NASA imagery; measured fire-weather data have not been imported. <a href="https://gibs.earthdata.nasa.gov/layer-metadata/v1.0/" target="_blank" rel="noopener noreferrer">NASA GIBS layers ↗</a></p></details>
+    </section>
+
+    <section class="workspace" id="calendar-section" aria-label="Burning calendar">
+      <div class="section-heading"><div><p class="eyebrow">02 / COMPARE</p><h2>Burning activity calendar</h2><p>Detection centroids in shared 1 km cells, counted once per UTC day.</p></div><div class="ui-badge">Times shown in UTC</div></div>
+
+      <div class="controls">
+        <label>YEAR<select id="year"><option>2015</option></select></label>
+        <label class="bbox-label">AREA OF INTEREST <span>West, south, east, north</span><input id="bbox" value="-122,39,-120,41" spellcheck="false" aria-label="Area bounding box west south east north"></label>
+        <button id="analyze" class="primary-button" type="button">Analyze area <span>↗</span></button>
+      </div>
+
+      <div class="series-row"><span>SENSOR VIEW</span><div class="segmented" role="group" aria-label="Sensor series"><button data-series="joint" class="selected" type="button">Joint</button><button data-series="modis" type="button">MODIS</button><button data-series="viirs-snpp" type="button">VIIRS S-NPP</button><button data-series="hms-viirs" type="button" hidden>NOAA HMS VIIRS</button></div><label id="additional-source-label" hidden>Imported product <select id="additional-source"><option value="">Choose product…</option></select></label><p>Separate series preserve the sensor transition.</p></div>
+      <div id="firms-source-compare" class="source-compare" aria-label="Sensor comparison for selected month"><button class="source-signal" data-source-target="modis" type="button"><span class="signal-index">01 / MODIS</span><strong id="compare-modis">—</strong><span class="signal-unit">Eligible rows</span><i id="compare-modis-bar"></i></button><div class="signal-connector" aria-hidden="true"><span>↔</span><small>TWO<br>SENSORS</small></div><button class="source-signal" data-source-target="viirs-snpp" type="button"><span class="signal-index">02 / VIIRS S-NPP</span><strong id="compare-viirs">—</strong><span class="signal-unit">Eligible rows</span><i id="compare-viirs-bar"></i></button><div class="signal-equals" aria-hidden="true"><span>→</span><small>1 KM GRID</small></div><button class="source-signal joint-signal" data-source-target="joint" type="button"><span class="signal-index">03 / JOINT VIEW</span><strong id="compare-joint">—</strong><span class="signal-unit">Detected cell-days</span><i id="compare-joint-bar"></i></button></div>
+      <div id="hms-source-compare" class="hms-comparison" hidden><div><span>NOAA HISTORICAL FIRE ARCHIVE</span><h3>Real VIIRS detections.<br><em>A visible fire season.</em></h3><p>NOAA HMS points from Suomi NPP, NOAA-20 and NOAA-21. Every day in a complete month is checked before the calendar is marked loaded.</p></div><div class="hms-measures"><div><strong id="hms-raw">—</strong><span>VIIRS POINTS</span></div><div><strong id="hms-cells">—</strong><span>1 KM CELL-DAYS</span></div><small id="hms-period">Loading archive…</small></div></div>
+      <p class="source-compare-note" id="source-compare-note">Loading the shared-grid comparison…</p>
+      <div class="export-row"><span id="aoi-status">Selected AOI: −122, 39, −120, 41</span><div><button id="export-calendar" type="button">↓ Calendar CSV</button><button id="export-observations" type="button">↓ Raw observations CSV</button></div></div>
+
+      <div class="stats" aria-live="polite">
+        <article class="stat"><span>DETECTED CELL-DAYS<button class="info-help" type="button" aria-label="Explain this measure" data-tooltip="A cell-day is one 1 km grid cell with a detection on one UTC day. Repeated observations in that cell and day count once. It is not burned area or a count of fires."><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-count">—</strong><small id="metric-month">Selected month</small></article>
+        <article class="stat"><span>PRIOR-YEAR MEDIAN<button class="info-help" type="button" aria-label="Explain this measure" data-tooltip="The middle value for the same month in available prior years, using the same source selection. Incomplete inputs can make this comparison unavailable."><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-baseline">—</strong><small id="baseline-years">Same month · same sources</small></article>
+        <article class="stat"><span>CHANGE FROM MEDIAN<button class="info-help" type="button" aria-label="Explain this measure" data-tooltip="The selected month compared with its prior-year median. This describes observed detection activity, not a prediction of fire risk."><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-change">—</strong><small>Detected cell-days, not a forecast</small></article>
+        <article class="stat coverage"><span>SATELLITE COVERAGE<button class="info-help" type="button" aria-label="Explain this measure" data-tooltip="Satellite pass and cloud masks are not loaded. No detections can mean no burning, obscured observations, or missing data; coverage remains unknown."><svg class="ui-icon" aria-hidden="true"><use href="./vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-coverage">Unknown</strong><small>Pass and cloud masks not loaded</small></article>
+      </div>
+      <section id="insight-card" class="insight-card" aria-live="polite" hidden><div class="insight-mark" aria-hidden="true">✦</div><div><p class="eyebrow">WHAT THIS VIEW SAYS</p><h3 id="insight-title">Building an evidence-backed insight…</h3><p id="insight-body"></p><small id="insight-source"></small></div></section>
+      <section id="responder-briefing" class="briefing-card" aria-labelledby="briefing-title" hidden>
+        <div class="briefing-card-head"><div><p class="eyebrow">HISTORICAL RESPONDER BRIEF</p><h3 id="briefing-title">Preparing a human review brief…</h3></div><span id="briefing-status" class="ui-badge">Historical only</span></div>
+        <p id="briefing-action"></p>
+        <div class="briefing-facts"><span><b id="briefing-active-days">—</b> active days</span><span><b id="briefing-unknown-days">—</b> unknown days</span><span><b id="briefing-baseline">—</b> baseline</span></div>
+        <div id="briefing-dates" class="briefing-dates"></div>
+        <p class="briefing-limit">This is an evidence review aid. It does not issue an alert, dispatch instruction, flight plan, evacuation order, or containment advice.</p>
+      </section>
+
+      <div class="calendar-context" id="calendar-context"></div>
+      <div class="content-grid calendar-analysis">
+        <section class="panel monthly-panel" aria-labelledby="monthly-title">
+          <div class="panel-head"><div><p class="eyebrow">YEAR AT A GLANCE</p><h3 id="monthly-title">Monthly activity</h3></div><span class="panel-note">CELL-DAYS</span></div>
+          <div id="monthly-bars" class="month-list"></div>
+          <p id="month-completeness" class="calendar-caption"></p>
+          <p class="footnote">Monthly totals sum daily detected cells. Hatched months have incomplete exports; they are not zero.</p>
+        </section>
+        <section class="panel days-panel" aria-labelledby="days-title">
+          <div class="panel-head"><div><p class="eyebrow">DAILY BURNING ACTIVITY · UTC</p><h3 id="days-title">July 2015</h3></div><div class="calendar-month-nav" role="group" aria-label="Calendar month"><button id="calendar-prev" type="button" aria-label="Previous month">←</button><button id="calendar-next" type="button" aria-label="Next month">→</button></div></div>
+          <p id="calendar-month-summary" class="calendar-caption" role="status"></p>
+          <div class="weekday-row" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+          <div id="day-grid" class="day-grid" role="group" aria-label="Daily detected cells, UTC"></div>
+          <div id="calendar-scale" class="calendar-scale"></div>
+          <div class="calendar-status-legend"><span><i class="calendar-key zero"></i> 0 in complete export</span><span><i class="calendar-key partial"></i> ≥ Partial count</span><span><i class="calendar-key missing"></i> Unknown</span></div>
+          <p class="calendar-caption">Each value counts distinct 1 km cells detected that UTC day. Select a day to inspect source pixels; arrow keys move between dates.</p>
+          <div id="calendar-day-summary" class="calendar-day-summary" aria-live="polite"></div>
+        </section>
+      </div>
+      <section class="study-tools panel" aria-labelledby="study-title">
+        <div class="study-heading"><div><p class="eyebrow">EXPORT THE EVIDENCE</p><h3 id="study-title">Take the result with you.</h3><p>Copy the selected view or download its data, source ledger, and checksums.</p></div><div class="study-actions"><button id="copy-view" type="button">Copy view link ↗</button><button id="download-study" type="button">↓ Download study</button></div></div>
+        <div id="share-fallback" hidden><label for="share-url">VIEW LINK</label><input id="share-url" readonly aria-label="Shareable view link"><small>A localhost link works only on this computer. Other people need access to the same hosted dataset.</small></div>
+
+      </section>
+    </section>
+    <nav class="workspace-links" aria-label="Sources"><a href="./method.html" data-method-link>How the calendar is calculated ↗</a><a href="./data.html">NASA data &amp; sources ↗</a></nav>
+    <p id="research-entry-copy" hidden></p>
+  </div>
+  </section>
+  </div>
+  <footer class="plan-safety-footer" aria-label="FireAtlas use limitations">
+    <span>RESEARCH TOOL · NOT OPERATIONAL</span>
+    <p>FireAtlas is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.</p>
+    <a href="./method.html">Review the method and limits ↗</a>
+  </footer>
+  </main>
+  <aside id="calendar-tour" class="calendar-tour" role="region" aria-labelledby="calendar-tour-title" aria-describedby="calendar-tour-copy" hidden>
+    <div class="calendar-tour-top"><span id="calendar-tour-count">01 / 04</span><button id="calendar-tour-close" type="button" aria-label="Close data tour">×</button></div>
+    <div class="calendar-tour-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="eyebrow">AUTHENTIC RECORD WALKTHROUGH</p>
+    <h2 id="calendar-tour-title" tabindex="-1">Loading the study…</h2>
+    <p id="calendar-tour-copy" aria-live="polite"></p>
+    <div class="calendar-tour-actions"><button id="calendar-tour-skip" type="button">Skip tour</button><div><button id="calendar-tour-back" type="button">Back</button><button id="calendar-tour-next" type="button">Next <span aria-hidden="true">→</span></button></div></div>
+  </aside>
+  <script id="globe-wildfire-data" type="application/json">{"kind":"selected-global-wildfire-casebook","reviewed_on":"2026-09-28","period_start":"2016-09-28","period_end":"2026-09-28","scope_note":"Selected major wildfire disasters and fire seasons reported during the past decade. This is not a complete list of every wildfire: satellite detections do not map one-to-one to incidents, and no single global source provides a complete, consistently verified incident and casualty census.","death_method_note":"Direct deaths are shown separately from estimated smoke-related mortality. A blank or ‘not reported’ responder count means the cited sources do not give a reliable breakdown; it does not mean zero.","location_note":"Markers show approximate affected areas, not ignition points, fire perimeters, or exact casualty locations.","events":[{"id":"la-2025","name":"Los Angeles area fires","place":"Los Angeles County, California, USA","period":"January 2025","unit":"Fire complex","lat":34.18,"lon":-118.5,"summary":"The Palisades and Eaton fires destroyed neighborhoods across Los Angeles County. Official direct-death counts exclude modeled estimates of additional smoke-related deaths.","deaths":{"direct":{"count":31,"label":"31 reported","detail":"Direct deaths attributed to the fires in the cited AP report."},"responders":{"count":null,"label":"Not separately reported","detail":"The linked coverage does not provide a confirmed responder death total."},"smoke":{"count":440,"label":"≈440 estimated","detail":"A separate study estimated excess deaths during the fire period; this is modeled smoke and health impact, not an official direct-fire toll."}},"sources":[{"publisher":"Associated Press","published":"2026-01-06","label":"One-year report: fires killed at least 31 people","url":"https://apnews.com/article/58574f14d63d7f81372198b3af526937","kind":"news"},{"publisher":"Associated Press","published":"2025-08-26","label":"Report on estimated excess deaths linked to wildfire smoke","url":"https://www.ap.org/news-highlights/spotlights/2025/new-studies-tie-unrecognized-deaths-and-health-problems-to-maui-and-la-wildfires/","kind":"research"}]},{"id":"south-korea-2025","name":"Southeastern Korea fires","place":"North Gyeongsang, South Korea","period":"March–May 2025","unit":"Multi-fire outbreak","lat":36.35,"lon":128.7,"summary":"A fast-moving outbreak of fires across southeastern South Korea became the country’s worst recorded wildfire disaster. Reports identify firefighters and other response personnel among those killed.","deaths":{"direct":{"count":31,"label":"31 reported","detail":"Latest direct-death toll reported in the linked AP coverage."},"responders":{"count":5,"label":"At least 5 reported","detail":"AP reported a helicopter pilot and four firefighters/other response workers among those killed; classifications vary across reports."}},"sources":[{"publisher":"Associated Press","published":"2025-04-06","label":"Follow-up reports 31 deaths, including a firefighting pilot","url":"https://apnews.com/article/be9485affc6eb9b85d217a405b94ddc7","kind":"news"},{"publisher":"Associated Press","published":"2025-03-31","label":"Wildfires killed 30; response workers among the dead","url":"https://apnews.com/article/0b04e3009e8827eb491fb52568a9fa9b","kind":"news"}]},{"id":"valparaiso-2024","name":"Valparaíso region fires","place":"Viña del Mar and Valparaíso, Chile","period":"February 2024","unit":"Fire complex","lat":-33.05,"lon":-71.45,"summary":"Fires swept through densely settled areas in central Chile. Investigators later charged a volunteer firefighter and a former forestry official in connection with starting the blaze; those accusations are not a finding about all causes.","deaths":{"direct":{"count":137,"label":"137 reported","detail":"Deaths attributed to the Valparaíso region fires in the cited AP report."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited report does not establish a separate responder fatality count."}},"sources":[{"publisher":"Associated Press","published":"2024-05-26","label":"Investigation into the fires that killed 137 people","url":"https://apnews.com/article/ab431b293fe71d9c0e5b0381778b8ffc","kind":"news"}]},{"id":"lahaina-2023","name":"Lahaina wildfire","place":"Maui, Hawaiʻi, USA","period":"August 2023","unit":"Community wildfire","lat":20.88,"lon":-156.68,"summary":"A wind-driven fire destroyed much of Lahaina. The final official toll is distinct from later research estimates of indirect effects such as smoke exposure.","deaths":{"direct":{"count":102,"label":"102 reported","detail":"Maui Police Department identified 102 people who died."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited reporting does not provide a verified responder death count."}},"sources":[{"publisher":"Associated Press","published":"2024-10-02","label":"Investigation reports the official toll of 102","url":"https://apnews.com/article/269a56345a92cdbd5a65db4314a9ba59","kind":"news"}]},{"id":"evros-2023","name":"Alexandroupolis–Evros fires","place":"Northeastern Greece","period":"August 2023","unit":"Regional fire outbreak","lat":40.93,"lon":26.05,"summary":"The regional outbreak burned near the Turkish border and Dadia forest. Most reported deaths in this tally were migrants found in fire-affected areas; the number is a regional fire-period total, not a count of all people exposed to the fires.","deaths":{"direct":{"count":20,"label":"20 reported","detail":"Contemporaneous reports attributed 20 deaths to the fires in the region; 18 bodies were found together in the Dadia area."},"responders":{"count":null,"label":"Not separately reported","detail":"The linked reports do not identify a confirmed responder fatality count."}},"sources":[{"publisher":"Reuters / ThePrint","published":"2023-08-28","label":"Regional fire toll reached 20","url":"https://www.marketscreener.com/news/latest/Greece-battles-Europe-s-deadliest-fire-of-the-summer-for-10th-day-44710941/","kind":"news"},{"publisher":"Reuters / ThePrint","published":"2023-08-22","label":"18 bodies found in the fire-hit forest","url":"https://theprint.in/world/rescuers-find-18-burned-bodies-as-wildfires-spread-in-greece/1725801/","kind":"news"}]},{"id":"chile-2023","name":"Central-southern Chile fires","place":"Biobío and Araucanía, Chile","period":"February 2023","unit":"Multi-fire outbreak","lat":-37.45,"lon":-72.1,"summary":"A heatwave coincided with a large outbreak of fires across central-southern Chile. The early response toll included a firefighter, a helicopter pilot, and a helicopter mechanic.","deaths":{"direct":{"count":26,"label":"At least 26 reported","detail":"A later Reuters report gave a toll of 26 as the fires continued."},"responders":{"count":3,"label":"At least 3 reported","detail":"Early AP reporting identified a firefighter, a firefighting helicopter pilot, and a mechanic killed during response operations."}},"sources":[{"publisher":"Voice of America / Reuters","published":"2023-02-05","label":"Death toll reached at least 24","url":"https://www.voanews.com/a/chile-wildfires-spread-amid-heat-wave-as-death-toll-rises-/6948473.html","kind":"news"},{"publisher":"Reuters","published":"2023-02-06","label":"Updated report: at least 26 deaths","url":"https://www.investing.com/news/commodities-news/chile-battles-deadliest-wildfires-on-record-as-heatwave-grips-2996326","kind":"news"},{"publisher":"Associated Press","published":"2023-02-03","label":"Firefighter and two helicopter crew among early deaths","url":"https://apnews.com/article/41c906f2059ec534e2d7d1e55916b413","kind":"news"}]},{"id":"amazon-2019","name":"Amazon fire season","place":"Brazilian Amazon, Brazil","period":"2019 fire season","unit":"Regional fire season","lat":-3.47,"lon":-62.22,"summary":"This was a season of many fires across the Amazon biome, not one bounded incident. No single confirmed direct-death total is provided here. A peer-reviewed study estimated additional deaths from fire-related air pollution; those are modeled health impacts, not people documented as dying in the flames.","deaths":{"direct":{"count":null,"label":"No consolidated direct toll","detail":"The linked event coverage does not give a verified direct-fire death total for the full Amazon fire season."},"responders":{"count":null,"label":"Not separately reported","detail":"The linked reports do not provide a fire-season total for firefighter or other responder deaths."},"smoke":{"count":3400,"label":"≈3,400 estimated","detail":"A peer-reviewed model estimated additional deaths in 2019 from increased particulate air-pollution exposure associated with the Amazon fires. This is not a direct-fire death count."}},"sources":[{"publisher":"TIME","published":"2019-08-21","label":"News report on the Amazon fire surge","url":"https://time.com/5657387/brazil-amazon-forest-fires-surge/","kind":"news"},{"publisher":"Environmental Research Letters","published":"2021-08-04","label":"Peer-reviewed estimate of smoke-related excess mortality","url":"https://pubmed.ncbi.nlm.nih.gov/34337273/","kind":"research"}]},{"id":"black-summer-2019","name":"Black Summer bushfires","place":"Eastern and southern Australia","period":"2019–2020","unit":"National fire season","lat":-35.1,"lon":149.5,"summary":"A season-long series of fires burned across multiple states. The direct toll is shown separately from estimates of deaths associated with smoke exposure.","deaths":{"direct":{"count":33,"label":"33 reported","detail":"Direct deaths attributed to the fires in official Australian reporting."},"responders":{"count":9,"label":"9 reported","detail":"Nine firefighters were included in the official direct death toll."},"smoke":{"count":417,"label":"≈417 estimated","detail":"Public-health research estimated additional deaths associated with smoke exposure; this is not a direct-fire toll."}},"sources":[{"publisher":"ABC News Australia","published":"2020-02-19","label":"Coverage of the 33 lives lost during Black Summer","url":"https://www.abc.net.au/news/2020-02-19/australia-bushfires-how-heat-and-drought-created-a-tinderbox/11976134","kind":"news"},{"publisher":"Australian Government","published":"2020-03-04","label":"Official statement: 33 deaths, including nine firefighters","url":"https://minister.homeaffairs.gov.au/davidlittleproud/Pages/bushfire-recovery-and-drought-response.aspx","kind":"official"},{"publisher":"Australian Institute of Health and Welfare","published":"2021","label":"Public-health analysis of direct and smoke-related deaths","url":"https://www.aihw.gov.au/getmedia/a14c3205-784c-4d81-ab49-a33ed4d3d813/aihw-phe-276.pdf?inline=true","kind":"research"}]},{"id":"camp-2018","name":"Camp Fire","place":"Paradise, California, USA","period":"November 2018","unit":"Community wildfire","lat":39.76,"lon":-121.62,"summary":"The Camp Fire destroyed much of Paradise and became California’s deadliest recorded wildfire. The final death count was revised after identification work.","deaths":{"direct":{"count":85,"label":"85 reported","detail":"Final toll reported by AP and California authorities."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited final-toll report does not provide a responder breakdown."}},"sources":[{"publisher":"Associated Press","published":"2025-10-08","label":"Camp Fire killed 85 people","url":"https://apnews.com/article/31c4bed29fc1376cad3f9896c4681c08","kind":"news"}]},{"id":"mati-2018","name":"Mati wildfire","place":"Attica, Greece","period":"July 2018","unit":"Community wildfire","lat":38.08,"lon":23.99,"summary":"A fast-moving fire reached coastal communities east of Athens. The final reported death toll rose after people died from their injuries.","deaths":{"direct":{"count":104,"label":"104 reported","detail":"Final reported toll for the Mati wildfire."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited reports do not provide a verified responder death count."}},"sources":[{"publisher":"Associated Press","published":"2026-08-01","label":"Mati fire killed 104 people","url":"https://apnews.com/article/9acd6a30ef36a33fbd48600620aeeb37","kind":"news"}]},{"id":"tubbs-2017","name":"Tubbs Fire","place":"Sonoma County, California, USA","period":"October 2017","unit":"Community wildfire","lat":38.45,"lon":-122.72,"summary":"The Tubbs Fire moved through Northern California wine country, including Santa Rosa neighborhoods. It was one of several concurrent fires in the region that month.","deaths":{"direct":{"count":22,"label":"22 reported","detail":"Deaths attributed specifically to the Tubbs Fire."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited report does not state a separate responder death toll for this incident."}},"sources":[{"publisher":"PBS NewsHour / Associated Press","published":"2019-01-24","label":"Report on the fire that killed 22 people","url":"https://www.pbs.org/newshour/nation/deadly-2017-california-fire-caused-by-privately-owned-electrical-system-report-concludes","kind":"news"}]},{"id":"portugal-oct-2017","name":"October Portugal fire outbreak","place":"Central and northern Portugal","period":"October 2017","unit":"National fire outbreak","lat":40.2,"lon":-8.1,"summary":"Hundreds of fires spread during extreme wind and dry conditions. This is a separate October outbreak from the June Pedrógão Grande disaster.","deaths":{"direct":{"count":50,"label":"50 reported","detail":"Portugal’s public broadcaster reported 50 deaths from the October fires."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited final-toll report does not give a verified responder death count."}},"sources":[{"publisher":"RTP Notícias","published":"2020-10-15","label":"Review of the October 2017 fires and 50 deaths","url":"https://www.rtp.pt/noticias/pais/fogo-matou-50-pessoas-em-outubro-de-2017_n1266863","kind":"news"}]},{"id":"pedrogao-2017","name":"Pedrógão Grande fire complex","place":"Central Portugal","period":"June 2017","unit":"Fire complex","lat":39.92,"lon":-8.15,"summary":"A group of fast-moving fires cut through central Portugal. The final official tally included a volunteer firefighter; early news reports carried lower counts while identification continued.","deaths":{"direct":{"count":66,"label":"66 reported","detail":"Final official toll: 65 civilians and one volunteer firefighter."},"responders":{"count":1,"label":"1 reported","detail":"One volunteer firefighter died from injuries sustained during the response."}},"sources":[{"publisher":"The Guardian","published":"2017-06-19","label":"News coverage of the deadly central Portugal fires","url":"https://www.theguardian.com/world/2017/jun/19/portugal-wildfire-death-toll-rises-to-62-as-search-for-victims-continues","kind":"news"},{"publisher":"European Commission Joint Research Centre","published":"2020","label":"Fire disaster case study and final toll","url":"https://drmkc.jrc.ec.europa.eu/portals/0/Knowledge/ScienceforDRM2020/Files/supercasestudy_04.pdf","kind":"official"}]},{"id":"turkey-2021","name":"Southern Turkey fires","place":"Antalya and Muğla, Türkiye","period":"July–August 2021","unit":"Regional fire outbreak","lat":37.1,"lon":30.4,"summary":"Fires burned near southern coastal communities and resorts, prompting evacuations and international firefighting assistance.","deaths":{"direct":{"count":8,"label":"8 reported","detail":"Reuters reported eight deaths as the fires spread along the southern coast."},"responders":{"count":null,"label":"Not separately reported","detail":"The cited tally does not identify responder deaths separately."}},"sources":[{"publisher":"Reuters / Euronews","published":"2021-08-02","label":"Death toll rose to eight as fires reached coastal areas","url":"https://www.euronews.com/2021/08/02/us-turkey-wildfire","kind":"news"}]},{"id":"algeria-2021","name":"Kabylia wildfires","place":"Tizi Ouzou and Béjaïa, Algeria","period":"August 2021","unit":"Regional fire outbreak","lat":36.7,"lon":4.1,"summary":"Multiple fires affected northern Algeria. Soldiers were deployed to help residents and fight the fires; dozens of them died in the response.","deaths":{"direct":{"count":90,"label":"90 reported","detail":"Reported total for the August 2021 fires."},"responders":{"count":33,"label":"33 soldiers reported","detail":"The IFRC described 33 members of the People's National Army deployed as firefighters among the dead."}},"sources":[{"publisher":"Le Monde","published":"2026-09-01","label":"Coverage of Algeria’s recurring wildfire risk, including the 2021 disaster","url":"https://www.lemonde.fr/en/le-monde-africa/article/2026/09/01/as-unprecedented-wildfires-rage-in-algeria-authorities-remain-largely-silent_6757032_124.html","kind":"news"},{"publisher":"International Federation of Red Cross and Red Crescent Societies","published":"2021-08-17","label":"Situation report: 90 deaths, including 33 soldiers fighting fires","url":"https://adore.ifrc.org/Download.aspx?FileId=461012","kind":"official"}]}]}</script>
+  <div id="globe-tooltip" class="globe-tooltip" role="tooltip" hidden></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

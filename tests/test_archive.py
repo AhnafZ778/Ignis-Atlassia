@@ -6,6 +6,7 @@ import unittest
 import zipfile
 
 from fireatlas.archive import BBOX, SAMPLE, build_bundle, import_bundle
+from fireatlas.aggregates import daily_aggregates
 from fireatlas.bootstrap import populate_showcase
 from fireatlas.core import calendar, connect
 from fireatlas.harmonization import month_audit
@@ -24,7 +25,19 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual((status["sync"]["completed"], status["sync"]["status"]), (16, "complete"))
             with connect(database) as db:
                 audit = month_audit(db, bbox=BBOX, year=2025, month=7, series="joint")
-                self.assertEqual((audit["raw_pixels_total"], audit["detected_cell_days"]), (1467, 474))
+                self.assertEqual((audit["raw_pixels_total"], audit["detected_cell_days"]), (1456, 474))
+                aggregates = daily_aggregates(db, "norcal", "2024-07-01", "2024-07-31")
+                aggregate_cells = {
+                    item["date_utc"]: item["sources"]["MODIS_SP"]["detected_cell_days"]
+                    for item in aggregates["days"]
+                }
+                legacy_cells = {
+                    item["date_utc"]: item["detected_cell_days"]
+                    for item in calendar(db, bbox=BBOX, year=2024, series="modis")["daily"]
+                    if item["date_utc"].startswith("2024-07-")
+                }
+                self.assertEqual(len(aggregate_cells), 31)
+                self.assertEqual(aggregate_cells, legacy_cells)
 
     def test_world_archives_become_verified_regional_months(self):
         with tempfile.TemporaryDirectory() as temporary:

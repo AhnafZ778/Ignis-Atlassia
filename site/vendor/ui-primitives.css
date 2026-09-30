@@ -1,0 +1,91 @@
+/*
+ * Button and Badge primitives adapted from shadcn/ui (MIT).
+ * Commit: 98a1fe67b439324ddc857f47fbdce056600a4329
+ * Sources: apps/v4/registry/new-york-v4/ui/{button,badge}.tsx
+ * Copyright (c) 2023 shadcn. See SHADCN_UI_LICENSE.txt.
+ * Utility classes translated to CSS; FireAtlas colors, 44px controls,
+ * explicit transition properties and reduced-motion support added.
+ */
+.ui-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 44px;
+  padding: .625rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius, .625rem);
+  font-family: inherit;
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition: color .18s ease, background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.ui-button:focus-visible,
+.ui-badge:focus-visible {
+  border-color: var(--ui-ring, #87ced6);
+  box-shadow: 0 0 0 3px var(--ui-ring-shadow, #87ced666);
+}
+.ui-button:disabled,
+.ui-button[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: .5;
+}
+.ui-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+.ui-button-primary {
+  background: var(--ui-primary, #ee844f);
+  color: var(--ui-primary-foreground, #130d08);
+}
+.ui-button-primary:hover {
+  background: var(--ui-primary-hover, #ffa66f);
+}
+.ui-button-outline {
+  border-color: var(--ui-border, #41535a);
+  background: var(--ui-background, #101d22);
+  color: var(--ui-foreground, #edf3f3);
+  box-shadow: 0 1px 2px #0000000d;
+}
+.ui-button-outline:hover {
+  background: var(--ui-accent, #1d343d);
+  color: var(--ui-accent-foreground, #fff);
+}
+.ui-badge {
+  display: inline-flex;
+  width: fit-content;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  overflow: hidden;
+  border: 1px solid var(--ui-border, #41535a);
+  border-radius: 999px;
+  padding: .25rem .625rem;
+  font-size: .75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  background: var(--ui-background, #101d22);
+  color: var(--ui-foreground, #edf3f3);
+  transition: color .18s ease, box-shadow .18s ease;
+}
+.ui-badge > svg {
+  width: .75rem;
+  height: .75rem;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-button,
+  .ui-badge {
+    transition: none;
+  }
+}

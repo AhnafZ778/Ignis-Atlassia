@@ -34,15 +34,26 @@ from .globe import snapshot as globe_snapshot, detail as globe_detail
 from .briefing import responder_briefing
 from .harmonization import month_audit
 from .validity import CASES as VALIDITY_CASES, report as validity_report, build_evidence as build_validity_evidence
+from .calendar_v2 import calendar_v2, prepare_calendar_v2, region_status
+from .regions import REGIONS
 
 STATIC = Path(__file__).with_name("static")
-EARTH_MODEL = Path(__file__).resolve().parent.parent / "earth.html"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+EARTH_MODEL = PROJECT_ROOT / "earth.html"
+DOC_ASSETS = {
+    "/docs/NASA_DATA_IMPORT.md": (PROJECT_ROOT / "docs" / "NASA_DATA_IMPORT.md", "text/markdown; charset=utf-8"),
+    "/docs/DATA.md": (PROJECT_ROOT / "docs" / "DATA.md", "text/markdown; charset=utf-8"),
+    "/docs/AI_USE.md": (PROJECT_ROOT / "docs" / "AI_USE.md", "text/markdown; charset=utf-8"),
+}
 ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
+    "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
     "/design.css": ("design.css", "text/css; charset=utf-8"),
     "/ui.js": ("ui.js", "text/javascript; charset=utf-8"),
     "/landing.css": ("landing.css", "text/css; charset=utf-8"),
+    "/harmonized.css": ("harmonized.css", "text/css; charset=utf-8"),
+    "/harmonized.js": ("harmonized.js", "text/javascript; charset=utf-8"),
     "/landing.js": ("landing.js", "text/javascript; charset=utf-8"),
     "/archive-hero.js": ("archive-hero.js", "text/javascript; charset=utf-8"),
     "/tour.css": ("tour.css", "text/css; charset=utf-8"),
@@ -52,6 +63,10 @@ ASSETS = {
     "/method.html": ("method.html", "text/html; charset=utf-8"),
     "/method.css": ("method.css", "text/css; charset=utf-8"),
     "/method.js": ("method.js", "text/javascript; charset=utf-8"),
+    "/review.html": ("review.html", "text/html; charset=utf-8"),
+    "/review.css": ("review.css", "text/css; charset=utf-8"),
+    "/review.js": ("review.js", "text/javascript; charset=utf-8"),
+    "/calibration-validation.js": ("calibration-validation.js", "text/javascript; charset=utf-8"),
     "/incident-media/park-fire-flames.jpg": ("incident-media/park-fire-flames.jpg", "image/jpeg"),
     "/incident-media/park-fire-02.jpg": ("incident-media/park-fire-02.jpg", "image/jpeg"),
     "/incident-media/park-fire-04.jpg": ("incident-media/park-fire-04.jpg", "image/jpeg"),
@@ -72,6 +87,12 @@ ASSETS = {
     "/earth-embed.js": ("earth-embed.js", "text/javascript; charset=utf-8"),
     "/terrain-earth.html": ("terrain-earth.html", "text/html; charset=utf-8"),
     "/globe.js": ("globe.js", "text/javascript; charset=utf-8"),
+    "/documented-fires.json": ("documented-fires.json", "application/json; charset=utf-8"),
+    "/assets/documented-fires.json": ("documented-fires.json", "application/json; charset=utf-8"),
+    "/samples/aggregates/norcal.json.gz": ("../samples/aggregates/norcal.json.gz", "application/gzip"),
+    "/samples/aggregates/punjab-haryana.json.gz": ("../samples/aggregates/punjab-haryana.json.gz", "application/gzip"),
+    "/samples/calibration/norcal.json": ("../samples/calibration/norcal.json", "application/json; charset=utf-8"),
+    "/samples/calibration/punjab-haryana.json": ("../samples/calibration/punjab-haryana.json", "application/json; charset=utf-8"),
     "/globe-math.js": ("globe-math.js", "text/javascript; charset=utf-8"),
     "/globe.css": ("globe.css", "text/css; charset=utf-8"),
     "/earth-poster-1440.webp": ("earth-poster-1440.webp", "image/webp"),
@@ -128,6 +149,9 @@ def handler_factory(database: Path):
     database = Path(database)
     globe_lock = threading.Lock()
     globe_cache = {}
+    calendar_cache_lock = threading.Lock()
+    calendar_cache = {}
+    calendar_prepared_cache = {}
     pilot_sync = PilotSync(database)
     class Handler(BaseHTTPRequestHandler):
         def _local_data_action(self, content_type):
@@ -139,15 +163,18 @@ def handler_factory(database: Path):
                     and self.headers.get("Content-Type") == content_type)
 
         def _respond(self, content: bytes, content_type: str, status: HTTPStatus = HTTPStatus.OK, filename=None):
-            self.send_response(status)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(content)))
-            self.send_header("Cache-Control", "no-store")
-            self.send_header("X-Content-Type-Options", "nosniff")
-            if filename:
-                self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
-            self.end_headers()
-            self.wfile.write(content)
+            try:
+                self.send_response(status)
+                self.send_header("Content-Type", content_type)
+                self.send_header("Content-Length", str(len(content)))
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                if filename:
+                    self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+                self.end_headers()
+                self.wfile.write(content)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
 
         def _json(self, value, status: HTTPStatus = HTTPStatus.OK):
             self._respond(json.dumps(value).encode(), "application/json; charset=utf-8", status)
@@ -232,6 +259,13 @@ def handler_factory(database: Path):
                 else:
                     self._json({"error": "Earth model file not found"}, HTTPStatus.NOT_FOUND)
                 return
+            if url.path in DOC_ASSETS:
+                path, content_type = DOC_ASSETS[url.path]
+                if path.is_file():
+                    self._respond(path.read_bytes(), content_type)
+                else:
+                    self._json({"error": "document not found"}, HTTPStatus.NOT_FOUND)
+                return
             if url.path in ASSETS:
                 file, kind = ASSETS[url.path]
                 self._respond((STATIC / file).read_bytes(), kind)
@@ -266,7 +300,41 @@ def handler_factory(database: Path):
                     self._json(pilot_sync.status())
                     return
                 with connect(database) as db:
-                    if url.path == "/api/validity":
+                    if url.path == "/api/v2/regions":
+                        self._json(region_status(db))
+                    elif url.path == "/api/v2/calendar":
+                        region = params.get("region", [""])[0]
+                        year = int(params.get("year", ["2024"])[0])
+                        month = int(params.get("month", ["7"])[0])
+                        history = params.get("history", ["0"])[0] == "1"
+                        stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
+                                       for p in (database, Path(str(database) + "-wal")))
+                        key = (region, year, month, history, stamps)
+                        with calendar_cache_lock:
+                            cached = calendar_cache.get(key)
+                            if cached and time.monotonic() - cached[0] < 300:
+                                result = cached[1]
+                            else:
+                                if (region not in REGIONS or not 2006 <= year <= 2026
+                                        or not 1 <= month <= 12):
+                                    result = calendar_v2(db, region=region, year=year, month=month,
+                                                         include_history=history)
+                                else:
+                                    prepared_key = (region, stamps)
+                                    prepared_item = calendar_prepared_cache.get(prepared_key)
+                                    if prepared_item is None:
+                                        prepared_item = prepare_calendar_v2(db, region=region,
+                                                                           fallback_year=2026)
+                                        if len(calendar_prepared_cache) >= 2:
+                                            calendar_prepared_cache.pop(next(iter(calendar_prepared_cache)))
+                                        calendar_prepared_cache[prepared_key] = prepared_item
+                                    result = calendar_v2(db, region=region, year=year, month=month,
+                                                         include_history=history, prepared=prepared_item)
+                                if len(calendar_cache) >= 8:
+                                    calendar_cache.pop(next(iter(calendar_cache)))
+                                calendar_cache[key] = (time.monotonic(), result)
+                        self._json(result)
+                    elif url.path == "/api/validity":
                         self._json(validity_report(db, case_id=params.get("case", ["park-2024"])[0],
                                                    selected_date=params.get("date", [None])[0]))
                     elif url.path == "/api/validity/check":
@@ -282,6 +350,16 @@ def handler_factory(database: Path):
                         case_id = params.get("case", ["park-2024"])[0]
                         self._respond(build_validity_evidence(db, case_id), "application/zip",
                                       filename=f"fireatlas_validity_{case_id}.zip")
+                    elif url.path == "/api/validity/review-template":
+                        from .mask_review import make_template
+                        from .masks import read_evidence
+                        case_id = params.get("case", ["park-2024"])[0]
+                        if case_id not in VALIDITY_CASES:
+                            raise ValueError("case must be park-2024 or grove-2025")
+                        template = make_template(case_id, read_evidence(case_id))
+                        self._respond(json.dumps(template, sort_keys=True, indent=2).encode(),
+                                      "application/json; charset=utf-8",
+                                      filename=f"fireatlas_{case_id}_native_mask_review_template.json")
                     elif url.path == "/api/research":
                         self._json(research_report(db, **_research_context(params)))
                     elif url.path == "/api/archive-overview":
@@ -300,6 +378,7 @@ def handler_factory(database: Path):
                         default_series = next((name for name, sources in SERIES.items()
                                                if latest and sources == (latest["source_id"],)), "joint")
                         standard_pair_ready = _complete_month(db, "2025-07", SERIES["joint"], NASA_ARCHIVE_BBOX)
+                        archive_status = region_status(db)
                         if standard_pair_ready:
                             default_view = {"year": 2024, "month": 7, "bbox": VALIDITY_CASES["park-2024"]["bbox"]}
                             default_series = "joint"
@@ -307,6 +386,7 @@ def handler_factory(database: Path):
                                     "default_view": default_view, "pilots": PILOTS,
                                     "default_series": default_series,
                                     "standard_pair_ready": standard_pair_ready,
+                                    "archive_status": archive_status,
                                     "available_sources": [row[0] for row in db.execute("SELECT DISTINCT source_id FROM batches ORDER BY source_id")],
                                     "source_counts": {row[0]: row[1] for row in db.execute("SELECT source_id,COUNT(*) FROM observations GROUP BY source_id")},
                                     "synthetic": bool(db.execute("SELECT 1 FROM batches WHERE demo=1 LIMIT 1").fetchone())})
