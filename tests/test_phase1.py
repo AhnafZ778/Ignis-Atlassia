@@ -101,6 +101,15 @@ class Phase1Tests(unittest.TestCase):
         self.assertIn("[MAP_KEY]", uri)
         self.assertNotIn("secret", uri)
 
+    def test_local_import_source_uri_does_not_publish_machine_path(self):
+        path = self.root / "modis.csv"
+        write_csv(path, [row()])
+        ingest(self.db, path, "MODIS_SP")
+
+        uri = self.db.execute("SELECT source_uri FROM batches").fetchone()[0]
+        self.assertEqual(uri, "local-file:modis.csv")
+        self.assertNotIn(str(self.root), uri)
+
     def test_incomplete_month_is_not_a_zero_and_has_no_baseline(self):
         path = self.root / "partial.csv"
         write_csv(path, [row()])

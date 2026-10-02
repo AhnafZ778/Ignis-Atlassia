@@ -34,7 +34,7 @@ class StaticCalendarExportTests(unittest.TestCase):
         self.assertIn("pairs", source["native_masks"]["paired_observations"])
 
     def test_evidence_card_exposes_traceable_quality_limit_and_link(self):
-        html = (Path(__file__).parents[1] / "fireatlas/static/index.html").read_text(encoding="utf-8")
+        html = (Path(__file__).parents[1] / "fireatlas/static/atlas.html").read_text(encoding="utf-8")
         script = (Path(__file__).parents[1] / "fireatlas/static/harmonized.js").read_text(encoding="utf-8")
         for element in ("harm-share-card-quality", "harm-share-card-limit", "harm-share-card-url"):
             self.assertIn(element, html)
@@ -48,12 +48,16 @@ class StaticCalendarExportTests(unittest.TestCase):
 
     def test_release_shell_exposes_persona_paths_and_pages_artifact(self):
         root = Path(__file__).parents[1]
-        html = (root / "fireatlas/static/index.html").read_text(encoding="utf-8")
+        home = (root / "fireatlas/static/index.html").read_text(encoding="utf-8")
+        atlas = (root / "fireatlas/static/atlas.html").read_text(encoding="utf-8")
         css = (root / "fireatlas/static/harmonized.css").read_text(encoding="utf-8")
         workflow = (root / ".github/workflows/pages.yml").read_text(encoding="utf-8")
-        self.assertIn('id="decision-paths"', html)
+        # The landing page stays globe-led; atlas-specific journeys and calendar
+        # evidence live with the analytical workflow.
+        self.assertIn('id="earth-frame-host"', home)
+        self.assertIn('id="decision-paths"', atlas)
         for label in ("EMERGENCY PLANNER", "LAND MANAGER", "SCIENTIST / EDUCATOR"):
-            self.assertIn(label, html)
+            self.assertIn(label, atlas)
         self.assertIn(".harm-persona-panel", css)
         self.assertIn("path: site", workflow)
         self.assertTrue((root / "fireatlas/static/.nojekyll").is_file())

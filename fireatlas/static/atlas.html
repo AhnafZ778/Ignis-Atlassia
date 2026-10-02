@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Atlas — Ignis-Atlassia</title>
+<meta content="Explore NASA MODIS and VIIRS observations on a dated map, replay, and harmonized calendar." name="description"/>
+<link href="/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="/styles.css" rel="stylesheet"/>
+<link href="/design.css" rel="stylesheet"/>
+<link href="/vendor/leaflet.css" rel="stylesheet"/>
+<link href="/harmonized.css" rel="stylesheet"/>
+<link href="/lab.css" rel="stylesheet"/>
+<link href="/vendor/ui-primitives.css" rel="stylesheet"/>
+<script defer="" src="/vendor/leaflet.js"></script>
+<script defer="" src="/ui.js"></script>
+<script defer="" src="/lab.js"></script>
+<script defer="" src="/static-atlas.js"></script>
+<script defer="" src="/app.js"></script>
+<script defer="" src="/study-ui.js"></script>
+<script defer="" src="/harmonized.js"></script>
+<link href="/workspace.css" rel="stylesheet"/><script defer="" src="/workspace.js"></script></head>
+<body class="atlas-page atlas-workspace scientific-workspace" data-page="atlas">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar">
+<a aria-label="Ignis-Atlassia home" class="brand" href="/"><span aria-hidden="true" class="brand-symbol"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"></circle><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"></ellipse><circle class="logo-dot" cx="25" cy="8" r="2"></circle></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a>
+<button aria-controls="site-navigation" aria-expanded="false" class="nav-toggle" type="button"><span></span><span></span><span class="menu-label">Menu</span></button>
+<nav aria-label="Project navigation" id="site-navigation"><a data-page-link="overview" href="/">Overview</a><a aria-current="page" class="active" data-page-link="atlas" href="/atlas.html">Atlas</a><a data-page-link="research" href="/research.html">Research lab</a><a data-page-link="data" href="/data.html">Data sources</a><a data-page-link="replay" href="/replay.html">Fire replay</a><details class="nav-resources"><summary>Methods <svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary><div><a data-page-link="method" href="/method.html">Method</a><a data-page-link="review" href="/review.html">Review</a></div></details></nav>
+</header>
+<main id="main-content">
+<section aria-labelledby="atlas-title" class="lab-shell lab-intro atlas-intro">
+<div><p class="eyebrow">ATLAS / DATED OBSERVATIONS</p><h1 id="atlas-title">Explore the observations. Understand the evidence.</h1><p>Locate NASA detections on the landscape, compare UTC dates, and trace every result to its source records.</p></div>
+<div class="atlas-intro-actions"><a class="atlas-primary-link" data-context-link="" href="/replay.html">Open fire replay <span aria-hidden="true">↗</span></a><a data-context-link="" href="/research.html">Compare sensors in the lab <span aria-hidden="true">↗</span></a></div>
+</section><nav aria-label="Atlas sections" class="lab-shell atlas-section-nav"><a href="#atlas-section"><span>01</span> Map &amp; replay</a><a href="#calendar-section"><span>02</span> Observation calendar</a><a href="#harmonized-calendar"><span>03</span> Regional reference</a><a href="#harm-history-title"><span>04</span> Historical archive</a></nav>
+<section aria-labelledby="static-atlas-title" class="lab-shell static-atlas" hidden="" id="static-atlas">
+<div class="panel-heading"><div><p class="eyebrow">BUNDLED ARCHIVE / STATIC EXPLORER</p><h2 id="static-atlas-title">Bundled observation atlas</h2><p>Explore the observations included in this release. Source completeness is shown in the regional calendar below.</p></div><span class="status-tag unknown" id="static-atlas-status" role="status">Loading archive bundle…</span></div>
+<form aria-label="Static map study context" class="context-controls" id="static-atlas-form">
+<label>Region<select data-context-field="region" id="static-region"><option value="norcal">Northern California</option><option value="punjab-haryana">Punjab–Haryana</option></select></label>
+<label>Year<select data-context-field="year" id="static-year"></select></label>
+<label>Month<select data-context-field="month" id="static-month"></select></label>
+<label class="wide">Area · west,south,east,north<input aria-describedby="static-aoi-help" data-context-field="bbox" id="static-bbox" spellcheck="false"/></label>
+<button type="submit">Apply view ↗</button>
+<small class="lab-muted" id="static-aoi-help">The area must remain inside the selected region’s bundled archive boundary.</small>
+</form>
+<div aria-label="Map context layer" class="static-map-tools" role="group">
+<button aria-pressed="true" data-static-layer="ndvi" type="button">Vegetation NDVI</button><button aria-pressed="false" data-static-layer="landcover" type="button">Land cover</button><button aria-pressed="false" data-static-layer="none" type="button">Hotspots only</button><button aria-disabled="true" disabled="" title="No supported weather dataset is bundled" type="button">Fire weather · unavailable</button>
+<button id="static-fit" type="button">Fit study area ↗</button><a class="ui-button" href="/research.html" id="static-study-link">Study this map area ↗</a>
+</div>
+<aside aria-label="Observation and archive status legend" class="semantic-legend" role="group"><div><h3>Observation meaning</h3><ul><li><i class="legend-swatch modis"></i> MODIS</li><li><i class="legend-swatch viirs"></i> VIIRS</li><li><i class="legend-swatch shared"></i> Shared grid cell · calendar below</li></ul></div><div><h3>Data status</h3><ul><li><i class="legend-swatch complete"></i> Complete export</li><li><i class="legend-swatch partial"></i> Partial / sampled</li><li><i class="legend-swatch unknown"></i> Unknown / unavailable</li></ul></div><p class="legend-limit">Marker count shows bundled detection samples. It does not show a fire perimeter, burned area, or forecast.</p><p class="lab-muted" id="static-map-coverage">Checking export completeness…</p></aside><div class="static-map-layout"><div aria-label="Map of imported satellite detection locations" id="static-map" role="application"></div></div><div aria-label="Daily observation replay" class="static-replay"><button id="static-play" type="button">▶ Play month</button><button aria-pressed="true" id="static-all" type="button">Show month</button><label for="static-day">UTC day</label><input id="static-day" max="31" min="1" type="range" value="1"/><output for="static-day" id="static-day-label">All dates</output></div>
+<p aria-live="polite" class="lab-muted" id="static-map-status" role="status">Reading bundled map observations…</p>
+</section>
+<div class="shell">
+<section aria-label="Selected study observations" class="landing-workspace" id="study-workspace">
+<div class="landing-workspace-content">
+<section aria-label="Geographic atlas" class="atlas-section" id="atlas-section">
+<div class="section-heading"><div><p class="eyebrow">01 / LOCATE</p><h2>Map &amp; daily replay</h2><p>Select a day to see where detections were reported.</p></div><span class="ui-badge"><svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#scan-eye"></use></svg> Observations, not boundaries</span></div><section aria-label="Study controls" class="atlas-study-setup"><div class="atlas-setup-heading"><strong>Define your study</strong><span aria-live="polite" id="atlas-selection-label">Northern California · July 2024 · UTC</span></div><div class="controls atlas-context-controls">
+<label>Study year<select id="year"><option>2015</option></select></label><label>Study month<select aria-label="Study month" id="atlas-month"><option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option></select></label>
+<label class="bbox-label">Study area<span>west, south, east, north</span><input aria-describedby="atlas-area-help" aria-label="Area bounding box west south east north" id="bbox" spellcheck="false" value="-122,39,-120,41"/></label>
+<button class="primary-button" id="analyze" type="button">Apply study area</button>
+</div><div class="series-row atlas-sensor-controls"><span>Observation source</span><div aria-label="Sensor series" class="segmented" role="group"><button aria-pressed="true" class="selected" data-series="joint" type="button">Both sensors · distinct cells</button><button aria-pressed="false" data-series="modis" type="button">MODIS</button><button aria-pressed="false" data-series="viirs-snpp" type="button">VIIRS S-NPP</button><button aria-pressed="false" data-series="hms-viirs" hidden="" type="button">NOAA HMS VIIRS</button></div><label hidden="" id="additional-source-label">Imported product <select id="additional-source"><option value="">Choose product…</option></select></label><p>Sources remain separate; the joint view counts each shared cell once.</p></div><p class="atlas-area-help" id="atlas-area-help">Edit the coordinates or pan the map and choose “Use map extent”. Your study area applies to the map and observation calendar.</p><div class="atlas-archive-status"><a class="dataset-status" href="/data.html" id="dataset-status">NASA FIRMS · data sources ↗</a></div><div class="demo-alert" id="data-alert"><strong>● CHECKING SOURCE DATA</strong><span>Loading imported observations and export completeness for this selection.</span></div></section>
+<div class="atlas-panel">
+<div class="map-toolbar"><div aria-label="Map context layer" class="layer-buttons" role="group"><button data-layer="none" type="button">Detections only</button><button class="selected" data-layer="ndvi" type="button">Vegetation · NDVI</button><button data-layer="landcover" type="button">Land cover</button><button aria-disabled="true" data-layer="fwi" type="button">Fire weather · unavailable</button></div><button class="map-action" id="use-map-aoi" type="button">Use map extent ↗</button></div><aside aria-label="Map legend" class="map-legend atlas-reading-key" id="map-legend">
+<div class="map-legend-head"><span>Map key</span><b id="map-legend-badge">NASA / FIRMS</b></div>
+<div class="map-legend-block"><small>Landscape context</small><div class="map-legend-context-row"><i aria-hidden="true" class="map-legend-swatch none" id="map-legend-context-swatch"></i><strong id="map-legend-context-title">No context overlay</strong></div><div class="map-legend-context-range none" id="map-legend-context-range"><i aria-hidden="true"></i><span>Only satellite detections</span></div></div>
+<div class="map-legend-block"><small>OBSERVATION MEANING</small><div class="map-legend-items"><span><i aria-hidden="true" class="map-legend-swatch modis"></i><b>MODIS</b> thermal detection</span><span><i aria-hidden="true" class="map-legend-swatch viirs"></i><b>VIIRS S-NPP</b> thermal detection</span><span><i aria-hidden="true" class="map-legend-swatch aoi"></i> Study area boundary</span></div><p class="map-legend-observation-note" id="map-legend-observation-note">Each point is a dated satellite detection.</p></div>
+<div class="map-legend-block"><small>DATA STATUS</small><div class="map-legend-statuses"><span><i aria-hidden="true" class="legend-swatch complete"></i> Complete export</span><span><i aria-hidden="true" class="legend-swatch partial"></i> Partial export</span><span><i aria-hidden="true" class="legend-swatch unknown"></i> Unknown / unavailable</span></div></div>
+<p id="map-legend-note">Satellite detections are dated observations, not a fire perimeter or a forecast.</p>
+</aside>
+<div class="atlas-map-view">
+<div aria-label="Ignis-Atlassia map with imported fire observations" id="map" role="application"><div aria-live="polite" class="map-replay-annotations" hidden="" id="map-replay-annotations"></div></div>
+</div>
+<div class="map-footer"><span id="map-status">Loading imported observations…</span><span id="layer-status">Map points show dated satellite detection locations.</span></div>
+<div aria-label="Replay selected month of satellite detections" class="map-timeline"><div class="map-timeline-top"><div><span>Daily playback · UTC</span><strong id="map-timeline-title">Select a month to begin</strong></div><div class="map-timeline-actions"><button id="map-play" type="button">▶ Play month</button><button disabled="" id="map-all" type="button">Show all dates</button></div></div><div aria-label="Select an acquisition day" class="map-timeline-bars" id="map-timeline-bars" role="group"></div><div class="atlas-timeline-scale"><span>Start of month</span><span><i aria-hidden="true" class="atlas-known-mark"></i> Detected cells <i aria-hidden="true" class="atlas-unknown-mark"></i> Incomplete export</span><span>End of month</span></div><input aria-label="Acquisition day of selected month" id="map-day" max="31" min="1" type="range" value="1"/><p>Bar height is the daily detected-cell count. A dashed or hatched bar means the source export is incomplete.</p><div aria-live="polite" class="map-replay-guide" hidden="" id="map-replay-guide"><article data-guide="map"><b>01 · Read the map</b><span>Dots are observed satellite detection cells for the selected UTC day.</span></article><article data-guide="timeline"><b>02 · Follow the date</b><span>Playback advances one day at a time so the pattern is easy to compare.</span></article><article data-guide="bars"><b>03 · Read the bars</b><span>Bar height shows detected cell-days; incomplete exports are marked as unknown.</span></article></div></div>
+</div>
+<details class="map-context-note"><summary>About these context layers <svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#chevron-down"></use></svg></summary><p class="map-note">Low zoom groups pixels for browsing; zoom in to inspect individual detections. Vegetation and land-cover overlays are dated NASA imagery; measured fire-weather data have not been imported. <a href="https://gibs.earthdata.nasa.gov/layer-metadata/v1.0/" rel="noopener noreferrer" target="_blank">NASA GIBS layers ↗</a></p></details>
+</section>
+<section aria-label="Burning calendar" class="workspace" id="calendar-section">
+<div class="section-heading"><div><p class="eyebrow">02 / COMPARE</p><h2>Observation calendar</h2><p>Compare months, then select a UTC day to inspect its original observations.</p></div><div class="ui-badge">Times shown in UTC</div></div>
+<div class="export-row"><span id="aoi-status">Selected AOI: −122, 39, −120, 41</span><div><button id="export-calendar" type="button">↓ Calendar CSV</button><button id="export-observations" type="button">↓ Raw observations CSV</button></div></div>
+<div aria-live="polite" class="stats">
+<article class="stat"><span>DETECTED CELL-DAYS<button aria-label="Explain this measure" class="info-help" data-tooltip="A cell-day is one 1 km grid cell with a detection on one UTC day. Repeated observations in that cell and day count once. It is not burned area or a count of fires." type="button"><svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-count">—</strong><small id="metric-month">Selected month</small></article>
+<article class="stat"><span>PRIOR-YEAR MEDIAN<button aria-label="Explain this measure" class="info-help" data-tooltip="The middle value for the same month in available prior years, using the same source selection. Incomplete inputs can make this comparison unavailable." type="button"><svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-baseline">—</strong><small id="baseline-years">Same month · same sources</small></article>
+<article class="stat"><span>CHANGE FROM MEDIAN<button aria-label="Explain this measure" class="info-help" data-tooltip="The selected month compared with its prior-year median. This describes observed detection activity, not a prediction of fire risk." type="button"><svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-change">—</strong><small>Detected cell-days, not a forecast</small></article>
+</div><article class="stat coverage atlas-coverage-note"><span>SATELLITE COVERAGE<button aria-label="Explain this measure" class="info-help" data-tooltip="Satellite pass and cloud masks are not loaded. No detections can mean no burning, obscured observations, or missing data; coverage remains unknown." type="button"><svg aria-hidden="true" class="ui-icon"><use href="/vendor/lucide-icons.svg#info"></use></svg></button></span><strong id="metric-coverage">Unknown</strong><small>Pass and cloud masks not loaded</small></article>
+<div class="calendar-context" id="calendar-context"></div>
+<details class="atlas-details atlas-sensor-details" open=""><summary><span><b>Source counts on the same study area</b><small>Raw detection rows and distinct cell-days use different units</small></span><span aria-hidden="true">+</span></summary><div class="atlas-details-content"><div aria-label="Sensor comparison for selected month" class="source-compare" id="firms-source-compare"><button class="source-signal" data-source-target="modis" type="button"><span class="signal-index">01 / MODIS</span><strong id="compare-modis">—</strong><span class="signal-unit">Eligible rows</span><i id="compare-modis-bar"></i></button><div aria-hidden="true" class="signal-connector"><span>↔</span><small>TWO<br/>SENSORS</small></div><button class="source-signal" data-source-target="viirs-snpp" type="button"><span class="signal-index">02 / VIIRS S-NPP</span><strong id="compare-viirs">—</strong><span class="signal-unit">Eligible rows</span><i id="compare-viirs-bar"></i></button><div aria-hidden="true" class="signal-equals"><span>→</span><small>1 KM GRID</small></div><button class="source-signal joint-signal" data-source-target="joint" type="button"><span class="signal-index">03 / JOINT VIEW</span><strong id="compare-joint">—</strong><span class="signal-unit">Detected cell-days</span><i id="compare-joint-bar"></i></button></div><div class="hms-comparison" hidden="" id="hms-source-compare"><div><span>NOAA HISTORICAL FIRE ARCHIVE</span><h3>Real VIIRS detections.<br/><em>A visible fire season.</em></h3><p>NOAA HMS points from Suomi NPP, NOAA-20 and NOAA-21. Every day in a complete month is checked before the calendar is marked loaded.</p></div><div class="hms-measures"><div><strong id="hms-raw">—</strong><span>VIIRS POINTS</span></div><div><strong id="hms-cells">—</strong><span>1 KM CELL-DAYS</span></div><small id="hms-period">Loading archive…</small></div></div><p class="source-compare-note" id="source-compare-note">Loading the shared-grid comparison…</p></div></details><div class="content-grid calendar-analysis">
+<section aria-labelledby="monthly-title" class="panel monthly-panel">
+<div class="panel-head"><div><p class="eyebrow">Select a month</p><h3 id="monthly-title">Months in this study year</h3></div><span class="panel-note">CELL-DAYS</span></div>
+<div class="month-list" id="monthly-bars"></div>
+<p class="calendar-caption" id="month-completeness"></p>
+<p class="footnote">Monthly totals sum daily detected cells. Hatched months have incomplete exports; they are not zero.</p>
+</section>
+<section aria-labelledby="days-title" class="panel days-panel">
+<div class="panel-head"><div><p class="eyebrow">Select a UTC day</p><h3 id="days-title">July 2015</h3></div><div aria-label="Calendar month" class="calendar-month-nav" role="group"><button aria-label="Previous month" id="calendar-prev" type="button">←</button><button aria-label="Next month" id="calendar-next" type="button">→</button></div></div>
+<p class="calendar-caption" id="calendar-month-summary" role="status"></p>
+<div aria-hidden="true" class="weekday-row"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+<div aria-label="Daily detected cells, UTC" class="day-grid" id="day-grid" role="group"></div>
+<div class="calendar-scale" id="calendar-scale"></div>
+<p class="atlas-calendar-reading">Cell color shows magnitude. The label and pattern show whether a count is complete, partial or unknown.</p><div class="calendar-status-legend"><span><i class="calendar-key zero"></i> 0 in complete export</span><span><i class="calendar-key partial"></i> ≥ Partial count</span><span><i class="calendar-key missing"></i> Unknown</span></div>
+<p class="calendar-caption">A cell is counted once per UTC day on the 1 km grid. Use arrow keys to move between dates.</p>
+<div aria-live="polite" class="calendar-day-summary" id="calendar-day-summary"></div>
+</section>
+</div><section aria-labelledby="evidence-title" class="atlas-source-evidence panel" hidden="" id="evidence-section"><div class="panel-head"><div><p class="eyebrow">Selected day / original records</p><h3 id="evidence-title">Source observations</h3></div><span class="evidence-date" id="evidence-date">Select a day</span></div><p class="atlas-evidence-unit"><span id="record-count">—</span> · Confidence uses each product’s native scale. FRP is reported fire radiative power in MW.</p><div aria-live="polite" class="records" id="records"></div><details class="atlas-source-provenance"><summary>Product versions and grid method</summary><div class="provenance" id="provenance"></div></details></section><details class="atlas-details atlas-interpretation"><summary><span><b>Interpret the selected month</b><small>Sensor comparison, baseline context and historical review notes</small></span><span aria-hidden="true">+</span></summary><div class="atlas-details-content"><section aria-live="polite" class="insight-card" hidden="" id="insight-card"><div aria-hidden="true" class="insight-mark">✦</div><div><p class="eyebrow">WHAT THIS VIEW SAYS</p><h3 id="insight-title">Building an evidence-backed insight…</h3><p id="insight-body"></p><small id="insight-source"></small></div></section><section aria-labelledby="briefing-title" class="briefing-card" hidden="" id="responder-briefing">
+<div class="briefing-card-head"><div><p class="eyebrow">HISTORICAL RESPONDER BRIEF</p><h3 id="briefing-title">Preparing a human review brief…</h3></div><span class="ui-badge" id="briefing-status">Historical only</span></div>
+<p id="briefing-action"></p>
+<div class="briefing-facts"><span><b id="briefing-active-days">—</b> active days</span><span><b id="briefing-unknown-days">—</b> unknown days</span><span><b id="briefing-baseline">—</b> baseline</span></div>
+<div class="briefing-dates" id="briefing-dates"></div>
+<p class="briefing-limit">This is an evidence review aid. It does not issue an alert, dispatch instruction, flight plan, evacuation order, or containment advice.</p>
+</section></div></details>
+<section aria-labelledby="study-title" class="study-tools panel">
+<div class="study-heading"><div><p class="eyebrow">EXPORT THE EVIDENCE</p><h3 id="study-title">Export this study</h3><p>Save the selected view, observation rows and source checksums for reproducible analysis.</p></div><div class="study-actions"><button id="copy-view" type="button">Copy view link ↗</button><button id="download-study" type="button">↓ Download study</button></div></div>
+<div hidden="" id="share-fallback"><label for="share-url">VIEW LINK</label><input aria-label="Shareable view link" id="share-url" readonly=""/><small>A localhost link works only on this computer. Other people need access to the same hosted dataset.</small></div>
+</section>
+</section>
+<nav aria-label="Sources" class="workspace-links"><a data-method-link="" href="/method.html">How the calendar is calculated ↗</a><a href="/data.html">NASA data &amp; sources ↗</a></nav>
+<p hidden="" id="research-entry-copy"></p>
+</div>
+</section>
+<section aria-labelledby="harmonized-title" class="harmonized-calendar atlas-reference-section" id="harmonized-calendar">
+<div aria-live="polite" class="harm-season-context" hidden="" id="harm-season-context" role="note"></div>
+<div class="harmonized-heading">
+<div><p class="eyebrow">03 / Compare the satellite records</p><h2 id="harmonized-title">Regional reference calendar</h2><p>VIIRS-equivalent cell-days for the full selected archive region. Observed values and MODIS-derived estimates stay visibly separate.</p></div>
+<div class="harm-heading-actions"><button aria-describedby="harm-share-status" class="harm-share" id="harm-share" type="button">Share evidence ↗</button><a class="harm-download" download="" href="/api/v2/calendar?region=norcal&amp;year=2024&amp;month=7" id="harm-download">Download data ↗</a><span aria-live="polite" class="harm-share-status" id="harm-share-status" role="status"></span></div>
+</div>
+<p class="atlas-reference-scope"><strong>Region-wide comparison.</strong> This calendar uses the archive region boundary, rather than a custom map extent. Select the region, year and month below.</p><div aria-label="Harmonized calendar selection" class="harm-controls">
+<label>AREA<select data-context-field="region" id="harm-region"><option value="norcal">Northern California</option><option value="punjab-haryana">Punjab–Haryana</option></select></label>
+<label>YEAR<select aria-label="Select calendar year" id="harm-year"></select></label>
+<label>MONTH<select aria-label="Select calendar month" id="harm-month"></select></label>
+<span id="harm-status" role="status">Loading imported NASA record…</span>
+</div>
+<p aria-live="polite" class="harm-verdict" id="harm-verdict">Checking the selected month against comparable imported records…</p><div class="harm-summary-grid">
+<article class="harm-summary-card"><span>HARMONIZED CELL-DAYS</span><strong id="harm-value">—</strong><small id="harm-value-note">Unknown until source exports are complete</small></article>
+<article class="harm-summary-card" title="Only complete prior months with the same observed or estimated sources and product versions enter this comparison."><span>COMPARABLE YEARS</span><strong id="harm-years">—</strong><small id="harm-percentile">No baseline loaded</small></article>
+<article class="harm-summary-card"><span>CRITICAL DATES</span><strong id="harm-season">—</strong><small id="harm-season-note">Cumulative activity and 15-day peak window</small></article>
+<article class="harm-summary-card harm-model-card"><span>CALIBRATION CHECK</span><strong id="harm-model">Awaiting data</strong><small id="harm-model-note">Held-out comparison controls whether scaling is used</small></article>
+</div>
+<div class="harm-content-grid">
+<section aria-labelledby="harm-days-title" class="harm-panel harm-calendar-panel">
+<div class="harm-panel-title"><div><p class="eyebrow">DAILY EVIDENCE</p><h3 id="harm-days-title">Select a UTC day</h3></div><span id="harm-month-total">—</span></div>
+<div aria-label="Harmonized calendar legend" class="semantic-legend harm-legend" role="group">
+<div><h3>Observation meaning</h3><ul><li><i class="observed"></i> VIIRS reference</li><li><i class="estimated"></i> MODIS estimate</li><li><i class="legend-swatch shared"></i> Shared 1 km cell-day</li></ul></div>
+<div><h3>Data status</h3><ul><li><i class="zero"></i> Complete export · zero detections</li><li><i class="partial"></i> Partial UTC day</li><li><i class="archive-detections"></i> Partial detections · export incomplete</li><li><i class="outage"></i> Documented gap</li><li><i class="unknown"></i> Unknown export</li></ul></div>
+<p class="legend-limit">Magnitude describes detection activity. Source and completeness remain separate; a zero export does not prove no fire.</p>
+</div><div aria-hidden="true" class="harm-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
+<div aria-label="Daily harmonized satellite observations" class="harm-day-grid" id="harm-day-grid" role="group"></div>
+<p class="harm-limit-note">A zero in a complete FIRMS export means zero records in that export. It does not prove a clear satellite pass, cloud-free sky, or no fire.</p>
+</section>
+<aside aria-labelledby="harm-source-title" class="harm-panel harm-evidence-panel">
+<div class="harm-panel-title"><div><p class="eyebrow">SOURCE STATUS</p><h3 id="harm-source-title">What supports this result?</h3></div></div>
+<div class="harm-source-status" id="harm-source-status"></div>
+<div class="harm-divider"></div>
+<p class="harm-day-title" id="harm-day-title">Choose a day to inspect its evidence.</p>
+<p class="harm-day-summary" id="harm-day-summary">No data is being fabricated for missing downloads.</p>
+<div class="harm-source-status" id="harm-day-source-status"></div>
+<div aria-live="polite" class="harm-records" id="harm-records"></div>
+<a class="harm-method-link" href="/method.html">Method, provenance and limitations ↗</a>
+</aside>
+</div><details class="atlas-details atlas-bridge-details"><summary><span><b>How MODIS and VIIRS support this month</b><small>Matched dates, shared cells, separate FRP and burned-area context</small></span><span aria-hidden="true">+</span></summary><div class="atlas-details-content"><section aria-labelledby="harm-bridge-title" class="harm-bridge-panel">
+<div class="harm-panel-title"><div><p class="eyebrow">VISIBLE SENSOR BRIDGE</p><h3 id="harm-bridge-title">Same grid. Separate evidence.</h3><p class="harm-bridge-method" id="harm-bridge-method">Centroid → EASE-Grid 1 km · source rows retained</p></div><span id="harm-bridge-state">Loading bridge state…</span></div>
+<div aria-label="Sensor bridge from native pixels to common grid" class="harm-bridge-flow">
+<article class="harm-bridge-sensor modis"><span>MODIS · NATIVE ~1 KM</span><strong id="harm-bridge-modis">—</strong><small id="harm-bridge-modis-note">Common-grid cell-days</small><i aria-hidden="true" id="harm-bridge-modis-bar"></i></article>
+<div aria-hidden="true" class="harm-bridge-arrow"><b>→</b><small>DEDUPLICATE<br/>1 KM GRID</small></div>
+<article class="harm-bridge-sensor viirs"><span>VIIRS S-NPP · NATIVE 375 M</span><strong id="harm-bridge-viirs">—</strong><small id="harm-bridge-viirs-note">Common-grid cell-days</small><i aria-hidden="true" id="harm-bridge-viirs-bar"></i></article>
+<div aria-hidden="true" class="harm-bridge-arrow"><b>→</b><small>REFERENCE<br/>OBSERVATION</small></div>
+<article class="harm-bridge-sensor result"><span>VIIRS-EQUIVALENT CALENDAR</span><strong id="harm-bridge-result">—</strong><small id="harm-bridge-result-note">The selected source is counted once</small><i aria-hidden="true" id="harm-bridge-result-bar"></i></article>
+</div>
+<div class="harm-bridge-detail-grid">
+<div class="harm-mismatch-card"><div class="harm-mini-heading"><span>DAILY MISMATCH · COMMON GRID</span><small id="harm-bridge-days">—</small></div><div class="harm-mismatch-bars"><span><i class="modis-only" id="harm-mismatch-modis-bar"></i><b id="harm-mismatch-modis">—</b><small>MODIS only</small></span><span><i class="both" id="harm-mismatch-both-bar"></i><b id="harm-mismatch-both">—</b><small>Both</small></span><span><i class="viirs-only" id="harm-mismatch-viirs-bar"></i><b id="harm-mismatch-viirs">—</b><small>VIIRS only</small></span><span><i class="gap" id="harm-mismatch-gap-bar"></i><b id="harm-mismatch-gap">—</b><small>Gap / unknown</small></span></div><p id="harm-bridge-note">Both sensors are retained; their raw pixels are never added together.</p></div>
+<div class="harm-frp-card"><div class="harm-mini-heading"><span>RAW FRP CONTEXT</span><small id="harm-frp-unit">MW · paired UTC dates</small></div><strong id="harm-frp-value">—</strong><p id="harm-frp-note">Fire Radiative Power is shown separately from activity cell-days.</p></div>
+<div class="harm-corroboration-card"><div class="harm-mini-heading"><span>DATED CORROBORATION</span><small id="harm-corroboration-state">ACTIVE FIRE ONLY</small></div><strong>MCD64A1 · C6.1</strong><p id="harm-corroboration-note">Select a dated calendar month to inspect the hash-bound burned-area check.</p><a href="/data/v2/validity/mcd64-corroboration.json" rel="noopener noreferrer" target="_blank">Evidence report ↗</a> · <a href="https://doi.org/10.5067/MODIS/MCD64A1.061" rel="noopener noreferrer" target="_blank">NASA product record ↗</a></div>
+</div>
+<div aria-live="polite" class="harm-share-card" hidden="" id="harm-share-card"><div><span class="harm-share-kicker">EVIDENCE CARD · <span id="harm-share-card-case">—</span></span><strong id="harm-share-card-title">—</strong><small id="harm-share-card-subtitle">—</small></div><dl><div><dt>CALENDAR</dt><dd id="harm-share-card-value">—</dd></div><div><dt>STATE</dt><dd id="harm-share-card-state">—</dd></div><div><dt>QUALITY</dt><dd id="harm-share-card-quality">—</dd></div><div><dt>INPUTS + HASH</dt><dd id="harm-share-card-inputs">—</dd></div><div><dt>LIMIT</dt><dd id="harm-share-card-limit">ACTIVE FIRE ONLY · pass/cloud coverage unknown</dd></div><div class="harm-share-card-url"><dt>URL</dt><dd><a href="#harmonized-calendar" id="harm-share-card-url">—</a></dd></div></dl></div>
+</section></div></details><details class="atlas-details atlas-regional-provenance"><summary><span><b>Source provenance &amp; official references</b><small>Build status, checksums, NASA product records and incident context</small></span><span aria-hidden="true">+</span></summary><div class="atlas-details-content"><p class="harm-build-meta" id="harm-build-meta" role="status">Evidence bundle: loading source hashes…</p><nav aria-label="Official data and incident sources" class="harm-official-links" id="harm-official-links"></nav></div></details>
+<section aria-labelledby="harm-history-title" class="harm-history-panel">
+<div class="harm-panel-title"><div><p class="eyebrow">04 / Patterns through time</p><h3 id="harm-history-title">Historical archive · one row per year</h3></div><span id="harm-history-range">Loading dated archive…</span></div><p class="atlas-history-reading">Each narrow cell is one UTC day. Choose a cell to open that month. Scroll sideways to compare the full year.</p>
+<div aria-label="Historical heatmap legend" class="harm-history-legend"><span><i class="observed"></i>VIIRS observed</span><span><i class="estimated"></i>MODIS estimate</span><span><i class="archive-detections"></i>Partial detections · export incomplete</span><span><i class="zero"></i>Complete export · zero detections</span><span><i class="outage"></i>NASA product gap</span><span><i class="unknown"></i>Unknown export</span></div><div aria-label="Scrollable historical daily activity heatmap" class="harm-history-scroll" tabindex="0">
+<div aria-hidden="true" class="harm-history-axis"><span></span><div class="harm-history-months"><span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span><span>SEP</span><span>OCT</span><span>NOV</span><span>DEC</span></div></div>
+<div aria-label="Daily harmonized observations by historical year" id="harm-history-grid" role="grid"><p class="harm-history-loading">History displays only imported results; missing dates stay unknown.</p></div>
+</div>
+<p class="harm-history-note" id="harm-history-note">Select a day to open that month and inspect its source rows. This archive records detections; it does not establish satellite pass, cloud, or no-fire status.</p>
+</section>
+</section>
+<section aria-labelledby="decision-paths-title" class="harm-persona-panel" id="decision-paths"><div class="atlas-next-heading"><p class="eyebrow">Continue the study</p><h3 id="decision-paths-title">A clear next step for every question.</h3></div><div class="atlas-next-grid"><a data-context-link="" href="/replay.html"><span>Follow a named fire</span><strong>Historical replay ↗</strong><p>Inspect daily heat on terrain with source-specific evidence.</p></a><a data-context-link="" href="/research.html"><span>Compare the sensors</span><strong>Research lab ↗</strong><p>Review overlap, candidate groups and coverage denominators.</p></a><a data-context-link="" href="/method.html"><span>Reproduce a result</span><strong>Calculation method ↗</strong><p>Trace the shared grid, native rows and scientific limits.</p></a></div></section>
+</div>
+<div aria-live="polite" id="toast" role="status"></div>
+</main>
+</body>
+</html>

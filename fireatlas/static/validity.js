@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const NS='http://www.w3.org/2000/svg';
   const $=selector=>document.querySelector(selector);
   const sourceNames={MODIS_SP:'MODIS',VIIRS_SNPP_SP:'VIIRS S-NPP'};
-  const sourceColors={MODIS_SP:'#f6a878',VIIRS_SNPP_SP:'#f4d49d'};
+  const sourceColors={MODIS_SP:'#f0b568',VIIRS_SNPP_SP:'#70cddd'};
   const scenes={
     sensors:['01 / TWO SENSORS','Different views of heat.','MODIS and VIIRS report original pixels at different native sizes. The daily calendar retains their identities.'],
     coverage:['02 / OBSERVATION GAPS','A blank is not a clear pass.','The FIRMS archive records detections. Clear, cloudy and missed satellite opportunities require separate fire-mask data.'],
@@ -86,22 +86,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(mobile()){
       label(21,33,'NATIVE PIXEL WIDTH · SAME SCALE',{size:13,fill:'#f4c39a',weight:700});line(20,45,370,45);
       rounded(20,64,166,244,'#0d2430','#49646c',10);rounded(204,64,166,244,'#0d2430','#49646c',10);
-      label(35,91,'MODIS',{size:16,fill:'#f6a878',weight:700});label(219,91,'VIIRS S-NPP',{size:16,fill:'#f4d49d',weight:700});
-      rounded(49,122,105,105,'#dc8c6150','#f6a878',3);
-      for(let x=0;x<3;x++)for(let y=0;y<3;y++)rounded(219+x*41,123+y*41,39.375,39.375,'#c99f6150','#f4d49d',2);
-      label(35,255,'1 km',{size:17,fill:'#f8c6a3',weight:700});label(219,255,'375 m',{size:17,fill:'#f4d49d',weight:700});
+      label(35,91,'MODIS',{size:16,fill:'#f0b568',weight:700});label(219,91,'VIIRS S-NPP',{size:16,fill:'#70cddd',weight:700});
+      rounded(49,122,105,105,'#dc8c6150','#f0b568',3);
+      for(let x=0;x<3;x++)for(let y=0;y<3;y++)rounded(219+x*41,123+y*41,39.375,39.375,'#70cddd50','#70cddd',2);
+      label(35,255,'1 km',{size:17,fill:'#f8c6a3',weight:700});label(219,255,'375 m',{size:17,fill:'#70cddd',weight:700});
       label(35,286,`${format(day?.raw_pixels.MODIS_SP)} pixels`,{size:14,fill:'#dce9e8'});label(219,286,`${format(day?.raw_pixels.VIIRS_SNPP_SP)} pixels`,{size:14,fill:'#dce9e8'});
       label(20,340,'ACTUAL COUNTS · SELECTED UTC DAY',{size:12,fill:'#93afb9',weight:700});return;
     }
     label(46,80,'SAME LANDSCAPE · DIFFERENT PIXEL SCALE',{size:13,fill:'#f4c39a',weight:700,spacing:1.7});
     line(46,102,914,102);
     rounded(56,144,400,280,'#0d2430','#49646c',15);rounded(504,144,400,280,'#0d2430','#49646c',15);
-    label(88,184,'MODIS',{size:19,fill:'#f6a878',weight:700});
-    label(536,184,'VIIRS S-NPP',{size:19,fill:'#f4d49d',weight:700});
-    rounded(142,217,160,160,'#dc8c6150','#f6a878',4);
-    for(let x=0;x<3;x++)for(let y=0;y<3;y++)rounded(571+x*64,218+y*64,60,60,'#c99f6150','#f4d49d',3);
+    label(88,184,'MODIS',{size:19,fill:'#f0b568',weight:700});
+    label(536,184,'VIIRS S-NPP',{size:19,fill:'#70cddd',weight:700});
+    rounded(142,217,160,160,'#dc8c6150','#f0b568',4);
+    for(let x=0;x<3;x++)for(let y=0;y<3;y++)rounded(571+x*64,218+y*64,60,60,'#70cddd50','#70cddd',3);
     label(341,304,'1 km',{size:25,fill:'#f8c6a3',weight:700});
-    label(797,304,'375 m',{size:25,fill:'#f4d49d',weight:700});
+    label(797,304,'375 m',{size:25,fill:'#70cddd',weight:700});
     label(88,399,`${format(day?.raw_pixels.MODIS_SP)} source pixels this day`,{size:16,fill:'#dce9e8'});
     label(536,399,`${format(day?.raw_pixels.VIIRS_SNPP_SP)} source pixels this day`,{size:16,fill:'#dce9e8'});
     footer('PIXEL WIDTHS ARE DRAWN AT THE SAME SCALE · COUNTS ARE FROM THE SELECTED UTC DAY');
@@ -181,14 +181,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     const day=selectedDay();
     if(mobile()){
       label(20,34,'ACTUAL COUNTS · SELECTED UTC DAY',{size:13,fill:'#f4c39a',weight:700});
-      const rows=[['MODIS',day?.raw_pixels.MODIS_SP,'#f6a878'],['VIIRS S-NPP',day?.raw_pixels.VIIRS_SNPP_SP,'#f4d49d'],['JOINT 1 KM CELLS',day?.joint_detected_cell_days,'#ffd1ab']];
+      const rows=[['MODIS',day?.raw_pixels.MODIS_SP,'#f0b568'],['VIIRS S-NPP',day?.raw_pixels.VIIRS_SNPP_SP,'#70cddd'],['JOINT 1 KM CELLS',day?.joint_detected_cell_days,'#ffd1ab']];
       rows.forEach(([name,value,color],i)=>{const y=61+i*87;rounded(20,y,350,75,i===2?'#34332e':'#19323c',i===2?'#e5a479':'#5e7b83',9);label(37,y+30,name,{size:15,fill:color,weight:700});label(350,y+54,format(value),{size:37,fill:'#fff',weight:700,anchor:'end'});});
       label(20,342,`${format(day?.co_detected_cell_days)} CELLS DETECTED BY BOTH SOURCES`,{size:12,fill:'#afc7ce',weight:700});return;
     }
     label(42,77,'ACTUAL SELECTED-DAY COUNTS',{size:13,fill:'#f4c39a',weight:700,spacing:1.8});line(42,96,918,96);
     rounded(54,161,230,220,'#19323c','#5e7b83',12);rounded(365,161,230,220,'#19323c','#5e7b83',12);rounded(676,161,230,220,'#263137','#df9a71',12);
-    label(169,215,'MODIS',{size:17,fill:'#f6a878',weight:700,anchor:'middle'});label(169,299,format(day?.raw_pixels.MODIS_SP),{size:56,fill:'#fff',weight:700,anchor:'middle'});label(169,339,'RAW PIXELS',{size:13,fill:'#9eb8c3',weight:700,anchor:'middle'});
-    label(480,215,'VIIRS S-NPP',{size:17,fill:'#f4d49d',weight:700,anchor:'middle'});label(480,299,format(day?.raw_pixels.VIIRS_SNPP_SP),{size:56,fill:'#fff',weight:700,anchor:'middle'});label(480,339,'RAW PIXELS',{size:13,fill:'#9eb8c3',weight:700,anchor:'middle'});
+    label(169,215,'MODIS',{size:17,fill:'#f0b568',weight:700,anchor:'middle'});label(169,299,format(day?.raw_pixels.MODIS_SP),{size:56,fill:'#fff',weight:700,anchor:'middle'});label(169,339,'RAW PIXELS',{size:13,fill:'#9eb8c3',weight:700,anchor:'middle'});
+    label(480,215,'VIIRS S-NPP',{size:17,fill:'#70cddd',weight:700,anchor:'middle'});label(480,299,format(day?.raw_pixels.VIIRS_SNPP_SP),{size:56,fill:'#fff',weight:700,anchor:'middle'});label(480,339,'RAW PIXELS',{size:13,fill:'#9eb8c3',weight:700,anchor:'middle'});
     label(791,215,'DAILY UNION',{size:17,fill:'#ffbd92',weight:700,anchor:'middle'});label(791,299,format(day?.joint_detected_cell_days),{size:56,fill:'#ffca9d',weight:700,anchor:'middle'});label(791,339,'DETECTED CELL-DAYS',{size:13,fill:'#cfb7a8',weight:700,anchor:'middle'});
     label(325,280,'+',{size:39,fill:'#a6c4cc',anchor:'middle'});label(636,280,'→',{size:41,fill:'#f6be9b',anchor:'middle'});
     label(480,426,`${format(day?.co_detected_cell_days)} cells have detections from both sources this day`,{size:18,fill:'#d3e5e7',anchor:'middle'});

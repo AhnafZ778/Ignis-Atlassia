@@ -1,0 +1,154 @@
+{
+  "layers": {
+    "camp-2018": {
+      "terrain": {
+        "bounds": [
+          -121.85,
+          39.6,
+          -121.3,
+          40.0
+        ],
+        "bytes": 283292,
+        "height": 560,
+        "path": "replay-context/camp-2018/terrain.png",
+        "product": "NASADEM_HGT",
+        "sha256": "725022675bdde697202efd29ad19d6bc81ec00dac8a10f8ee7972158db49cc1b",
+        "status": "available",
+        "style": "Local NASADEM hillshade draped as transparent terrain context.",
+        "tile_sources": [
+          "NASADEM_HGT_n39w122.zip"
+        ],
+        "version": "001",
+        "width": 760
+      }
+    },
+    "grove-2025": {
+      "terrain": {
+        "bounds": [
+          -121.55,
+          39.25,
+          -121.28,
+          39.48
+        ],
+        "bytes": 101615,
+        "height": 560,
+        "path": "replay-context/grove-2025/terrain.png",
+        "product": "NASADEM_HGT",
+        "sha256": "f443716732fc7717c46016d441c3e2b9ad587d9f4a09c5291aa43d0c1710cac4",
+        "status": "available",
+        "style": "Local NASADEM hillshade draped as transparent terrain context.",
+        "tile_sources": [
+          "NASADEM_HGT_n39w122.zip"
+        ],
+        "version": "001",
+        "width": 760
+      }
+    },
+    "park-2024": {
+      "burned-area": {
+        "bounds": [
+          -122.0,
+          39.5,
+          -121.3,
+          40.5
+        ],
+        "bytes": 44427,
+        "date_range": [
+          "2024-07",
+          "2024-08"
+        ],
+        "height": 560,
+        "interpretation": "Burn Date context, shown only where the monthly product contains a date. MODIS-dependent, lagged, and not independent validation.",
+        "path": "replay-context/park-2024/burned-area.png",
+        "periods": [
+          {
+            "granules": [
+              "MCD64A1.A2024183.h08v04.061.2024251134350.hdf",
+              "MCD64A1.A2024183.h08v05.061.2024251134141.hdf"
+            ],
+            "month": "2024-07"
+          },
+          {
+            "granules": [
+              "MCD64A1.A2024214.h08v04.061.2024291133013.hdf",
+              "MCD64A1.A2024214.h08v05.061.2024291131948.hdf"
+            ],
+            "month": "2024-08"
+          }
+        ],
+        "product": "MCD64A1",
+        "sha256": "a01319f254052977212ef6b14c38bf930ebdbe38ebf1d54105ae155179bad5bc",
+        "status": "available",
+        "version": "061",
+        "width": 760
+      },
+      "landcover": {
+        "bounds": [
+          -122.0,
+          39.5,
+          -121.3,
+          40.5
+        ],
+        "bytes": 251654,
+        "classification": "IGBP LC_Type1, classes 1\u201317",
+        "height": 560,
+        "path": "replay-context/park-2024/landcover.png",
+        "product": "MCD12Q1",
+        "product_year": 2024,
+        "sha256": "5067da1fb0b7be591b3632750d89efa00245441722277bb05f839753fd86e514",
+        "source_granules": [
+          "MCD12Q1.A2024001.h08v04.061.2025205072123.hdf",
+          "MCD12Q1.A2024001.h08v05.061.2025205073841.hdf"
+        ],
+        "status": "available",
+        "version": "061",
+        "width": 760
+      },
+      "ndvi": {
+        "bounds": [
+          -122.0,
+          39.5,
+          -121.3,
+          40.5
+        ],
+        "bytes": 542470,
+        "composite_start": "2024-07-11",
+        "composite_window_days": 16,
+        "height": 560,
+        "path": "replay-context/park-2024/ndvi.png",
+        "product": "MOD13Q1",
+        "quality_filter": "pixel reliability 0 or 1; cloud, snow/ice and fill are transparent",
+        "sha256": "f73ea4084c75b6348e622b868d09929c686236c970cb20f20f359f697273a8e3",
+        "source_granules": [
+          "MOD13Q1.A2024193.h08v04.061.2024212093130.hdf",
+          "MOD13Q1.A2024193.h08v05.061.2024212093433.hdf"
+        ],
+        "status": "available",
+        "version": "061",
+        "width": 760
+      },
+      "terrain": {
+        "bounds": [
+          -122.0,
+          39.5,
+          -121.3,
+          40.5
+        ],
+        "bytes": 199249,
+        "height": 560,
+        "path": "replay-context/park-2024/terrain.png",
+        "product": "NASADEM_HGT",
+        "sha256": "1b09c497437963be776e7d873f57e9e8932dc9a742a4d6857ddb985c8e4b43a4",
+        "status": "available",
+        "style": "Local NASADEM hillshade draped as transparent terrain context.",
+        "tile_sources": [
+          "NASADEM_HGT_n39w122.zip",
+          "NASADEM_HGT_n40w122.zip"
+        ],
+        "version": "001",
+        "width": 760
+      }
+    }
+  },
+  "schema": "fireatlas-replay-context-v1"
+}

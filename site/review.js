@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cases = new Map();
   let caseId = params.get('case') === 'park-2024' ? 'park-2024' : 'grove-2025';
   let template = null;
+  let activeSample = 0;
   const fmt = value => Number(value).toLocaleString('en-US');
 
   function setStatus(title, copy, mark = '…', tone = '') {
@@ -81,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
       card.append(controls); target.append(card);
       controls.addEventListener('input', updateProgress); controls.addEventListener('change', updateProgress);
     });
+    activeSample = 0;
+    renderQueue();
     updateProgress();
   }
   function readSample(card, sample) {
@@ -104,12 +107,38 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach((card, index) => { const value = readSample(card, samples[index]); const ok = sampleComplete(value); card.dataset.complete = String(ok); if (value.outcome && !ok) card.dataset.error = 'true'; else delete card.dataset.error; if (ok) complete += 1; });
     $('#review-progress').textContent = `${fmt(complete)} / ${fmt(Math.max(30, samples.length))}`;
     $('#review-download').disabled = samples.length < 30 || complete !== samples.length;
+    if ($('#review-progress-bar')) { $('#review-progress-bar').value=complete; $('#review-progress-bar').max=Math.max(30,samples.length); }
+    selectSample(activeSample);
     return { complete, cards, samples };
+  }
+  function renderQueue() {
+    const nav = $('#review-queue-nav'); if (!nav) return;
+    nav.replaceChildren();
+    document.querySelectorAll('.review-sample').forEach((card,index) => {
+      const button = document.createElement('button'); button.type = 'button'; button.dataset.sampleIndex=String(index);
+      button.addEventListener('click', () => selectSample(index)); nav.append(button);
+    });
+    selectSample(activeSample);
+  }
+  function selectSample(index) {
+    const cards = [...document.querySelectorAll('.review-sample')];
+    activeSample = Math.max(0, Math.min(cards.length-1,index));
+    cards.forEach((card,i) => {card.hidden=i!==activeSample;});
+    const label=$('#review-selected-sample'); if(label)label.textContent=cards.length ? `Sample ${String(activeSample+1).padStart(2,'0')} of ${cards.length}` : 'Sample queue unavailable';
+    if($('#review-previous'))$('#review-previous').disabled=!cards.length||activeSample===0;
+    if($('#review-next'))$('#review-next').disabled=!cards.length||activeSample===cards.length-1;
+    if($('#review-next-pending'))$('#review-next-pending').disabled=!cards.length;
+    document.querySelectorAll('[data-sample-index]').forEach((button,i) => {
+      const complete=cards[i]?.dataset.complete==='true';button.dataset.complete=String(complete);
+      button.textContent=`${complete?'✓':'○'} ${String(i+1).padStart(2,'0')}`;
+      button.setAttribute('aria-pressed',String(i===activeSample));
+      button.setAttribute('aria-label',`Sample ${i+1}, ${complete?'complete':'pending'}`);
+    });
   }
   function isoTime() {
     const raw = $('#reviewer-time').value;
     if (!raw) return '';
-    const value = new Date(raw);
+    const value = new Date(`${raw}Z`);
     return Number.isNaN(value.valueOf()) ? '' : value.toISOString();
   }
   function buildReview() {
@@ -139,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#review-form').reset(); $('#reviewer-role').value = 'independent scientific reviewer'; document.querySelectorAll('.review-sample').forEach(card => { card.dataset.complete = 'false'; delete card.dataset.error; }); $('#review-feedback').textContent = ''; updateProgress();
   }
   async function selectCase(id) {
+    activeSample=0; $('#review-queue-nav')?.replaceChildren();
     caseId = id; document.querySelectorAll('[data-case]').forEach(button => button.classList.toggle('active', button.dataset.case === id));
     $('#review-command').textContent = `python3 -m fireatlas.mask_review --case ${id} --review fireatlas_${id}_native_mask_review.json --install`;
     $('#review-download').disabled = true; $('#review-samples').innerHTML = '<div class="review-empty">Loading the case template…</div>';
@@ -146,6 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
     catch (error) { template = null; $('#review-status-mark').textContent = '!'; $('#review-status-title').textContent = 'Review queue unavailable'; $('#review-status-copy').textContent = error.message; $('#review-samples').innerHTML = `<div class="review-empty">${error.message}</div>`; updateProgress(); }
   }
   document.querySelectorAll('[data-case]').forEach(button => button.addEventListener('click', () => selectCase(button.dataset.case)));
+  $('#review-previous')?.addEventListener('click', () => selectSample(activeSample-1));
+  $('#review-next')?.addEventListener('click', () => selectSample(activeSample+1));
+  $('#review-next-pending')?.addEventListener('click', () => {
+    const cards=[...document.querySelectorAll('.review-sample')];
+    for(let offset=1;offset<=cards.length;offset++){const index=(activeSample+offset)%cards.length;if(cards[index].dataset.complete!=='true'){selectSample(index);cards[index].querySelector('select')?.focus();break;}}
+  });
   $('#review-download').addEventListener('click', download); $('#review-reset').addEventListener('click', clearForm);
   $('#review-form').addEventListener('input', updateProgress); $('#review-form').addEventListener('change', updateProgress);
   selectCase(caseId);

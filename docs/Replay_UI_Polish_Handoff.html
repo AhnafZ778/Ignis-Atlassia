@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091315">
+  <meta name="description" content="Self-contained synthetic FireAtlas replay interface for visual design review.">
+  <title>FireAtlas Replay — Offline UI Handoff</title>
+  <!--
+    SELF-CONTAINED DESIGN HANDOFF
+    This file intentionally uses only inline CSS, SVG, and JavaScript. It has no
+    external assets, network calls, API keys, or real observation data. An outside
+    designer can open this file directly and redesign the interface in place.
+    Keep the synthetic-data banner and scientific meaning/limitations clear.
+  -->
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #081114;
+      --panel: #0d1a1e;
+      --panel-raised: #122227;
+      --panel-soft: #102024;
+      --line: rgba(164, 194, 194, .16);
+      --line-strong: rgba(164, 194, 194, .26);
+      --text: #ecf3ef;
+      --muted: #99afb0;
+      --faint: #6e898d;
+      --amber: #f3b463;
+      --cyan: #70d1d1;
+      --green: #a9c990;
+      --danger: #ff997a;
+      --heat-low: #ffd76d;
+      --heat-mid: #ff8c4b;
+      --heat-high: #ec4b32;
+      --radius: 14px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .24);
+      font-family: "DM Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--page);
+      color: var(--text);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(ellipse at 75% -18%, #173033 0, transparent 42%), var(--page); }
+    button, select, input { font: inherit; }
+    button, select { color: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+    .skip-link { position: fixed; z-index: 99; left: 1rem; top: -4rem; padding: .7rem 1rem; background: var(--text); color: var(--page); border-radius: 8px; }
+    .skip-link:focus { top: 1rem; }
+    .page-width { width: min(1420px, calc(100% - 48px)); margin-inline: auto; }
+
+    .demo-ribbon { background: #332a17; border-bottom: 1px solid rgba(243, 180, 99, .34); color: #f4d7a4; }
+    .demo-ribbon-inner { min-height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 11px; letter-spacing: .035em; }
+    .demo-ribbon strong { color: #ffce7f; text-transform: uppercase; letter-spacing: .1em; }
+    .demo-ribbon span:last-child { color: #d9c9a7; }
+    .topbar { border-bottom: 1px solid var(--line); background: rgba(9, 19, 22, .92); }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; min-height: 68px; gap: 24px; }
+    .brand { text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; letter-spacing: -.025em; white-space: nowrap; }
+    .brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid rgba(112, 209, 209, .4); border-radius: 50%; color: var(--cyan); font-size: 17px; }
+    .brand span:last-child span { color: var(--cyan); }
+    nav { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+    nav a { padding: 9px 12px; border-radius: 8px; color: var(--muted); font-size: 12px; text-decoration: none; }
+    nav a:hover, nav a[aria-current="page"] { background: var(--panel-raised); color: var(--text); }
+    nav a[aria-current="page"] { box-shadow: inset 0 -2px var(--amber); }
+
+    main { padding-block: 34px 70px; }
+    .eyebrow { margin: 0 0 9px; color: var(--amber); font-size: 10px; font-weight: 750; letter-spacing: .15em; text-transform: uppercase; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); align-items: end; gap: 32px; margin-bottom: 24px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 12px; max-width: 760px; font-size: clamp(31px, 4.3vw, 54px); line-height: 1.03; letter-spacing: -.052em; font-weight: 650; }
+    h1 em { color: var(--amber); font-style: normal; }
+    .intro-copy { max-width: 660px; margin-bottom: 0; color: #b4c4c3; font-size: 14px; line-height: 1.7; }
+    .truth-card { display: flex; align-items: flex-start; gap: 12px; padding: 16px 17px; border: 1px solid rgba(243, 180, 99, .25); border-radius: 12px; background: rgba(243, 180, 99, .065); }
+    .truth-symbol { flex: 0 0 auto; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: rgba(243, 180, 99, .13); color: var(--amber); }
+    .truth-card strong { display: block; margin-bottom: 5px; font-size: 12px; }
+    .truth-card p { margin: 0; color: #b9c3b8; font-size: 11px; line-height: 1.55; }
+
+    .workspace { display: grid; grid-template-columns: minmax(285px, 330px) minmax(0, 1fr); align-items: stretch; gap: 12px; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(160deg, rgba(18, 34, 39, .98), rgba(12, 24, 28, .98)); box-shadow: var(--shadow); }
+    .controls { padding: 20px; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+    .section-head h2, .subhead h2 { margin: 0; font-size: 18px; font-weight: 620; letter-spacing: -.02em; }
+    .status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid rgba(243, 180, 99, .3); border-radius: 6px; color: #f4ca8c; background: rgba(243, 180, 99, .08); font-size: 9px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+    .field-label { display: block; margin: 14px 0 7px; color: #d9e1dc; font-size: 11px; font-weight: 600; }
+    .select { width: 100%; min-height: 42px; padding: 0 36px 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background-color: #0a161a; font-size: 12px; }
+    .case-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 13px 0 10px; }
+    .fact { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: rgba(7, 15, 18, .36); }
+    .fact span { display: block; margin-bottom: 5px; color: var(--faint); font-size: 8px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; }
+    .fact strong { font-size: 11px; line-height: 1.35; font-weight: 600; }
+    .small-note, .help { margin: 9px 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+    fieldset { min-width: 0; margin: 18px 0 0; padding: 14px 0 0; border: 0; border-top: 1px solid var(--line); }
+    legend { padding: 0 0 8px; color: var(--amber); font-size: 9px; font-weight: 750; letter-spacing: .11em; }
+    .row { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 8px; margin: 8px 0; }
+    .row label { color: #ced9d5; font-size: 10px; }
+    .row .select { min-height: 38px; font-size: 10px; }
+    .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .context-button, .view-button, .subtle-button, .primary-button, .day-button {
+      min-height: 35px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 7px; background: rgba(7, 16, 19, .54); color: #b9c9c7; font-size: 10px; transition: border-color .16s, background .16s, color .16s, transform .16s;
+    }
+    .context-button:hover, .view-button:hover, .subtle-button:hover, .day-button:hover { border-color: rgba(112, 209, 209, .55); color: var(--text); }
+    .context-button[aria-pressed="true"], .view-button[aria-pressed="true"], .day-button[aria-pressed="true"] { border-color: rgba(243, 180, 99, .64); background: rgba(243, 180, 99, .12); color: #ffe0ad; }
+    .source-note { display: flex; gap: 8px; margin-top: 18px; padding: 11px; border: 1px dashed var(--line-strong); border-radius: 8px; color: var(--muted); background: rgba(4, 12, 14, .25); font-size: 9px; line-height: 1.55; }
+    .source-note::before { content: "i"; flex: 0 0 auto; width: 15px; height: 15px; display: grid; place-items: center; border: 1px solid var(--faint); border-radius: 50%; color: var(--cyan); font-size: 9px; font-weight: 700; }
+    .source-note p { margin: 0; }
+
+    .map-panel { min-width: 0; overflow: hidden; }
+    .map-topline { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .map-topline .eyebrow { margin-bottom: 4px; }
+    .map-topline strong { font-size: 12px; font-weight: 600; }
+    .view-switch { display: flex; gap: 5px; padding: 4px; border: 1px solid var(--line); border-radius: 9px; background: #0a1519; }
+    .view-button { min-height: 30px; padding: 6px 9px; border-color: transparent; font-size: 9px; }
+    .map-wrap { position: relative; min-height: 465px; height: clamp(425px, 42vw, 570px); overflow: hidden; isolation: isolate; background: #18271f; }
+    .map-surface { position: absolute; inset: -3%; transform: perspective(1200px) rotateX(10deg) scale(1.04); transform-origin: 50% 55%; transition: transform .4s ease, filter .4s ease; overflow: hidden; background: #18291f; }
+    .map-panel[data-view="2d"] .map-surface { transform: none; }
+    .map-panel[data-context="ndvi"] .map-surface { filter: saturate(1.28) hue-rotate(-7deg); }
+    .map-panel[data-context="landcover"] .map-surface { filter: saturate(.72) hue-rotate(18deg); }
+    .map-panel[data-context="burned-area"] .map-surface { filter: saturate(.78) sepia(.22); }
+    .terrain-svg { display: block; width: 100%; height: 100%; }
+    .map-vignette { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(5, 13, 15, .24), transparent 20%, transparent 80%, rgba(5, 13, 15, .28)), linear-gradient(0deg, rgba(5, 13, 15, .30), transparent 22%, transparent 82%, rgba(5, 13, 15, .22)); }
+    .map-chrome { position: absolute; z-index: 4; display: flex; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid rgba(220, 238, 230, .19); border-radius: 7px; background: rgba(8, 19, 22, .83); color: #d9e7df; backdrop-filter: blur(8px); font-size: 9px; }
+    .map-chrome.top-left { top: 14px; left: 14px; }
+    .map-chrome.top-right { top: 14px; right: 14px; }
+    .map-chrome.bottom-left { bottom: 14px; left: 14px; color: #bed0c7; }
+    .zoom-controls { display: grid; gap: 4px; }
+    .zoom-controls button { width: 26px; height: 24px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: inherit; font-size: 15px; }
+    .zoom-controls button:hover { background: rgba(255,255,255,.1); }
+    .map-key { display: flex; align-items: center; gap: 10px; }
+    .key-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .key-mark { width: 7px; height: 7px; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; }
+    .key-mark.modis { background: var(--amber); }
+    .key-mark.viirs { background: var(--cyan); }
+    .map-fit { padding: 8px 10px; border: 0; border-left: 1px solid var(--line); background: transparent; color: #dce8e1; font-size: 9px; }
+    .map-caption { position: absolute; z-index: 2; bottom: 15px; right: 14px; color: rgba(230, 239, 232, .64); font-size: 8px; letter-spacing: .04em; }
+    .map-legend { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 9px; min-height: 49px; padding: 10px 16px; border-top: 1px solid rgba(0,0,0,.32); background: #0d191d; }
+    .heat-legend { display: flex; align-items: center; gap: 9px; color: #b6c7c5; font-size: 9px; }
+    .heat-ramp { display: inline-block; width: 100px; height: 8px; border: 1px solid rgba(255,255,255,.14); border-radius: 20px; background: linear-gradient(90deg, rgba(255,215,109,.12), #ffd76d 22%, #ff8c4b 63%, #ec4b32); }
+    .legend-caveat { color: var(--muted); font-size: 9px; }
+    .map-inspector { display: flex; justify-content: space-between; gap: 16px; padding: 11px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .map-inspector strong { color: #d8e2de; font-weight: 600; }
+
+    .timeline { margin-top: 13px; padding: 21px; }
+    .timeline-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+    .subhead { margin-bottom: 16px; }
+    .subhead h2 { margin-bottom: 6px; }
+    .subhead p { max-width: 650px; margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+    .primary-button { border-color: rgba(243, 180, 99, .5); background: #8f6130; color: #fff1dc; font-weight: 650; }
+    .primary-button:hover { background: #a56f35; }
+    .subtle-button { min-height: 34px; }
+    .timeline-current { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 8px 0 11px; }
+    .timeline-current label { color: #d6e0dc; font-size: 10px; }
+    .timeline-current output { color: var(--text); font-size: 15px; font-weight: 650; letter-spacing: .02em; }
+    .frame-status { padding: 5px 7px; border: 1px solid var(--line-strong); border-radius: 5px; color: #e8c994; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .range { width: 100%; height: 24px; margin: 4px 0 5px; accent-color: var(--amber); cursor: pointer; }
+    .day-buttons { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; }
+    .day-button { min-height: 56px; text-align: left; }
+    .day-button b, .day-button span { display: block; }
+    .day-button b { margin-bottom: 6px; font-size: 10px; }
+    .day-button span { color: var(--muted); font-size: 8px; }
+    .day-button.partial::after { content: "PARTIAL"; display: inline-block; margin-top: 5px; color: var(--amber); font-size: 7px; letter-spacing: .08em; }
+    .day-button.unknown { border-style: dashed; background: repeating-linear-gradient(135deg, rgba(153,175,176,.055), rgba(153,175,176,.055) 5px, transparent 5px, transparent 10px); }
+    .day-button.unknown::after { content: "UNKNOWN"; display: inline-block; margin-top: 5px; color: #aabbbc; font-size: 7px; letter-spacing: .08em; }
+    .daily-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; }
+    .daily-summary strong { color: var(--text); font-weight: 600; }
+
+    .lower-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); gap: 13px; margin-top: 13px; }
+    .lower-panel { padding: 20px; }
+    .lower-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+    .lower-heading h2 { margin: 0; font-size: 16px; font-weight: 620; }
+    .counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+    .count-card { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: rgba(5, 13, 15, .3); }
+    .count-title { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: #c5d2ce; font-size: 9px; }
+    .sensor-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+    .sensor-dot.viirs { background: var(--cyan); }
+    .sensor-dot.shared { background: var(--green); }
+    .count-value { display: block; margin-bottom: 4px; font-size: 23px; font-weight: 650; letter-spacing: -.04em; }
+    .count-detail { color: var(--muted); font-size: 8px; line-height: 1.4; }
+    .table-scroll { overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
+    caption { padding: 10px 12px; color: var(--muted); text-align: left; }
+    th, td { padding: 9px 12px; border-top: 1px solid var(--line); white-space: nowrap; }
+    th { color: #8ea7a9; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+    td { color: #d0dcd7; }
+    .platform-label { display: inline-flex; align-items: center; gap: 6px; }
+    .table-note { margin: 9px 0 0; color: var(--muted); font-size: 8px; line-height: 1.5; }
+    .status-list { display: grid; gap: 8px; }
+    .status-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 11px; border: 1px solid var(--line); border-radius: 8px; background: rgba(5,13,15,.25); }
+    .status-card strong { display: block; margin-bottom: 3px; font-size: 10px; font-weight: 600; }
+    .status-card p { margin: 0; color: var(--muted); font-size: 8px; line-height: 1.4; }
+    .status-pill { padding: 5px 6px; border: 1px dashed rgba(243,180,99,.5); border-radius: 5px; color: #f0c785; background: rgba(243,180,99,.07); font-size: 7px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+    .status-pill.unknown { border-color: rgba(153,175,176,.35); color: #b1c2c2; background: rgba(153,175,176,.06); }
+    .caveat { margin: 12px 0 0; padding: 10px; border-left: 2px solid var(--amber); color: #bbc7c2; background: rgba(243,180,99,.055); font-size: 8px; line-height: 1.55; }
+    details.method { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; line-height: 1.6; }
+    details.method summary { color: #d5e0dc; cursor: pointer; font-weight: 600; }
+    details.method p { margin: 9px 0 0; }
+    .context-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 13px; }
+    .context-note { display: flex; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: rgba(13, 26, 30, .72); }
+    .context-icon { color: var(--cyan); font-size: 15px; }
+    .context-note strong { display: block; margin-bottom: 5px; font-size: 10px; }
+    .context-note p { margin: 0; color: var(--muted); font-size: 8px; line-height: 1.55; }
+
+    .handoff { margin-top: 28px; border: 1px solid rgba(112,209,209,.25); border-radius: 12px; background: rgba(13,26,30,.72); }
+    .handoff > summary { padding: 16px 18px; color: #d8e9e4; cursor: pointer; font-size: 12px; font-weight: 650; }
+    .handoff-content { padding: 0 18px 19px; color: #b3c3c1; font-size: 10px; line-height: 1.65; }
+    .handoff-content h2 { margin: 20px 0 8px; color: var(--text); font-size: 14px; }
+    .handoff-content ul { margin: 7px 0; padding-left: 19px; }
+    .handoff-content li { margin: 4px 0; }
+    .contract-table { width: 100%; margin-top: 9px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .contract-table td:first-child { color: #dce8e1; font-weight: 650; }
+    .contract-table td { white-space: normal; vertical-align: top; }
+    .footer { display: flex; justify-content: space-between; gap: 14px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--faint); font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+    .toast { position: fixed; z-index: 20; right: 22px; bottom: 22px; max-width: min(420px, calc(100vw - 32px)); padding: 12px 16px; border: 1px solid rgba(112,209,209,.35); border-radius: 9px; color: var(--text); background: #14282d; box-shadow: var(--shadow); font-size: 11px; line-height: 1.4; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .map-panel.fit-flash .map-surface { animation: fit-pulse .55s ease; }
+    @keyframes fit-pulse { 50% { filter: brightness(1.25) saturate(1.15); transform: perspective(1200px) rotateX(7deg) scale(1.12); } }
+
+    @media (max-width: 1020px) {
+      .page-width { width: min(100% - 32px, 900px); }
+      .intro { grid-template-columns: 1fr; gap: 16px; }
+      .truth-card { max-width: 600px; }
+      .workspace { grid-template-columns: 280px minmax(0, 1fr); }
+      .controls { padding: 16px; }
+      .map-wrap { min-height: 430px; }
+      .map-key { gap: 6px; }
+      .context-notes { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .page-width { width: calc(100% - 24px); }
+      .topbar-inner { min-height: auto; padding-block: 13px; align-items: flex-start; flex-direction: column; gap: 8px; }
+      nav { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
+      nav a { flex: 0 0 auto; padding: 8px 10px; font-size: 10px; }
+      main { padding-top: 24px; }
+      .workspace, .lower-grid { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+      .controls, .map-panel, .lower-panel { min-width: 0; max-width: 100%; }
+      .controls { order: 2; }
+      .map-panel { order: 1; }
+      .map-wrap { min-height: 365px; height: 58vh; max-height: 500px; }
+      .map-topline { min-height: 58px; }
+      .map-chrome.top-right { top: auto; bottom: 54px; right: 10px; }
+      .map-chrome.bottom-left { bottom: 11px; left: 10px; }
+      .map-caption { bottom: 13px; right: 10px; max-width: 37%; text-align: right; }
+      .map-legend { align-items: flex-start; flex-direction: column; }
+      .timeline { padding: 16px; }
+      .timeline-head { flex-direction: column; gap: 8px; }
+      .actions { justify-content: flex-start; }
+      .day-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .counts { gap: 6px; }
+      .count-card { padding: 9px; }
+      .count-value { font-size: 19px; }
+      .context-notes { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; }
+    }
+    @media (max-width: 420px) {
+      .demo-ribbon-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 7px; font-size: 9px; }
+      .demo-ribbon span:last-child { line-height: 1.4; }
+      h1 { font-size: 34px; }
+      .truth-card { padding: 12px; }
+      .map-wrap { min-height: 320px; height: 68vw; }
+      .map-topline { align-items: flex-start; flex-direction: column; }
+      .map-chrome.top-left { top: 9px; left: 9px; padding: 5px 6px; }
+      .map-key { gap: 6px; }
+      .key-item { font-size: 8px; }
+      .map-fit { padding: 7px; }
+      .map-chrome.top-right { right: 8px; bottom: 47px; }
+      .counts { grid-template-columns: 1fr; }
+      .count-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3px 8px; }
+      .count-title { grid-column: 1; margin: 0; }
+      .count-value { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+      .count-detail { grid-column: 1; }
+      .day-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .map-inspector { flex-direction: column; gap: 4px; }
+      .lower-panel { padding: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to replay</a>
+
+  <!-- Visible warning prevents the illustrative values from being mistaken for observations. -->
+  <div class="demo-ribbon" role="note" aria-label="Offline synthetic data notice">
+    <div class="page-width demo-ribbon-inner"><strong>Offline UI reference · synthetic data only</strong><span>Every date, count, coordinate, and map layer below is invented for interface review.</span></div>
+  </div>
+
+  <header class="topbar">
+    <div class="page-width topbar-inner">
+      <a class="brand" href="#main-content" aria-label="FireAtlas replay design reference"><span class="brand-mark" aria-hidden="true">✳</span><span>FireAtlas <span>Replay</span></span></a>
+      <nav aria-label="Illustrative project navigation">
+        <a href="#main-content">Overview</a><a href="#workspace">Atlas</a><a href="#timeline">Research</a><a href="#selected-frame">Data notes</a><a href="#main-content" aria-current="page">Fire replay</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="page-width">
+    <!-- Product purpose and scientific boundary should remain visible above the workspace. -->
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">HISTORICAL OBSERVATION REPLAY / UI DESIGN HANDOFF</p>
+        <h1 id="page-title">Follow the signal<br><em>through the landscape.</em></h1>
+        <p class="intro-copy">Choose a named study, inspect MODIS and VIIRS detections by UTC day, and compare their locations with terrain and vegetation context. This mock page demonstrates the intended workflow; all displayed values are synthetic.</p>
+      </div>
+      <aside class="truth-card" aria-label="Scientific interpretation limit">
+        <span class="truth-symbol" aria-hidden="true">◎</span>
+        <div><strong>Observed detections, not simulated spread</strong><p>Heat represents a smoothed concentration of reported sample locations. It does not draw a fire perimeter, establish continuous coverage, or predict where a fire moved.</p></div>
+      </aside>
+    </section>
+
+    <!-- WORKSPACE: setup stays beside the map on wide screens and moves below it on phones. -->
+    <section id="workspace" class="workspace" aria-label="Replay setup and map">
+      <aside class="panel controls" aria-label="Study and display controls">
+        <div class="section-head"><div><p class="eyebrow">01 / CHOOSE A CASE</p><h2>Study setup</h2></div><span id="case-state" class="status">Synthetic demo</span></div>
+
+        <label class="field-label" for="case-select">Named fire study</label>
+        <select id="case-select" class="select" aria-describedby="case-caveat">
+          <option value="ridge">North Ridge · demo 2024</option>
+          <option value="canyon">Canyon Loop · demo 2018</option>
+          <option value="foothill">Foothill Test · demo 2025</option>
+        </select>
+        <div class="case-facts"><div class="fact"><span>Demo window · UTC</span><strong id="case-window">Jul 11–16, 2024</strong></div><div class="fact"><span>Illustrative area</span><strong id="case-area">North Range · mock AOI</strong></div></div>
+        <p id="case-caveat" class="small-note">The case name and study area are fictional. In the real workflow, the selected dates and area define which observation records are grouped for display; they do not prove incident membership.</p>
+
+        <fieldset>
+          <legend>02 / SELECT THE OBSERVATION</legend>
+          <div class="row"><label for="sensor-select">Sensor view</label><select id="sensor-select" class="select"><option value="joint">Both · distinct cell union</option><option value="modis">MODIS · Terra + Aqua</option><option value="viirs">VIIRS · Suomi-NPP</option></select></div>
+          <div class="row"><label for="metric-select">Heatmap meaning</label><select id="metric-select" class="select"><option value="density">Daily detection concentration</option><option value="persistence">Observed days through date</option><option value="frp">Peak reported FRP · MW</option></select></div>
+          <p id="metric-help" class="help">Each occupied 1 km sample cell contributes once to the daily view. Brighter heat means more detections nearby, not a hotter fire.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>03 / ADD LANDSCAPE CONTEXT</legend>
+          <div id="context-controls" class="context-grid" role="group" aria-label="Illustrative map context layer">
+            <button class="context-button" type="button" data-context="terrain" aria-pressed="true">Terrain relief</button>
+            <button class="context-button" type="button" data-context="ndvi" aria-pressed="false">Vegetation NDVI</button>
+            <button class="context-button" type="button" data-context="landcover" aria-pressed="false">Land cover</button>
+            <button class="context-button" type="button" data-context="burned-area" aria-pressed="false">Burn date</button>
+          </div>
+          <p id="context-help" class="help">The background is an abstract illustration. In the real page, context layers come from local supplied rasters and have their own dates and availability.</p>
+        </fieldset>
+        <div class="source-note"><p id="case-notes">Demo fixture: six dates, two mock sensor streams, and deliberately mixed completeness states.</p></div>
+      </aside>
+
+      <section class="panel map-panel" id="map-panel" data-view="3d" data-context="terrain" aria-label="Observation heatmap on illustrative terrain">
+        <div class="map-topline"><div><p class="eyebrow">04 / READ THE OBSERVATIONS</p><strong id="map-frame-title">North Ridge · July 11, 2024</strong></div>
+          <div class="view-switch" role="group" aria-label="Map perspective"><button id="view-3d" class="view-button" type="button" aria-pressed="true">Relief view</button><button id="view-2d" class="view-button" type="button" aria-pressed="false">Flat view</button></div>
+        </div>
+        <div id="replay-map" class="map-wrap" role="img" aria-label="Synthetic heatmap over an illustrative topographic landscape">
+          <div class="map-surface" id="map-surface">
+            <!-- All map art is inline SVG. It is a visual placeholder, not geographic data. -->
+            <svg class="terrain-svg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="terrain-fill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#537447"/><stop offset=".38" stop-color="#304e3b"/><stop offset=".72" stop-color="#273d37"/><stop offset="1" stop-color="#756b4b"/></linearGradient>
+                <linearGradient id="ridge-light" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d3c795" stop-opacity=".44"/><stop offset="1" stop-color="#274235" stop-opacity="0"/></linearGradient>
+                <radialGradient id="heat-gradient"><stop offset="0" stop-color="#fff2a1" stop-opacity=".96"/><stop offset=".2" stop-color="#ffc05d" stop-opacity=".9"/><stop offset=".48" stop-color="#ff743f" stop-opacity=".68"/><stop offset=".76" stop-color="#ed452e" stop-opacity=".33"/><stop offset="1" stop-color="#d73c31" stop-opacity="0"/></radialGradient>
+                <pattern id="contour-lines" width="176" height="136" patternUnits="userSpaceOnUse"><path d="M-18 72 C12 25 70 25 91 54 S151 88 190 30 M-21 91 C12 45 70 44 92 73 S150 107 194 51 M-20 111 C14 64 69 65 92 92 S151 128 194 70 M-22 130 C14 82 69 83 91 111 S151 146 194 91" fill="none" stroke="#d6d2a6" stroke-opacity=".2" stroke-width="1"/></pattern>
+                <filter id="soften"><feGaussianBlur stdDeviation="1.1"/></filter>
+              </defs>
+              <rect width="800" height="520" fill="url(#terrain-fill)"/>
+              <path d="M0 0h800v115c-79 38-113 47-182 24-89-29-124-2-204 41-78 43-110 20-185-5C152 151 87 188 0 160Z" fill="#82905d" opacity=".38"/>
+              <path d="M0 355c83-69 152-50 235-105s125-104 208-92 96 60 182 49 128-68 175-86v399H0Z" fill="#182e2c" opacity=".5"/>
+              <path d="M58 0 167 0 330 520H165Z" fill="url(#ridge-light)" opacity=".47"/>
+              <path d="M505 0 605 0 790 520H660Z" fill="#c0b779" opacity=".11"/>
+              <path d="M469-20c-33 76-24 124-74 174-43 43-41 81-76 111-34 30-38 64-61 92-22 28-21 80-61 163" fill="none" stroke="#90b6a4" stroke-opacity=".58" stroke-width="5"/>
+              <path d="M469-20c-33 76-24 124-74 174-43 43-41 81-76 111-34 30-38 64-61 92-22 28-21 80-61 163" fill="none" stroke="#5a978b" stroke-width="2"/>
+              <path d="M0 0h800v520H0z" fill="url(#contour-lines)" opacity=".82"/>
+              <path d="M127 102c83-42 183-28 234 18 32 29 37 69 10 101-29 34-29 59-9 95 22 40 8 76-31 102-55 36-119 8-169 25-56 19-106-4-119-45-17-53 28-81 31-133 3-56-36-112 53-163Z" fill="#99a476" fill-opacity=".13" stroke="#d8c77f" stroke-opacity=".44" stroke-width="2" stroke-dasharray="8 7"/>
+              <text x="106" y="83" fill="#e3e0c9" fill-opacity=".7" font-size="11" letter-spacing="3">MOCK STUDY AREA</text>
+              <text x="570" y="375" fill="#d5dbcc" fill-opacity=".62" font-size="10" letter-spacing="2">RIVER VALLEY · ILLUSTRATIVE</text>
+              <text x="78" y="444" fill="#d5dbcc" fill-opacity=".52" font-size="9" letter-spacing="2">NORTH RANGE</text>
+              <g id="heat-layer" opacity=".94"></g>
+              <g id="cell-layer" opacity=".96"></g>
+            </svg>
+          </div>
+          <div class="map-vignette" aria-hidden="true"></div>
+          <div class="map-chrome top-left"><div class="zoom-controls" aria-label="Illustrative zoom controls"><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" aria-label="Zoom out">−</button></div><span>DEMO MAP</span></div>
+          <div class="map-chrome top-right"><div class="map-key" aria-label="Sensor symbol key"><span class="key-item"><i class="key-mark modis"></i> MODIS</span><span class="key-item"><i class="key-mark viirs"></i> VIIRS</span></div><button id="map-fit" class="map-fit" type="button">Fit study area ↗</button></div>
+          <div class="map-chrome bottom-left">Illustrative terrain · no geographic basemap</div>
+          <span class="map-caption">SYNTHETIC VISUAL FIXTURE · NOT TO SCALE</span>
+        </div>
+        <div class="map-legend"><div class="heat-legend"><span>Lower</span><i class="heat-ramp" aria-hidden="true"></i><span id="heat-legend-label">Higher daily concentration</span></div><span class="legend-caveat">Heat is relative concentration; it is not fire intensity or a perimeter.</span></div>
+        <div id="map-inspector" class="map-inspector" aria-live="polite"><strong>Map inspector</strong><span id="inspector-text">Select a synthetic sample cell in the illustration to preview the intended inspection detail.</span></div>
+      </section>
+    </section>
+
+    <!-- TIMELINE: the selected UTC date drives the map, counts, status, and sample rows. -->
+    <section id="timeline" class="panel timeline" aria-labelledby="timeline-title">
+      <div class="timeline-head"><div class="subhead"><p class="eyebrow">05 / MOVE THROUGH UTC DAYS</p><h2 id="timeline-title">Daily observations</h2><p>Choose a day to update the selected frame. A day with no listed sample is unknown unless a matching complete observation export is available.</p></div>
+        <div class="actions"><button id="play-button" class="primary-button" type="button">▶ Play days</button><button id="pause-button" class="subtle-button" type="button">Pause</button><button id="export-day" class="subtle-button" type="button">↓ Export this day</button></div>
+      </div>
+      <div class="timeline-current"><label for="day-slider">Selected UTC day</label><output id="selected-date" for="day-slider">2024-07-11</output><span id="frame-status" class="frame-status">PARTIAL EXPORT · DEMO</span></div>
+      <input id="day-slider" class="range" type="range" min="0" max="5" value="0" aria-label="Select a synthetic UTC observation day">
+      <div id="day-buttons" class="day-buttons" role="group" aria-label="Select one of the six synthetic dates"></div>
+      <div class="daily-summary"><span><strong id="daily-summary-count">35 unique sample cells</strong> · synthetic fixture</span><span id="daily-summary-note">Illustrative MODIS + VIIRS union for this UTC day</span></div>
+    </section>
+
+    <!-- SELECTED FRAME: always keep source counts separate and explain status denominators. -->
+    <section id="selected-frame" class="lower-grid" aria-label="Selected date records and completeness state">
+      <section class="panel lower-panel" aria-labelledby="counts-title">
+        <div class="lower-heading"><div><p class="eyebrow">SELECTED FRAME</p><h2 id="counts-title">Sensor counts stay separate</h2></div><button id="export-case" class="subtle-button" type="button">↓ Export case CSV</button></div>
+        <div class="counts">
+          <article class="count-card"><span class="count-title"><i class="sensor-dot" aria-hidden="true"></i>MODIS sample detections</span><strong id="modis-count" class="count-value">18</strong><span class="count-detail">Synthetic records for selected UTC day</span></article>
+          <article class="count-card"><span class="count-title"><i class="sensor-dot viirs" aria-hidden="true"></i>VIIRS S-NPP sample detections</span><strong id="viirs-count" class="count-value">27</strong><span class="count-detail">Synthetic records for selected UTC day</span></article>
+          <article class="count-card"><span class="count-title"><i class="sensor-dot shared" aria-hidden="true"></i>Distinct 1 km cell union</span><strong id="union-count" class="count-value">35</strong><span class="count-detail">Shared sample cells counted once</span></article>
+        </div>
+        <div class="table-scroll"><table>
+          <caption id="table-caption">Synthetic example records for 2024-07-11 · values are fabricated</caption>
+          <thead><tr><th scope="col">UTC time</th><th scope="col">Sensor / platform</th><th scope="col">FRP · MW</th><th scope="col">Confidence</th><th scope="col">Sample coordinates</th></tr></thead>
+          <tbody id="observation-rows"></tbody>
+        </table></div>
+        <p class="table-note">Example rows only. In the live tool the table is populated from the selected case bundle and can be exported for analysis.</p>
+      </section>
+      <aside class="panel lower-panel" aria-labelledby="status-title">
+        <div class="lower-heading"><div><p class="eyebrow">DATA STATUS</p><h2 id="status-title">What this frame can support</h2></div></div>
+        <div id="status-list" class="status-list"></div>
+        <p class="caveat">A complete export describes the export request. It does not prove a satellite observed every location or that clouds and smoke did not obscure the ground.</p>
+        <details class="method"><summary>How the example heatmap is intended to work</summary><p>In the live workflow, eligible MODIS and VIIRS active-fire records are mapped to a shared equal-area 1 km cell grid and deduplicated within sensor and UTC date. The 2D map smooths cell values with a fixed kernel. The relief view colors actual sample-cell footprints by those values. Sensor sources remain separate; “Both” is their distinct cell union. Missing records are not treated as no-fire observations.</p><p>This standalone mock does not run that science calculation. It uses invented values and procedural SVG shapes only to show the interface behavior.</p></details>
+      </aside>
+    </section>
+
+    <section class="context-notes" aria-label="How to interpret contextual map layers">
+      <article class="context-note"><span class="context-icon" aria-hidden="true">△</span><div><strong>Terrain relief</strong><p>Real terrain is geographic context and elevation. It does not show active fire or fire behavior.</p></div></article>
+      <article class="context-note"><span class="context-icon" aria-hidden="true">▧</span><div><strong>Vegetation and land cover</strong><p>NDVI and land-cover products have their own acquisition periods. They are not instantaneous fire-day measurements.</p></div></article>
+      <article class="context-note"><span class="context-icon" aria-hidden="true">◉</span><div><strong>Burn-date context</strong><p>A later burned-area product can provide context, but it is not independent active-fire validation.</p></div></article>
+    </section>
+
+    <!-- Embedded product brief helps an external designer preserve behavior while polishing the UI. -->
+    <details id="handoff-notes" class="handoff" open>
+      <summary>External designer brief · behavior and data contract</summary>
+      <div class="handoff-content">
+        <p><strong>Purpose:</strong> redesign the historical replay interface for scientific users. Make choosing a case, reading the selected observation day, and understanding data completeness obvious. This file is the complete offline reference; no website, API, account, or dataset is needed to inspect it.</p>
+        <p><strong>Data honesty:</strong> every count, time, coordinate, case label, map feature, and status in this mock is synthetic. Keep the “synthetic demo” warning prominent in any redesign. Do not turn heat into a simulated fire perimeter, forecast, or spread animation.</p>
+        <h2>How the controls are meant to work</h2>
+        <table class="contract-table"><tbody>
+          <tr><td>Named fire study</td><td>Switches case name, date window, mock AOI, day frames, heat clusters, counts, and sample records together.</td></tr>
+          <tr><td>Sensor view</td><td>Shows both sources together or a single sensor. The “Both” total is a distinct shared-grid cell union, not MODIS + VIIRS added blindly.</td></tr>
+          <tr><td>Heatmap meaning</td><td>Daily concentration, accumulated observed-day persistence through the selected date, or peak reported FRP in MW. The legend and explanatory copy change with the choice.</td></tr>
+          <tr><td>Context layer</td><td>Changes the visual backdrop between terrain, vegetation NDVI, land cover, and burned-area context. Each needs a date/availability note in the real product.</td></tr>
+          <tr><td>Relief / flat view</td><td>Changes map presentation only. Relief uses a three-dimensional terrain surface in the real site; this offline example uses a restrained perspective treatment.</td></tr>
+          <tr><td>UTC day controls</td><td>Slider, date buttons, and play/pause all select the same frame. The map, selected date, source counts, sample table, and status cards update together.</td></tr>
+          <tr><td>Map inspection</td><td>Click a sample cell to preview cell detail. Fit-area and zoom controls demonstrate intended map actions; the SVG is only a static illustration.</td></tr>
+          <tr><td>Exports</td><td>Buttons download a tiny CSV generated from the synthetic fixture so the affordance can be reviewed offline.</td></tr>
+        </tbody></table>
+        <h2>Assignment for the external UI designer</h2>
+        <p>Use this file as the complete product brief and redesign the replay page into a clearer, more polished scientific workspace. Work from the visible mock and embedded code only; assume there is no access to the original website, APIs, credentials, or source datasets. Return a complete replacement HTML page that can be opened locally. Keep the page responsive and its controls usable.</p>
+        <ul>
+          <li>You may reorganize the visual hierarchy, layout, typography, spacing, map frame, legend, and supporting details.</li>
+          <li>Keep case selection, sensor filtering, metric selection, context-layer selection, daily playback, day selection, map view, map inspection, and CSV export represented and understandable.</li>
+          <li>Keep every sample visibly synthetic. Do not add external imagery, remote fonts, APIs, or claims that the illustrative map is geographically accurate.</li>
+          <li>Preserve the scientific caveats: satellite detections are observations, completeness states are not fire/no-fire labels, and the heatmap is not a perimeter or forecast.</li>
+          <li>Make unknown, partial, and complete states distinguishable with text and shape as well as color; make the map usable with keyboard and assistive technology.</li>
+        </ul>
+        <h2>Design priorities</h2>
+        <ul>
+          <li>Keep the map as the main visual anchor, with controls and legend close to the map.</li>
+          <li>Use one continuous low-to-high heat ramp for magnitude. Use text and distinct symbols as well as color for MODIS and VIIRS.</li>
+          <li>Show the exact selected UTC date and completeness state next to the timeline.</li>
+          <li>Never make unknown or incomplete dates look like zero fire activity.</li>
+          <li>Keep sample counts separate by sensor and label their unit. Do not imply counts are burned area.</li>
+          <li>Retain a compact methodology/caveat section and a keyboard-accessible table alternative to map interaction.</li>
+          <li>Support wide desktop, tablet, and narrow mobile layouts. Respect reduced-motion preferences.</li>
+        </ul>
+        <h2>Local demo implementation</h2>
+        <p>The editable fixture and UI behavior are in the final inline <code>&lt;script&gt;</code>. CSS, SVG terrain, controls, and interaction states are all in this single HTML file. It makes no network request. You may replace or reorganize the markup and visual system, but preserve truthful labels and the control behavior described above.</p>
+      </div>
+    </details>
+
+    <footer class="footer"><span>FireAtlas · historical observation replay</span><span>Offline design handoff · all fixture values synthetic</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /*
+      OFFLINE DEMO FIXTURE
+      These named examples, daily numbers, locations, rows, and completeness
+      states are invented. Replace only with explicitly described UI test data;
+      never present this fixture as an observation archive.
+    */
+    const DEMO_CASES = {
+      ridge: {
+        title: "North Ridge", window: "Jul 11–16, 2024", area: "North Range · mock AOI",
+        note: "Demo fixture: six dates, two mock sensor streams, and deliberately mixed completeness states.",
+        days: [
+          {date:"2024-07-11", modis:18, viirs:27, union:35, frp:42.8, status:"partial export", modisStatus:"partial export", viirsStatus:"partial export", modisHeat:[[250,190,90],[330,245,63],[290,335,37]], viirsHeat:[[292,210,76],[365,271,62],[315,325,40]]},
+          {date:"2024-07-12", modis:24, viirs:33, union:45, frp:68.4, status:"complete export", modisStatus:"complete export", viirsStatus:"partial export", modisHeat:[[259,180,108],[337,234,72],[300,334,48]], viirsHeat:[[288,214,91],[369,263,75],[321,326,49]]},
+          {date:"2024-07-13", modis:31, viirs:41, union:58, frp:83.1, status:"unknown", modisStatus:"complete export", viirsStatus:"unknown", modisHeat:[[265,175,116],[348,232,82],[300,331,55]], viirsHeat:[[292,210,104],[376,269,80],[325,320,55]]},
+          {date:"2024-07-14", modis:28, viirs:38, union:53, frp:74.6, status:"partial export", modisStatus:"partial export", viirsStatus:"partial export", modisHeat:[[280,178,112],[348,228,84],[299,330,57]], viirsHeat:[[300,205,99],[378,264,78],[331,320,50]]},
+          {date:"2024-07-15", modis:21, viirs:30, union:42, frp:59.7, status:"complete export", modisStatus:"complete export", viirsStatus:"complete export", modisHeat:[[294,189,95],[354,243,69],[310,326,44]], viirsHeat:[[312,211,82],[378,271,64],[334,319,42]]},
+          {date:"2024-07-16", modis:12, viirs:19, union:27, frp:31.2, status:"partial export", modisStatus:"partial export", viirsStatus:"partial export", modisHeat:[[305,201,71],[356,250,53],[320,320,34]], viirsHeat:[[319,221,64],[373,268,48],[340,315,31]]}
+        ]
+      },
+      canyon: {
+        title: "Canyon Loop", window: "Aug 03–08, 2018", area: "Canyon Basin · mock AOI",
+        note: "Demo fixture: an alternate mock case with a narrower cluster and different export states.",
+        days: [
+          {date:"2018-08-03", modis:9, viirs:15, union:20, frp:18.6, status:"complete export", modisStatus:"complete export", viirsStatus:"complete export", modisHeat:[[410,175,66],[455,235,48],[400,300,34]], viirsHeat:[[438,198,61],[472,251,44],[421,309,32]]},
+          {date:"2018-08-04", modis:15, viirs:22, union:31, frp:35.4, status:"partial export", modisStatus:"complete export", viirsStatus:"partial export", modisHeat:[[399,181,85],[456,230,61],[399,310,41]], viirsHeat:[[430,194,78],[473,247,59],[418,310,38]]},
+          {date:"2018-08-05", modis:20, viirs:24, union:36, frp:47.9, status:"unknown", modisStatus:"unknown", viirsStatus:"partial export", modisHeat:[[393,186,96],[451,226,70],[399,307,45]], viirsHeat:[[426,197,82],[470,246,65],[418,315,40]]},
+          {date:"2018-08-06", modis:17, viirs:28, union:39, frp:52.1, status:"partial export", modisStatus:"partial export", viirsStatus:"partial export", modisHeat:[[389,190,90],[448,228,69],[404,302,48]], viirsHeat:[[422,199,91],[468,249,67],[414,312,43]]},
+          {date:"2018-08-07", modis:13, viirs:18, union:25, frp:28.7, status:"complete export", modisStatus:"complete export", viirsStatus:"complete export", modisHeat:[[398,194,73],[447,233,54],[405,298,36]], viirsHeat:[[425,205,70],[464,250,51],[416,306,35]]},
+          {date:"2018-08-08", modis:7, viirs:11, union:15, frp:16.3, status:"partial export", modisStatus:"partial export", viirsStatus:"unknown", modisHeat:[[406,202,55],[445,237,40],[409,296,27]], viirsHeat:[[430,208,50],[461,252,37],[416,301,25]]}
+        ]
+      },
+      foothill: {
+        title: "Foothill Test", window: "Sep 18–23, 2025", area: "Foothill Plain · mock AOI",
+        note: "Demo fixture: a third fictional case, included to make the case selector behavior clear.",
+        days: [
+          {date:"2025-09-18", modis:6, viirs:14, union:18, frp:13.8, status:"unknown", modisStatus:"unknown", viirsStatus:"partial export", modisHeat:[[210,270,47],[277,312,35],[350,165,24]], viirsHeat:[[236,286,56],[297,325,43],[367,180,30]]},
+          {date:"2025-09-19", modis:10, viirs:19, union:26, frp:26.1, status:"partial export", modisStatus:"partial export", viirsStatus:"complete export", modisHeat:[[219,263,63],[281,308,48],[352,171,33]], viirsHeat:[[246,280,71],[307,321,53],[366,182,36]]},
+          {date:"2025-09-20", modis:18, viirs:25, union:37, frp:39.5, status:"complete export", modisStatus:"complete export", viirsStatus:"complete export", modisHeat:[[226,256,80],[293,301,61],[355,176,38]], viirsHeat:[[250,275,83],[314,314,62],[370,186,43]]},
+          {date:"2025-09-21", modis:16, viirs:30, union:40, frp:51.3, status:"partial export", modisStatus:"complete export", viirsStatus:"partial export", modisHeat:[[232,250,86],[300,298,65],[358,180,43]], viirsHeat:[[258,270,91],[322,309,66],[373,190,48]]},
+          {date:"2025-09-22", modis:11, viirs:21, union:29, frp:32.2, status:"unknown", modisStatus:"partial export", viirsStatus:"unknown", modisHeat:[[240,252,68],[305,298,54],[358,185,36]], viirsHeat:[[263,271,75],[326,310,54],[375,193,39]]},
+          {date:"2025-09-23", modis:5, viirs:12, union:15, frp:12.6, status:"partial export", modisStatus:"partial export", viirsStatus:"partial export", modisHeat:[[247,257,48],[310,300,38],[358,190,27]], viirsHeat:[[270,275,52],[330,311,39],[376,196,28]]}
+        ]
+      }
+    };
+
+    const SAMPLE_ROWS = [
+      {time:"04:18:22", sensor:"MODIS", platform:"Terra", frp:"12.4", confidence:"high", lat:"39.7421", lon:"−121.3842"},
+      {time:"04:21:06", sensor:"VIIRS", platform:"Suomi-NPP", frp:"8.7", confidence:"nominal", lat:"39.7518", lon:"−121.3664"},
+      {time:"04:22:14", sensor:"MODIS", platform:"Aqua", frp:"6.2", confidence:"nominal", lat:"39.7595", lon:"−121.3987"},
+      {time:"04:25:31", sensor:"VIIRS", platform:"Suomi-NPP", frp:"15.5", confidence:"high", lat:"39.7682", lon:"−121.3519"},
+      {time:"04:29:47", sensor:"VIIRS", platform:"Suomi-NPP", frp:"3.1", confidence:"low", lat:"39.7774", lon:"−121.3752"}
+    ];
+
+    const $ = id => document.getElementById(id);
+    const caseSelect = $("case-select");
+    const sensorSelect = $("sensor-select");
+    const metricSelect = $("metric-select");
+    const mapPanel = $("map-panel");
+    const heatLayer = $("heat-layer");
+    const cellLayer = $("cell-layer");
+    let caseId = "ridge";
+    let dayIndex = 0;
+    let playTimer = null;
+    let zoom = 1;
+    let toastTimer = null;
+
+    function activeCase() { return DEMO_CASES[caseId]; }
+    function activeDay() { return activeCase().days[dayIndex]; }
+    function commas(value) { return Number(value).toLocaleString("en-US"); }
+    function formatDate(date) {
+      return new Intl.DateTimeFormat("en-US", {timeZone:"UTC", month:"long", day:"numeric", year:"numeric"}).format(new Date(`${date}T00:00:00Z`));
+    }
+    function selectedCount(day) {
+      if (sensorSelect.value === "modis") return day.modis;
+      if (sensorSelect.value === "viirs") return day.viirs;
+      return day.union;
+    }
+    function cumulativeSamples() {
+      return activeCase().days.slice(0, dayIndex + 1).reduce((total, day) => total + selectedCount(day), 0);
+    }
+    function selectedFrp(day) {
+      return (day.frp * (sensorSelect.value === "modis" ? .72 : 1)).toFixed(1);
+    }
+    function applyMapTransform() {
+      $("map-surface").style.transform = mapPanel.dataset.view === "2d"
+        ? `scale(${zoom})`
+        : `perspective(1200px) rotateX(10deg) scale(${1.04 * zoom})`;
+    }
+    function showToast(message) {
+      const node = $("toast");
+      node.textContent = message;
+      node.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => node.classList.remove("show"), 2500);
+    }
+    function svgNode(name, attrs) {
+      const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+      return node;
+    }
+
+    function renderDates() {
+      const days = activeCase().days;
+      $("day-slider").max = String(days.length - 1);
+      $("day-slider").value = String(dayIndex);
+      $("day-buttons").replaceChildren(...days.map((day, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `day-button${day.status === "partial export" ? " partial" : day.status === "unknown" ? " unknown" : ""}`;
+        button.setAttribute("aria-pressed", String(index === dayIndex));
+        button.setAttribute("aria-label", `${day.date}, ${day.status}, ${day.union} synthetic union cells`);
+        const date = new Date(`${day.date}T00:00:00Z`);
+        const b = document.createElement("b"); b.textContent = new Intl.DateTimeFormat("en-US", {timeZone:"UTC", month:"short", day:"numeric"}).format(date);
+        const span = document.createElement("span"); span.textContent = `${day.union} sample cells`;
+        button.append(b, span);
+        if (day.status === "unknown") button.setAttribute("aria-label", `${day.date}, completeness unknown, not zero activity`);
+        button.addEventListener("click", () => selectDay(index));
+        return button;
+      }));
+    }
+
+    function renderMap(day) {
+      heatLayer.replaceChildren();
+      cellLayer.replaceChildren();
+      const sensorMode = sensorSelect.value;
+      const series = sensorMode === "modis" ? [["MODIS", day.modisHeat]] : sensorMode === "viirs" ? [["VIIRS", day.viirsHeat]] : [["MODIS", day.modisHeat], ["VIIRS", day.viirsHeat]];
+      const metricScale = metricSelect.value === "frp" ? 1.16 : metricSelect.value === "persistence" ? 1.04 : .92;
+      const metricStrength = metricSelect.value === "frp" ? day.frp / 100 : metricSelect.value === "persistence" ? (dayIndex + 1) / 8 : day.union / 100;
+      series.forEach(([sensor, points]) => points.forEach(([x, y, radius], index) => {
+        const strength = .4 + Math.min(.48, metricStrength + index * .035);
+        heatLayer.append(svgNode("ellipse", {cx:x, cy:y, rx:radius * metricScale, ry:radius * .76 * metricScale, fill:"url(#heat-gradient)", opacity:strength}));
+        const color = sensor === "MODIS" ? "#f3b463" : "#70d1d1";
+        // These little square footprints are stylized example cells, not geolocation pixels.
+        for (let cell = 0; cell < 3; cell++) {
+          const offsetX = (cell - 1) * 9 + (index % 2 ? 3 : 0);
+          const offsetY = ((cell % 2) * 8) - 3;
+          const rect = svgNode("rect", {x:x + offsetX - 3, y:y + offsetY - 3, width:6, height:6, rx:1, fill:color, "fill-opacity":.7, stroke:"#fff4dc", "stroke-opacity":.9, "stroke-width":.7, "data-sensor":sensor, "data-index":index});
+          rect.style.cursor = "pointer";
+          rect.addEventListener("click", () => {
+            $("inspector-text").textContent = `Synthetic ${sensor} sample cell · ${day.date} · demonstration only`;
+            showToast("Illustrative cell selected · no real coordinate");
+          });
+          cellLayer.append(rect);
+        }
+      }));
+      $("map-panel").setAttribute("aria-label", `${activeCase().title} synthetic heatmap for ${day.date}; illustrative terrain, not geographic data`);
+    }
+
+    function renderRows(day) {
+      const tbody = $("observation-rows");
+      const mode = sensorSelect.value;
+      const rows = SAMPLE_ROWS.filter(row => mode === "joint" || (mode === "modis" && row.sensor === "MODIS") || (mode === "viirs" && row.sensor === "VIIRS"));
+      tbody.replaceChildren(...rows.map(row => {
+        const tr = document.createElement("tr");
+        const vals = [row.time, `${row.sensor} · ${row.platform}`, row.frp, row.confidence, `${row.lat}, ${row.lon}`];
+        vals.forEach((value, index) => { const td = document.createElement("td"); td.textContent = value; if (index === 1) { const wrap = document.createElement("span"); wrap.className = "platform-label"; const dot = document.createElement("i"); dot.className = `sensor-dot${row.sensor === "VIIRS" ? " viirs" : ""}`; dot.setAttribute("aria-hidden", "true"); wrap.append(dot, document.createTextNode(value)); td.replaceChildren(wrap); } tr.append(td); });
+        return tr;
+      }));
+      $("table-caption").textContent = `Synthetic example records for ${day.date} · values are fabricated`;
+    }
+
+    function renderStatus(day) {
+      const statuses = [["MODIS · Terra + Aqua", day.modisStatus], ["VIIRS · Suomi-NPP", day.viirsStatus]];
+      $("status-list").replaceChildren(...statuses.map(([name, state]) => {
+        const card = document.createElement("div"); card.className = "status-card";
+        const text = document.createElement("div");
+        const strong = document.createElement("strong"); strong.textContent = name;
+        const p = document.createElement("p"); p.textContent = "Synthetic export-state example · no satellite coverage claim";
+        text.append(strong, p);
+        const pill = document.createElement("span"); pill.className = `status-pill${state === "unknown" ? " unknown" : ""}`; pill.textContent = state;
+        card.append(text, pill); return card;
+      }));
+    }
+
+    function render() {
+      const study = activeCase();
+      const day = activeDay();
+      $("case-window").textContent = study.window;
+      $("case-area").textContent = study.area;
+      $("case-notes").textContent = study.note;
+      $("map-frame-title").textContent = `${study.title} · ${formatDate(day.date)}`;
+      $("selected-date").textContent = day.date;
+      $("frame-status").textContent = `${day.status} · demo`;
+      $("daily-summary-count").textContent = metricSelect.value === "frp"
+        ? `Peak reported FRP · ${selectedFrp(day)} MW`
+        : metricSelect.value === "persistence"
+          ? `${commas(cumulativeSamples())} cumulative synthetic ${sensorSelect.value === "joint" ? "cell-days" : "detection-days"}`
+          : `${commas(selectedCount(day))} ${sensorSelect.value === "joint" ? "unique sample cells" : "sample detections"}`;
+      $("daily-summary-note").textContent = metricSelect.value === "frp" ? "Reported fire radiative power · illustrative value" : metricSelect.value === "persistence" ? `Synthetic sample history through ${day.date}; real per-cell persistence uses distinct observed dates` : `Illustrative ${sensorSelect.value === "joint" ? "MODIS + VIIRS union" : sensorSelect.value.toUpperCase()} samples on this UTC day`;
+      $("modis-count").textContent = commas(day.modis);
+      $("viirs-count").textContent = commas(day.viirs);
+      $("union-count").textContent = commas(day.union);
+      $("heat-legend-label").textContent = metricSelect.value === "frp" ? "Higher reported FRP · MW" : metricSelect.value === "persistence" ? "More observed sample-days" : "Higher daily concentration";
+      $("metric-help").textContent = metricSelect.value === "frp" ? "FRP is the satellite-reported fire radiative power value in megawatts. It is not burned area or total fire heat." : metricSelect.value === "persistence" ? "The live map counts distinct dates with a sample in each cell through the selected day. No sample does not establish no fire." : "Each occupied 1 km sample cell contributes once to the daily view. Brighter heat means more detections nearby, not a hotter fire.";
+      const modisKind = day.modisStatus === "unknown" ? "unknown" : "";
+      const viirsKind = day.viirsStatus === "unknown" ? "unknown" : "";
+      renderDates(); renderMap(day); renderRows(day); renderStatus(day);
+      $("modis-count").dataset.status = modisKind;
+      $("viirs-count").dataset.status = viirsKind;
+    }
+
+    function selectDay(index) {
+      dayIndex = Math.max(0, Math.min(activeCase().days.length - 1, Number(index)));
+      render();
+    }
+    function switchCase(value) { stopPlayback(); caseId = value; dayIndex = 0; $("inspector-text").textContent = "Select a synthetic sample cell in the illustration to preview the intended inspection detail."; render(); }
+    function stopPlayback() { clearInterval(playTimer); playTimer = null; }
+    function startPlayback() {
+      if (playTimer) { stopPlayback(); return; }
+      playTimer = setInterval(() => {
+        const next = dayIndex + 1;
+        if (next >= activeCase().days.length) { stopPlayback(); return; }
+        selectDay(next);
+      }, 900);
+      showToast("Playing synthetic UTC frames");
+    }
+    function downloadCsv(allDays) {
+      const study = activeCase();
+      const selectedDays = allDays ? study.days : [activeDay()];
+      const lines = ["case_id,date_utc,sensor,synthetic_detection_count,synthetic_cell_union,synthetic_status"];
+      selectedDays.forEach(day => {
+        lines.push(`${caseId},${day.date},MODIS,${day.modis},${day.union},${day.modisStatus}`);
+        lines.push(`${caseId},${day.date},VIIRS_SNPP,${day.viirs},${day.union},${day.viirsStatus}`);
+      });
+      const blob = new Blob([lines.join("\n") + "\n"], {type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a"); link.href = url; link.download = `synthetic-${caseId}-${allDays ? "case" : activeDay().date}.csv`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("Downloaded a CSV containing synthetic demo values.");
+    }
+
+    caseSelect.addEventListener("change", event => switchCase(event.target.value));
+    sensorSelect.addEventListener("change", render);
+    metricSelect.addEventListener("change", render);
+    $("day-slider").addEventListener("input", event => selectDay(event.target.value));
+    $("play-button").addEventListener("click", startPlayback);
+    $("pause-button").addEventListener("click", () => { stopPlayback(); showToast("Replay paused"); });
+    $("export-day").addEventListener("click", () => downloadCsv(false));
+    $("export-case").addEventListener("click", () => downloadCsv(true));
+    $("view-3d").addEventListener("click", () => { mapPanel.dataset.view = "3d"; $("view-3d").setAttribute("aria-pressed", "true"); $("view-2d").setAttribute("aria-pressed", "false"); applyMapTransform(); });
+    $("view-2d").addEventListener("click", () => { mapPanel.dataset.view = "2d"; $("view-3d").setAttribute("aria-pressed", "false"); $("view-2d").setAttribute("aria-pressed", "true"); applyMapTransform(); });
+    document.querySelectorAll("[data-context]").forEach(button => button.addEventListener("click", () => {
+      mapPanel.dataset.context = button.dataset.context;
+      document.querySelectorAll("[data-context]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+      const notes = {terrain:"Abstract terrain relief selected. The live page overlays supplied elevation context.", ndvi:"Vegetation NDVI selected. Real imagery is a dated composite and is not an instantaneous fire-day measurement.", landcover:"Land cover selected. Real imagery represents annual classes, not current active-fire status.", "burned-area":"Burn-date context selected. A later burned-area product is contextual, not independent active-fire validation."};
+      $("context-help").textContent = notes[button.dataset.context];
+    }));
+    $("map-fit").addEventListener("click", () => { mapPanel.classList.remove("fit-flash"); void mapPanel.offsetWidth; mapPanel.classList.add("fit-flash"); showToast("Illustrative study area fitted in the viewport"); });
+    document.querySelectorAll("[data-zoom]").forEach(button => button.addEventListener("click", () => {
+      zoom = Math.max(.88, Math.min(1.18, zoom + (button.dataset.zoom === "in" ? .05 : -.05)));
+      applyMapTransform();
+    }));
+    render();
+  </script>
+</body>
+</html>

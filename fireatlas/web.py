@@ -37,6 +37,8 @@ from .harmonization import month_audit
 from .validity import CASES as VALIDITY_CASES, report as validity_report, build_evidence as build_validity_evidence
 from .calendar_v2 import calendar_v2, prepare_calendar_v2, region_status
 from .regions import REGIONS
+from .provenance import public_source_reference, sanitize_public_payload
+from .replay import CASES as REPLAY_CASES, build_case as build_replay_case, build_catalog as build_replay_catalog
 
 STATIC = Path(__file__).with_name("static")
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -55,6 +57,12 @@ ASSETS = {
     "/design.css": ("design.css", "text/css; charset=utf-8"),
     "/ui.js": ("ui.js", "text/javascript; charset=utf-8"),
     "/landing.css": ("landing.css", "text/css; charset=utf-8"),
+    "/lab.css": ("lab.css", "text/css; charset=utf-8"),
+    "/lab.js": ("lab.js", "text/javascript; charset=utf-8"),
+    "/workspace.css": ("workspace.css", "text/css; charset=utf-8"),
+    "/workspace.js": ("workspace.js", "text/javascript; charset=utf-8"),
+    "/landing-overview.js": ("landing-overview.js", "text/javascript; charset=utf-8"),
+    "/legacy-redirect.js": ("legacy-redirect.js", "text/javascript; charset=utf-8"),
     "/harmonized.css": ("harmonized.css", "text/css; charset=utf-8"),
     "/harmonized.js": ("harmonized.js", "text/javascript; charset=utf-8"),
     "/landing.js": ("landing.js", "text/javascript; charset=utf-8"),
@@ -104,7 +112,25 @@ ASSETS = {
     "/research.html": ("research.html", "text/html; charset=utf-8"),
     "/research.css": ("research.css", "text/css; charset=utf-8"),
     "/research.js": ("research.js", "text/javascript; charset=utf-8"),
+    "/research-overview.js": ("research-overview.js", "text/javascript; charset=utf-8"),
+    "/research-candidates.html": ("research-candidates.html", "text/html; charset=utf-8"),
+    "/research-exposure.html": ("research-exposure.html", "text/html; charset=utf-8"),
+    "/research-validation.html": ("research-validation.html", "text/html; charset=utf-8"),
+    "/research-deep.js": ("research-deep.js", "text/javascript; charset=utf-8"),
+    "/atlas.html": ("atlas.html", "text/html; charset=utf-8"),
+    "/static-atlas.js": ("static-atlas.js", "text/javascript; charset=utf-8"),
+    "/replay.html": ("replay.html", "text/html; charset=utf-8"),
+    "/replay.css": ("replay.css", "text/css; charset=utf-8"),
+    "/replay.js": ("replay.js", "text/javascript; charset=utf-8"),
+    "/replay-context/manifest.json": ("replay-context/manifest.json", "application/json; charset=utf-8"),
+    "/replay-context/park-2024/terrain.png": ("replay-context/park-2024/terrain.png", "image/png"),
+    "/replay-context/park-2024/ndvi.png": ("replay-context/park-2024/ndvi.png", "image/png"),
+    "/replay-context/park-2024/landcover.png": ("replay-context/park-2024/landcover.png", "image/png"),
+    "/replay-context/park-2024/burned-area.png": ("replay-context/park-2024/burned-area.png", "image/png"),
+    "/replay-context/camp-2018/terrain.png": ("replay-context/camp-2018/terrain.png", "image/png"),
+    "/replay-context/grove-2025/terrain.png": ("replay-context/grove-2025/terrain.png", "image/png"),
     "/favicon.svg": ("favicon.svg", "image/svg+xml"),
+    "/favicon.ico": ("favicon.svg", "image/svg+xml"),
     "/vendor/leaflet.js": ("vendor/leaflet.js", "text/javascript; charset=utf-8"),
     "/vendor/leaflet.css": ("vendor/leaflet.css", "text/css; charset=utf-8"),
 }
@@ -155,6 +181,9 @@ def handler_factory(database: Path):
     calendar_cache_lock = threading.Lock()
     calendar_cache = {}
     calendar_prepared_cache = {}
+    replay_cache_lock = threading.Lock()
+    replay_cache = {}
+    replay_cache_stamp = None
     pilot_sync = PilotSync(database)
     native_assets = {}
     if NATIVE_MASK_INVENTORY.is_file():
@@ -191,7 +220,8 @@ def handler_factory(database: Path):
                 pass
 
         def _json(self, value, status: HTTPStatus = HTTPStatus.OK):
-            self._respond(json.dumps(value).encode(), "application/json; charset=utf-8", status)
+            self._respond(json.dumps(sanitize_public_payload(value)).encode(),
+                          "application/json; charset=utf-8", status)
 
         def do_POST(self):
             path = urlsplit(self.path).path
@@ -266,6 +296,7 @@ def handler_factory(database: Path):
                 self._json({"error": "database unavailable"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
         def do_GET(self):
+            nonlocal replay_cache_stamp
             url = urlsplit(self.path)
             if url.path == "/api/native-masks":
                 assets = []
@@ -333,6 +364,36 @@ def handler_factory(database: Path):
                 params = parse_qs(url.query)
                 if "demo" in params:
                     raise ValueError("The synthetic showcase has been retired; remove the demo parameter.")
+                if url.path in ("/api/replay", "/api/replay/catalog"):
+                    stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
+                                   for p in (database, Path(str(database) + "-wal")))
+                    case_id = params.get("case", [""])[0]
+                    with replay_cache_lock:
+                        if replay_cache_stamp != stamps:
+                            replay_cache.clear()
+                            replay_cache_stamp = stamps
+                        if url.path == "/api/replay":
+                            if case_id not in REPLAY_CASES:
+                                raise ValueError("case must be park-2024, camp-2018, or grove-2025")
+                            key = ("case", case_id)
+                            if key not in replay_cache:
+                                with connect(database) as db:
+                                    replay_cache[key] = build_replay_case(db, case_id)
+                            result = replay_cache[key]
+                        else:
+                            key = ("catalog",)
+                            if key not in replay_cache:
+                                with connect(database) as db:
+                                    cases = {}
+                                    for replay_case_id in REPLAY_CASES:
+                                        case_key = ("case", replay_case_id)
+                                        if case_key not in replay_cache:
+                                            replay_cache[case_key] = build_replay_case(db, replay_case_id)
+                                        cases[replay_case_id] = replay_cache[case_key]
+                                    replay_cache[key] = build_replay_catalog(db, cases)
+                            result = replay_cache[key]
+                    self._json(result)
+                    return
                 if url.path in ("/api/globe", "/api/globe/detail"):
                     source, day = params.get("source", ["all"])[0], params.get("date", ["all"])[0]
                     # Bound both cache size and age; database/WAL changes invalidate the snapshot.
@@ -413,7 +474,7 @@ def handler_factory(database: Path):
                         if case_id not in VALIDITY_CASES:
                             raise ValueError("case must be park-2024 or grove-2025")
                         template = make_template(case_id, read_evidence(case_id))
-                        self._respond(json.dumps(template, sort_keys=True, indent=2).encode(),
+                        self._respond(json.dumps(sanitize_public_payload(template), sort_keys=True, indent=2).encode(),
                                       "application/json; charset=utf-8",
                                       filename=f"fireatlas_{case_id}_native_mask_review_template.json")
                     elif url.path == "/api/research":
@@ -576,7 +637,9 @@ def handler_factory(database: Path):
                             writer = csv.DictWriter(output, fieldnames=fields)
                             writer.writeheader()
                             for row in raw:
-                                writer.writerow({field: row[field] for field in fields})
+                                record = {field: row[field] for field in fields}
+                                record["source_uri"] = public_source_reference(record["source_uri"])
+                                writer.writerow(record)
                         else:
                             raise ValueError("kind must be calendar or observations")
                         self._respond(output.getvalue().encode(), "text/csv; charset=utf-8",

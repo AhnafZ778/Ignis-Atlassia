@@ -27,11 +27,23 @@ function validateView(input) {
 }
 
 function viewConfig() {
-  return {year: state.year, month: state.month + 1, series: state.series, bbox: state.bbox, day: state.day || "", layer: contextChoice};
+  const month = state.month + 1;
+  const shared = window.FireAtlasContext?.read() || {};
+  const first = `${state.year}-${String(month).padStart(2, "0")}-01`;
+  const last = new Date(Date.UTC(state.year, month, 0)).toISOString().slice(0, 10);
+  const inheritedCutoff = shared.year === state.year && shared.month === month ? shared.as_of : "";
+  const asOf = inheritedCutoff && inheritedCutoff >= first && inheritedCutoff <= last ? inheritedCutoff : last;
+  return {year: state.year, month, bbox: state.bbox, series: state.series, day: state.day || "",
+    as_of: asOf, distance_km: shared.distance_km ?? 2, gap_days: shared.gap_days ?? 1,
+    region: shared.region || "norcal", layer: contextChoice};
 }
 
 function viewUrl() {
-  const url = new URL("/", location.origin);
+  // The analytical workspace now lives on /atlas.html. Keep the canonical
+  // route stable while retaining the root hash compatibility shim for older
+  // links that still open the overview page.
+  const path = document.body?.dataset.page === "atlas" ? "/atlas.html" : "/";
+  const url = new URL(path, location.origin);
   url.search = new URLSearchParams(viewConfig()); url.hash = "calendar-section";
   if (initialLiteEarth) url.searchParams.set("lite", "1");
   return url.href;
@@ -49,6 +61,7 @@ function syncView() {
   if (!state.data) return;
   const url = new URL(viewUrl()); url.hash = location.hash;
   history.replaceState(null, "", url);
+  window.FireAtlasContext?.apply(document, viewConfig());
   document.querySelectorAll("[data-method-link]").forEach(link => link.href = methodUrl());
   document.querySelectorAll('a[href*="/method.html"]').forEach(preserveEarthMode);
   if ($("#share-fallback") && !$("#share-fallback").hidden) $("#share-url").value = viewUrl();
@@ -59,6 +72,9 @@ function syncView() {
     const option = new Option(String(state.year), String(state.year)); $("#year").add(option);
   }
   $("#year").value = state.year;
+  if ($("#atlas-month")) $("#atlas-month").value = String(state.month);
+  if ($("#atlas-selection-label")) $("#atlas-selection-label").textContent = `${new Intl.DateTimeFormat("en", {month:"long", year:"numeric", timeZone:"UTC"}).format(new Date(Date.UTC(state.year,state.month,1)))} · ${state.bbox} · UTC`;
+
 }
 
 function renderStudySources() {

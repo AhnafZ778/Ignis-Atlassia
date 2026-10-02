@@ -8,6 +8,15 @@
 <style>
 .esri-view .esri-view-surface:focus::after{outline:none!important}
 html,body,#earth{margin:0;width:100%;height:100%;overflow:hidden;background:#020609;color:#dbeaf3;font-family:system-ui,sans-serif}#earth{position:fixed;inset:0;touch-action:pan-y}.esri-view .esri-view-surface--inset-outline:focus::after{outline:none}.esri-attribution{background:#020609cc!important;color:#a0b4c2!important;font-size:9px!important}.esri-attribution a{color:#bacbd5!important}.esri-ui{bottom:0!important}.esri-ui-bottom-left{max-width:calc(100% - 30px)}#loading{position:fixed;inset:0;display:grid;place-content:center;text-align:center;gap:12px;background:#020609;z-index:5;font-size:13px;color:#a9c2d0}#loading[hidden]{display:none}#loading span{font-size:10px;color:#7893a4}.terrain-spinner{width:24px;height:24px;margin:0 auto;border:1px solid #7da3bb38;border-top-color:#efa36c;border-radius:50%;animation:spin 1.2s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#loading.error .terrain-spinner{display:none}.terrain-tools{position:fixed;top:20px;left:20px;z-index:4;display:flex;gap:8px;padding:10px;border:1px solid #8cacbd40;border-radius:12px;background:#091823dd}.terrain-tools button,.terrain-tools a{padding:9px 12px;border:1px solid #8cacbd38;border-radius:7px;color:#deebf3;background:#183140;font:12px system-ui;cursor:pointer;text-decoration:none}.embedded .terrain-tools{display:none}@media(prefers-reduced-motion:reduce){.terrain-spinner{animation:none}}
+
+/* Standalone controls only; the embedded landing globe keeps its composition. */
+body:not(.embedded) .terrain-tools{top:18px;left:18px;right:18px;width:max-content;max-width:calc(100% - 36px);flex-wrap:wrap;padding:12px;border-color:#29434f;background:#0e1e26ed;backdrop-filter:blur(16px);box-shadow:0 12px 32px #0004}
+body:not(.embedded) .terrain-tools :is(a,button){min-height:44px;padding:11px 16px;font-size:14px;border-color:#3d5b69;color:#e9f1f2;background:#152b35}
+body:not(.embedded) .terrain-tools a{color:#70cddd;font-weight:650}
+body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outline-offset:3px}
+.terrain-reading-guide{position:fixed;right:20px;bottom:36px;z-index:4;width:min(320px,calc(100% - 40px));padding:16px;border:1px solid #29434f;border-radius:12px;background:#0e1e26ed;color:#abc0c9;font-size:12px;line-height:1.65;pointer-events:none}
+.terrain-reading-guide strong{display:block;color:#e9f1f2;font-size:14px;margin-bottom:6px}.terrain-reading-guide p{margin:0}.embedded .terrain-reading-guide{display:none}
+@media(max-width:600px){body:not(.embedded) .terrain-tools{top:12px;left:12px;max-width:calc(100% - 24px);gap:6px;padding:8px}body:not(.embedded) .terrain-tools :is(a,button){font-size:12px;padding:9px 11px}.terrain-reading-guide{right:12px;bottom:36px;width:calc(100% - 24px);padding:12px}}
 </style>
 <script>window.terrainError = message => {const el=document.getElementById('loading');if(el){el.hidden=false;el.classList.add('error');el.querySelector('strong').textContent='Terrain Earth could not load';el.querySelector('span').textContent=message||'Check the connection to the imagery and elevation services.';if(window.fireAtlasEarth?.view)window.dispatchEvent(new Event('terrain-unavailable'));}};</script>
 <script src="https://js.arcgis.com/4.32/" onerror="terrainError('The terrain SDK is unavailable. Retry when connected.')"></script>
@@ -16,6 +25,7 @@ html,body,#earth{margin:0;width:100%;height:100%;overflow:hidden;background:#020
 <div id="earth" aria-label="Interactive satellite Earth with World Elevation terrain"></div>
 <div id="loading" role="status"><i class="terrain-spinner" aria-hidden="true"></i><strong>Loading satellite Earth</strong><span>Ignis-Atlassia Terrain · World Imagery + World Elevation</span></div>
 <nav class="terrain-tools" aria-label="Terrain navigation"><a href="/">Ignis-Atlassia</a><button id="california" type="button">California terrain</button><button id="world" type="button">Reset globe</button></nav>
+<aside class="terrain-reading-guide" aria-label="How to read the terrain"><strong>Explore the landscape</strong><p>Drag to rotate and scroll to zoom. Satellite imagery and elevation provide landscape context; this view does not show fire activity or a forecast.</p></aside>
 <script>
 (() => {
   'use strict';

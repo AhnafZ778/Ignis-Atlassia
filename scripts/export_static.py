@@ -26,6 +26,8 @@ from fireatlas.validation_check import check as analytical_validity_check
 from fireatlas.mask_review import make_template
 from fireatlas.masks import read_evidence
 from fireatlas.globe import static_bundle as static_globe_bundle
+from fireatlas.provenance import public_source_reference, sanitize_public_payload
+from fireatlas.replay import CASES as REPLAY_CASES, build_case as build_replay_case, build_catalog as build_replay_catalog
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "fireatlas" / "static"
@@ -38,7 +40,8 @@ TEXT_SUFFIXES = {".html", ".css", ".js", ".webmanifest"}
 
 def _write_json(path: Path, value: object, root: Path) -> dict:
     path.parent.mkdir(parents=True, exist_ok=True)
-    body = json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    body = json.dumps(sanitize_public_payload(value), sort_keys=True,
+                      separators=(",", ":"), allow_nan=False).encode("utf-8")
     path.write_bytes(body)
     return {"path": path.relative_to(root).as_posix(),
             "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body)}
@@ -46,7 +49,8 @@ def _write_json(path: Path, value: object, root: Path) -> dict:
 
 def _write_bundle_json(path: Path, value: object, root: Path) -> dict:
     path.parent.mkdir(parents=True, exist_ok=True)
-    body = json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    body = json.dumps(sanitize_public_payload(value), sort_keys=True,
+                      separators=(",", ":"), allow_nan=False).encode("utf-8")
     with path.open("wb") as raw:
         with gzip.GzipFile(fileobj=raw, mode="wb", mtime=0) as compressed:
             compressed.write(body)
@@ -311,8 +315,8 @@ def _complete_observation_archive(db: sqlite3.Connection, site: Path, region_id:
             "daynight": row["daynight"],
             "thermal_anomaly_flag": row["thermal_anomaly_flag"],
             "source_file_sha256": row["file_sha256"],
-            "source_uri": row["source_uri"],
-            "batch_source_uri": row["batch_source_uri"],
+            "source_uri": public_source_reference(row["source_uri"]),
+            "batch_source_uri": public_source_reference(row["batch_source_uri"]),
             "retrieved_utc": row["retrieved_utc"],
         }
         try:
@@ -351,7 +355,12 @@ def _bundle_mcd64_sources(site: Path, file_inventory: list[dict]) -> None:
     if checklist.is_file():
         target = site / "data" / "v2" / "validity" / "fire-mask-download-checklist.csv"
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(checklist, target)
+        # Keep generated text artifacts diff-friendly while preserving every
+        # checklist field and URL from the supplied source file. The source has
+        # a whitespace-only final row, so discard only blank records.
+        lines = checklist.read_text(encoding="utf-8-sig").replace("\r\n", "\n").replace("\r", "\n").splitlines()
+        lines = [line for line in lines if line.strip()]
+        target.write_text("\n".join(lines) + "\n", encoding="utf-8")
         body = target.read_bytes()
         file_inventory.append({"path": target.relative_to(site).as_posix(),
                                "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
@@ -360,7 +369,9 @@ def _bundle_mcd64_sources(site: Path, file_inventory: list[dict]) -> None:
     if local_inventory.is_file():
         target = site / "data" / "v2" / "validity" / "fire-mask-local-inventory.csv"
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(local_inventory, target)
+        lines = local_inventory.read_text(encoding="utf-8-sig").replace("\r\n", "\n").replace("\r", "\n").splitlines()
+        lines = [line for line in lines if line.strip()]
+        target.write_text("\n".join(lines) + "\n", encoding="utf-8")
         body = target.read_bytes()
         file_inventory.append({"path": target.relative_to(site).as_posix(),
                                "sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body),
@@ -412,6 +423,21 @@ def _export_static_into(database: Path, site: Path, *, static_source: Path,
         source_hashes.update(globe["input_file_sha256"])
         file_inventory.append(_write_bundle_json(
             site_data / "globe" / "recent.json.gz", globe, site))
+
+        # The standalone historical replay uses the full local case windows,
+        # packaged as compressed browser bundles. This avoids shipping the
+        # database or making a static visitor infer missing days are zero.
+        replay_cases = {}
+        replay_root = site / "data" / "replay"
+        for replay_case_id in REPLAY_CASES:
+            replay_case = build_replay_case(db, replay_case_id)
+            replay_cases[replay_case_id] = replay_case
+            for source in replay_case["summary"]["sources"].values():
+                source_hashes.update(source["source_file_hashes"])
+            file_inventory.append(_write_bundle_json(
+                replay_root / "cases" / f"{replay_case_id}.json.gz", replay_case, site))
+        file_inventory.append(_write_json(
+            replay_root / "catalog.json", build_replay_catalog(db, replay_cases), site))
 
         # Keep the dated evidence story usable from a static checkout too.  Each
         # case/date report is generated from the same database snapshot as the

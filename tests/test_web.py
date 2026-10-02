@@ -52,6 +52,35 @@ class WebMvpTests(unittest.TestCase):
         self.assertIn(b"AI assistance helped with code and documentation", sources)
         self.assertIn(b"No independent scientific reviewer is recorded yet", sources)
 
+    def test_focused_analysis_pages_load_directly(self):
+        pages = {
+            "/atlas.html": b'id="harmonized-calendar"',
+            "/replay.html": b"Observed detections, not simulated spread",
+            "/research.html": b'id="overview-controls"',
+            "/research-candidates.html": b'id="candidate-list"',
+            "/research-exposure.html": b'id="coverage-file"',
+            "/research-validation.html": b'id="validation-gates"',
+            "/data.html": b'id="archive-region-list"',
+            "/method.html": b'id="data-flow"',
+            "/review.html": b'id="review-samples"',
+        }
+        for route, marker in pages.items():
+            with self.subTest(route=route):
+                _, page = self.get(route)
+                self.assertIn(marker, page)
+
+    def test_replay_catalog_and_case_bundle_routes(self):
+        _, catalog_body = self.get("/api/replay/catalog")
+        catalog = json.loads(catalog_body)
+        self.assertEqual(catalog["schema"], "fireatlas-observation-replay-catalog-v1")
+        self.assertEqual({case["id"] for case in catalog["cases"]},
+                         {"park-2024", "camp-2018", "grove-2025"})
+        _, bundle_body = self.get("/api/replay?case=park-2024")
+        bundle = json.loads(bundle_body)
+        self.assertEqual(bundle["schema"], "fireatlas-observation-replay-v1")
+        self.assertEqual(bundle["case_id"], "park-2024")
+        self.assertEqual(len(bundle["frames"]), 22)
+
     def test_native_review_form_is_served_and_hash_bound_template_is_available(self):
         _, page = self.get("/review.html?case=grove-2025")
         self.assertIn(b"id=\"review-samples\"", page)
@@ -106,37 +135,39 @@ class WebMvpTests(unittest.TestCase):
 
     def test_calendar_map_observations_and_exports(self):
         _, home = self.get("/")
-        self.assertIn(b"Burning activity calendar", home)
-        self.assertIn(b"NASA SPACE APPS 2026", home)
-        self.assertIn(b'id="harm-official-links"', home)
+        _, atlas = self.get("/atlas.html")
+        self.assertIn(b"NASA SPACE APPS 2026", atlas)
+        self.assertIn(b'id="harm-official-links"', atlas)
         _, calendar_script = self.get("/harmonized.js")
         self.assertIn(b"state?.availability?.notices", calendar_script)
         self.assertIn(b"Open NASA product notice", calendar_script)
-        self.assertIn(b"harm-season-context", home)
+        self.assertIn(b"harm-season-context", atlas)
         self.assertIn(b"2024 paddy-harvest monitoring", calendar_script)
         self.assertIn(b"PRID=2060764", calendar_script)
         self.assertIn(b"do not confirm crop-residue fires", calendar_script)
-        self.assertIn(b"VISIBLE SENSOR BRIDGE", home)
-        self.assertIn(b"RAW FRP CONTEXT", home)
-        self.assertIn(b"MCD64A1", home)
-        self.assertIn(b'id="harm-share-card"', home)
-        self.assertIn(b'id="harm-build-meta"', home)
-        self.assertIn(b'id="harm-bridge-method"', home)
-        self.assertIn(b"INPUTS + HASH", home)
-        self.assertIn(b"cyan solid", home)
-        self.assertIn(b"purple hatch", home)
-        self.assertIn(b"gray crosshatch", home)
+        self.assertIn(b"VISIBLE SENSOR BRIDGE", atlas)
+        self.assertIn(b"RAW FRP CONTEXT", atlas)
+        self.assertIn(b"MCD64A1", atlas)
+        self.assertIn(b'id="harm-share-card"', atlas)
+        self.assertIn(b'id="harm-build-meta"', atlas)
+        self.assertIn(b'id="harm-bridge-method"', atlas)
+        self.assertIn(b"INPUTS + HASH", atlas)
+        self.assertIn(b"cyan solid", atlas)
+        self.assertIn(b"amber hatch", atlas)
+        self.assertIn(b"gray crosshatch", atlas)
         _, validity_script = self.get("/validity.js")
         self.assertIn(b"validity-unknown", validity_script)
         _, validity_style = self.get("/validity.css")
         self.assertIn(b"same state grammar", validity_style)
-        calendar_panel = home.split(b'<section id="harmonized-calendar"', 1)[1]
+        calendar_panel = atlas.split(b'<section id="harmonized-calendar"', 1)[1]
         verdict_index = calendar_panel.index(b'id="harm-verdict"')
         links_index = calendar_panel.index(b'id="harm-official-links"')
         heading_index = calendar_panel.index(b'class="harmonized-heading"')
         self.assertLess(verdict_index, links_index)
         self.assertLess(links_index, heading_index)
-        self.assertNotIn(b"archive-timeline", home)
+        self.assertNotIn(b"archive-timeline", atlas)
+        self.assertNotIn(b"Burning activity calendar", home)
+        self.assertIn(b"Open the atlas", home)
         self.assertIn(b"earth-frame-host", home)
         self.assertIn(b'id="globe-markers"', home)
         self.assertIn(b'id="globe-wildfires"', home)

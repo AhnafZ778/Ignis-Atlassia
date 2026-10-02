@@ -117,16 +117,10 @@
     const time = candidateCompositeDate();
     if (!time) return;
     if (state.contextLayer) state.map.removeLayer(state.contextLayer);
-    state.contextLayer = L.tileLayer.wms("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi", {
-      layers: "MODIS_Terra_L3_NDVI_16Day",
-      format: "image/png",
-      transparent: true,
-      version: "1.1.1",
-      time,
-      attribution: "NASA GIBS / MODIS",
-      opacity: 0.9,
-      maxZoom: 13,
-      keepBuffer: 2
+    const url = `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_L3_NDVI_16Day/default/${time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`;
+    state.contextLayer = L.tileLayer(url, {
+      attribution: "NASA GIBS / MODIS", opacity: 0.9,
+      maxNativeZoom: 9, maxZoom: 18, keepBuffer: 3
     }).addTo(state.map);
     const label = $("candidate-map-label");
     if (label) label.textContent = `NASA MODIS NDVI · ${time} · CONTEXT ONLY`;

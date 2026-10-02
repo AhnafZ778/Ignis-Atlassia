@@ -243,9 +243,23 @@
 
   function evidenceHref() {
     const url = new URL(location.href);
-    url.search = new URLSearchParams({harm_region: regionSelect.value, harm_year: yearSelect.value, harm_month: monthSelect.value}).toString();
+    const context = window.FireAtlasContext?.read() || {};
+    const year = Number(yearSelect.value), month = Number(monthSelect.value);
+    url.search = window.FireAtlasContext?.write({...context, region: regionSelect.value, year, month,
+      as_of: new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10), day: ""}) ||
+      new URLSearchParams({region: regionSelect.value, year, month}).toString();
     url.hash = "harmonized-calendar";
     return url.href;
+  }
+
+  function syncCanonicalContext() {
+    const year = Number(yearSelect.value), month = Number(monthSelect.value);
+    const context = {...(window.FireAtlasContext?.read() || {}), region: regionSelect.value, year, month,
+      as_of: new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10), day: ""};
+    const url = new URL(location.href);
+    url.search = window.FireAtlasContext?.write(context) || new URLSearchParams(context).toString();
+    history.replaceState(null, "", url);
+    window.FireAtlasContext?.apply(document, context);
   }
 
   async function shareEvidence() {
@@ -735,20 +749,21 @@
     try {
       const status = await getJson("/api/v2/regions");
       regions = status.regions;
-      const sharedRegion = new URLSearchParams(location.search).get("harm_region");
+      const params = new URLSearchParams(location.search);
+      const sharedRegion = params.get("region") || params.get("harm_region");
       if (regions.some((item) => item.id === sharedRegion)) regionSelect.value = sharedRegion;
       fillYears();
-      const sharedYear = Number(new URLSearchParams(location.search).get("harm_year"));
-      const sharedMonth = Number(new URLSearchParams(location.search).get("harm_month"));
+      const sharedYear = Number(params.get("year") || params.get("harm_year"));
+      const sharedMonth = Number(params.get("month") || params.get("harm_month"));
       if (sharedYear >= 2006 && sharedYear <= 2026 && [...yearSelect.options].some((option) => Number(option.value) === sharedYear)) yearSelect.value = String(sharedYear);
       if (sharedMonth >= 1 && sharedMonth <= 12) monthSelect.value = String(sharedMonth);
       renderOfficialLinks();
       displaySourceStatus();
       await loadCalendar({includeHistory: true});
     } catch (error) { setStatus(`Archive status unavailable: ${error.message}`); }
-    regionSelect.addEventListener("change", () => { fillYears(); renderOfficialLinks(); displaySourceStatus(); loadCalendar({includeHistory: true}); });
-    yearSelect.addEventListener("change", () => loadCalendar({includeHistory: true}));
-    monthSelect.addEventListener("change", () => { selectedDate = null; renderSeasonContext(); renderCalendar(); });
+    regionSelect.addEventListener("change", () => { fillYears(); renderOfficialLinks(); displaySourceStatus(); syncCanonicalContext(); loadCalendar({includeHistory: true}); });
+    yearSelect.addEventListener("change", () => { syncCanonicalContext(); loadCalendar({includeHistory: true}); });
+    monthSelect.addEventListener("change", () => { selectedDate = null; syncCanonicalContext(); renderSeasonContext(); renderCalendar(); });
     $("#harm-share")?.addEventListener("click", shareEvidence);
   }
 

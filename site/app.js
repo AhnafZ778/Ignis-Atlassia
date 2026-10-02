@@ -20,23 +20,27 @@ async function getJson(path) {
 
 function showValue(value) { return value === null || value === undefined ? "—" : String(value); }
 
-async function loadMeta() {
+async function loadMeta({preserveContext = false} = {}) {
   const meta = await getJson("/api/meta");
   const yearSelect = $("#year"); yearSelect.replaceChildren();
   const defaultView = meta.default_view || {year:2015,month:7,bbox:[-122,39,-120,41]};
-  const years = [...new Set([...meta.years, defaultView.year])].sort((a,b) => a-b);
+  const selectedView = preserveContext
+    ? {year: state.year, month: state.month + 1, bbox: state.bbox.split(",").map(Number), series: state.series}
+    : defaultView;
+  const years = [...new Set([...(meta.years || []), selectedView.year])].sort((a,b) => a-b);
   for (const year of years) {
     const option = document.createElement("option"); option.value = year; option.textContent = year;
     yearSelect.append(option);
   }
-  state.year = defaultView.year; state.month = defaultView.month - 1; state.bbox = defaultView.bbox.join(",");
-  state.series = meta.default_series || "joint";
+  state.year = selectedView.year; state.month = selectedView.month - 1; state.bbox = selectedView.bbox.join(",");
+  state.series = preserveContext ? selectedView.series : (meta.default_series || "joint");
   yearSelect.value = String(state.year);
   const status = $("#dataset-status");
-  status.textContent = meta.standard_pair_ready ? "NASA FIRMS MODIS + VIIRS · authentic archive ↗" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
+  if (status) status.textContent = meta.standard_pair_ready ? "NASA FIRMS MODIS + VIIRS · authentic archive ↗" : meta.available_sources?.includes("NOAA_HMS_VIIRS") ? "NOAA HMS VIIRS · authentic archive ↗" : meta.years.length ? "Authentic imports · view source status ↗" : "Authentic data · awaiting first import ↗";
   const showRealProof = meta.standard_pair_ready || meta.available_sources?.includes("NOAA_HMS_VIIRS");
-  $("#real-source-note").hidden = !showRealProof;
-  if (showRealProof) {
+  const realSourceNote = $("#real-source-note");
+  if (realSourceNote) realSourceNote.hidden = !showRealProof;
+  if (showRealProof && realSourceNote) {
     const note = $("#real-source-note");
     note.querySelector(".orbital-kicker").textContent = meta.standard_pair_ready ? "NASA FIRMS / REGIONAL ARCHIVE" : "VERIFIED ARCHIVE / NOAA";
     $("#hero-real-count").textContent = meta.standard_pair_ready
@@ -520,11 +524,11 @@ function renderMapLegend() {
   const legend = $("#map-legend");
   if (!legend) return;
   const context = {
-    none: {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."},
-    ndvi: {title: "Vegetation condition (NDVI)", range: "lower signal → higher signal", note: "NASA MODIS 16-day composite; vegetation context only."},
-    landcover: {title: "Broad land-cover class", range: "forest · shrubland · grassland · cropland", note: "NASA MODIS annual class context; it does not identify current fuels."},
-    fwi: {title: "Fire weather unavailable", range: "No measured layer", note: "Measured fire-weather data have not been imported. No weather risk is shown."},
-  }[contextChoice] || {title: "No context overlay", range: "Only satellite detections", note: "Hotspots are dated thermal observations. They do not show a fire perimeter."};
+    none: {title: "No context overlay", range: "Only satellite detections", note: "Thermal detections only; no fire perimeter or burned area is shown."},
+    ndvi: {title: "Vegetation condition (NDVI)", range: "lower signal → higher signal", note: "NASA MODIS 16-day vegetation context. Points are not fire perimeters or burned area."},
+    landcover: {title: "Broad land-cover class", range: "forest · shrubland · grassland · cropland", note: "NASA MODIS annual context; it does not show current fuels or fire perimeters."},
+    fwi: {title: "Fire weather unavailable", range: "No measured layer", note: "Measured fire-weather data are unavailable; no weather risk is shown."},
+  }[contextChoice] || {title: "No context overlay", range: "Only satellite detections", note: "Thermal detections only; no fire perimeter or burned area is shown."};
   const badge = $("#map-legend-badge");
   badge.textContent = "NASA / FIRMS";
   const title = $("#map-legend-context-title");
@@ -535,7 +539,7 @@ function renderMapLegend() {
   scale.className = `map-legend-context-range ${contextChoice}`;
   scale.querySelector("span").textContent = context.range;
   const observationNote = $("#map-legend-observation-note");
-  if (observationNote) observationNote.textContent = "Imported NASA FIRMS standard-product detection records.";
+  if (observationNote) observationNote.textContent = "Each point is a dated satellite detection.";
   $("#map-legend-note").textContent = context.note;
 }
 
@@ -548,11 +552,13 @@ async function updateContextLayer() {
     const ndvi = contextChoice === "ndvi";
     const time = ndvi ? compositeDate() : `${Math.min(state.year, 2024)}-01-01`;
     const layer = ndvi ? "MODIS_Terra_L3_NDVI_16Day" : "MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual";
-    contextLayer = L.tileLayer.wms("https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi", {
-      layers: layer, format: "image/png", transparent: true, version: "1.1.1", time,
-      attribution: "NASA GIBS / MODIS", opacity: 0.72,
+    const nativeZoom = ndvi ? 9 : 8;
+    const tileUrl = `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/${time}/GoogleMapsCompatible_Level${nativeZoom}/{z}/{y}/{x}.png`;
+    contextLayer = L.tileLayer(tileUrl, {
+      attribution: "NASA GIBS / MODIS", opacity: 0.82,
+      maxNativeZoom: nativeZoom, maxZoom: 18, keepBuffer: 3,
     }).addTo(map);
-    contextLayer.on("tileerror", () => { $("#layer-status").textContent = "NASA imagery could not load for this date or connection."; });
+    contextLayer.on("tileerror", () => { $("#layer-status").textContent = "Some NASA imagery tiles are unavailable for this date or connection; landscape context may be incomplete."; });
     $("#layer-status").textContent = ndvi
       ? `NASA MODIS NDVI 16-day composite · requested ${time} · vegetation condition only`
       : `NASA MODIS annual land cover · ${time.slice(0,4)} · broad class context`;
@@ -704,7 +710,7 @@ async function updateMap() {
         const note = document.createElement("p"); note.textContent = `All imported points in this grid bin · ${feature.sensors.join(" + ")}. Zoom in to inspect detections.`;
         body.append(title, note); marker.bindPopup(body); markers.addLayer(marker);
       } else {
-        const marker = L.circleMarker([feature.lat, feature.lon], {radius: 6, color: "#ffe1c2", weight: 1.5, fillColor: feature.sensor === "MODIS" ? "#ef8055" : "#edbd64", fillOpacity: .9});
+        const marker = L.circleMarker([feature.lat, feature.lon], {radius: 6, color: "#ffe1c2", weight: 1.5, fillColor: feature.sensor === "MODIS" ? "#f0b568" : "#70cddd", fillOpacity: .9});
         const body = document.createElement("div");
         const title = document.createElement("strong"); title.textContent = `${feature.sensor} · ${feature.platform}`;
         const line = document.createElement("p"); line.textContent = `${feature.acquisition_utc} · native confidence ${feature.confidence_raw} · version ${feature.product_version}`;
@@ -757,7 +763,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const note = document.createElement("aside");
       note.className = "static-calendar-note";
       note.setAttribute("role", "note");
-      note.innerHTML = '<span class="static-calendar-note-kicker">STATIC ARCHIVE</span><p>The dated calendar above runs from bundled NASA records. The interactive area-study map requires the local server.</p>';
+      note.innerHTML = '<span class="static-calendar-note-kicker">STATIC ARCHIVE</span><p>The map and harmonized calendar use bundled NASA records. Candidate grouping, observation-mask analysis, and live API exports require the local analysis service.</p>';
       workspace.before(note);
       workspace.hidden = true;
     }
@@ -793,7 +799,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $("#analyze").addEventListener("click", async () => {
     try {
-      const next = validateView({...viewConfig(), bbox: $("#bbox").value.trim(), year: $("#year").value, day: ""});
+      const next = validateView({...viewConfig(), bbox: $("#bbox").value.trim(), year: $("#year").value, month: Number($("#atlas-month")?.value ?? state.month) + 1, day: ""});
       await loadCalendar(next); drawAoi(true);
     } catch (error) { toast(error.message); }
   });
@@ -815,6 +821,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
   $("#year").addEventListener("change", () => $("#analyze").click());
+  $("#atlas-month")?.addEventListener("change", () => $("#analyze").click());
   document.querySelectorAll("[data-series]").forEach(button => button.addEventListener("click", async () => {
     try { await loadCalendar({series: button.dataset.series, day: null}); } catch (error) { toast(error.message); }
   }));
@@ -841,20 +848,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!calendarInitialized) {pendingValidityDetail = event.detail; return;}
     applyValidityDay(event.detail);
   });
-  try {
-    await loadMeta();
-    let next = {};
-    if (location.search) {
-      try {
-        const params = new URLSearchParams(location.search);
-        params.delete("demo");
-        next = validateView({...viewConfig(), ...Object.fromEntries(params)});
-        if (new URLSearchParams(location.search).has("demo")) history.replaceState(null, "", `${location.pathname}?${params}${location.hash}`);
-      }
-      catch (error) { toast(`${error.message} Showing the default view.`); }
-    }
-    await loadCalendar(next); drawAoi(true);
-  } catch (error) { toast(error.message); }
+  const defaultContext = {year: 2024, month: 7, bbox: "-122.2,38.8,-120,41", series: "joint", layer: "ndvi", day: ""};
+  let next = validateView({...viewConfig(), ...defaultContext});
+  const params = new URLSearchParams(location.search);
+  if (["year", "month", "bbox", "series", "day", "layer"].some(key => params.has(key))) {
+    try { next = validateView({...viewConfig(), ...Object.fromEntries(params)}); }
+    catch (error) { toast(`${error.message} Showing the Northern California default view.`); }
+  }
+  state.year = next.year; state.month = next.month; state.series = next.series; state.bbox = next.bbox; state.day = next.day;
+  contextChoice = next.layer;
+  $("#map-status").textContent = `Loading ${monthNames[state.month]} ${state.year} detections and NASA context…`;
+  drawAoi(true);
+  updateContextLayer();
+
+  // The archive metadata includes a detailed regional completeness audit and
+  // can take longer than the calendar query. Start both together so that
+  // metadata work never holds the map and daily workspace behind it.
+  const [metaResult, calendarResult] = await Promise.allSettled([
+    loadMeta({preserveContext: true}),
+    loadCalendar(next).then(() => drawAoi(true)),
+  ]);
+  if (metaResult.status === "rejected") {
+    const status = $("#dataset-status");
+    if (status) status.textContent = "Archive status unavailable · inspect Data sources ↗";
+  }
+  if (calendarResult.status === "rejected") toast(calendarResult.reason?.message || "Could not load the selected archive view.");
   calendarInitialized = true;
   if (pendingValidityDetail) await applyValidityDay(pendingValidityDetail);
   document.dispatchEvent(new CustomEvent("fireatlas:study-ready"));

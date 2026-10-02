@@ -21,6 +21,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from pyproj import Transformer
 from .availability import source_status
+from .provenance import public_source_reference
 
 GRID_METERS = 1000
 GRID_VERSION = "ease6933-centroid-1km-v1"
@@ -176,6 +177,9 @@ def calendar_row_included(raw: str | dict) -> bool:
 
 def _safe_source_uri(uri: str) -> str:
     """Preserve traceability without storing a FIRMS MAP_KEY or URL credentials."""
+    safe_reference = public_source_reference(uri)
+    if safe_reference != uri:
+        return safe_reference or "local-file:local-source"
     parts = urlsplit(uri)
     if parts.scheme not in ("http", "https"):
         return uri
