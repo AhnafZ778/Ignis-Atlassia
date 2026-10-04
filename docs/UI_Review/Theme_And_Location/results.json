@@ -1,0 +1,293 @@
+[
+  {
+    "name": "research",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "assistant",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)",
+    "archiveOpen": true
+  },
+  {
+    "name": "assistant",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)",
+    "archiveOpen": true
+  },
+  {
+    "name": "assistant",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)",
+    "archiveOpen": true
+  },
+  {
+    "name": "replay",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "replay",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "replay",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "terrain-earth",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(2, 6, 9)"
+  },
+  {
+    "name": "terrain-earth",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(2, 6, 9)"
+  },
+  {
+    "name": "terrain-earth",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(2, 6, 9)"
+  },
+  {
+    "name": "index",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(8, 13, 18)"
+  },
+  {
+    "name": "index",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(8, 13, 18)"
+  },
+  {
+    "name": "index",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(8, 13, 18)"
+  },
+  {
+    "name": "atlas",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "atlas",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "atlas",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  }
+]

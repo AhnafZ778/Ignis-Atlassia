@@ -10,20 +10,21 @@
 html,body,#earth{margin:0;width:100%;height:100%;overflow:hidden;background:#020609;color:#dbeaf3;font-family:system-ui,sans-serif}#earth{position:fixed;inset:0;touch-action:pan-y}.esri-view .esri-view-surface--inset-outline:focus::after{outline:none}.esri-attribution{background:#020609cc!important;color:#a0b4c2!important;font-size:9px!important}.esri-attribution a{color:#bacbd5!important}.esri-ui{bottom:0!important}.esri-ui-bottom-left{max-width:calc(100% - 30px)}#loading{position:fixed;inset:0;display:grid;place-content:center;text-align:center;gap:12px;background:#020609;z-index:5;font-size:13px;color:#a9c2d0}#loading[hidden]{display:none}#loading span{font-size:10px;color:#7893a4}.terrain-spinner{width:24px;height:24px;margin:0 auto;border:1px solid #7da3bb38;border-top-color:#efa36c;border-radius:50%;animation:spin 1.2s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#loading.error .terrain-spinner{display:none}.terrain-tools{position:fixed;top:20px;left:20px;z-index:4;display:flex;gap:8px;padding:10px;border:1px solid #8cacbd40;border-radius:12px;background:#091823dd}.terrain-tools button,.terrain-tools a{padding:9px 12px;border:1px solid #8cacbd38;border-radius:7px;color:#deebf3;background:#183140;font:12px system-ui;cursor:pointer;text-decoration:none}.embedded .terrain-tools{display:none}@media(prefers-reduced-motion:reduce){.terrain-spinner{animation:none}}
 
 /* Standalone controls only; the embedded landing globe keeps its composition. */
-body:not(.embedded) .terrain-tools{top:18px;left:18px;right:18px;width:max-content;max-width:calc(100% - 36px);flex-wrap:wrap;padding:12px;border-color:#29434f;background:#0e1e26ed;backdrop-filter:blur(16px);box-shadow:0 12px 32px #0004}
-body:not(.embedded) .terrain-tools :is(a,button){min-height:44px;padding:11px 16px;font-size:14px;border-color:#3d5b69;color:#e9f1f2;background:#152b35}
-body:not(.embedded) .terrain-tools a{color:#70cddd;font-weight:650}
-body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outline-offset:3px}
-.terrain-reading-guide{position:fixed;right:20px;bottom:36px;z-index:4;width:min(320px,calc(100% - 40px));padding:16px;border:1px solid #29434f;border-radius:12px;background:#0e1e26ed;color:#abc0c9;font-size:12px;line-height:1.65;pointer-events:none}
-.terrain-reading-guide strong{display:block;color:#e9f1f2;font-size:14px;margin-bottom:6px}.terrain-reading-guide p{margin:0}.embedded .terrain-reading-guide{display:none}
+body:not(.embedded) .terrain-tools{top:18px;left:18px;right:18px;width:max-content;max-width:calc(100% - 36px);flex-wrap:wrap;padding:12px;border-color:#7A8E9E;background:#fffffff2;backdrop-filter:blur(16px);box-shadow:0 12px 32px #0004}
+body:not(.embedded) .terrain-tools :is(a,button){min-height:44px;padding:11px 16px;font-size:14px;border-color:#7A8E9E;color:#142C3E;background:#FFFFFF}
+body:not(.embedded) .terrain-tools a{color:#2457D6;font-weight:650}
+body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #2457D6;outline-offset:3px}
+.terrain-reading-guide{position:fixed;right:20px;bottom:36px;z-index:4;width:min(320px,calc(100% - 40px));padding:16px;border:1px solid #7A8E9E;border-radius:12px;background:#fffffff2;color:#4D6575;font-size:12px;line-height:1.65;pointer-events:none}
+.terrain-reading-guide strong{display:block;color:#142C3E;font-size:14px;margin-bottom:6px}.terrain-reading-guide p{margin:0}.embedded .terrain-reading-guide{display:none}
 @media(max-width:600px){body:not(.embedded) .terrain-tools{top:12px;left:12px;max-width:calc(100% - 24px);gap:6px;padding:8px}body:not(.embedded) .terrain-tools :is(a,button){font-size:12px;padding:9px 11px}.terrain-reading-guide{right:12px;bottom:36px;width:calc(100% - 24px);padding:12px}}
 </style>
 <script>window.terrainError = message => {const el=document.getElementById('loading');if(el){el.hidden=false;el.classList.add('error');el.querySelector('strong').textContent='Terrain Earth could not load';el.querySelector('span').textContent=message||'Check the connection to the imagery and elevation services.';if(window.fireAtlasEarth?.view)window.dispatchEvent(new Event('terrain-unavailable'));}};</script>
 <script src="https://js.arcgis.com/4.32/" onerror="terrainError('The terrain SDK is unavailable. Retry when connected.')"></script>
+<link rel="stylesheet" href="./workspace.css"><link rel="stylesheet" href="./assistant.css"><script defer src="./lab.js"></script><script defer src="./assistant-views.js"></script><script defer src="./assistant-visuals.js"></script><script defer src="./assistant.js"></script>
 <meta name="fireatlas-static-data" content="./data/v2/">
 <meta name="fireatlas-static-snapshot" content="2026-10-01">
 </head>
-<body>
+<body data-page="terrain">
 <div id="earth" aria-label="Interactive satellite Earth with World Elevation terrain"></div>
 <div id="loading" role="status"><i class="terrain-spinner" aria-hidden="true"></i><strong>Loading satellite Earth</strong><span>Ignis-Atlassia Terrain · World Imagery + World Elevation</span></div>
 <nav class="terrain-tools" aria-label="Terrain navigation"><a href="./">Ignis-Atlassia</a><button id="california" type="button">California terrain</button><button id="world" type="button">Reset globe</button></nav>
@@ -37,7 +38,7 @@ body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outl
   require(['esri/Map','esri/views/SceneView','esri/geometry/Point','esri/Camera','esri/core/reactiveUtils'],(ArcGISMap,SceneView,Point,Camera,reactiveUtils)=>{
     const R=6378137,rad=Math.PI/180,motion=matchMedia('(prefers-reduced-motion: reduce)');
     let visible=true,playing=!motion.matches,ready=false,frameId=0,previous=0,orbit=null,fitAltitude=18000000,fitPadding=0;
-    let globeDirty=true,globe=null,navigationAltitude=null,navigationSequence=0;
+    let globeDirty=true,globe=null,navigationAltitude=null,navigationCamera=null,navigationSequence=0;
     const vector=(lon,lat)=>{const a=lon*rad,b=lat*rad;return [Math.cos(b)*Math.sin(a),Math.sin(b),Math.cos(b)*Math.cos(a)];};
     const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
     const geometryCache=new WeakMap();let elevationRevision=0,samplerHandle=null;
@@ -99,17 +100,26 @@ body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outl
       playing=false;finishOrbit(false);
       const sequence=++navigationSequence;navigationAltitude=camera.position?.z??null;
       const target=camera.position&&camera.declaredClass!=='esri.Camera'?new Camera(camera):camera;
-      scene.goTo(target,{animate:!motion.matches,duration:700}).catch(error=>{if(error.name!=='AbortError')console.warn('Terrain navigation:',error.message);}).finally(()=>{if(sequence===navigationSequence)navigationAltitude=null;});
+      navigationCamera=target.position?target.clone():null;
+      const task=scene.goTo(target,{animate:!motion.matches,duration:700}).then(()=>sequence===navigationSequence).catch(error=>{if(error.name!=='AbortError')console.warn('Terrain navigation:',error.message);return false;}).finally(()=>{if(sequence===navigationSequence){navigationAltitude=null;navigationCamera=null;}});
       start();
+      return task;
     }
     const bridge=window.fireAtlasEarth={view:null,onFrame:null,renderer:'arcgis-terrain',
       setVisible(value){visible=Boolean(value);if(visible)start();},
-      focus(lon,lat,{altitude}={}){if(!Number.isFinite(lon)||!Number.isFinite(lat))return;goTo({position:{longitude:lon,latitude:Math.max(-85,Math.min(85,lat)),z:Number.isFinite(altitude)?Math.max(8000,Math.min(50000000,altitude)):scene.camera.position.z,spatialReference:{wkid:4326}},tilt:0,heading:0});},
+      focus(lon,lat,{altitude}={}){if(!Number.isFinite(lon)||!Number.isFinite(lat))return Promise.reject(Error('Invalid geographic location.'));const z=Number.isFinite(altitude)?Math.max(8000,Math.min(50000000,altitude)):(navigationCamera??scene.camera).position.z;scene.padding={left:0,bottom:z<fitAltitude*.65?0:fitPadding*2};return goTo({position:{longitude:lon,latitude:Math.max(-85,Math.min(85,lat)),z,spatialReference:{wkid:4326}},tilt:0,heading:0,fov:55});},
+      focusBounds(bbox){
+        if(!Array.isArray(bbox)||bbox.length!==4||!bbox.every(Number.isFinite)||bbox[0]>=bbox[2]||bbox[1]>=bbox[3])return Promise.reject(Error('A valid geographic boundary is required.'));
+        const [w,s,e,n]=bbox,lat=(s+n)/2,diagonal=Math.hypot(scene.width,scene.height),half=Math.tan(55*rad/2);
+        const horizontal=(e-w)*rad*R*Math.max(.05,Math.cos(lat*rad)),vertical=(n-s)*rad*R;
+        const altitude=Math.max(12000,Math.min(50000000,1.3*Math.max(horizontal*diagonal/(2*half*scene.width),vertical*diagonal/(2*half*scene.height))));
+        return bridge.focus((w+e)/2,lat,{altitude});
+      },
       setPlaying(value){finishOrbit(false);scene.animation?.stop();playing=Boolean(value);if(playing&&scene.camera.tilt!==0){const camera=scene.camera.clone();camera.tilt=0;camera.heading=0;scene.camera=camera;}start();},
       rotateOnce({duration=8000}={}){finishOrbit(false);playing=false;scene.animation?.stop();if(motion.matches)return Promise.resolve(true);return new Promise(resolve=>{orbit={camera:scene.camera.clone(),elapsed:0,duration:Math.max(1000,duration),resolve};start();});},
       cancelOrbit(){finishOrbit(false);},
-      zoom(delta){const camera=scene.camera.clone();camera.position.z=Math.max(8000,Math.min(50000000,(navigationAltitude??camera.position.z)*Math.exp(delta*.8)));goTo(camera);},
-      reset(){dimensions();scene.padding={left:0,bottom:fitPadding*2};goTo({position:{longitude:20,latitude:12,z:fitAltitude,spatialReference:{wkid:4326}},tilt:0,heading:0,fov:55});}
+      zoom(delta){if(!Number.isFinite(delta))return Promise.reject(Error('Invalid zoom.'));const camera=(navigationCamera??scene.camera).clone();camera.position.z=Math.max(8000,Math.min(50000000,(navigationAltitude??camera.position.z)*Math.exp(delta*.8)));scene.padding={left:0,bottom:camera.position.z<fitAltitude*.65?0:fitPadding*2};return goTo(camera);},
+      reset(){dimensions();scene.padding={left:0,bottom:fitPadding*2};return goTo({position:{longitude:20,latitude:12,z:fitAltitude,spatialReference:{wkid:4326}},tilt:0,heading:0,fov:55});}
     };
     function draw(now){
       frameId=0;if(!ready||!visible||document.hidden)return;
@@ -127,7 +137,7 @@ body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outl
     function start(){if(ready&&!frameId&&visible&&!document.hidden){previous=0;frameId=requestAnimationFrame(draw);}}
     reactiveUtils.watch(()=>scene.camera,()=>{globeDirty=true;});
     reactiveUtils.watch(()=>scene.groundView?.elevationSampler,sampler=>{samplerHandle?.remove();elevationRevision++;if(sampler)samplerHandle=sampler.on('changed',()=>elevationRevision++);},{initial:true});
-    scene.on('pointer-down',()=>{playing=false;finishOrbit(false);navigationAltitude=null;navigationSequence++;});
+    scene.on('pointer-down',()=>{playing=false;finishOrbit(false);navigationAltitude=null;navigationCamera=null;navigationSequence++;});
     // Native SceneView panning moves the camera toward terrain. The landing
     // globe instead orbits at a fixed altitude; wheel and buttons own zooming.
     if(embedded){
@@ -136,7 +146,7 @@ body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outl
         event.stopPropagation();
         if(event.action==='start'){
           playing=false;finishOrbit(false);scene.animation?.stop();
-          navigationAltitude=null;navigationSequence++;
+          navigationAltitude=null;navigationCamera=null;navigationSequence++;
           const camera=scene.camera.clone();
           const focal=Math.hypot(scene.width,scene.height-scene.padding.bottom)/(2*Math.tan(camera.fov*rad/2));
           drag={x:event.x,y:event.y,camera,degreesPerPixel:Math.min(.4,camera.position.z/R/focal/rad)};
@@ -155,7 +165,7 @@ body:not(.embedded) .terrain-tools :focus-visible{outline:2px solid #70cddd;outl
     }
     scene.on('mouse-wheel',()=>{playing=false;finishOrbit(false);});
     scene.on('key-down',event=>{if(event.key===' '){event.stopPropagation();bridge.setPlaying(!playing);}else if(['r','R'].includes(event.key)){event.stopPropagation();bridge.reset();}else if(['+','='].includes(event.key)){event.stopPropagation();bridge.zoom(-.3);}else if(event.key==='-'){event.stopPropagation();bridge.zoom(.3);}});
-    window.addEventListener('resize',()=>{const wasAtGlobe=scene.camera.position.z>fitAltitude*.65;dimensions();scene.padding={left:0,bottom:fitPadding*2};if(wasAtGlobe){const camera=scene.camera.clone();camera.position.z=fitAltitude;scene.camera=camera;}globeDirty=true;});
+    window.addEventListener('resize',()=>{const wasAtGlobe=scene.camera.position.z>fitAltitude*.65;dimensions();scene.padding={left:0,bottom:wasAtGlobe?fitPadding*2:0};if(wasAtGlobe){const camera=scene.camera.clone();camera.position.z=fitAltitude;scene.camera=camera;}globeDirty=true;});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)start();});
     window.addEventListener('pagehide',()=>{cancelAnimationFrame(frameId);finishOrbit(false);samplerHandle?.remove();scene.destroy();});
     motion.addEventListener('change',()=>{if(motion.matches)bridge.setPlaying(false);});

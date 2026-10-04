@@ -1,0 +1,9 @@
+# Isolated Python 3.12+ environment; base FireAtlas stays dependency-light.
+pydantic-ai-slim[openai,google,mcp,ag-ui]==2.53.0
+fastmcp-slim[client,server]==4.0.10
+mcp==2.2.0
+starlette==1.7.0
+uvicorn==0.54.0
+
+# Bounded scientific figure callouts; measurements remain in source evidence.
+opencv-python-headless==4.13.0.92

@@ -1,0 +1,127 @@
+[
+  {
+    "kind": "timeline",
+    "width": 1440,
+    "overflow": false,
+    "bars": 31,
+    "incomplete": 0,
+    "fill": "rgb(0, 110, 134)"
+  },
+  {
+    "kind": "timeline",
+    "width": 390,
+    "overflow": false,
+    "bars": 31,
+    "incomplete": 0,
+    "fill": "rgb(0, 110, 134)"
+  },
+  "Day 25 of 31 · July 25, 2024",
+  {
+    "kind": "dark-theater",
+    "width": 1440,
+    "overflow": false,
+    "surfaces": [
+      [
+        ".assistant-theater-chat",
+        "rgb(24, 39, 51)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-theater-chat-head",
+        "rgb(17, 27, 35)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-visual-toolbar",
+        "rgb(24, 39, 51)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-visual-stage",
+        "rgb(17, 27, 35)",
+        "rgb(236, 241, 244)"
+      ]
+    ]
+  },
+  {
+    "kind": "dark-theater",
+    "width": 390,
+    "overflow": false,
+    "surfaces": [
+      [
+        ".assistant-theater-chat",
+        "rgb(24, 39, 51)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-theater-chat-head",
+        "rgb(17, 27, 35)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-visual-toolbar",
+        "rgb(24, 39, 51)",
+        "rgb(236, 241, 244)"
+      ],
+      [
+        ".assistant-visual-stage",
+        "rgb(17, 27, 35)",
+        "rgb(236, 241, 244)"
+      ]
+    ]
+  },
+  {
+    "kind": "assistant-ready",
+    "enabled": true,
+    "noteHidden": true,
+    "context": {
+      "year": 2024,
+      "month": 7,
+      "bbox": [
+        -122,
+        39.5,
+        -121.3,
+        40.5
+      ],
+      "as_of": "2024-08-14",
+      "series": "joint",
+      "day": "2024-07-25",
+      "distance_km": 2,
+      "gap_days": 1,
+      "region": "norcal",
+      "layer": "ndvi",
+      "case": "park-2024",
+      "start": "2024-07-24",
+      "end": "2024-08-14",
+      "source": "joint",
+      "metric": "density",
+      "revision": 4
+    }
+  },
+  {
+    "kind": "ai-answer",
+    "status": "Evidence ready",
+    "messages": [
+      "For the currently selected UTC day, compare the MODIS and VIIRS detection counts. State the exact date and explain why the sensor counts differ. Cite the stored records.",
+      "AI-assisted interpretationMODIS vs VIIRS detections on the selected UTC day (Park Fire replay)On the selected UTC day in the Park Fire replay, the stored frame shows a large MODIS standard-product detection count while VIIRS S-NPP reports none. The difference is not evidence of sensor disagreement: NASA documented a Suomi-NPP standard-product processing gap spanning this day, so the VIIRS frame is labeled a documented product gap despite complete export requests. Zero is a gap-day absence of eligible records, not proof of no fire. Over the full study, both sensors contribute detections, so the daily imbalance is a known archive artifact rather than a physical pattern.AI& · zai-org/GLM-5.3-Flash · efficient · estimated $0.0016Both sensors date utc · 2024-07-252024-07-25reported metadataInspect source valueMODIS detections · 2024-07-25603recordsInspect source valueMODIS occupied cells · 2024-07-25415cellsInspect source valueVIIRS S-NPP detections · 2024-07-250recordsInspect source valueMODIS label · 2024-07-25Complete export requestreported metadataInspect source valueVIIRS S-NPP label · 2024-07-25Documented product gapreported metadataInspect source valueMODIS study detections2,703recordsInspect source valueVIIRS S-NPP study detections3,521recordsInspect source valueExplain visually ↗Open calculationGo to replayGo to overlapGo to candidatesGo to sourcesInterpretation limitsSatellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+    ],
+    "errors": []
+  },
+  {
+    "kind": "light-theater",
+    "width": 1440,
+    "overflow": false,
+    "chart": true,
+    "fill": "rgb(241, 243, 245)"
+  },
+  {
+    "kind": "light-theater",
+    "width": 390,
+    "overflow": false,
+    "chart": true,
+    "fill": "rgb(241, 243, 245)"
+  },
+  {
+    "browserErrors": []
+  }
+]

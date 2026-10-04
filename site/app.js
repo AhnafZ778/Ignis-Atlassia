@@ -12,7 +12,7 @@ function toast(message) {
 }
 
 async function getJson(path) {
-  const response = await fetch(path);
+  const response = await fetch(path, {signal: AbortSignal.timeout(45000)});
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Could not load data");
   return data;
@@ -84,7 +84,7 @@ async function loadMeta({preserveContext = false} = {}) {
       button.title = hint;
     });
   }
-  $(".series-row p").textContent = "Select an imported product to inspect its observations.";
+
   const weatherButton = $('[data-layer="fwi"]');
   weatherButton.setAttribute("aria-disabled", "true");
   weatherButton.textContent = "Fire weather · unavailable";
@@ -345,8 +345,7 @@ function renderMonths() {
 
 function calendarHeat(value, maximum) {
   const t = Math.log1p(value) / Math.log1p(Math.max(1, maximum));
-  const low = [35, 58, 65], high = [255, 177, 99];
-  return {color: `rgb(${low.map((channel, i) => Math.round(channel + (high[i] - channel) * t)).join(",")})`, dark: t > .58};
+  return window.FireAtlasPalette.heat(t);
 }
 
 function renderDays() {
@@ -495,7 +494,7 @@ function initMap() {
     $("#map-status").textContent = "Map library unavailable. The calendar remains available.";
     return;
   }
-  map = L.map("map", {scrollWheelZoom: false, worldCopyJump: true, preferCanvas: true, minZoom: 0, zoomSnap: 0.25}).setView([39.8, -121.1], 8);
+  map = L.map("map", {scrollWheelZoom: false, worldCopyJump: true, preferCanvas: true, minZoom: 0, zoomSnap: 0.25}).setView([39.8, -121.1], 8);window.FireAtlasViews?.registerMap("atlas",map);
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors", maxZoom: 18, className: "atlas-basemap",
   }).addTo(map);
@@ -651,10 +650,13 @@ function renderTimeline() {
     const isPeak = count > 0 && index === peakDay;
     button.className = "map-timeline-bar" + (mapDay === index + 1 ? " active" : "") + (isPeak ? " peak" : "");
     const partial = !entries[index]?.export_window_complete;
+    button.classList.toggle("incomplete", partial);
+    button.classList.toggle("empty", count === 0);
+    button.setAttribute("aria-pressed", String(mapDay === index + 1));
     const label = partial ? (count ? `${count} imported cell-days · partial export` : "No imported detections · coverage unknown") : `${count} detected cell-days`;
     button.setAttribute("aria-label", `${monthNames[state.month]} ${index + 1}, ${state.year}: ${label}${isPeak ? " · PEAK DAY" : ""}`);
     button.title = `Day ${index + 1} · ${label}${isPeak ? " · Peak" : ""}`;
-    const fill = document.createElement("span"); fill.style.height = `${Math.max(5, count / max * 100)}%`;
+    const fill = document.createElement("span"); fill.style.height = `${count / max * 100}%`;
     button.append(fill); button.addEventListener("click", () => { stopMapPlayback(); setMapDay(index + 1, true); });
     bars.append(button);
   });
@@ -710,7 +712,7 @@ async function updateMap() {
         const note = document.createElement("p"); note.textContent = `All imported points in this grid bin · ${feature.sensors.join(" + ")}. Zoom in to inspect detections.`;
         body.append(title, note); marker.bindPopup(body); markers.addLayer(marker);
       } else {
-        const marker = L.circleMarker([feature.lat, feature.lon], {radius: 6, color: "#ffe1c2", weight: 1.5, fillColor: feature.sensor === "MODIS" ? "#f0b568" : "#70cddd", fillOpacity: .9});
+        const marker = L.circleMarker([feature.lat, feature.lon], {radius: 6, color: "#ffe1c2", weight: 1.5, fillColor: feature.sensor === "MODIS" ? "#A75500" : "#006E86", fillOpacity: .9});
         const body = document.createElement("div");
         const title = document.createElement("strong"); title.textContent = `${feature.sensor} · ${feature.platform}`;
         const line = document.createElement("p"); line.textContent = `${feature.acquisition_utc} · native confidence ${feature.confidence_raw} · version ${feature.product_version}`;
@@ -755,7 +757,7 @@ function render() {
 document.addEventListener("DOMContentLoaded", async () => {
   // A static release contains a complete, prebuilt harmonized calendar, but
   // not the live AOI/map APIs used by this older study workspace. Keep the
-  // static path honest and quiet: the calendar stays available above, while
+  // static path honest and quiet: Regional history retains the calendar, while
   // the server-backed workspace and its tour are omitted from that build.
   if (document.querySelector('meta[name="fireatlas-static-data"]')) {
     const workspace = document.getElementById("study-workspace");
@@ -763,7 +765,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const note = document.createElement("aside");
       note.className = "static-calendar-note";
       note.setAttribute("role", "note");
-      note.innerHTML = '<span class="static-calendar-note-kicker">STATIC ARCHIVE</span><p>The map and harmonized calendar use bundled NASA records. Candidate grouping, observation-mask analysis, and live API exports require the local analysis service.</p>';
+      note.innerHTML = '<span class="static-calendar-note-kicker">STATIC ARCHIVE</span><p>This map uses bundled detection samples. Open Regional history for the archive calendars. Candidate grouping, observation-mask analysis, and live API exports require the local analysis service.</p>';
       workspace.before(note);
       workspace.hidden = true;
     }
@@ -857,6 +859,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   state.year = next.year; state.month = next.month; state.series = next.series; state.bbox = next.bbox; state.day = next.day;
   contextChoice = next.layer;
+  $("#year").replaceChildren(new Option(String(state.year),String(state.year)));
+  $("#atlas-month").value = String(state.month);
+  $("#bbox").value = state.bbox;
   $("#map-status").textContent = `Loading ${monthNames[state.month]} ${state.year} detections and NASA context…`;
   drawAoi(true);
   updateContextLayer();
@@ -877,3 +882,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (pendingValidityDetail) await applyValidityDay(pendingValidityDetail);
   document.dispatchEvent(new CustomEvent("fireatlas:study-ready"));
 });
+
+document.addEventListener('DOMContentLoaded',()=>window.FireAtlasViews?.register('atlas',{
+  capabilities:['study bounds','daily observations','NASA context','calendar'],
+  context:()=>({year:state.year,month:state.month+1,bbox:state.bbox,series:state.series,day:state.day||'',layer:contextChoice}),
+  state:()=>({ready:Boolean(state.data),visible_points:replayFeatures.length,totals_basis:'calendar calculation; displayed points are sampled'}),
+  apply:async cfg=>{stopMapPlayback();contextChoice=cfg.layer||'ndvi';await loadCalendar({year:cfg.year,month:cfg.month-1,bbox:cfg.bbox.join(','),series:cfg.series,day:cfg.day||''});drawAoi(true);updateContextLayer();if(cfg.day)await loadDay(cfg.day);}
+}));

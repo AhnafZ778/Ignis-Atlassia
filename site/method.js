@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const staticDataRoot = document.querySelector('meta[name="fireatlas-static-data"]')?.content;
   const staticCache = new Map();
   function node(tag, attrs, parent, text) { const n=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(attrs||{})) n.setAttribute(k,v); if(text!==undefined)n.textContent=text; parent.append(n); return n; }
-  function svgText(parent,x,y,text,size=11,color='#b6cdd1') {return node('text',{x,y,fill:color,'font-family':'DM, sans-serif','font-size':size,'text-anchor':'middle'},parent,text);}
-  function calendarUrl(c) { const q=new URLSearchParams(c); if(liteEarth)q.set('lite','1');else q.delete('lite'); return `./?${q}#calendar-section`; }
-  if(liteEarth)for(const selector of ['#method-calendar','#context-calendar','#flow-calendar-link']){const link=$(selector);if(link)link.href='./?lite=1#calendar-section';}
-  async function json(url) { const r=await fetch(url); const data=await r.json(); if(!r.ok)throw Error(data.error||`Request failed (${r.status})`); return data; }
+  function svgText(parent,x,y,text,size=12,color='#4D6575') {return node('text',{x,y,fill:color,'font-family':'DM Sans, sans-serif','font-size':size,'text-anchor':'middle'},parent,text);}
+  function calendarUrl(c) { const q=new URLSearchParams(c); if(liteEarth)q.set('lite','1');else q.delete('lite'); return `./atlas.html?${q}#calendar-section`; }
+  if(liteEarth)for(const selector of ['#method-calendar','#context-calendar','#flow-calendar-link']){const link=$(selector);if(link)link.href='./atlas.html?lite=1#calendar-section';}
+  async function json(url) { const r=await fetch(url,{signal:AbortSignal.timeout(90000)}); const data=await r.json(); if(!r.ok)throw Error(data.error||`Request failed (${r.status})`); return data; }
   async function staticFile(path) {
     const target=new URL(path,new URL(staticDataRoot,document.baseURI));
     if(!staticCache.has(target.href)){
@@ -100,12 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const svg=$('#flow-calendar');svg.replaceChildren();node('title',{},svg,'Actual counts for days in the selected historical case');
     const maximum=Math.max(1,...report.days.map(d=>d.joint_detected_cell_days));
     report.days.forEach((d,i)=>{const x=9+(i%5)*38,y=18+Math.floor(i/5)*43,active=d.date_utc===day.date_utc;
-      node('rect',{x,y,width:33,height:37,rx:4,fill:d.joint_detected_cell_days?`rgba(139,211,202,${.12+.65*d.joint_detected_cell_days/maximum})`:'#13252e',stroke:active?'#ffaf7c':'#47616b','stroke-width':active?2:1},svg);
-      svgText(svg,x+16.5,y+12,d.date_utc.slice(8),8,'#c4d8dc');svgText(svg,x+16.5,y+27,d.joint_detected_cell_days,10,'#f3f6f3');
+      node('rect',{x,y,width:33,height:37,rx:4,fill:d.joint_detected_cell_days?`rgba(139,211,202,${.12+.65*d.joint_detected_cell_days/maximum})`:'#EEF1F5',stroke:active?'#2457D6':'#7A8E9E','stroke-width':active?2:1},svg);
+      svgText(svg,x+16.5,y+12,d.date_utc.slice(8),12,'#142C3E');svgText(svg,x+16.5,y+27,d.joint_detected_cell_days,12,'#142C3E');
     });
     const g=$('#flow-grid');g.replaceChildren();node('title',{},g,'Schematic of records grouped into a common grid; the detailed example below uses actual source rows');
-    for(let x=0;x<4;x++)for(let y=0;y<3;y++)node('rect',{x:27+x*36,y:20+y*36,width:36,height:36,fill:x===1&&y===1?'#6aaf9c44':'#11242d',stroke:'#51727c'},g);
-    svgText(g,100,148,'1 km × 1 km · schematic',10);
+    for(let x=0;x<4;x++)for(let y=0;y<3;y++)node('rect',{x:27+x*36,y:20+y*36,width:36,height:36,fill:x===1&&y===1?'#6aaf9c44':'#FFFFFF',stroke:'#7A8E9E'},g);
+    svgText(g,100,148,'1 km × 1 km · schematic',12);
     $('#union-modis').textContent=fmt(day.detected_cell_days.MODIS_SP);$('#union-viirs').textContent=fmt(day.detected_cell_days.VIIRS_SNPP_SP);$('#union-overlap').textContent=fmt(day.co_detected_cell_days);$('#union-total').textContent=fmt(day.joint_detected_cell_days);
     const picker=$('#trace-cell');picker.replaceChildren();
     const cells=[...report.selected_day_cells].sort((a,b)=>b.raw_pixels-a.raw_pixels);
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     holder.querySelector('button')?.click();
     const square=$('.trace-grid-cell svg');square.querySelectorAll('circle').forEach(n=>n.remove());
-    shown.forEach((row,i)=>node('circle',{cx:53+(i%3)*10,cy:54+Math.floor(i/3)*15,r:3,style:`fill:${row.source_id==='MODIS_SP'?'#ffaf7c':'#f4d49d'}`},square));
+    shown.forEach((row,i)=>node('circle',{cx:53+(i%3)*10,cy:54+Math.floor(i/3)*15,r:3,style:`fill:${row.source_id==='MODIS_SP'?'#A75500':'#006E86'}`},square));
   }
   $('#flow-day').addEventListener('change',event=>window.dispatchEvent(new CustomEvent('fireatlas:select-validity-day',{detail:{date:event.target.value}})));
   $('#trace-cell').addEventListener('change',e=>{selectedCell=report.selected_day_cells.find(c=>`${c.grid_x}:${c.grid_y}`===e.target.value);renderCell();});

@@ -481,8 +481,9 @@
       button.setAttribute("aria-label", aria); button.title = aria;
       if (item?.value > 0 && maximum > 0) {
         const t = Math.log1p(item.value) / Math.log1p(maximum);
-        const hue = item.quality === "good" ? 20 : 155;
-        button.style.setProperty("--harm-heat", `hsl(${hue} ${Math.round(38 + t * 27)}% ${Math.round(28 + t * 18)}%)`);
+        const heat = window.FireAtlasPalette.heat(t);
+        button.style.setProperty("--harm-heat", heat.color);
+        button.style.setProperty("--harm-ink", heat.dark ? "#000000" : "#FFFFFF");
       }
       button.addEventListener("click", () => { selectedDate = stamp; renderCalendar(); loadEvidence(stamp); });
       button.addEventListener("keydown", (event) => {
@@ -565,6 +566,14 @@
       const row = document.createElement("div"); row.className = "harm-history-year-row"; row.setAttribute("role", "row");
       const yearLabel = document.createElement("span"); yearLabel.className = "harm-history-year";
       yearLabel.setAttribute("role", "rowheader"); yearLabel.textContent = String(year);
+      const monthJump=document.createElement('div');monthJump.className='harm-history-month-jump';monthJump.setAttribute('aria-label',`Open readable monthly dates for ${year}`);
+      for(let month=1;month<=12;month++){
+        const stamp=`${year}-${String(month).padStart(2,'0')}-01`;
+        const end=new Date(Date.UTC(year,month,0)).toISOString().slice(0,10);
+        const button=document.createElement('button');button.type='button';button.textContent=monthNames[month-1].slice(0,3);button.disabled=end<firstDate||stamp>lastDate;
+        button.setAttribute('aria-label',`Open ${monthNames[month-1]} ${year} daily calendar; missing dates remain unknown`);
+        button.addEventListener('click',()=>selectHistoryDay(stamp<firstDate?firstDate:stamp));monthJump.append(button);
+      }
       const days = document.createElement("div"); days.className = "harm-history-days";
       let cursor = new Date(Date.UTC(year, 0, 1));
       for (let position = 0; position < 366; position += 1) {
@@ -602,7 +611,7 @@
         button.setAttribute("aria-label", accessible); button.title = accessible;
         if (item?.quality === "good" && item.value > 0 && maximum > 0) {
           const t = Math.log1p(item.value) / Math.log1p(maximum);
-          button.style.setProperty("--history-color", `hsl(20 ${Math.round(40 + t * 25)}% ${Math.round(27 + t * 26)}%)`);
+          button.style.setProperty("--history-color", window.FireAtlasPalette.heat(t).color);
         }
         button.addEventListener("click", () => selectHistoryDay(stamp));
         button.addEventListener("keydown", (event) => {
@@ -614,7 +623,7 @@
             day.setUTCDate(day.getUTCDate() + (event.key === "ArrowLeft" ? -1 : 1)); next = day.toISOString().slice(0, 10);
           } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
             const nextYear = year + (event.key === "ArrowUp" ? -1 : 1);
-            const lastDay = new Date(Date.UTC(nextYear, month, 0)).getUTCDate();
+            const lastDay = new Date(Date.UTC(nextYear, Number(stamp.slice(5, 7)), 0)).getUTCDate();
             next = `${nextYear}-${stamp.slice(5, 7)}-${String(Math.min(Number(stamp.slice(8, 10)), lastDay)).padStart(2, "0")}`;
           } else {
             next = `${year}-${event.key === "Home" ? "01-01" : "12-31"}`;
@@ -625,7 +634,8 @@
         buttonByDate.set(stamp, button); days.append(button);
         cursor = new Date(Date.UTC(year, cursor.getUTCMonth(), cursor.getUTCDate() + 1));
       }
-      row.append(yearLabel, days); rows.push(row); grid.append(row);
+      const dailyStrip=document.createElement('details');dailyStrip.className='harm-history-exact-strip';const dailySummary=document.createElement('summary');dailySummary.textContent=`${year} daily overview · expand for exact dates`;dailyStrip.append(dailySummary,days);
+      row.append(yearLabel, monthJump,dailyStrip); rows.push(row); grid.append(row);
     }
     const earliestAvailable = history.days.find((item) => item.quality !== "unknown")?.date;
     const earliestPartial = history.days.find((item) => item.partial_modis_cell_days > 0 || item.partial_viirs_cell_days > 0)?.date;

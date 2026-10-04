@@ -228,7 +228,11 @@ def process(directory, case_id, store=STORE):
 
 @lru_cache(maxsize=2)
 def load_evidence(case_id, path, modified):
-    with connect_store(path) as db:
+    # Reading evidence must not migrate or write the native-mask database.
+    from .core import Connection
+    with sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True, factory=Connection) as db:
+        db.row_factory = sqlite3.Row
+        db.execute('PRAGMA query_only=ON')
         inventory = [dict(row) for row in db.execute('SELECT * FROM granules WHERE case_id=? ORDER BY producer_id', (case_id,))]
         pixels = [dict(row) for row in db.execute('SELECT * FROM pixels WHERE case_id=? ORDER BY producer_id,line,sample', (case_id,))]
     return {'schema': SCHEMA, 'case_id': case_id, 'method': METHOD, 'inventory': inventory, 'pixels': pixels}

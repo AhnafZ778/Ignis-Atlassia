@@ -7,7 +7,7 @@
   const root = new URL(rootMeta.content, document.baseURI);
   const context = window.FireAtlasContext;
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  let regions = new Map(), manifest = {}, observations = [], calendar = null, map, markers, outline, layer, playback = null;
+  let regions = new Map(), manifest = {}, observations = [], calendar = null, map, markers, outline, layer, playback = null, selectionVersion = 0;
   const addDays = (year, month) => new Date(Date.UTC(year, month, 0)).getUTCDate();
   const endDate = (year, month) => `${year}-${String(month).padStart(2, "0")}-${String(addDays(year, month)).padStart(2, "0")}`;
   function compositeDate(date) {
@@ -32,7 +32,8 @@
     map = L.map("static-map", {scrollWheelZoom: true, attributionControl: false, minZoom: 2, maxZoom: 14});
     L.control.attribution({prefix: false, position: "bottomright"}).addTo(map);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 18, attribution: "© OpenStreetMap contributors"}).addTo(map);
-    markers = L.layerGroup().addTo(map); outline = L.rectangle([[0, 0], [0, 0]], {color: "#ff9d63", weight: 2, dashArray: "7 6", fillOpacity: 0}).addTo(map);
+    markers = L.layerGroup().addTo(map); outline = L.rectangle([[0, 0], [0, 0]], {color: "#2457D6", weight: 2, dashArray: "7 6", fillOpacity: 0}).addTo(map);
+    document.querySelectorAll('[data-atlas-scope]').forEach(button => button.addEventListener('click', () => requestAnimationFrame(() => map.invalidateSize({pan: false}))));
   }
   function bboxValues(value) {
     const parts = String(value).split(",").map(Number);
@@ -70,7 +71,12 @@
     markers.clearLayers();
     visible.forEach(item => {
       const raw = item.raw || {}, sensor = item.sensor || "Unknown";
-      const marker = L.circleMarker([Number(raw.latitude), Number(raw.longitude)], {radius: sensor === "MODIS" ? 5 : 4, color: "#fff1df", weight: 1, fillColor: sensor === "MODIS" ? "#e8a85c" : "#67c7d0", fillOpacity: .84});
+      const kind = sensor === "MODIS" ? "modis" : sensor.startsWith("VIIRS") ? "viirs" : "unknown";
+      const marker = L.marker([Number(raw.latitude), Number(raw.longitude)], {
+        icon: L.divIcon({className: 'static-observation-marker', html: `<span class="${kind}" aria-hidden="true"></span>`, iconSize: [12,12], iconAnchor: [6,6]}),
+        title: `${sensor} · ${item.platform} · ${item.acquisition_utc} UTC`,
+        alt: `${sensor} detection`, riseOnHover: true,
+      });
       marker.bindTooltip(`${sensor} · ${item.platform} · ${item.acquisition_utc} UTC`);
       const popup = document.createElement("div"), title = document.createElement("strong"), detail = document.createElement("p");
       title.textContent = `${sensor} · ${item.platform}`;
@@ -82,9 +88,9 @@
     const truncated = stamp ? Boolean(observations.find(day => day.date_utc === stamp)?.truncated) : observations.some(day => day.truncated);
     const dayText = stamp ? `${stamp} UTC` : `${monthNames[Number($("static-month").value) - 1]} ${$("static-year").value} · month view`;
     $("static-map-status").textContent = `${visible.length.toLocaleString()} bundled detections shown · ${dayText}${truncated ? " · sample capped at 200 records per day" : ""}. Absence of points does not show that an area was continuously observed.`;
-    if (truncated) $("static-map-coverage").textContent += " The map point bundle is capped at 200 sample records per day.";
   }
   function updateLayer(name) {
+    $("static-display-label").textContent = `Map display · ${{ndvi:"Vegetation NDVI",landcover:"Land cover",none:"Hotspots only"}[name] || "Geographic context"}`;
     document.querySelectorAll("[data-static-layer]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.staticLayer === name)));
     if (layer) { map.removeLayer(layer); layer = null; }
     if (name === "ndvi" || name === "landcover") {
@@ -94,6 +100,10 @@
       const layerName = isNdvi ? "MODIS_Terra_L3_NDVI_16Day" : "MODIS_Combined_L3_IGBP_Land_Cover_Type_Annual";
       const url = `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layerName}/default/${date}/GoogleMapsCompatible_Level${nativeZoom}/{z}/{y}/{x}.png`;
       layer = L.tileLayer(url, {maxNativeZoom: nativeZoom, maxZoom: 14, attribution: "NASA GIBS / MODIS", opacity: .82, keepBuffer: 3}).addTo(map);
+      $("static-context-status").textContent = `${isNdvi ? "NASA MODIS NDVI · 16-day composite" : "NASA MODIS land cover · annual classes"} · ${date}. Context, not fire-day conditions.`;
+      layer.on('tileerror', () => { if (layer?.options?.attribution === 'NASA GIBS / MODIS') $("static-context-status").textContent = `Some ${isNdvi ? 'NDVI' : 'land-cover'} imagery tiles are unavailable. Observation records remain displayed; try another layer.`; });
+    } else {
+      $("static-context-status").textContent = "Geographic basemap only · no vegetation or weather measurement displayed.";
     }
     const next = {...context.read(), layer: name, region: $("static-region").value, year: Number($("static-year").value), month: Number($("static-month").value)};
     const url = new URL(location.href); url.search = context.write(next); history.replaceState(null, "", url); context.apply(document, next);
@@ -110,16 +120,27 @@
     $("static-day").max = String(addDays(Number($("static-year").value), Number($("static-month").value)));
   }
   async function loadSelection() {
+    const version = ++selectionVersion;
     const region = $("static-region").value, year = Number($("static-year").value), month = Number($("static-month").value);
+    selectedBounds();
+    if (playback) { clearInterval(playback); playback = null; $("static-play").textContent = "▶ Play month"; }
+    $("static-atlas-form").querySelector('button[type=submit]').disabled = true;
+    $("static-map-status").textContent = "Loading the selected archive bundle…";
     const base = `calendar/${region}/${year}.json`;
     const [observationsForYear, calendarForYear] = await Promise.all([
       getGzipJson(`observations/${region}/${year}.json.gz`), getJson(base),
     ]);
+    if (version !== selectionVersion) return;
     observations = Object.entries(observationsForYear.days || {}).filter(([stamp]) => Number(stamp.slice(5, 7)) === month).map(([date_utc, value]) => ({date_utc, ...value}));
     calendar = calendarForYear;
     $("static-day").max = String(addDays(year, month));
     if (Number($("static-day").value) > addDays(year, month)) $("static-day").value = "1";
     renderCoverage(); renderMap();
+    $("static-selection-title").textContent = `${regions.get(region).name || $("static-region").selectedOptions[0].textContent} · ${monthNames[month - 1]} ${year}`;
+    $("static-selection-meta").textContent = `Area ${$("static-bbox").value} · bundled observation samples · UTC`;
+    document.querySelector('.static-study-editor').open = false;
+    $("static-atlas-form").querySelector('button[type=submit]').disabled = false;
+    ['static-play','static-all','static-day','static-fit'].forEach(id => { $(id).disabled = false; });
     const selected = {...context.read(), region, year, month, bbox: $("static-bbox").value, as_of: endDate(year, month)};
     const url = new URL(location.href); url.search = context.write(selected); history.replaceState(null, "", url); context.apply(document, selected);
     const query = context.write(selected, {path: "./research.html"}); $("static-study-link").href = query;
@@ -149,7 +170,22 @@
       map.fitBounds([[south, west], [north, east]]);
       updateLayer(ctx.layer === "landcover" ? "landcover" : ctx.layer === "none" ? "none" : "ndvi");
       await loadSelection();
-      $("static-atlas-form").addEventListener("submit", async event => { event.preventDefault(); $("static-day-label").value = "All dates"; $("static-all").setAttribute("aria-pressed", "true"); await loadSelection(); fit(); });
+      $("static-atlas-form").addEventListener("submit", async event => {
+        event.preventDefault(); $("static-day-label").value = "All dates"; $("static-all").setAttribute("aria-pressed", "true");
+        try { await loadSelection(); fit(); }
+        catch (error) {
+          context.status($("static-atlas-status"), "VIEW UNAVAILABLE", "unavailable");
+          $("static-map-status").textContent = error.message;
+          markers.clearLayers();
+          $("static-atlas-form").querySelector('button[type=submit]').disabled = false;
+          document.querySelector('.static-study-editor').open = true;
+        }
+      });
+      $("static-atlas-form").addEventListener('input', () => {
+        $("static-selection-meta").textContent = "Settings changed. Apply the view to update the observations.";
+        if (playback) { clearInterval(playback); playback = null; $("static-play").textContent = "▶ Play month"; }
+        ['static-play','static-all','static-day','static-fit'].forEach(id => { $(id).disabled = true; });
+      });
       $("static-region").addEventListener("change", () => { const b = regions.get($("static-region").value).bbox; $("static-bbox").value = b.join(","); });
       $("static-month").addEventListener("change", () => { $("static-day").max = String(addDays(Number($("static-year").value), Number($("static-month").value))); });
       $("static-year").addEventListener("change", () => { $("static-day").max = String(addDays(Number($("static-year").value), Number($("static-month").value))); });
@@ -158,7 +194,11 @@
       $("static-play").addEventListener("click", play); $("static-fit").addEventListener("click", fit);
       document.querySelectorAll("[data-static-layer]").forEach(button => button.addEventListener("click", () => updateLayer(button.dataset.staticLayer)));
       window.addEventListener("beforeunload", () => playback && clearInterval(playback));
-    } catch (error) { context.status($("static-atlas-status"), "BUNDLE UNAVAILABLE", "unavailable"); $("static-map-status").textContent = error.message; }
+    } catch (error) {
+      context.status($("static-atlas-status"), "BUNDLE UNAVAILABLE", "unavailable"); $("static-map-status").textContent = error.message;
+      $("static-atlas-form").querySelector('button[type=submit]').disabled = false;
+      document.querySelector('.static-study-editor').open = true;
+    }
   }
   document.addEventListener("DOMContentLoaded", init);
 })();

@@ -10,6 +10,7 @@ dependencies = [
 
 [project.optional-dependencies]
 masks = ["numpy>=1.24,<3"]
+assistant = ["pydantic-ai-slim[openai,google,mcp,ag-ui]==2.53.0; python_version >= '3.12'", "fastmcp-slim[client,server]==4.0.10; python_version >= '3.12'", "mcp==2.2.0; python_version >= '3.12'", "starlette==1.7.0; python_version >= '3.12'", "uvicorn==0.54.0; python_version >= '3.12'"]
 
 [project.scripts]
 fireatlas = "fireatlas.cli:main"
@@ -22,4 +23,4 @@ build-backend = "setuptools.build_meta"
 include = ["fireatlas*"]
 
 [tool.setuptools.package-data]
-fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "static/incident-media/*", "samples/*"]
+fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "static/incident-media/*", "samples/*", "assistant/system.md"]

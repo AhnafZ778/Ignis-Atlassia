@@ -1,0 +1,257 @@
+[
+  {
+    "name": "atlas",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 452.75,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "atlas",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 439.03125,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "atlas",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 706.84375,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 711.8125,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 716.09375,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 826.9375,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 643.328125,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 629.609375,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-candidates",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 761.734375,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-exposure",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "research-validation",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "data",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "method",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "review",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "replay",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 594.515625,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "replay",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 580.796875,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "replay",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 750.265625,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "assistant",
+    "width": 1440,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 480.796875,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "assistant",
+    "width": 1024,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 558,
+    "background": "rgb(247, 245, 239)"
+  },
+  {
+    "name": "assistant",
+    "width": 390,
+    "loaded": true,
+    "errors": [],
+    "overflow": false,
+    "mapTop": 643.515625,
+    "background": "rgb(247, 245, 239)"
+  }
+]

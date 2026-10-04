@@ -1,0 +1,74 @@
+[
+  {
+    "name": "index",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "atlas",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "replay",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "research",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "research-candidates",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "research-exposure",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "research-validation",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "data",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "method",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "review",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "assistant",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  },
+  {
+    "name": "terrain-earth",
+    "pass": true,
+    "errors": [],
+    "assets": []
+  }
+]

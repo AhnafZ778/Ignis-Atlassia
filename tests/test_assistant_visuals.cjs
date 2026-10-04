@@ -1,0 +1,15 @@
+const assert = require('node:assert/strict');
+const {describe, valid} = require('../fireatlas/static/assistant-visuals.js');
+const MODIS='MODIS_SP',VIIRS='VIIRS_SNPP_SP';
+const frames=[{date_utc:'2024-07-01',products:{[MODIS]:{detections:0,state:'unknown'},[VIIRS]:{detections:23,state:'partial_export'}}},{date_utc:'2024-07-02',products:{[MODIS]:{detections:null,state:'unknown'},[VIIRS]:{detections:7,state:'complete_export'}}}];
+const daily=describe({operation:'replay',payload:{frames}});
+assert.deepEqual(daily.rows.map(r=>r.values),[[0,23],[null,7]]);
+assert.equal(daily.unit,'eligible detections');assert.equal(daily.rows[1].path,'/frames/1/products');
+assert.equal(daily.rows[0].states[0],'unknown');assert.equal(valid(null),false);assert.equal(valid(undefined),false);assert.equal(valid(0),true);assert.equal(valid(Infinity),false);
+const missing=describe({operation:'missingness',payload:{days:frames.map(f=>({date:f.date_utc,products:f.products}))}});
+assert.equal(missing.kind,'availability');assert.deepEqual(missing.rows.map(r=>r.values),daily.rows.map(r=>r.values));assert.equal(missing.rows[1].path,'/days/1/products');
+const overlap=describe({operation:'research',payload:{complete_exports:{[MODIS]:true,[VIIRS]:false},overlap:{daily:[{date:'2024-07-01',modis:3,viirs:5,both:2,union:6}]}}});
+assert.deepEqual(overlap.rows[0].values,[3,5,2]);assert.deepEqual(overlap.rows[0].states,[true,false,false]);assert.equal(overlap.unit,'occupied cells per UTC day');
+assert.equal(describe({operation:'replay',payload:{frames}},'workflow').kind,'workflow');
+const absent=describe({operation:'replay',payload:{frames:[]}});assert.equal(absent.rows.length,0);
+console.log('Evidence graphs preserve source counts, units, exact paths, unknown states and null values.');

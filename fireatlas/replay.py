@@ -134,8 +134,25 @@ def _source_export_status(db, case: dict, source_id: str, stamp: str) -> dict:
         "pass_cloud_opportunity": "unknown"}
 
 
-def build_case(db, case_id: str) -> dict:
-    case = _case_spec(case_id)
+def build_case(db, case_id: str, *, study: dict | None = None, max_records: int | None = None) -> dict:
+    # Custom studies share the exact named-case method without modifying CASES.
+    case = _case_spec(case_id) if study is None else dict(study)
+    if study is not None:
+        from .core import validate_bbox
+        validate_bbox(tuple(case["bbox"]))
+        first, last = date.fromisoformat(case["start"]), date.fromisoformat(case["end"])
+        if first > last or (last - first).days > 30:
+            raise ValueError("Custom observation replay supports at most 31 ordered UTC days.")
+        case.setdefault("gaps", [])
+        # Keep documented product gaps relevant to custom AOIs too.
+        from .availability import notices
+        for item in notices():
+            source = item.get("source_id")
+            start, end = item.get("start_utc", "")[:10], item.get("end_utc", "")[:10]
+            if source in SOURCES and start and end:
+                case["gaps"].append({"source_id": source, "start": start, "end": end,
+                                     "partial_first": item["_start"].strftime('%H:%M:%S') != '00:00:00',
+                                     "partial_last": item["_end"].strftime('%H:%M:%S') != '23:59:59'})
     end_exclusive = (date.fromisoformat(case["end"]) + timedelta(days=1)).isoformat()
     west, south, east, north = case["bbox"]
     raw_rows = db.execute("""
@@ -147,8 +164,12 @@ def build_case(db, case_id: str) -> dict:
         WHERE b.demo=0 AND o.source_id IN (?,?)
           AND o.processing_level='SP' AND o.acquisition_utc>=? AND o.acquisition_utc<?
           AND o.lon>=? AND o.lon<=? AND o.lat>=? AND o.lat<=?
-        ORDER BY o.acquisition_utc,o.detection_id
-    """, (*SOURCES, case["start"], end_exclusive, west, east, south, north)).fetchall()
+        ORDER BY o.acquisition_utc,o.detection_id LIMIT ?
+    """, (*SOURCES, case["start"], end_exclusive, west, east, south, north,
+            max_records + 1 if max_records is not None else -1)).fetchall()
+
+    if max_records is not None and len(raw_rows) > max_records:
+        raise ValueError("Detailed replay exceeds the record limit; narrow the area or interval. No sampled total was substituted.")
 
     unique = {}
     duplicate_count = 0

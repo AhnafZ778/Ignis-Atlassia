@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         const url=staticDataRoot
           ? new URL(`validity/${id}${date?`/${date}`:''}.json`,new URL(staticDataRoot,document.baseURI)).href
           : `/api/validity?${new URLSearchParams({case:id,...(date?{date}:{})})}`;
-        const response=await fetch(url);next=await response.json();if(!response.ok)throw new Error(next.error||'Study unavailable');cache.set(key,next);
+        const response=await fetch(url,{signal:AbortSignal.timeout(90000)});next=await response.json();if(!response.ok)throw new Error(next.error||'Study unavailable');cache.set(key,next);
       }
       if(current!==request)return;
       report=next;selectedDate=next.selected_date_utc;render();

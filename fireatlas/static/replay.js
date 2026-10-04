@@ -80,7 +80,7 @@
     const query = params.toString();
     history.replaceState(null, "", `${location.pathname}${query ? `?${query}` : ""}`);
     document.querySelectorAll("[data-context-link]").forEach(link => {
-      const destination = new URL(link.getAttribute("href") || "/", location.href);
+      const destination = new URL(link.getAttribute("href") || "./", location.href);
       const contextParams = new URLSearchParams(standard);
       const contextQuery = contextParams.toString();
       link.href = `${destination.pathname}${contextQuery ? `?${contextQuery}` : ""}${destination.hash}`;
@@ -157,23 +157,31 @@
     const items = visibleCells.map(cell => ({cell, value: heatValue(cell)}))
       .filter(item => Number.isFinite(item.value) && item.value > 0);
     const max = Math.max(1, ...items.map(item => item.value));
-    context.globalCompositeOperation = "lighter";
-    const rx = canvas.width * 0.016;
-    const ry = rx * canvas.width / canvas.height;
-    for (const item of items) {
-      const cell = item.cell;
-      const x = ((cell.longitude - bbox[0]) / (bbox[2] - bbox[0])) * canvas.width;
-      const y = ((bbox[3] - cell.latitude) / (bbox[3] - bbox[1])) * canvas.height;
-      const intensity = Math.max(.12, Math.min(1, item.value / max));
-      const radius = rx * (.72 + .42 * Math.sqrt(intensity));
-      const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-      gradient.addColorStop(0, `rgba(255,244,185,${.58 * intensity})`);
-      gradient.addColorStop(.26, `rgba(255,177,92,${.48 * intensity})`);
-      gradient.addColorStop(.62, `rgba(239,91,58,${.26 * intensity})`);
-      gradient.addColorStop(1, "rgba(180,47,38,0)");
-      context.fillStyle = gradient;
-      context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    // Accumulate one scalar field, then apply the same magnitude ramp as the legend.
+    // Frame-relative normalization and eligible cell values remain unchanged.
+    const width=canvas.width,height=canvas.height,field=new Float32Array(width*height);
+    const rx=width*.016;
+    for(const {cell,value} of items){
+      const x=((cell.longitude-bbox[0])/(bbox[2]-bbox[0]))*width;
+      const y=((bbox[3]-cell.latitude)/(bbox[3]-bbox[1]))*height;
+      const intensity=Math.max(.12,Math.min(1,value/max));
+      const sigma=rx*(.72+.42*Math.sqrt(intensity))/2;
+      const radius=3*sigma;
+      for(let py=Math.max(0,Math.floor(y-radius));py<Math.min(height,Math.ceil(y+radius));py++){
+        for(let px=Math.max(0,Math.floor(x-radius));px<Math.min(width,Math.ceil(x+radius));px++){
+          const d=((px-x)**2+(py-y)**2)/(sigma*sigma);
+          if(d<=9)field[py*width+px]+=intensity*Math.exp(-d/2);
+        }
+      }
     }
+    let fieldMax=0;for(const value of field)fieldMax=Math.max(fieldMax,value);
+    const pixels=context.createImageData(width,height);
+    if(fieldMax>0)for(let i=0;i<field.length;i++){
+      const t=field[i]/fieldMax;if(t<.008)continue;
+      const color=heatColor(t);const p=i*4;
+      pixels.data[p]=color[0];pixels.data[p+1]=color[1];pixels.data[p+2]=color[2];pixels.data[p+3]=Math.round(215*Math.min(1,Math.sqrt(t)));
+    }
+    context.putImageData(pixels,0,0);
     const url = canvas.toDataURL("image/png");
     heatUrl = url;
     if (mapMode === "2d" && leafletMap) updateLeafletHeat();
@@ -281,7 +289,7 @@
     const map = document.createElement("div"); map.id = "replay-map-2d";
     map.setAttribute("aria-label", "Two-dimensional satellite map fallback with the same selected date heatmap");
     container.insertBefore(map, $("replay-loading"));
-    leafletMap = L.map(map, {zoomControl: true, scrollWheelZoom: true, preferCanvas: true, attributionControl: true});
+    leafletMap = L.map(map, {zoomControl: true, scrollWheelZoom: true, preferCanvas: true, attributionControl: true});window.FireAtlasViews?.registerMap("replay",leafletMap);
     leafletMap.setView([(south + north) / 2, (west + east) / 2], 9);
     leafletBase = L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxNativeZoom: 19, maxZoom: 19, attribution: "Imagery © Esri", keepBuffer: 2,
@@ -297,7 +305,7 @@
     if (sdkPromise) return sdkPromise;
     sdkPromise = new Promise((resolve, reject) => {
       const style = document.createElement("link");
-      style.rel = "stylesheet"; style.href = "https://js.arcgis.com/4.32/esri/themes/dark/main.css";
+      style.rel = "stylesheet"; style.href = "https://js.arcgis.com/4.32/esri/themes/light/main.css";
       document.head.append(style);
       const script = document.createElement("script"); script.src = "https://js.arcgis.com/4.32/";
       script.async = true;
@@ -318,7 +326,7 @@
   }
 
   function heatColor(intensity) {
-    const stops = [[0, [255, 245, 183]], [.38, [255, 190, 100]], [.72, [245, 105, 66]], [1, [179, 43, 39]]];
+    const stops = [[0, [255, 242, 178]], [.25, [254, 196, 79]], [.5, [252, 141, 60]], [.75, [227, 74, 51]], [1, [179, 0, 0]]];
     let low = stops[0], high = stops[stops.length - 1];
     for (let index = 1; index < stops.length; index += 1) {
       if (intensity <= stops[index][0]) { low = stops[index - 1]; high = stops[index]; break; }
@@ -527,6 +535,7 @@
   }
 
   function renderFrame() {
+    assistantSelection = null;
     const frame = currentFrame(); if (!frame) return;
     const counts = sourceCounts(frame);
     $("day-modis").textContent = number(counts.modis);
@@ -549,6 +558,11 @@
     $("daily-summary").innerHTML = `<span>${dailyLine}</span>`;
     renderTimeline(); renderDayStatus(frame); renderObservationTable(frame); drawHeatmap(); syncUrl();
     $("export-frame").disabled = false; $("export-all").disabled = false;
+    $("previous-frame").disabled = frameIndex === 0;
+    $("next-frame").disabled = frameIndex >= bundle.frames.length - 1;
+    $("play-replay").disabled = Boolean(playTimer) || bundle.frames.length < 2;
+    $("stop-replay").disabled = !playTimer;
+    window.dispatchEvent(new CustomEvent('fireatlas:study-changed'));
   }
 
   function renderCaseSummary(entry) {
@@ -649,6 +663,8 @@
       $("map-inspector").innerHTML = "<strong>Map inspector</strong><span>No reported cell is within 2.5 km of that location.</span>";
       return;
     }
+    assistantSelection = {cell_id: cellKey(nearest), geometry:{type:'Polygon',coordinates:[nearest.ring]}, date:currentFrame().date_utc};
+    window.dispatchEvent(new CustomEvent('fireatlas:selection-changed',{detail:{label:'Selected replay cell center',point:[nearest.longitude,nearest.latitude],digits:4,date:currentFrame().date_utc}}));
     const dates = selectedMetric === "persistence" ? `${number(nearest.observed_days)} distinct observed dates` : bundle.frames[frameIndex].date_utc;
     const frp = selectedSource === "MODIS_SP" ? nearest.modis_frp_max_mw : selectedSource === "VIIRS_SNPP_SP" ? nearest.viirs_frp_max_mw : null;
     const sensorLine = `${number(nearest.modis_detection_count)} MODIS / ${number(nearest.viirs_detection_count)} VIIRS detections in view`;
@@ -689,6 +705,8 @@
       setContextAvailability(); syncUrl();
     }));
     $("day-slider").addEventListener("input", event => selectFrame(event.target.value));
+    $("previous-frame").addEventListener("click", () => { stopPlayback(); selectFrame(frameIndex - 1); });
+    $("next-frame").addEventListener("click", () => { stopPlayback(); selectFrame(frameIndex + 1); });
     $("play-replay").addEventListener("click", startPlayback);
     $("stop-replay").addEventListener("click", stopPlayback);
     $("view-3d").addEventListener("click", () => { requestedMapMode = "3d"; setMapMode("3d"); });
@@ -741,6 +759,50 @@
       $("replay-workspace").setAttribute("aria-busy", "false");
     }
   }
+
+
+  let assistantSelection = null, assistantAnnotations = null;
+  async function awaitTerrain(){const until=Date.now()+45000;while(!sceneView&&Date.now()<until)await new Promise(resolve=>setTimeout(resolve,250));if(!sceneView)throw Error('The terrain scene is unavailable or still loading. The flat map remains usable; choose Flat view to focus it.');}
+  document.addEventListener('DOMContentLoaded', () => window.FireAtlasViews?.register('replay', {
+    capabilities: ['UTC day','sensor','heat metric','landscape','terrain view','cell inspection','heat figure'],
+    context: () => bundle ? {case: selectedCase.startsWith('custom') ? undefined : selectedCase, bbox: bundle.case.bbox, start: bundle.case.start, end: bundle.case.end, as_of: bundle.case.end, day: currentFrame()?.date_utc || '', source: selectedSource, metric: selectedMetric, context: selectedContext, view: mapMode, series: selectedSource === 'MODIS_SP' ? 'modis' : selectedSource === 'VIIRS_SNPP_SP' ? 'viirs-snpp' : 'joint'} : {},
+    state: () => ({ready: Boolean(bundle), method: bundle?.method, displayed_cells: visibleCells.length, totals_basis: 'full backend calculation; never visible marks', map_view: mapMode}),
+    selection: () => assistantSelection,
+    focusPlace:async place=>{
+      if(requestedMapMode==='3d'&&!sceneView)await awaitTerrain();
+      if(mapMode==='3d'&&sceneView){
+        const sdk=window.replayArcgis;
+        if(sceneView._assistantPlace)sceneView.graphics.remove(sceneView._assistantPlace);
+        const point=new sdk.Graphic({geometry:{type:'point',longitude:place.longitude,latitude:place.latitude},symbol:{type:'simple-marker',color:[169,201,144],size:12,outline:{color:'white',width:2}}});
+        sceneView.graphics.add(point);sceneView._assistantPlace=point;
+        await sceneView.goTo({center:[place.longitude,place.latitude],zoom:Math.min(13,Math.max(4,Math.log2(360/Math.max(.01,place.bbox[2]-place.bbox[0])))),tilt:55},{animate:false});
+      }else{
+        const [w,s,e,n]=place.bbox;leafletMap.fitBounds([[s,w],[n,e]],{maxZoom:14,animate:false});
+        leafletMap._assistantPlace?.remove();leafletMap._assistantPlace=L.circleMarker([place.latitude,place.longitude],{color:'#fff',radius:8}).addTo(leafletMap).bindTooltip(place.title+' · geographic reference',{permanent:true}).openTooltip();
+      }
+      let notice=$('replay-camera-note');if(!notice){notice=document.createElement('p');notice.id='replay-camera-note';notice.className='replay-help';notice.setAttribute('role','status');$('replay-workspace').append(notice);}
+      notice.textContent='Camera at '+place.title+'. Geographic reference only; study boundary, dates and observation records are unchanged.';
+    },
+    apply: async (cfg, action) => {
+      stopPlayback();
+      if (cfg.case && cfg.case !== selectedCase) await loadCase(cfg.case);
+      if (!cfg.case && action?.result_id) {
+        const response = await getJson(`/api/assistant/evidence/${encodeURIComponent(action.result_id)}`);
+        if (response.kind !== 'evidence' || response.body.operation !== 'replay') throw Error('A custom replay requires its complete replay result. Open it in the assistant workspace.');
+        bundle = response.body.payload; selectedCase = bundle.case_id;
+        if (![...caseSelect.options].some(o => o.value === selectedCase)) caseSelect.add(new Option('Custom observation study', selectedCase));
+        caseSelect.value = selectedCase; frameIndex = 0; renderCaseSummary({...bundle.case, summary:bundle.summary}); setContextAvailability();
+      }
+      if (!bundle) throw Error('Replay is still loading. Retry after the observation bundle appears.');
+      if (bundle.case.start !== cfg.start || bundle.case.end !== cfg.end || JSON.stringify(bundle.case.bbox) !== JSON.stringify(cfg.bbox)) throw Error('This replay does not match the requested study. Open the result in the assistant workspace.');
+      selectedSource = cfg.source; selectedMetric = cfg.metric; $('source-select').value = selectedSource; $('metric-select').value = selectedMetric; updateMetricControls();
+      if (cfg.context && ['terrain','ndvi','landcover','burned-area'].includes(cfg.context)) { selectedContext = cfg.context; setContextAvailability(); }
+      const day = cfg.day || cfg.start; selectFrame(Math.max(0,bundle.frames.findIndex(f => f.date_utc === day)));
+      if(cfg.view){requestedMapMode=cfg.view;if(cfg.view==='3d'&&!sceneView)await awaitTerrain();setMapMode(cfg.view);}
+    },
+    capture: async () => { if(mapMode==='3d' && sceneView){try{const figure=await sceneView.takeScreenshot({width:1200,height:800,format:'png'});return {data:figure.dataUrl.split(',')[1],mime:'image/png',caption:`Selected terrain scene · ${currentFrame().date_utc} · ${selectedSource} · ${selectedMetric}; streamed geographic context, frame-relative heat`};}catch{}} if (!heatUrl) throw Error('The heat layer is still loading.'); return {data:heatUrl.split(',')[1],mime:'image/png',caption:`Selected heat overlay only · ${currentFrame().date_utc} · ${selectedSource} · ${selectedMetric}; basemap omitted, frame-relative smoothing`}; },
+    annotate: items => { if (!leafletMap) return; assistantAnnotations?.remove(); assistantAnnotations = L.layerGroup().addTo(leafletMap); items.forEach(item => { const g=item.body.geometry; if (!g) return; const c=item.body.context; if(c.start!==bundle.case.start || JSON.stringify(c.bbox)!==JSON.stringify(bundle.case.bbox))return; const feature=L.geoJSON(g,{style:{color:'#fff',weight:3,fill:false},pointToLayer:(_,point)=>L.circleMarker(point,{color:'#fff',radius:7,fill:false})}).addTo(assistantAnnotations); feature.bindTooltip(String(item.body.text)); }); }
+  }));
 
   document.addEventListener("DOMContentLoaded", init);
 })();

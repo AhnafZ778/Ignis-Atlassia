@@ -122,6 +122,13 @@ ASSETS = {
     "/replay.html": ("replay.html", "text/html; charset=utf-8"),
     "/replay.css": ("replay.css", "text/css; charset=utf-8"),
     "/replay.js": ("replay.js", "text/javascript; charset=utf-8"),
+    "/assistant.html": ("assistant.html", "text/html; charset=utf-8"),
+    "/assistant.css": ("assistant.css", "text/css; charset=utf-8"),
+    "/assistant.js": ("assistant.js", "text/javascript; charset=utf-8"),
+    "/assistant-views.js": ("assistant-views.js", "text/javascript; charset=utf-8"),
+    "/assistant-visuals.js": ("assistant-visuals.js", "text/javascript; charset=utf-8"),
+    "/assistant-map.js": ("assistant-map.js", "text/javascript; charset=utf-8"),
+    "/assistant-workspace.js": ("assistant-workspace.js", "text/javascript; charset=utf-8"),
     "/replay-context/manifest.json": ("replay-context/manifest.json", "application/json; charset=utf-8"),
     "/replay-context/park-2024/terrain.png": ("replay-context/park-2024/terrain.png", "image/png"),
     "/replay-context/park-2024/ndvi.png": ("replay-context/park-2024/ndvi.png", "image/png"),
@@ -159,7 +166,7 @@ def _research_context(params):
             "month": int(params.get("month", ["7"])[0]), "bbox": _bbox(params),
             "as_of": params.get("as_of", [None])[0],
             "distance_km": float(params.get("distance_km", ["2"])[0]),
-            "gap_days": int(params.get("gap_days", ["1"])[0])}
+            "gap_days": int(params.get("gap_days", ["1"])[0]), **({"start_date": params["start_date"][0]} if params.get("start_date") else {})}
 
 
 def _records(db, sources, bbox, start, end, limit):
@@ -176,6 +183,9 @@ def _records(db, sources, bbox, start, end, limit):
 
 def handler_factory(database: Path):
     database = Path(database)
+    from .assistant import AssistantService
+    from .assistant.http import handle as assistant_request
+    assistant = AssistantService(database)
     globe_lock = threading.Lock()
     globe_cache = {}
     calendar_cache_lock = threading.Lock()
@@ -224,6 +234,8 @@ def handler_factory(database: Path):
                           "application/json; charset=utf-8", status)
 
         def do_POST(self):
+            if assistant_request(self, assistant):
+                return
             path = urlsplit(self.path).path
             if path == "/api/data/sync":
                 # A browser can start ingestion only through the local app, never cross-site.
@@ -296,6 +308,8 @@ def handler_factory(database: Path):
                 self._json({"error": "database unavailable"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
         def do_GET(self):
+            if assistant_request(self, assistant):
+                return
             nonlocal replay_cache_stamp
             url = urlsplit(self.path)
             if url.path == "/api/native-masks":
@@ -651,6 +665,11 @@ def handler_factory(database: Path):
             except sqlite3.Error:
                 self._json({"error": "database unavailable"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
+        def do_DELETE(self):
+            if not assistant_request(self, assistant):
+                self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
+
+    Handler.assistant = assistant
     return Handler
 
 
@@ -682,6 +701,7 @@ def main():
         pass
     finally:
         server.server_close()
+        server.RequestHandlerClass.assistant.close()
 
 
 if __name__ == "__main__":

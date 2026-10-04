@@ -236,8 +236,14 @@ def coverage(rows, mask, config, start, cutoff, complete):
             "note": "Rates apply only to supplied observed cell-days, not the full AOI. Missing mask rows remain unknown. No joint exposure is inferred."}
 
 
-def report(db, *, year=2015, month=7, bbox=(-122, 39, -120, 41), as_of=None, distance_km=2, gap_days=1, mask=None):
+def report(db, *, year=2015, month=7, bbox=(-122, 39, -120, 41), as_of=None, distance_km=2, gap_days=1, mask=None, start_date=None):
     config, start, cutoff = context(year, month, bbox, as_of, distance_km, gap_days)
+    if start_date is not None:
+        selected_start = date.fromisoformat(start_date)
+        if not start <= selected_start <= cutoff:
+            raise ValueError("Research start must fall inside the selected month and cutoff.")
+        start = selected_start
+        config["start_date"] = start.isoformat()
     rows = load_records(db, config, start, cutoff)
     complete = {source: _complete_month(db, start.isoformat()[:7], (source,), config["bbox"]) for source in SOURCES}
     batches = db.execute("""SELECT DISTINCT b.source_id,b.file_sha256,b.source_uri,b.demo FROM batches b
@@ -264,6 +270,8 @@ def report(db, *, year=2015, month=7, bbox=(-122, 39, -120, 41), as_of=None, dis
               "gates": {"calibration": "Requires matched overpasses, observation masks, reference labels and independent holdout validation.",
                         "radar": "Requires co-registered SAR before/after scenes, quality masks and a dated optical cross-check.",
                         "spread": "Requires a validated regional fuel/terrain model, weather ensemble and held-out arrival observations."}}
+    if start_date is not None:
+        result["method_version"] = "fireatlas-research-window-v1"
     from .presentation import PREFIX, provenance as presentation_provenance
     if result["demo_data"] and any(p["source_uri"].startswith(PREFIX) for p in result["provenance"]):
         result["presentation"] = presentation_provenance()

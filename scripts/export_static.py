@@ -124,12 +124,22 @@ def _rebase_local_asset_urls(site: Path) -> None:
         if not path.is_file() or path.suffix not in TEXT_SUFFIXES:
             continue
         text = path.read_text(encoding="utf-8")
-        text = quoted.sub(lambda match: f"{match['q']}{_relative_static_path(match['url'], routes)}{match['q']}", text)
+        def rebase_quoted(match):
+            # A bare slash in JavaScript/JSON is commonly a separator or JSON
+            # pointer escape, not a homepage URL. Rewriting it corrupts exact
+            # evidence lookup. Mark homepage links explicitly as ./ in scripts.
+            if match['url']=='/':
+                # HTML also contains inline scripts. Only an actual link/form
+                # attribute establishes that a bare slash is a homepage route.
+                attribute=path.suffix=='.html' and re.search(r'(?:href|action|src)\s*=\s*$',text[max(0,match.start()-40):match.start()],re.I)
+                if not attribute and path.suffix!='.css':return match[0]
+            return f"{match['q']}{_relative_static_path(match['url'], routes)}{match['q']}"
+        text = quoted.sub(rebase_quoted, text)
         text = unquoted_css.sub(lambda match: f"url({_relative_static_path(match['url'], routes)})", text)
         path.write_text(text, encoding="utf-8")
 
 
-def _copy_site_assets(site: Path, static_source: Path = STATIC) -> None:
+def _copy_site_assets(site: Path, static_source: Path = STATIC, *, snapshot_date: str | None = None) -> None:
     site.mkdir(parents=True, exist_ok=True)
     shutil.copytree(static_source, site, dirs_exist_ok=True)
     earth_model = ROOT / "earth.html"
@@ -142,7 +152,7 @@ def _copy_site_assets(site: Path, static_source: Path = STATIC) -> None:
             target = site / "samples" / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
-    for relative in ("DATA.md", "NASA_DATA_IMPORT.md", "AI_USE.md", "NATIVE_MASK_VALIDATION.md"):
+    for relative in ("DATA.md", "NASA_DATA_IMPORT.md", "AI_USE.md", "NATIVE_MASK_VALIDATION.md", "SCIENTIFIC_ASSISTANT_PLAN.md", "SCIENTIFIC_ASSISTANT_SETUP.md"):
         source = DOCS / relative
         if source.is_file():
             target = site / "docs" / relative
@@ -151,7 +161,7 @@ def _copy_site_assets(site: Path, static_source: Path = STATIC) -> None:
     license_file = ROOT / "LICENSE"
     if license_file.is_file():
         shutil.copy2(license_file, site / "LICENSE")
-    snapshot = datetime.now(timezone.utc).date().isoformat()
+    snapshot = snapshot_date or datetime.now(timezone.utc).date().isoformat()
     metadata = (f'<meta name="fireatlas-static-data" content="./data/v2/">\n'
                 f'<meta name="fireatlas-static-snapshot" content="{snapshot}">\n')
     # Static data links are relative to the page, so every top-level page that

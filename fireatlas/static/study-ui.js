@@ -42,7 +42,7 @@ function viewUrl() {
   // The analytical workspace now lives on /atlas.html. Keep the canonical
   // route stable while retaining the root hash compatibility shim for older
   // links that still open the overview page.
-  const path = document.body?.dataset.page === "atlas" ? "/atlas.html" : "/";
+  const path = document.body?.dataset.page === "atlas" ? "/atlas.html" : "./";
   const url = new URL(path, location.origin);
   url.search = new URLSearchParams(viewConfig()); url.hash = "calendar-section";
   if (initialLiteEarth) url.searchParams.set("lite", "1");

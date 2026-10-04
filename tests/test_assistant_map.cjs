@@ -1,0 +1,25 @@
+/* Run with node tests/test_assistant_map.cjs. No providers or network involved. */
+const assert=require('node:assert/strict');
+const {createIndex,frame,concentration}=require('../fireatlas/static/assistant-map.js');
+const M='MODIS_SP',V='VIIRS_SNPP_SP';
+const cell=(x,sources,lat=40)=>({grid_x:x,grid_y:1,sources,longitude:-121+x*.01175,latitude:lat,ring:[]});
+const a=cell(0,[M,V]),b=cell(1,[M]),c=cell(2,[V]);
+const bundle={frames:[{date_utc:'2024-07-24',cells:[a,b]},{date_utc:'2024-07-25',cells:[cell(0,[V]),c]},{date_utc:'2024-07-26',cells:[]}],observations:[{id:1,date:'2024-07-24',source_id:M},{id:2,date:'2024-07-24',source_id:V},{id:3,date:'2024-07-25',source_id:V}]};
+const index=createIndex(bundle);
+assert.equal(frame(index,0).cells.length,2,'shared cells count once');
+assert.equal(frame(index,0,V).cells.length,1,'source filters use cells actually reported by the sensor');
+assert.equal(frame(index,1,'joint','history').cells.length,3);
+assert.equal(frame(index,1,'joint','history').cells.find(c=>c.grid_x===0).observed_days,2,'joint persistence counts dates, not two sensors');
+assert.equal(frame(index,1,M,'history').cells.find(c=>c.grid_x===0).observed_days,1,'VIIRS-only reappearance does not add MODIS persistence');
+assert.deepEqual(frame(index,1).newCells.map(c=>c.grid_x),[2]);
+assert.deepEqual(frame(index,2).newCells,[]);
+assert.equal(frame(index,2).records.length,0);
+assert.equal(frame(index,2,'joint','history').cells.length,3,'empty date does not erase observed history');
+assert.equal(frame(index,0,'joint','history').records.length,2,'future rows are not included');
+assert.equal(frame(index,1).maximum,frame(index,2).maximum,'daily scale remains fixed across frames');
+assert.equal(frame(index,0,'joint','history').maximum,frame(index,2,'joint','history').maximum,'history scale is fixed across frames');
+assert.equal(concentration([{...a,value:1}],a),1,'one occupied cell contributes once');
+assert.equal(concentration([{...a,value:2}],a),2,'observed-day accumulation uses its real magnitude');
+assert.equal(frame(index,1,M).maximum,frame(index,1,V).maximum,'split sensors share an identical magnitude scale');
+assert(index.maxima['joint:daily']>=1);assert(index.maxima['joint:history']>=2);
+console.log('Observation heatmap aggregation: source parity, chronology, shared-grid union, fixed scales, empty-day and cumulative checks passed.');

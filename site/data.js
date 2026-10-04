@@ -4,6 +4,18 @@
   const staticSnapshot = document.querySelector('meta[name="fireatlas-static-snapshot"]')?.content || 'static snapshot';
   const staticCache = new Map();
   let timer, busy = false;
+  function filterSources(){
+    const query=$("source-search").value.trim().toLowerCase();
+    const cards=[...$("source-list").querySelectorAll('.source-card')];
+    for(const card of cards)card.hidden=!card.textContent.toLowerCase().includes(query);
+    const count=cards.filter(card=>!card.hidden).length;
+    $("source-search-status").textContent=`${count} of ${cards.length} imported products`;
+    $("source-search-empty").hidden=!cards.length||count>0;
+  }
+  function filterRegions(){
+    const selected=$("archive-region-filter").value;
+    $("archive-region-list").querySelectorAll('.archive-region-card').forEach(card=>{card.hidden=selected!=='all'&&card.dataset.region!==selected;});
+  }
   if (new Date() >= new Date("2026-10-01T04:00:00Z")) {
     $("maintenance-title").textContent = "September maintenance window has passed";
     $("maintenance-copy").textContent = "The September 25–30 FIRMS2 advisory is historical. It does not confirm a current outage or recovery. Use the connection status below and NASA’s latest notice to check service availability.";
@@ -25,7 +37,7 @@
       return;
     }
     try {
-      const response = await fetch("/api/native-masks");
+      const response = await fetch("/api/native-masks", {signal:AbortSignal.timeout(30000)});
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Local asset list unavailable.");
       const formatSize = bytes => bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GiB`
@@ -48,7 +60,7 @@
   async function staticFile(path) {
     const target = new URL(path, new URL(staticDataRoot, document.baseURI));
     if (!staticCache.has(target.href)) {
-      const response = await fetch(target);
+      const response = await fetch(target, {signal:AbortSignal.timeout(20000)});
       if (!response.ok) throw new Error(`Static archive file unavailable (${response.status}).`);
       staticCache.set(target.href, await response.json());
     }
@@ -102,6 +114,7 @@
     holder.replaceChildren();
     for (const region of payload.regions || []) {
       const card = node("article", "", "archive-region-card");
+      card.dataset.region=region.id;
       const heading = node("div", "", "archive-region-heading");
       heading.append(node("h3", region.name), node("small", `W ${region.bbox[0]} · S ${region.bbox[1]} · E ${region.bbox[2]} · N ${region.bbox[3]}`));
       card.append(heading);
@@ -129,13 +142,17 @@
       }
       holder.append(card);
     }
+    const chosen=$("archive-region-filter").value;
+    $("archive-region-filter").replaceChildren(new Option('All regions','all'),...(payload.regions||[]).map(region=>new Option(region.name,region.id)));
+    $("archive-region-filter").value=[...$("archive-region-filter").options].some(option=>option.value===chosen)?chosen:'all';
+    filterRegions();
     const complete = (payload.regions || []).reduce((sum, region) => sum + Object.values(region.products)
       .reduce((subtotal, product) => subtotal + product.complete_month_count, 0), 0);
     $("archive-coverage-status").textContent = `${(payload.regions || []).length} study areas · ${complete.toLocaleString()} complete region-product-month exports recorded. Reconstructed archive rows are labeled partial; missing dates remain unknown. Export completeness is not a pass or cloud mask.`;
   }
   async function getJson(path) {
     if (!staticDataRoot) {
-      const response = await fetch(path); const data = await response.json();
+      const response = await fetch(path, {signal:AbortSignal.timeout(30000)}); const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load data");
       return data;
     }
@@ -161,6 +178,7 @@
     try {
       const data = await getJson("/api/data/status");
       $("data-error").hidden = true;
+      $("data-retry").hidden=true;
       const recent = data.sources.filter(source => !source.demo && source.source_id.endsWith("_NRT") && source.observations);
       $("recent-imports").hidden = !recent.length;
       if (recent.length) {
@@ -177,7 +195,7 @@
         $("recent-exclusions").textContent = excluded ? `${excluded} polar source row retained in the exclusion ledger outside the ±86° atlas grid.` : "Original CSV rows and file hashes preserved.";
       }
       const noaa = data.sources.find(source => source.source_id === "NOAA_HMS_VIIRS");
-      $("noaa-count").textContent = noaa ? noaa.observations.toLocaleString() : "0";
+      $("noaa-count").textContent = noaa ? noaa.observations.toLocaleString() : "—";
       $("noaa-state").textContent = noaa ? "AUTHENTIC ARCHIVE LOADED" : "ARCHIVE READY TO IMPORT";
       $("noaa-open").hidden = !noaa;
       $("noaa-years").replaceChildren(...(data.hms_windows || []).map(item => node("span", `${item.year} ${item.complete ? "✓" : "·"}`, item.complete ? "ready" : "")));
@@ -250,6 +268,7 @@
         }
         $("source-list").append(card);
       }
+      filterSources();
       $("pilot-validation").replaceChildren();
       if (data.hms_validation?.status === "reproduced") {
         const line = node("article", "", "validation-pilot");
@@ -268,10 +287,15 @@
       if (running) timer = setTimeout(refresh, 2500);
     } catch (error) {
       $("data-error").hidden = false; $("data-error").textContent = error.message;
+      $("data-retry").hidden=false;
       $("sync-pilots").disabled = true;
     } finally { busy = false; }
   }
   $("refresh-data").addEventListener("click", refresh);
+  $("data-retry").addEventListener("click",refresh);
+  $("archive-retry").addEventListener("click",refreshArchiveCoverage);
+  $("source-search").addEventListener("input",filterSources);
+  $("archive-region-filter").addEventListener("change",filterRegions);
   $("import-complete").addEventListener("change", () => {
     $("import-window").hidden = !$("import-complete").checked;
     $("import-month").required = $("import-complete").checked;

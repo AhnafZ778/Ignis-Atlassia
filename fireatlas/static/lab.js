@@ -80,11 +80,11 @@
       node.value = context[key];
     });
     root.querySelectorAll("[data-context-link]").forEach(node => {
-      const path = node.dataset.contextLink || node.getAttribute("href") || "/";
+      const path = node.dataset.contextLink || node.getAttribute("href") || "./";
       node.href = link(path, context);
     });
     root.querySelectorAll("#site-navigation a[data-page-link]").forEach(node => {
-      const target = new URL(node.getAttribute("href") || "/", location.href);
+      const target = new URL(node.getAttribute("href") || "./", location.href);
       node.href = link(`${target.pathname}${target.hash}`, context);
     });
     return context;

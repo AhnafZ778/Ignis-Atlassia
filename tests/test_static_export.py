@@ -9,10 +9,23 @@ from pathlib import Path
 
 from fireatlas.core import connect
 from fireatlas.calendar_v2 import calendar_v2, prepare_calendar_v2
-from scripts.export_static import compact_static_validity_report, export_static
+from scripts.export_static import compact_static_validity_report, export_static, _rebase_local_asset_urls
 
 
 class StaticCalendarExportTests(unittest.TestCase):
+    def test_asset_rebasing_preserves_json_pointer_separators(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            (root/'assistant-map.js').write_text('window.mapReady=true;')
+            page='<a href="/">Home</a><script src="/assistant-map.js"></script><script>const parts=path.split("/");</script>'
+            (root/'assistant.html').write_text(page)
+            script='const pointer="/frames/6/products/MODIS_SP/detections"; const keys=pointer.slice(1).split("/").map(k=>k.replaceAll("~1","/"));'
+            (root/'assistant.js').write_text(script)
+            _rebase_local_asset_urls(root)
+            self.assertEqual((root/'assistant.js').read_text(),script)
+            self.assertIn('href="./"',(root/'assistant.html').read_text())
+            self.assertIn('src="./assistant-map.js"',(root/'assistant.html').read_text())
+            self.assertIn('path.split("/")',(root/'assistant.html').read_text())
     def test_static_validity_summary_keeps_ui_fields_and_leaves_full_evidence_explicit(self):
         source = {
             "case_id": "park-2024",
@@ -56,8 +69,10 @@ class StaticCalendarExportTests(unittest.TestCase):
         # evidence live with the analytical workflow.
         self.assertIn('id="earth-frame-host"', home)
         self.assertIn('id="decision-paths"', atlas)
-        for label in ("EMERGENCY PLANNER", "LAND MANAGER", "SCIENTIST / EDUCATOR"):
-            self.assertIn(label, atlas)
+        # The earlier redesign replaced persona captions with scientific
+        # workflow links. Check that each destination still preserves context.
+        for route in ("replay.html", "research.html", "method.html"):
+            self.assertIn(f'data-context-link="" href="/{route}"', atlas)
         self.assertIn(".harm-persona-panel", css)
         self.assertIn("path: site", workflow)
         self.assertTrue((root / "fireatlas/static/.nojekyll").is_file())

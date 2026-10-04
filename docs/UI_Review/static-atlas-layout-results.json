@@ -1,0 +1,22 @@
+[
+  {
+    "width": 1440,
+    "overflow": false,
+    "legendVisible": true,
+    "markerKinds": [
+      "modis",
+      "viirs"
+    ],
+    "mapHeight": 558
+  },
+  {
+    "width": 390,
+    "overflow": false,
+    "legendVisible": true,
+    "markerKinds": [
+      "modis",
+      "viirs"
+    ],
+    "mapHeight": 428
+  }
+]

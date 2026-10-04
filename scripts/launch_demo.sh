@@ -6,7 +6,7 @@ REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
 uv sync --frozen
-exec uv run python -m fireatlas.web \
+exec bash scripts/run_website.sh \
   --db data/fireatlas.sqlite3 \
   --host 127.0.0.1 \
   --port "${PORT:-8000}"

@@ -7,14 +7,14 @@
 <meta content="Complete the hash-bound independent review of Ignis-Atlassia native NASA fire-mask samples." name="description"/>
 <link href="/favicon.svg" rel="icon"/><link href="/styles.css" rel="stylesheet"/><link href="/review.css" rel="stylesheet"/><link href="/lab.css" rel="stylesheet"/>
 <script defer="" src="/lab.js"></script><script defer="" src="/review.js"></script>
-<link href="/workspace.css" rel="stylesheet"/><script defer="" src="/workspace.js"></script></head>
-<body class="atlas-page review-page lab-page scientific-workspace" data-page="review">
-<header class="topbar"><a aria-label="Ignis-Atlassia home" class="brand" href="/"><span aria-hidden="true" class="brand-symbol"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"></circle><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"></ellipse><circle cx="25" cy="8" r="2"></circle></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a><button aria-controls="site-navigation" aria-expanded="false" class="nav-toggle" type="button"><span class="menu-label">Menu</span></button><nav aria-label="Project navigation" id="site-navigation"><a data-page-link="overview" href="/">Overview</a><a data-page-link="atlas" href="/atlas.html">Atlas</a><a data-page-link="research" href="/research.html">Research lab</a><a data-page-link="data" href="/data.html">Data sources</a><a data-page-link="replay" href="/replay.html">Fire replay</a><details class="nav-resources"><summary>Methods</summary><div><a data-page-link="method" href="/method.html">Method</a><a aria-current="page" class="active" data-page-link="review" href="/review.html">Review</a></div></details></nav></header>
+<link href="/workspace.css" rel="stylesheet"/><script defer="" src="/workspace.js"></script><link href="/assistant.css" rel="stylesheet"/><script defer="" src="/assistant-views.js"></script><script defer="" src="/assistant-visuals.js"></script><script defer="" src="/assistant.js"></script></head>
+<body class="atlas-page review-page lab-page scientific-workspace" data-page="review"><a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar"><a aria-label="Ignis-Atlassia home" class="brand" href="/"><span aria-hidden="true" class="brand-symbol"><svg viewbox="0 0 32 32"><circle cx="16" cy="16" r="9"></circle><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"></ellipse><circle cx="25" cy="8" r="2"></circle></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a><button aria-controls="site-navigation" aria-expanded="false" class="nav-toggle" type="button"><span class="menu-label">Menu</span></button><nav aria-label="Project navigation" id="site-navigation"><a data-context-link="" data-page-link="overview" href="/">Overview</a><a data-context-link="" data-page-link="atlas" href="/atlas.html">Atlas</a><a data-context-link="" data-page-link="replay" href="/replay.html">Fire replay</a><a data-context-link="" data-page-link="research" href="/research.html">Research lab</a><a data-context-link="" data-page-link="data" href="/data.html">Data sources</a><a data-context-link="" data-page-link="assistant" href="/assistant.html">Assistant</a><details class="nav-resources" data-active="true"><summary>Methods</summary><div><a data-context-link="" data-page-link="method" href="/method.html">Method</a><a aria-current="page" class="active" data-context-link="" data-page-link="review" href="/review.html">Review</a></div></details></nav></header>
 <main class="review-main" id="main-content">
 <section aria-labelledby="review-title" class="review-hero">
 <div>
 <p class="review-kicker">INDEPENDENT SCIENTIFIC CHECK / NATIVE MASKS</p>
-<h1 id="review-title">Review the evidence.<br/><em>One sample at a time.</em></h1>
+<h1 id="review-title">Review the original native-mask samples.</h1>
 <p class="review-lead">Open the original NASA fire-mask and geolocation files, then record what the deterministic sample queue shows. This form never fills in an observation for you.</p>
 </div>
 <div aria-label="Choose case" class="review-case-switch" role="group">
@@ -22,7 +22,7 @@
 <button data-case="park-2024" type="button">Park Fire <small>2024</small></button>
 <button class="active" data-case="grove-2025" type="button">Grove Fire <small>2025</small></button>
 </div>
-</section><nav aria-label="Page sections" class="section-jump-nav"><a href="#reviewer-details"><span>01</span>Identify the reviewer</a><a href="#sample-workspace"><span>02</span>Inspect native samples</a><a href="#review-export"><span>03</span>Export the signed record</a></nav>
+</section><nav aria-label="Page sections" class="section-jump-nav"><a href="#reviewer-details"><span>01</span>Identify the reviewer</a><a href="#sample-workspace"><span>02</span>Inspect native samples</a><a href="#review-export"><span>03</span>Export the reviewer-attested record</a></nav>
 <section aria-live="polite" class="review-status-card" id="review-status-card">
 <div class="review-status-mark" id="review-status-mark">…</div>
 <div><strong id="review-status-title">Loading the hash-bound queue…</strong><p id="review-status-copy">The form is read-only until the case template is loaded.</p></div>
@@ -39,7 +39,7 @@
 <p class="review-boundary"><strong>What this gate proves</strong> the processor’s sampled native interpretation agrees with a reviewer. It does not turn detections into perimeters or prove complete satellite coverage.</p>
 </section>
 <form id="review-form" novalidate="">
-<section aria-labelledby="reviewer-title" class="review-panel" id="reviewer-details">
+<p class="draft-status" id="review-draft-status" role="status">Drafts stay in this browser and are saved separately for each case.</p><section aria-labelledby="reviewer-title" class="review-panel" id="reviewer-details">
 <div class="review-panel-head"><div><p class="review-kicker">REVIEWER ATTESTATION</p><h2 id="reviewer-title">Who checked this?</h2></div><span class="review-required">All fields required</span></div>
 <div class="review-fields">
 <label>Name<input autocomplete="name" id="reviewer-name" required=""/></label>
@@ -52,10 +52,10 @@
 </section>
 <section aria-labelledby="samples-title" class="review-panel" id="sample-workspace">
 <div class="review-panel-head"><div><p class="review-kicker">DETERMINISTIC SAMPLE QUEUE</p><h2 id="samples-title">Check each native sample.</h2></div><span class="review-input-summary" id="review-input-summary">Waiting for source data</span></div>
-<div class="review-queue-toolbar"><div><strong id="review-selected-sample">Sample queue</strong><p>Read the processor’s expectation, then enter your own observation from the original file.</p></div><div class="review-queue-actions"><button aria-label="Previous sample" id="review-previous" type="button">← Previous</button><button id="review-next" type="button">Next →</button><button id="review-next-pending" type="button">Next incomplete</button></div></div><div aria-label="Select a native sample" class="review-queue-nav" id="review-queue-nav" role="group"></div><p class="review-queue-key"><span>○ Pending</span><span>✓ Complete</span><span>Outline · selected sample</span></p><div class="review-samples" id="review-samples"><div class="review-empty">Loading the case template…</div></div>
+<div class="review-queue-toolbar"><div><strong id="review-selected-sample">Sample queue</strong><p>Read the processor’s expectation, then enter your own observation from the original file.</p></div><div class="review-queue-actions"><button aria-label="Previous sample" id="review-previous" type="button">← Previous</button><button id="review-next" type="button">Next →</button><button id="review-next-pending" type="button">Next incomplete</button></div></div><details class="review-class-reference"><summary>Native mask classes · reference key</summary><p>Class codes describe the native mask sample. They do not measure whole-cell observation coverage.</p><dl class="mask-class-key"><dt>0</dt><dd>Missing input</dd><dt>1</dt><dd>Not processed / bowtie</dd><dt>2</dt><dd>Unusable</dd><dt>3</dt><dd>Non-fire water</dd><dt>4</dt><dd>Cloud</dd><dt>5</dt><dd>Non-fire land</dd><dt>6</dt><dd>Unknown</dd><dt>7</dt><dd>Fire · low confidence</dd><dt>8</dt><dd>Fire · nominal confidence</dd><dt>9</dt><dd>Fire · high confidence</dd></dl></details><details class="task-details"><summary>Select a sample · full queue</summary><div aria-label="Select a native sample" class="review-queue-nav" id="review-queue-nav" role="group"></div></details><p class="review-queue-key"><span>○ Pending</span><span>✓ Complete</span><span>Outline · selected sample</span></p><div class="review-samples" id="review-samples"><div class="review-empty">Loading the case template…</div></div>
 </section>
 <section class="review-submit review-panel" id="review-export">
-<div><p class="review-kicker">EXPORT / VALIDATE</p><h2>Save the signed record.</h2><p id="review-submit-copy">The browser creates a JSON record. Validate it against the same evidence store before installing it.</p></div>
+<div><p class="review-kicker">EXPORT / VALIDATE</p><h2>Save the reviewer-attested record.</h2><p id="review-submit-copy">The browser creates a JSON record. Validate it against the same evidence store before installing it.</p></div>
 <div class="review-actions"><button class="review-button primary" disabled="" id="review-download" type="button">Download review JSON ↓</button><button class="review-button" id="review-reset" type="button">Clear form</button></div>
 <details><summary>Install and validate the exported record locally</summary><pre class="review-command" id="review-command">python3 -m fireatlas.mask_review --case grove-2025 --review fireatlas_grove-2025_native_mask_review.json --install</pre></details>
 <p class="review-feedback" id="review-feedback" role="status"></p>

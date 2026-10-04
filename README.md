@@ -2,7 +2,7 @@
 
 **Challenge:** NASA Space Apps 2026 · Harmonization of MODIS and VIIRS Hot Spots
 
-Ignis-Atlassia is a research prototype for inspecting dated NASA FIRMS active-fire detections and counting distinct 1 km equal-area grid cell-days in UTC. The calendar variant includes FIRMS type 0 or missing, across confidence levels; other rows remain inspectable but are excluded from totals. The home page opens on the 3D globe; the calendar and source evidence are below it. A hotspot is a satellite thermal observation, not a fire perimeter, burned area, or proof that no fire occurred.
+Ignis-Atlassia is a research prototype for inspecting dated NASA FIRMS active-fire detections and counting distinct 1 km equal-area grid cell-days in UTC. The calendar variant includes FIRMS type 0 or missing, across confidence levels; other rows remain inspectable but are excluded from totals. The home page opens on the existing 3D globe. Atlas, Fire replay, Research lab, Data sources, Method, Review, and the scientific assistant are separate focused workspaces. A hotspot is a satellite thermal observation, not a fire perimeter, burned area, or proof that no fire occurred.
 
 **Public demo:** Not deployed from this checkout. Run locally at http://127.0.0.1:8000/.
 **Repository:** https://github.com/AhnafZ778/NASA-Spaceapps
@@ -11,8 +11,7 @@ Ignis-Atlassia is a research prototype for inspecting dated NASA FIRMS active-fi
 ## Run
 
 ```bash
-uv sync
-bash scripts/launch_demo.sh
+bash scripts/run_website.sh
 ```
 
 For the tests:
@@ -20,6 +19,20 @@ For the tests:
 ```bash
 uv run python -m unittest discover -s tests
 ```
+
+## Website design and visual review
+
+The actual website uses a shared light interface: warm ivory, white work surfaces, dark ink, and cobalt actions. MODIS is amber/circle, VIIRS is cyan/diamond, and shared cells are green/square. Unknown and partial records retain explicit status labels. The landing globe and its interactions are preserved.
+
+See the [implemented redesign and screenshot review](docs/UI_Review/README.md) and [page-by-page audit](docs/UI_UX_AUDIT_AND_LIGHT_REDESIGN.md).
+
+Production UI sources are in `fireatlas/static/`. To refresh `site/` after a UI edit while preserving its existing observation data and snapshot date:
+
+```bash
+uv run python scripts/refresh_static_assets.py --site site
+```
+
+A new data export still uses `scripts/export_static.py`. Static hosting supports bundled evidence; live research calculations and assistant tools require the local service. Map imagery and streamed terrain need network access.
 
 ## Data and study areas
 
@@ -60,3 +73,9 @@ The local app imports original FIRMS fields, preserves source provenance, assign
 Ignis-Atlassia is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool.
 
 See [data and methods](docs/NASA_ARCHIVE_IMPORT.md), [the Winning Plan and live scorecard](docs/winning-plan/SCORECARD.md), [AI use and numerical review status](docs/AI_USE.md), and [current validation limits](docs/VALIDITY_CASES.md).
+
+## Scientific assistant
+
+Open `/assistant.html` for stored-data investigations, linked replay maps, source-status tables and a private reproducible notebook. The existing pages also include a contextual assistant. Scientific action buttons work without an AI key; optional OpenAI/Google conversation, selected-figure vision, narration and MCP connections are configured on the server.
+
+See [the architecture and delivery plan](docs/SCIENTIFIC_ASSISTANT_PLAN.md) and [setup instructions](docs/SCIENTIFIC_ASSISTANT_SETUP.md). The assistant reuses the existing calculations and preserves the globe and satellite. It does not download datasets, predict spread or turn missing observations into zero activity.
