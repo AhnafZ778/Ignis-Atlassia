@@ -1,0 +1,49 @@
+Park observations — browser QA
+==============================
+Narration text (AI voice only when generated and labelled)
+
+[00:00:00.000] The study boundary
+Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:02.000] Activity through time
+Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:04.000] The observation record
+Show why a blank record can remain unknown. Collected exports, documented processing gaps and actual observation opportunity are different questions.
+  - MODIS incomplete export days: 0 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS incomplete export dates: None in this study reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS days without imported records: 2 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS dates without imported records: 2024-08-03, 2024-08-14 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP incomplete export days: 6 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP incomplete export dates: 2024-07-24, 2024-07-25, 2024-07-26, 2024-07-27, 2024-07-28, 2024-07-29 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP days without imported records: 6 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP dates without imported records: 2024-07-24, 2024-07-25, 2024-07-26, 2024-07-27, 2024-07-28, 2024-08-03 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+
+[00:00:06.000] A finding to inspect
+Present the checked finding, then open its evidence. Keep the explanatory interpretation distinct from the saved measurement.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:08.000] Behind the result
+Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.
+  - Full matching original records: 7220 records (observed; receipt c978b258e438, release e18841ce496b)
+  - Records in this page: 100 records (observed; receipt c978b258e438, release e18841ce496b)
+
+[00:00:10.000] What we can conclude
+Close with the supported observation and the matching evidence download. Keep ignition, continuous spread, perimeter and forecast claims outside the conclusions.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+Limitations:
+- Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire.

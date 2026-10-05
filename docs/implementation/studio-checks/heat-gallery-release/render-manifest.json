@@ -1,0 +1,79 @@
+{
+  "captions_fallback": true,
+  "engine": "local-svg-ffmpeg",
+  "evidence": [
+    {
+      "receipt_sha256": "c978b258e438df1a1d879b2e0b63c1d0bd09a81048b8e694405617656ef36a3f",
+      "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+      "snapshot_id": "snap_-qJp4De3GH6e_ul7",
+      "snapshot_sha256": "4ed391ffe929113a0f4370f234eb76f132d873eeeddaac83f23c37fef6dd4df6"
+    },
+    {
+      "receipt_sha256": "aab1e42fae597b32e9ed7f25fed6e8df3c7fbe19fca052679952f8770e88b2d1",
+      "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+      "snapshot_id": "snap_2EP5ojUrci_OwJoH",
+      "snapshot_sha256": "4643fbaa6d879a4bd73c8ed52b3f05aab29c13c126dd753888b0b735b1dd606e"
+    },
+    {
+      "receipt_sha256": "eb0038af1588dd14e522e9f979bf3460e22758d3efcbf94b80c87167713fe3b4",
+      "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+      "snapshot_id": "snap_9Atrlq1YhhQbX6rZ",
+      "snapshot_sha256": "56ee806f89eebe348a44aa4dffb219f197ebb7f82b4db14a625a63119df58973"
+    }
+  ],
+  "files": {
+    "briefing.mp4": {
+      "bytes": 406048,
+      "sha256": "bd50acd34394e739614b7b1093190c0175378a85cf80d0da8472cf0c7d11f6c2"
+    },
+    "captions.vtt": {
+      "bytes": 1246,
+      "sha256": "070bec24ae3a357c8e748a5aac34c0ab3ca77d8b1e22f7edd08e99aa909abf86"
+    },
+    "evidence-hashes.json": {
+      "bytes": 959,
+      "sha256": "8db10acd24f28d87d2d31d1ec11a8eadcab997db5d4fc4d5a7038e2af4d28baa"
+    },
+    "transcript.txt": {
+      "bytes": 4047,
+      "sha256": "097ae0e3c2af57eee042e081a1e7f448171bb4f64a84f9dbdd339dee79854a29"
+    }
+  },
+  "limitations": [
+    "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+  ],
+  "narration": {
+    "attempted_status": null,
+    "cached_segments": null,
+    "disclosure": null,
+    "reason": "The author chose a captioned video without AI narration.",
+    "segments": [],
+    "skipped_chapters": [],
+    "status": "captions-only",
+    "timing": {
+      "chapters": [],
+      "checked": false,
+      "reason": "No audio was selected for rendering."
+    }
+  },
+  "profile": {
+    "aspect": "landscape",
+    "duration_seconds": 12.0,
+    "fps": 30,
+    "height": 1080,
+    "id": "briefing-1080p-landscape",
+    "width": 1920
+  },
+  "rasterizer": "chromium",
+  "render_id": "rnd_Qs8xIqTq1dAbQoLB",
+  "schema": "fireatlas-studio-render-manifest-v1",
+  "story_sha256": "0def63ed25cb8d77b8e67ad936499a0a1dab9c5d8bb59abfcc528e8c3d7f2851",
+  "subtitles": {
+    "activation": "Default subtitle track; display support depends on the video player.",
+    "caption_version": 2,
+    "codec": "mov_text",
+    "embedded": true,
+    "source": "captions.vtt",
+    "text": "Saved resolved narration, with authored caption/title fallback."
+  }
+}

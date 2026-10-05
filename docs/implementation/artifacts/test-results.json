@@ -1,0 +1,87 @@
+{
+  "full_python": {
+    "log_path": "/tmp/ignis-final-python-tests.log",
+    "log_sha256": "eea211cf261285961f37e142ae5f7ad8c71b0716850c8bb174f3f4f046cc146d",
+    "python_tests": 178,
+    "seconds": 237.444,
+    "outcome": "passed"
+  },
+  "regional_and_calendar": {
+    "log_path": "/tmp/ignis-regional-tests.log",
+    "log_sha256": "c1e768d3857a6ced1210acf27922a2d9fd211cd2c43942f531af3424d6dea9f9",
+    "python_tests": 18,
+    "seconds": 7.163,
+    "outcome": "passed"
+  },
+  "static_export": {
+    "log_path": "/tmp/ignis-final-static-tests.log",
+    "log_sha256": "acdbab496d16ed5a1247bed170b0cce718a365f48d29109a3580a750a5e80caf",
+    "python_tests": 6,
+    "seconds": 4.365,
+    "outcome": "passed"
+  },
+  "javascript": {
+    "log_path": "/tmp/ignis-js-checks.log",
+    "log_sha256": "a9241e0c27fd1e90dc9219054be450b4914c3e90ae2ac49cc81a03522f1f7455",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "scientific_preservation": {
+    "log_path": "/tmp/ignis-preservation.log",
+    "log_sha256": "9e9cbe5bfceeeb413868bc365653d87c0c14b617ebbd8580a33ad47ee6b437a2",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "workspaces": {
+    "log_path": "/tmp/ignis-workspace-browser.log",
+    "log_sha256": "06653a3db22b41723b9ed6d0d61b84163cbaba241374c3d78dc03fc04d7a9676",
+    "outcome": "passed"
+  },
+  "static_calendar": {
+    "log_path": "/tmp/ignis-static-calendar.log",
+    "log_sha256": "29e68b9418dd6fd5943ca65e898a96ccad92f18023f08f2adbddec13d1c7ba4f",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "static_data": {
+    "log_path": "/tmp/ignis-static-data.log",
+    "log_sha256": "63e7f161b018081240ee96b04ae9956b002e065b8f8e2be696ad49125ac07c9a",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "static_globe": {
+    "log_path": "/tmp/ignis-static-globe.log",
+    "log_sha256": "9d8954fb86cb8f516beaf9a12334cbe401219339ad41e7c8a7bb1b1b57c71803",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "static_method_park": {
+    "log_path": "/tmp/ignis-static-method.log",
+    "log_sha256": "d284d2e7f5cc063a5628be7787dbaee8e876852700eeaf0045d39dce6438055d",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "static_method_grove": {
+    "log_path": "/tmp/ignis-static-grove.log",
+    "log_sha256": "697831b3a2de4cf7680c72f322d366576bd813379de11fd8bb709c5184deaf77",
+    "python_tests": null,
+    "seconds": null,
+    "outcome": "passed"
+  },
+  "connected_terrain": {
+    "log_path": "/tmp/ignis-terrain-browser.log",
+    "log_sha256": "bb79de7f20ac36d2785eaae2da0cfe22c3cc35ab752bb2c8586f743799a05b8c",
+    "outcome": "passed"
+  },
+  "local_workspaces": {
+    "log_path": "/tmp/ignis-local-browser.log",
+    "log_sha256": "a9f227f8a56d78026e7d3f0611457281fea424e10d21472dfcd049e4673e5e29",
+    "outcome": "passed"
+  }
+}

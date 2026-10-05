@@ -1,0 +1,18 @@
+{
+  "verified": true,
+  "indexed_files": [
+    ".vite/manifest.json",
+    "assets/TldrawBoard-BapSWxud.js",
+    "assets/TldrawBoard-C272mPqd.css",
+    "assets/WorkflowPanel-BTSM7f6X.js",
+    "assets/WorkflowPanel-BnuhLJ6X.css",
+    "assets/collaboration-iAdzrBg1.js",
+    "assets/sanitizeSvg-BRz1NfP5.js",
+    "assets/studio-BvyGvi9Z.css",
+    "assets/studio-I7FAEkgW.js",
+    "studio-entry.js",
+    "features.json"
+  ],
+  "manifest_parity": true,
+  "reader_style_script_parity": true
+}

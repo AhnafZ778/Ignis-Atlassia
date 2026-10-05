@@ -1,0 +1,49 @@
+Park observations — browser QA
+==============================
+Narration text (AI voice only when generated and labelled)
+
+[00:00:00.000] The study boundary
+The map shows recorded observations inside the selected geographic and UTC window. Nearby detections are not a validated assignment to an incident.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:02.000] Activity through time
+The timeline compares recorded activity within the study. An occupied cell-day counts one detected common cell on one UTC date.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:04.000] The observation record
+These source states distinguish collected records from unknown evidence and processing gaps. An empty record does not establish a fire-free day.
+  - MODIS incomplete export days: 0 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS incomplete export dates: None in this study reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS days without imported records: 2 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - MODIS dates without imported records: 2024-08-03, 2024-08-14 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP incomplete export days: 6 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP incomplete export dates: 2024-07-24, 2024-07-25, 2024-07-26, 2024-07-27, 2024-07-28, 2024-07-29 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP days without imported records: 6 UTC days (observed; receipt eb0038af1588, release e18841ce496b)
+  - VIIRS S-NPP dates without imported records: 2024-07-24, 2024-07-25, 2024-07-26, 2024-07-27, 2024-07-28, 2024-08-03 reported UTC dates (observed; receipt eb0038af1588, release e18841ce496b)
+
+[00:00:06.000] A finding to inspect
+The cited result comes from frozen evidence. Its interpretation remains editable and does not change the source measurements.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+[00:00:08.000] Behind the result
+Original satellite observations retain native source fields and acquisition time. Those rows and common-cell counts answer different questions.
+  - Full matching original records: 7220 records (observed; receipt c978b258e438, release e18841ce496b)
+  - Records in this page: 100 records (observed; receipt c978b258e438, release e18841ce496b)
+
+[00:00:10.000] What we can conclude
+The study supports inspection of dated thermal observations. It does not establish ignition, continuous spread, a perimeter, or a forecast.
+  - Eligible unique detections: 6224 records (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Distinct union: 2228 cell-days (observed; receipt aab1e42fae59, release e18841ce496b)
+  - Days with imported detections: 21 UTC days (observed; receipt aab1e42fae59, release e18841ce496b)
+
+Limitations:
+- Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire.

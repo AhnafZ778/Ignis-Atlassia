@@ -1,0 +1,37 @@
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /evidence.html?tab=validity&case=park-2024 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /design.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /assistant.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /analytical.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /workspace.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /lab.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /research.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /data.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /method.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /review.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /workspace-context.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /validity.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /vendor/leaflet.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /assistant-views.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /workspace-shell.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /analytical-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /workspace.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /assistant-visuals.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /assistant.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /method.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:42] code 404, message File not found
+127.0.0.1 - - [05/Oct/2026 02:21:42] "GET /api/assistant/capabilities HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /fonts/dm-sans.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /fonts/space-grotesk.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /validity.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /data/v2/validity/park-2024.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire-04.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire-05.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire-02.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire-flames.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire-06.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /incident-media/park-fire.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /data/v2/validity/park-2024-check.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 02:21:43] "GET /data/v2/validity/park-2024-review-template.json HTTP/1.1" 200 -
+Static method verified: park-2024; incident media loaded; recount passed; no scientific API calls (assistant capability availability may be probed).

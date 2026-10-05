@@ -1,0 +1,159 @@
+
+> fireatlas-studio-app@0.1.0 build
+> tsc --noEmit && vite build && node scripts/excalidraw-sdk.mjs && node scripts/postbuild.mjs
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 3187 modules transformed.
+rendering chunks...
+computing gzip size...
+../fireatlas/static/studio-assets/assets/Assistant-SemiBold-SCI4bEL9.woff2            20.21 kB
+../fireatlas/static/studio-assets/assets/Assistant-Regular-DVxZuzxb.woff2             20.23 kB
+../fireatlas/static/studio-assets/assets/Assistant-Medium-DrcxCXg3.woff2              20.32 kB
+../fireatlas/static/studio-assets/assets/Assistant-Bold-gm-uSS1B.woff2                20.38 kB
+../fireatlas/static/studio-assets/.vite/manifest.json                                 61.48 kB │ gzip:   6.69 kB
+../fireatlas/static/studio-assets/assets/WorkflowPanel-BnuhLJ6X.css                   15.87 kB │ gzip:   2.67 kB
+../fireatlas/static/studio-assets/assets/studio-DImezM2R.css                          16.58 kB │ gzip:   4.21 kB
+../fireatlas/static/studio-assets/assets/TldrawBoard-C272mPqd.css                     78.83 kB │ gzip:  14.64 kB
+../fireatlas/static/studio-assets/assets/excalidraw-BJL_58c3.css                     144.61 kB │ gzip:  22.92 kB
+../fireatlas/static/studio-assets/assets/channel-BpsEg_0m.js                           0.11 kB │ gzip:   0.12 kB
+../fireatlas/static/studio-assets/assets/init-Gi6I4Gst.js                              0.15 kB │ gzip:   0.13 kB
+../fireatlas/static/studio-assets/assets/chunk-2Q5K7J3B-CdN9CQkF.js                    0.19 kB │ gzip:   0.16 kB
+../fireatlas/static/studio-assets/assets/chunk-JWPE2WC7-Ll_y3kMH.js                    0.22 kB │ gzip:   0.17 kB
+../fireatlas/static/studio-assets/assets/chunk-XXDRQBXY-B8U5wOLo.js                    0.27 kB │ gzip:   0.23 kB
+../fireatlas/static/studio-assets/assets/chunk-5VM5RSS4-CPAYCm4X.js                    0.36 kB │ gzip:   0.27 kB
+../fireatlas/static/studio-assets/assets/file-open-7c801643-684qeFg4.js                0.45 kB │ gzip:   0.32 kB
+../fireatlas/static/studio-assets/assets/stateDiagram-v2-MP3YSRHH-NZX5ePew.js          0.45 kB │ gzip:   0.31 kB
+../fireatlas/static/studio-assets/assets/subset-worker.chunk-xynEP-ja.js               0.47 kB │ gzip:   0.34 kB
+../fireatlas/static/studio-assets/assets/classDiagram-ZZMXUADV-CjfkOBbs.js             0.49 kB │ gzip:   0.33 kB
+../fireatlas/static/studio-assets/assets/classDiagram-v2-VYDZK3BY-CjfkOBbs.js          0.49 kB │ gzip:   0.33 kB
+../fireatlas/static/studio-assets/assets/chunk-POPQ4Y6H-DoL615T1.js                    0.50 kB │ gzip:   0.35 kB
+../fireatlas/static/studio-assets/assets/file-open-002ab408-DIuFHtCF.js                0.54 kB │ gzip:   0.33 kB
+../fireatlas/static/studio-assets/assets/swimlanesDiagram-VR7AAH4N-B0ZzFLCe.js         0.57 kB │ gzip:   0.39 kB
+../fireatlas/static/studio-assets/assets/directory-open-01563666-DWU9wJ6I.js           0.59 kB │ gzip:   0.36 kB
+../fireatlas/static/studio-assets/assets/infoDiagram-27XIBGKW-GbeiREpD.js              0.61 kB │ gzip:   0.41 kB
+../fireatlas/static/studio-assets/assets/file-save-3189631c-C1wFhQhH.js                0.71 kB │ gzip:   0.46 kB
+../fireatlas/static/studio-assets/assets/file-save-745eba88-Bb9F9Kg7.js                0.87 kB │ gzip:   0.50 kB
+../fireatlas/static/studio-assets/assets/sizeCapture-INFHLROL-ZBi63OFR.js              0.96 kB │ gzip:   0.54 kB
+../fireatlas/static/studio-assets/assets/value-DIujSiJ7.js                             1.07 kB │ gzip:   0.56 kB
+../fireatlas/static/studio-assets/assets/ordinal-Cboi1Yqb.js                           1.19 kB │ gzip:   0.57 kB
+../fireatlas/static/studio-assets/assets/directory-open-4ed118d0-CunoC1EB.js           1.55 kB │ gzip:   0.79 kB
+../fireatlas/static/studio-assets/assets/railroadDiagram-O6MQD6OU-CvxvDmD4.js          1.63 kB │ gzip:   0.77 kB
+../fireatlas/static/studio-assets/assets/abnfDiagram-VCTEODGH-CyCgtWR-.js              1.83 kB │ gzip:   0.90 kB
+../fireatlas/static/studio-assets/assets/chunk-F27PBJKO-D9ecbood.js                    1.91 kB │ gzip:   0.85 kB
+../fireatlas/static/studio-assets/assets/pegDiagram-XKGWAZYB-CRid8WE1.js               1.98 kB │ gzip:   0.93 kB
+../fireatlas/static/studio-assets/assets/ebnfDiagram-PWID7BFC-Cmirs2vs.js              2.03 kB │ gzip:   0.89 kB
+../fireatlas/static/studio-assets/assets/with-selector-KdxdPg5B.js                     2.43 kB │ gzip:   1.18 kB
+../fireatlas/static/studio-assets/assets/roundRect-mAH3dD0p.js                         2.90 kB │ gzip:   1.04 kB
+../fireatlas/static/studio-assets/assets/arc-Dn-LG4QB.js                               3.42 kB │ gzip:   1.46 kB
+../fireatlas/static/studio-assets/assets/diagram-Z3DM3KII-Vy8PCkKf.js                  4.24 kB │ gzip:   1.85 kB
+../fireatlas/static/studio-assets/assets/linear-D1g5s_fh.js                            4.66 kB │ gzip:   1.90 kB
+../fireatlas/static/studio-assets/assets/defaultLocale-DX6XiGOO.js                     4.69 kB │ gzip:   2.18 kB
+../fireatlas/static/studio-assets/assets/diagram-UQ7AKVKN-DgrvMGtP.js                  6.10 kB │ gzip:   2.63 kB
+../fireatlas/static/studio-assets/assets/pieDiagram-E7YTZNPT-D75wSm-P.js               6.32 kB │ gzip:   2.64 kB
+../fireatlas/static/studio-assets/assets/sanitizeSvg-BRz1NfP5.js                       7.32 kB │ gzip:   2.98 kB
+../fireatlas/static/studio-assets/assets/diagram-S7CK7UJ4-CIY2zdvZ.js                  8.24 kB │ gzip:   3.68 kB
+../fireatlas/static/studio-assets/assets/si-LK-N5RQ5JYF-_7qv84i5.js                    8.68 kB │ gzip:   3.38 kB
+../fireatlas/static/studio-assets/assets/az-AZ-76LH7QW2-DEWVtS_-.js                    8.71 kB │ gzip:   3.61 kB
+../fireatlas/static/studio-assets/assets/zh-HK-E62DVLB3-BZ-x6f_d.js                    9.18 kB │ gzip:   4.11 kB
+../fireatlas/static/studio-assets/assets/cynefinDiagram-5FMLGOSQ-DIm4H5QK.js          10.12 kB │ gzip:   3.64 kB
+../fireatlas/static/studio-assets/assets/kk-KZ-P5N5QNE5-DXk3IE-I.js                   10.22 kB │ gzip:   4.22 kB
+../fireatlas/static/studio-assets/assets/kaa-6HZHGXH3-BOQuWY-G.js                     10.27 kB │ gzip:   4.20 kB
+../fireatlas/static/studio-assets/assets/stateDiagram-D77RDMKH-Zvp8rg8D.js            10.40 kB │ gzip:   3.64 kB
+../fireatlas/static/studio-assets/assets/dagre-GXQ25YYZ-Bvy2nvLf.js                   10.70 kB │ gzip:   4.04 kB
+../fireatlas/static/studio-assets/assets/diagram-VSXAHHWV-C5mA6z7a.js                 10.75 kB │ gzip:   4.14 kB
+../fireatlas/static/studio-assets/assets/lt-LT-XHIRWOB4-CQHv4K4e.js                   12.60 kB │ gzip:   5.38 kB
+../fireatlas/static/studio-assets/assets/vi-VN-M7AON7JQ-DdySmvFQ.js                   13.96 kB │ gzip:   5.81 kB
+../fireatlas/static/studio-assets/assets/da-DK-5WZEPLOC-D8dPwLiK.js                   14.51 kB │ gzip:   6.08 kB
+../fireatlas/static/studio-assets/assets/th-TH-HPSO5L25-CS8reWq5.js                   15.62 kB │ gzip:   5.22 kB
+../fireatlas/static/studio-assets/assets/chunk-SVP7TREG-BvV6GxUc.js                   15.73 kB │ gzip:   4.39 kB
+../fireatlas/static/studio-assets/assets/diagram-VX7I27RA-C3WOYwwE.js                 15.99 kB │ gzip:   5.70 kB
+../fireatlas/static/studio-assets/assets/nn-NO-6E72VCQL-DTmMZeCW.js                   16.05 kB │ gzip:   6.73 kB
+../fireatlas/static/studio-assets/assets/nl-NL-IS3SIHDZ-Py52qd1m.js                   16.83 kB │ gzip:   6.94 kB
+../fireatlas/static/studio-assets/assets/ishikawaDiagram-5VMMS53U-688lZnFa.js         17.49 kB │ gzip:   6.65 kB
+../fireatlas/static/studio-assets/assets/my-MM-5M5IBNSE-BkTavUHk.js                   17.67 kB │ gzip:   5.35 kB
+../fireatlas/static/studio-assets/assets/hu-HU-A5ZG7DT2-DSQl8z8l.js                   18.18 kB │ gzip:   7.61 kB
+../fireatlas/static/studio-assets/assets/fi-FI-Z5N7JZ37-BYv4OmyS.js                   18.50 kB │ gzip:   7.54 kB
+../fireatlas/static/studio-assets/assets/kab-KAB-ZGHBKWFO-CjinSSOq.js                 18.88 kB │ gzip:   7.55 kB
+../fireatlas/static/studio-assets/assets/zh-TW-RAJ6MFWO-CSPaqyyp.js                   19.09 kB │ gzip:   8.89 kB
+../fireatlas/static/studio-assets/assets/zh-CN-LNUGB5OW-EYu27_WP.js                   19.15 kB │ gzip:   8.92 kB
+../fireatlas/static/studio-assets/assets/lv-LV-5QDEKY6T-hipD7WvV.js                   19.24 kB │ gzip:   7.80 kB
+../fireatlas/static/studio-assets/assets/gl-ES-HMX3MZ6V-74WDMEM3.js                   19.49 kB │ gzip:   7.77 kB
+../fireatlas/static/studio-assets/assets/tr-TR-DEFEU3FU-TTPhGHNE.js                   19.61 kB │ gzip:   7.99 kB
+../fireatlas/static/studio-assets/assets/cs-CZ-2BRQDIVT-B1zs3RWv.js                   19.62 kB │ gzip:   8.41 kB
+../fireatlas/static/studio-assets/assets/pt-PT-UZXXM6DQ-CSJfi1sj.js                   19.75 kB │ gzip:   7.80 kB
+../fireatlas/static/studio-assets/assets/id-ID-SAP4L64H-DRjvg8vO.js                   19.78 kB │ gzip:   7.71 kB
+../fireatlas/static/studio-assets/assets/ca-ES-6MX7JW3Y-BhgYAPPV.js                   19.89 kB │ gzip:   7.92 kB
+../fireatlas/static/studio-assets/assets/oc-FR-POXYY2M6-CJmjilXx.js                   19.94 kB │ gzip:   7.84 kB
+../fireatlas/static/studio-assets/assets/nb-NO-T6EIAALU-CFOES2JT.js                   20.20 kB │ gzip:   8.23 kB
+../fireatlas/static/studio-assets/assets/kanban-definition-UXKFOSKX-FtehGFur.js       20.32 kB │ gzip:   7.21 kB
+../fireatlas/static/studio-assets/assets/he-IL-6SHJWFNN-CV9sOKzI.js                   20.42 kB │ gzip:   7.59 kB
+../fireatlas/static/studio-assets/assets/bg-BG-XCXSNQG7-Jng3N6uA.js                   20.86 kB │ gzip:   7.41 kB
+../fireatlas/static/studio-assets/assets/pt-BR-5N22H2LF-4cU_y6QO.js                   21.14 kB │ gzip:   8.22 kB
+../fireatlas/static/studio-assets/assets/eu-ES-A7QVB2H4-BNnnjqbT.js                   21.30 kB │ gzip:   8.24 kB
+../fireatlas/static/studio-assets/assets/es-ES-U4NZUMDT-BoDfR7N-.js                   21.45 kB │ gzip:   8.49 kB
+../fireatlas/static/studio-assets/assets/sl-SI-NN7IZMDC-C5cKfiQq.js                   21.46 kB │ gzip:   8.58 kB
+../fireatlas/static/studio-assets/assets/sv-SE-XGPEYMSR-CSmpLQRG.js                   21.61 kB │ gzip:   8.57 kB
+../fireatlas/static/studio-assets/assets/it-IT-JPQ66NNP-BSBlrQma.js                   22.16 kB │ gzip:   8.60 kB
+../fireatlas/static/studio-assets/assets/sk-SK-C5VTKIMK-BkWey3FN.js                   22.41 kB │ gzip:   9.11 kB
+../fireatlas/static/studio-assets/assets/pl-PL-T2D74RX3-CZF86_dM.js                   22.58 kB │ gzip:   9.24 kB
+../fireatlas/static/studio-assets/assets/mindmap-definition-YA3MSWOX-D6kHdHCj.js      23.20 kB │ gzip:   7.82 kB
+../fireatlas/static/studio-assets/assets/sankeyDiagram-P5KCCOFB-Bvc4SxHJ.js           23.24 kB │ gzip:   8.55 kB
+../fireatlas/static/studio-assets/assets/ro-RO-JPDTUUEW-DysYyCgs.js                   23.25 kB │ gzip:   8.96 kB
+../fireatlas/static/studio-assets/assets/de-DE-XR44H4JA-BHdpELj_.js                   23.44 kB │ gzip:   9.00 kB
+../fireatlas/static/studio-assets/assets/ja-JP-DBVTYXUO-BSg2-8JH.js                   23.50 kB │ gzip:   8.85 kB
+../fireatlas/static/studio-assets/assets/fr-FR-RHASNOE6-CTHnns0D.js                   23.54 kB │ gzip:   8.91 kB
+../fireatlas/static/studio-assets/assets/journeyDiagram-3NMN7TZE-BGE20W5Y.js          23.60 kB │ gzip:   8.36 kB
+../fireatlas/static/studio-assets/assets/bn-BD-2XOGV67Q-DIqkAOLM.js                   23.70 kB │ gzip:   6.73 kB
+../fireatlas/static/studio-assets/assets/ko-KR-MTYHY66A-4Is9hDuM.js                   23.98 kB │ gzip:   9.20 kB
+../fireatlas/static/studio-assets/assets/fa-IR-HGAKTJCU--mEIzGDW.js                   24.34 kB │ gzip:   8.49 kB
+../fireatlas/static/studio-assets/assets/wardleyDiagram-VM6X3IG4-BEmBrIaK.js          25.53 kB │ gzip:   6.80 kB
+../fireatlas/static/studio-assets/assets/ar-SA-G6X2FPQ2-BxeM8sva.js                   25.77 kB │ gzip:   9.16 kB
+../fireatlas/static/studio-assets/assets/pa-IN-N4M65BXN-BCwud-rh.js                   28.08 kB │ gzip:   8.01 kB
+../fireatlas/static/studio-assets/assets/ku-TR-6OUDTVRD-Cw2i4Sfq.js                   29.42 kB │ gzip:   9.30 kB
+../fireatlas/static/studio-assets/assets/gitGraphDiagram-WWUBYQGX-DdRVgfuv.js         29.45 kB │ gzip:   8.71 kB
+../fireatlas/static/studio-assets/assets/el-GR-BZB4AONW-BAF_ckf-.js                   29.77 kB │ gzip:   9.65 kB
+../fireatlas/static/studio-assets/assets/erDiagram-RLTQ6QDP-BMOLpgXD.js               30.82 kB │ gzip:  10.59 kB
+../fireatlas/static/studio-assets/assets/ru-RU-B4JR7IUQ-DF3GW7pa.js                   30.84 kB │ gzip:   9.93 kB
+../fireatlas/static/studio-assets/assets/timeline-definition-24CTP7MA-BtRzKICQ.js     30.87 kB │ gzip:  10.16 kB
+../fireatlas/static/studio-assets/assets/requirementDiagram-BXWQKSXE-BnZtpf0j.js      31.02 kB │ gzip:   9.75 kB
+../fireatlas/static/studio-assets/assets/uk-UA-QMV73CPH-H1J59ISf.js                   31.74 kB │ gzip:  10.16 kB
+../fireatlas/static/studio-assets/assets/hi-IN-IWLTKZ5I-DERhPaVW.js                   32.45 kB │ gzip:   9.19 kB
+../fireatlas/static/studio-assets/assets/pica-BMG1llXt.js                             32.59 kB │ gzip:  12.96 kB
+../fireatlas/static/studio-assets/assets/quadrantDiagram-AXDQQJYC-BqHPy6gd.js         34.07 kB │ gzip:   9.98 kB
+../fireatlas/static/studio-assets/assets/ta-IN-2NMHFXQM-rn1q5BC9.js                   35.37 kB │ gzip:   8.60 kB
+../fireatlas/static/studio-assets/assets/layout-DWEOH2s4.js                           35.43 kB │ gzip:  12.74 kB
+../fireatlas/static/studio-assets/assets/km-KH-HSX4SM5Z-DnYM6HrQ.js                   36.75 kB │ gzip:   9.33 kB
+../fireatlas/static/studio-assets/assets/Combination-ChAsTJpu.js                      37.32 kB │ gzip:  14.06 kB
+../fireatlas/static/studio-assets/assets/transform-CpIVI4vC.js                        37.33 kB │ gzip:  12.62 kB
+../fireatlas/static/studio-assets/assets/chunk-IMKFNOWR-Ce8eoM77.js                   38.11 kB │ gzip:  12.49 kB
+../fireatlas/static/studio-assets/assets/blockDiagram-I7D4REHJ-DIR0bC3i.js            41.79 kB │ gzip:  13.59 kB
+../fireatlas/static/studio-assets/assets/vennDiagram-4TSXK5OY-C9TT2MiC.js             41.99 kB │ gzip:  15.70 kB
+../fireatlas/static/studio-assets/assets/mr-IN-CRQNXWMA-CQnhQu20.js                   42.35 kB │ gzip:  10.73 kB
+../fireatlas/static/studio-assets/assets/xychartDiagram-S5SC5T6Z-BDrql2fZ.js          44.54 kB │ gzip:  12.52 kB
+../fireatlas/static/studio-assets/assets/image-blob-reduce.esm-BZtWH-rr.js            45.80 kB │ gzip:  16.70 kB
+../fireatlas/static/studio-assets/assets/chunk-TICWLB2K-C7v3tpbw.js                   49.21 kB │ gzip:  15.75 kB
+../fireatlas/static/studio-assets/assets/flowDiagram-HODETNUW-Dj274VJI.js             61.87 kB │ gzip:  19.88 kB
+../fireatlas/static/studio-assets/assets/c4Diagram-7LVT6UL2-CdIGwAtW.js               65.50 kB │ gzip:  18.79 kB
+../fireatlas/static/studio-assets/assets/ganttDiagram-EL5Y4UJY-886epmOq.js            69.75 kB │ gzip:  23.57 kB
+../fireatlas/static/studio-assets/assets/cose-bilkent-JH36ORCC-Ck8C1XOT.js            81.73 kB │ gzip:  22.48 kB
+../fireatlas/static/studio-assets/assets/swimlanes-42K2YHIH-vRjGv81l.js              115.82 kB │ gzip:  42.52 kB
+../fireatlas/static/studio-assets/assets/sequenceDiagram-WJ2MYXX4-umkEHqQw.js        117.00 kB │ gzip:  31.12 kB
+../fireatlas/static/studio-assets/assets/studio-C0FasCJL.js                          135.12 kB │ gzip:  41.83 kB
+../fireatlas/static/studio-assets/assets/architectureDiagram-5GKGNRK7-CCFwWbWJ.js    151.86 kB │ gzip:  43.13 kB
+../fireatlas/static/studio-assets/assets/WorkflowPanel-CIHG7CZa.js                   152.39 kB │ gzip:  49.66 kB
+../fireatlas/static/studio-assets/assets/collaboration-iAdzrBg1.js                   196.44 kB │ gzip:  60.71 kB
+../fireatlas/static/studio-assets/assets/index-vqU_5UYy.js                           223.70 kB │ gzip:  69.85 kB
+../fireatlas/static/studio-assets/assets/katex-HP8lGamR.js                           261.31 kB │ gzip:  77.57 kB
+../fireatlas/static/studio-assets/assets/cytoscape.esm-BB4DxJjf.js                   443.04 kB │ gzip: 141.98 kB
+../fireatlas/static/studio-assets/assets/cynefin-OW5HDTMX-Bh9rg6Q8.js                687.73 kB │ gzip: 151.78 kB
+../fireatlas/static/studio-assets/assets/index-DuyG9_9l.js                           699.63 kB │ gzip: 174.18 kB
+../fireatlas/static/studio-assets/assets/excalidraw-GgFvF5AB.js                    1,090.87 kB │ gzip: 353.92 kB
+../fireatlas/static/studio-assets/assets/TldrawBoard-C0SueFeP.js                   1,679.02 kB │ gzip: 507.75 kB
+../fireatlas/static/studio-assets/assets/subset-shared.chunk-DKko7aOi.js           1,820.60 kB │ gzip: 735.77 kB
+
+(!) Some chunks are larger than 600 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 23.85s

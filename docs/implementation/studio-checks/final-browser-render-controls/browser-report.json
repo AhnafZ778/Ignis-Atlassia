@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "Authentic Park: 6,224 eligible records and 2,228 joint cell-days retain distinct units.",
+    "Explicit handoff refresh restores the same saved board.",
+    "JARVIS runs checked source states through the existing orchestrator without a model key.",
+    "Interval, highlighted cell, multi-card gallery, audience duration and camera transition resolve into the shared scene contract.",
+    "Prepared map/chart/source states and chapter explore/resume preserve the saved scene.",
+    "Portable reader runs under a project subpath with no backend or external imagery requests.",
+    "React Flow lazy mounts alongside its keyboard/table editor.",
+    "React Flow recipe runs, saves node receipts and materializes a real editable story.",
+    "Silent documentary rendered the same six prepared scenes at 1080p, 30 fps, 12 seconds, including the resolved camera/gallery metadata."
+  ],
+  "page_errors": [],
+  "initial_load": {
+    "requests": 17,
+    "response_body_bytes": 586259,
+    "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+  },
+  "narrow_layout": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ]
+}

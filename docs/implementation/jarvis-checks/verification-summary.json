@@ -1,0 +1,102 @@
+{
+  "date": "2026-10-05",
+  "scope": "JARVIS orchestration and editable whiteboard portability; local implementation only",
+  "python": {
+    "passed": 329,
+    "seconds": 460.781,
+    "command": ".venv-assistant/bin/python -m unittest discover -s tests",
+    "provider_calls": "No live provider calls; isolated fixtures and mocked transports."
+  },
+  "frontend": {
+    "passed": 51,
+    "test_files": 13,
+    "typescript_vite_build": "passed",
+    "command": "npm --prefix studio-app test; npm --prefix studio-app run build"
+  },
+  "focused": {
+    "portability_tests": 17,
+    "assistant_and_portability_tests": 62,
+    "miro_mock_tests": 5,
+    "note": "Focused runs precede the final full Python run, which includes these checks."
+  },
+  "landing": {
+    "protected_asset_hashes": 75,
+    "outside_header_html_boundaries": 2,
+    "result": "unchanged"
+  },
+  "asset_parity": {
+    "studio_manifest_files": 382,
+    "source_and_static_hashes_match": true,
+    "scoped_asset_parity": true,
+    "editor_html_expected_static_metadata_only": true,
+    "javascript_syntax_files": 177
+  },
+  "runtime_dependency_audit": {
+    "known_vulnerabilities": 0,
+    "scope": "npm audit --omit=dev"
+  },
+  "browser": {
+    "acceptance_checks": 11,
+    "page_errors": [],
+    "archive": {
+      "compressed_bytes": 1334265,
+      "expanded_bytes": 10247148,
+      "entries": 22,
+      "objects": 29
+    },
+    "reports": [
+      "browser-report.json",
+      "interruption-trace.json",
+      "restoration-comparison.json",
+      "presets/report.json"
+    ]
+  },
+  "cold_loading": {
+    "Explore": {
+      "requests": 29,
+      "decoded_response_body_bytes": 3182152,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked."
+    },
+    "Investigate": {
+      "requests": 29,
+      "decoded_response_body_bytes": 1698340,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked."
+    },
+    "Evidence": {
+      "requests": 26,
+      "decoded_response_body_bytes": 1103582,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked."
+    }
+  },
+  "static": {
+    "project_subpath": "/project/",
+    "backend_success_simulated": false,
+    "static_calendar_files": 42,
+    "calendar_evidence_hashes": 128,
+    "park_grove_validity_and_source_ledger": "passed",
+    "report": "static-loading-report.json"
+  },
+  "existing_visual_units": [
+    "test_assistant_map.cjs",
+    "test_assistant_visuals.cjs",
+    "test_investigation_terrain.cjs"
+  ],
+  "remaining_external_gates": [
+    "Live Miro token/scopes and explicitly authorized test destination",
+    "External MCP UI host acceptance",
+    "Configured live conversational provider verification; paid calls were not performed",
+    "Existing licensed tldraw/hosted collaboration gates"
+  ],
+  "remaining_scientific_gates": [
+    "Actual independent native-mask review",
+    "Validated observation exposure denominator",
+    "Independent source/product authentication"
+  ],
+  "shipping_notes": [
+    "Restart a pre-existing local Python service to load backend changes",
+    "Native/Excalidraw backend export needs pinned Node dependencies; PNG/PDF require Chromium",
+    "Static evidence and Excalidraw continuation work without private persistence or science services",
+    "Historical imported scene previews are retained; new story edits resolve new revisions",
+    "Frame/selection archives explicitly omit whole-board project histories"
+  ]
+}

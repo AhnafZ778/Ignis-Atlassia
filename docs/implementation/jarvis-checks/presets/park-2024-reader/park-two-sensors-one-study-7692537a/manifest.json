@@ -1,0 +1,112 @@
+{
+  "files": [
+    {
+      "bytes": 757,
+      "path": "README.txt",
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    {
+      "bytes": 208,
+      "path": "attribution.json",
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    {
+      "bytes": 1246,
+      "path": "captions.vtt",
+      "sha256": "83bc1ab531361a6cda6904068c22530eb454a53ccb160600f4ca014a85f7c0b3"
+    },
+    {
+      "bytes": 2726,
+      "path": "evidence/snap_3uHCPgiuD8UVbF1V.receipt.json.gz",
+      "sha256": "8e2d0aa2d2433580e4d7e516b07c9adfbd8b5ea525032b41513b07741b6839b4"
+    },
+    {
+      "bytes": 4887,
+      "path": "evidence/snap_3uHCPgiuD8UVbF1V.snapshot.json",
+      "sha256": "639dd1b11c19e462cfe90202598a02c074aca384610e50a7c45fb422b9d176ec"
+    },
+    {
+      "bytes": 6973,
+      "path": "evidence/snap_H1_IVE2X5yY6AnwO.receipt.json.gz",
+      "sha256": "5503d90e7a01e4ba980928245fd966ef5d4fde9303bada78cf8ab30fa242a63d"
+    },
+    {
+      "bytes": 3048,
+      "path": "evidence/snap_H1_IVE2X5yY6AnwO.snapshot.json",
+      "sha256": "4c92e0d86119e720b313a16d161286ac5e11613c79108c2a126d5508f3ec107a"
+    },
+    {
+      "bytes": 440665,
+      "path": "evidence/snap_zbCeM7-4rxKbArDP.receipt.json.gz",
+      "sha256": "f5d455ab4bd89818a1de45ffacace95f6bf76e4cc7cf73038293a94dbf369b2e"
+    },
+    {
+      "bytes": 3317,
+      "path": "evidence/snap_zbCeM7-4rxKbArDP.snapshot.json",
+      "sha256": "364fcfac0e572b977d3d9033a59cefbc500d676915a3803c98976bd0854787e1"
+    },
+    {
+      "bytes": 31404,
+      "path": "fallbacks/chapter-1.svg",
+      "sha256": "0bee6758023dbd0b7c744c6c6dd54f61d5a49c626a0b835fa2dc37b2818ec936"
+    },
+    {
+      "bytes": 4059,
+      "path": "fallbacks/chapter-2.svg",
+      "sha256": "b5a8121c25c27c68d4117f4c4a410d1263056c2b8aff3c8b05a8f5c4e8c606eb"
+    },
+    {
+      "bytes": 5892,
+      "path": "fallbacks/chapter-3.svg",
+      "sha256": "935d22bb964528f5b70d8af47a8dd9d2e28e839a2ae56349938791b191c4468c"
+    },
+    {
+      "bytes": 1313,
+      "path": "fallbacks/chapter-4.svg",
+      "sha256": "c5cd8bb23daf738ab5a6da77d1a336d3a8d0156d644491b7a3c5fab590ab755f"
+    },
+    {
+      "bytes": 3886,
+      "path": "fallbacks/chapter-5.svg",
+      "sha256": "52ac72dd3dfb958ce5bf9c965542479dbd16b0570ba3d14363554fbca6fa8e0d"
+    },
+    {
+      "bytes": 1313,
+      "path": "fallbacks/chapter-6.svg",
+      "sha256": "75085c0038f5968cf4116b96257ec824228c2a2d911f9edca6ac04febeeb7515"
+    },
+    {
+      "bytes": 347,
+      "path": "index.html",
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    {
+      "bytes": 2570,
+      "path": "reader.css",
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    {
+      "bytes": 11044,
+      "path": "reader.js",
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    {
+      "bytes": 313629,
+      "path": "story.json",
+      "sha256": "5d9216b157e6cac7775554801ab3493225c8e9d23cc17a4c72af319e3f2146c4"
+    },
+    {
+      "bytes": 4044,
+      "path": "transcript.txt",
+      "sha256": "656446712f37b47be34d5e9c05ddf151fc1b1ddcb86d0e361ba1119e55366f33"
+    }
+  ],
+  "generated_utc": "2026-10-05T12:11:07+00:00",
+  "manifest_sha256": "9a8160e6326e53dcc7fc9c870641332e2042b14c68f30c00a2c92212bdf12600",
+  "private_identifiers": false,
+  "requires_backend": false,
+  "schema": "fireatlas-studio-reader-v1",
+  "slug": "park-two-sensors-one-study-7692537a",
+  "story_sha256": "7692537a8b5eeda15ea4fbd1a0322bcd5abf42b899bac4ae0fa49bb44042fbe4",
+  "title": "Park \u00b7 two sensors, one study"
+}

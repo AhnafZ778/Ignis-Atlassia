@@ -1,0 +1,56 @@
+{
+  "blocked_ack": {
+    "status": "awaiting_view_ack",
+    "phase": "awaiting_view_ack",
+    "outputs": {
+      "document_id": "doc_w-btSCgOEbJyOObW",
+      "export_job_ids": [
+        "export_cf1592a5d3954714cf878e85",
+        "export_5b5ff83ac691b69471fee1b7"
+      ],
+      "object_ids": [
+        "j_75713eedc8f746f3acfcab1b9394df",
+        "j_2a5d39c78299c03cd44cd1c86661d7",
+        "j_d6a71e6846d2e721c69d2c7d3db74e",
+        "j_a06969b52869941f50720940f93ec6",
+        "j_fe9f1eee9fb90602eb4263ab70644a",
+        "j_44c9b2942e03cc28681b7ca6283680",
+        "j_15cb782585fb502ef7ce1a7f153df0"
+      ],
+      "package_id": "j_a3e3dae3490444461f30f54f0b0d0c",
+      "return_destination": "/investigate.html?year=2024&month=7&bbox=-122%2C39.5%2C-121.3%2C40.5&start=2024-07-24&end=2024-08-14&as_of=2024-08-14&day=2024-07-25&case=park-2024&region=norcal&series=joint&source=joint&distance_km=2&gap_days=1&layer=terrain&calendar_metric=harmonized&metric=density&scope=daily&view=2d&split=true&scale=study&context_version=2",
+      "revision": 2,
+      "transaction_id": "tx_0E0kfuJsR-WSstp_",
+      "workflow_id": "j_17c186d5bcca965dd604f6391a5e21"
+    },
+    "board_revision": 2
+  },
+  "after_reload": {
+    "status": "completed",
+    "phase": "completed",
+    "outputs": {
+      "acknowledged_instance": "canvas-e1403b44ac39",
+      "document_id": "doc_w-btSCgOEbJyOObW",
+      "export_job_ids": [
+        "export_cf1592a5d3954714cf878e85",
+        "export_5b5ff83ac691b69471fee1b7"
+      ],
+      "object_ids": [
+        "j_75713eedc8f746f3acfcab1b9394df",
+        "j_2a5d39c78299c03cd44cd1c86661d7",
+        "j_d6a71e6846d2e721c69d2c7d3db74e",
+        "j_a06969b52869941f50720940f93ec6",
+        "j_fe9f1eee9fb90602eb4263ab70644a",
+        "j_44c9b2942e03cc28681b7ca6283680",
+        "j_15cb782585fb502ef7ce1a7f153df0"
+      ],
+      "package_id": "j_a3e3dae3490444461f30f54f0b0d0c",
+      "return_destination": "/investigate.html?year=2024&month=7&bbox=-122%2C39.5%2C-121.3%2C40.5&start=2024-07-24&end=2024-08-14&as_of=2024-08-14&day=2024-07-25&case=park-2024&region=norcal&series=joint&source=joint&distance_km=2&gap_days=1&layer=terrain&calendar_metric=harmonized&metric=density&scope=daily&view=2d&split=true&scale=study&context_version=2",
+      "revision": 2,
+      "transaction_id": "tx_0E0kfuJsR-WSstp_",
+      "workflow_id": "j_17c186d5bcca965dd604f6391a5e21"
+    },
+    "board_revision": 2
+  },
+  "duplicate_insertion": false
+}

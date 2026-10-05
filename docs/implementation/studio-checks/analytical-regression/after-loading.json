@@ -1,0 +1,388 @@
+{
+  "calendar": [
+    {
+      "url": "/demo/atlas.html",
+      "status": 200,
+      "bytes": 39318
+    },
+    {
+      "url": "/demo/styles.css",
+      "status": 200,
+      "bytes": 19674
+    },
+    {
+      "url": "/demo/vendor/ui-primitives.css",
+      "status": 200,
+      "bytes": 2391
+    },
+    {
+      "url": "/demo/vendor/leaflet.css",
+      "status": 200,
+      "bytes": 14145
+    },
+    {
+      "url": "/demo/harmonized.css",
+      "status": 200,
+      "bytes": 27842
+    },
+    {
+      "url": "/demo/design.css",
+      "status": 200,
+      "bytes": 60591
+    },
+    {
+      "url": "/demo/lab.css",
+      "status": 200,
+      "bytes": 33776
+    },
+    {
+      "url": "/demo/workspace.css",
+      "status": 200,
+      "bytes": 113894
+    },
+    {
+      "url": "/demo/assistant.css",
+      "status": 200,
+      "bytes": 67811
+    },
+    {
+      "url": "/demo/analytical.css",
+      "status": 200,
+      "bytes": 3728
+    },
+    {
+      "url": "/demo/vendor/lucide-icons.svg",
+      "status": 200,
+      "bytes": 5565
+    },
+    {
+      "url": "/demo/fonts/dm-sans.ttf",
+      "status": 200,
+      "bytes": 240164
+    },
+    {
+      "url": "/demo/fonts/space-grotesk.ttf",
+      "status": 200,
+      "bytes": 136676
+    },
+    {
+      "url": "/demo/workspace-context.js",
+      "status": 200,
+      "bytes": 8901
+    },
+    {
+      "url": "/demo/workspace-shell.js",
+      "status": 200,
+      "bytes": 6203
+    },
+    {
+      "url": "/demo/vendor/leaflet.js",
+      "status": 200,
+      "bytes": 147552
+    },
+    {
+      "url": "/demo/assistant-views.js",
+      "status": 200,
+      "bytes": 16418
+    },
+    {
+      "url": "/demo/workspace.js",
+      "status": 200,
+      "bytes": 7300
+    },
+    {
+      "url": "/demo/harmonized.js",
+      "status": 200,
+      "bytes": 53861
+    },
+    {
+      "url": "/demo/assistant.js",
+      "status": 200,
+      "bytes": 34722
+    },
+    {
+      "url": "/demo/assistant-visuals.js",
+      "status": 200,
+      "bytes": 22278
+    },
+    {
+      "url": "/demo/data/analysis/regions.json",
+      "status": 200,
+      "bytes": 29126
+    },
+    {
+      "url": "/demo/api/assistant/capabilities",
+      "status": 404,
+      "bytes": 335
+    },
+    {
+      "url": "/demo/data/analysis/calendar/norcal/2026.json",
+      "status": 200,
+      "bytes": 1702650
+    },
+    {
+      "url": "/demo/data/analysis/manifest.json",
+      "status": 200,
+      "bytes": 372466
+    }
+  ],
+  "investigation": [
+    {
+      "url": "/demo/styles.css",
+      "status": 200,
+      "bytes": 19674
+    },
+    {
+      "url": "/demo/investigate.html?case=grove-2025",
+      "status": 200,
+      "bytes": 23648
+    },
+    {
+      "url": "/demo/design.css",
+      "status": 200,
+      "bytes": 60591
+    },
+    {
+      "url": "/demo/workspace.css",
+      "status": 200,
+      "bytes": 113894
+    },
+    {
+      "url": "/demo/lab.css",
+      "status": 200,
+      "bytes": 33776
+    },
+    {
+      "url": "/demo/assistant.css",
+      "status": 200,
+      "bytes": 67811
+    },
+    {
+      "url": "/demo/analytical.css",
+      "status": 200,
+      "bytes": 3728
+    },
+    {
+      "url": "/demo/vendor/leaflet.css",
+      "status": 200,
+      "bytes": 14145
+    },
+    {
+      "url": "/demo/workspace-context.js",
+      "status": 200,
+      "bytes": 8901
+    },
+    {
+      "url": "/demo/vendor/leaflet.js",
+      "status": 200,
+      "bytes": 147552
+    },
+    {
+      "url": "/demo/fonts/dm-sans.ttf",
+      "status": 200,
+      "bytes": 240164
+    },
+    {
+      "url": "/demo/fonts/space-grotesk.ttf",
+      "status": 200,
+      "bytes": 136676
+    },
+    {
+      "url": "/demo/assistant-map.js",
+      "status": 200,
+      "bytes": 6922
+    },
+    {
+      "url": "/demo/assistant-views.js",
+      "status": 200,
+      "bytes": 16418
+    },
+    {
+      "url": "/demo/workspace-shell.js",
+      "status": 200,
+      "bytes": 6203
+    },
+    {
+      "url": "/demo/assistant-visuals.js",
+      "status": 200,
+      "bytes": 22278
+    },
+    {
+      "url": "/demo/assistant-workspace.js",
+      "status": 200,
+      "bytes": 66260
+    },
+    {
+      "url": "/demo/workspace.js",
+      "status": 200,
+      "bytes": 7300
+    },
+    {
+      "url": "/demo/assistant.js",
+      "status": 200,
+      "bytes": 34722
+    },
+    {
+      "url": "/demo/replay-context/manifest.json",
+      "status": 200,
+      "bytes": 4501
+    },
+    {
+      "url": "/demo/data/replay/catalog.json",
+      "status": 200,
+      "bytes": 7161
+    },
+    {
+      "url": "/demo/replay-context/grove-2025/terrain.png",
+      "status": 200,
+      "bytes": 101615
+    },
+    {
+      "url": "/demo/api/replay/catalog",
+      "status": 404,
+      "bytes": 335
+    },
+    {
+      "url": "/demo/api/assistant/capabilities",
+      "status": 404,
+      "bytes": 335
+    },
+    {
+      "url": "/demo/data/replay/cases/grove-2025.json.gz",
+      "status": 200,
+      "bytes": 3275
+    },
+    {
+      "url": "/demo/api/replay?case=grove-2025",
+      "status": 404,
+      "bytes": 335
+    }
+  ],
+  "evidence": [
+    {
+      "url": "/demo/evidence.html?tab=calibration&region=norcal",
+      "status": 200,
+      "bytes": 59509
+    },
+    {
+      "url": "/demo/styles.css",
+      "status": 200,
+      "bytes": 19674
+    },
+    {
+      "url": "/demo/design.css",
+      "status": 200,
+      "bytes": 60591
+    },
+    {
+      "url": "/demo/workspace.css",
+      "status": 200,
+      "bytes": 113894
+    },
+    {
+      "url": "/demo/assistant.css",
+      "status": 200,
+      "bytes": 67811
+    },
+    {
+      "url": "/demo/lab.css",
+      "status": 200,
+      "bytes": 33776
+    },
+    {
+      "url": "/demo/research.css",
+      "status": 200,
+      "bytes": 16041
+    },
+    {
+      "url": "/demo/data.css",
+      "status": 200,
+      "bytes": 15122
+    },
+    {
+      "url": "/demo/method.css",
+      "status": 200,
+      "bytes": 26664
+    },
+    {
+      "url": "/demo/validity.css",
+      "status": 200,
+      "bytes": 32441
+    },
+    {
+      "url": "/demo/analytical.css",
+      "status": 200,
+      "bytes": 3728
+    },
+    {
+      "url": "/demo/review.css",
+      "status": 200,
+      "bytes": 9864
+    },
+    {
+      "url": "/demo/workspace-context.js",
+      "status": 200,
+      "bytes": 8901
+    },
+    {
+      "url": "/demo/assistant-views.js",
+      "status": 200,
+      "bytes": 16418
+    },
+    {
+      "url": "/demo/vendor/leaflet.js",
+      "status": 200,
+      "bytes": 147552
+    },
+    {
+      "url": "/demo/fonts/dm-sans.ttf",
+      "status": 200,
+      "bytes": 240164
+    },
+    {
+      "url": "/demo/fonts/space-grotesk.ttf",
+      "status": 200,
+      "bytes": 136676
+    },
+    {
+      "url": "/demo/workspace-shell.js",
+      "status": 200,
+      "bytes": 6203
+    },
+    {
+      "url": "/demo/workspace.js",
+      "status": 200,
+      "bytes": 7300
+    },
+    {
+      "url": "/demo/analytical-panels.js",
+      "status": 200,
+      "bytes": 9965
+    },
+    {
+      "url": "/demo/assistant-visuals.js",
+      "status": 200,
+      "bytes": 22278
+    },
+    {
+      "url": "/demo/assistant.js",
+      "status": 200,
+      "bytes": 34722
+    },
+    {
+      "url": "/demo/calibration-validation.js",
+      "status": 200,
+      "bytes": 13449
+    },
+    {
+      "url": "/demo/api/assistant/capabilities",
+      "status": 404,
+      "bytes": 335
+    },
+    {
+      "url": "/demo/data/analysis/calibration/norcal.json",
+      "status": 200,
+      "bytes": 481760
+    }
+  ]
+}

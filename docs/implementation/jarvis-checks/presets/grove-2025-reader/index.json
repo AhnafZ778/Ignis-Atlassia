@@ -1,0 +1,13 @@
+{
+  "schema": "fireatlas-studio-catalog-v1",
+  "stories": [
+    {
+      "duration_seconds": 45.0,
+      "manifest": "grove-a-small-inspectable-example-e82d549f/manifest.json",
+      "manifest_sha256": "8b9315b04ad4daf143d5866d65e01f2966b4c252d16506e3514c3581864f0d00",
+      "scenes": 3,
+      "slug": "grove-a-small-inspectable-example-e82d549f",
+      "title": "Grove \u00b7 a small, inspectable example"
+    }
+  ]
+}

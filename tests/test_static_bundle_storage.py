@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.static_bundle_storage import prepare, assemble
+from scripts.static_bundle_storage import prepare, assemble, prune_parts
 
 
 class StaticBundleStorageTests(unittest.TestCase):
@@ -50,6 +50,20 @@ class StaticBundleStorageTests(unittest.TestCase):
         (self.root / 'bundles/archive-storage.json').write_text(json.dumps(self.storage))
         with self.assertRaisesRegex(ValueError, 'escapes'):
             assemble(self.root)
+
+    def test_publication_prunes_only_parts_and_preserves_exact_archive(self):
+        self.archive.unlink()
+        prune_parts(self.root)
+        self.assertEqual(self.archive.read_bytes(), self.body)
+        self.assertEqual(list((self.root / 'bundles').glob('*.part*')), [])
+        self.assertEqual(assemble(self.root), ['bundles/example.zip'])
+
+    def test_cleanup_cannot_delete_a_different_file(self):
+        self.storage['archives'][0]['parts'][0]['path'] = 'bundles/example.zip'
+        (self.root / 'bundles/archive-storage.json').write_text(json.dumps(self.storage))
+        with self.assertRaisesRegex(ValueError, 'named transport'):
+            prune_parts(self.root)
+        self.assertEqual(self.archive.read_bytes(), self.body)
 
 
 if __name__ == '__main__':

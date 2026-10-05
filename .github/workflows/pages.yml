@@ -24,7 +24,7 @@ jobs:
       - name: Check out the reviewed bundle
         uses: actions/checkout@v4
       - name: Reassemble verified regional archives
-        run: python3 scripts/static_bundle_storage.py --site site
+        run: python3 scripts/static_bundle_storage.py --site site --prune-parts
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload the static bundle

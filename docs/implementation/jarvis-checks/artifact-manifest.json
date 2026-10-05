@@ -1,0 +1,569 @@
+{
+  "schema": "fireatlas-implementation-evidence-v1",
+  "files": {
+    "restored-360.png": {
+      "bytes": 79140,
+      "sha256": "23a330d2d247f70558468c7c8eb4debf717ed9cf90a5058cdbd358f0b856d5ae"
+    },
+    "static-calendar.log": {
+      "bytes": 1137,
+      "sha256": "ba6d38bcfa2db36010589c58c154df9ea0fb2a2c17690c36df9b36d1daa27aa8"
+    },
+    "static-investigate.png": {
+      "bytes": 345657,
+      "sha256": "4e081a0350198521a7a5cc16d6667df4b0077b641fd9ef46c4fef6867167d47a"
+    },
+    "park-whiteboard.pdf": {
+      "bytes": 744838,
+      "sha256": "52a5a169f9a7e4bc5b5fa242c031016140f72cbb5e6680fe855755c74fb116d9"
+    },
+    "restoration-comparison.json": {
+      "bytes": 737,
+      "sha256": "23c1ca2456a39ec876e8fd7442040f392d771b11642d4b57015c0c4368791619"
+    },
+    "miro-mocks.log": {
+      "bytes": 103,
+      "sha256": "2b68188b4b01f317f84065f7ac72587be2d34452c30dd13ae6b7349fe64260e8"
+    },
+    "park-investigation.fireatlas.zip": {
+      "bytes": 1334265,
+      "sha256": "1ba55231260ba187ce421d45931ac3d16d066c199f87cb75b580517060114d1e"
+    },
+    "static-excalidraw-subpath.png": {
+      "bytes": 116065,
+      "sha256": "abf00b10a0d477bacc7e1e1f2a74144213c157f1f1fb946daeab6c4990663eaf"
+    },
+    "landing-guard.log": {
+      "bytes": 67,
+      "sha256": "7a49b1e769bc5eb33e74746b17a76b2cf5b2bb568ca6efc6558100237a045fef"
+    },
+    "static-loading-report.json": {
+      "bytes": 12293,
+      "sha256": "bc32529e100b044e60c7044920f073c1f36d4cdbc95ccba427eb5be8b47ff58f"
+    },
+    "asset-syntax-report.json": {
+      "bytes": 11880,
+      "sha256": "20c27b3c671f27c5195635dc69479c5cc9008b9bff82d39bbfdcacd1d7a66163"
+    },
+    "static-evidence.png": {
+      "bytes": 330248,
+      "sha256": "d9fd4523f31713785f642e4f0c5722dc2559c82158dda3535d9da65f235c47c7"
+    },
+    "asset-syntax.log": {
+      "bytes": 183,
+      "sha256": "c88118340cdb99d2187b7b3f32f79a8837148088b8c2ededa04d72e2066bfff3"
+    },
+    "atlas-harmonized-canvas.png": {
+      "bytes": 465251,
+      "sha256": "b71fe4100c70cda2f342216bf44c3741b4dbc5120be68fbbced86f9ce300457f"
+    },
+    "static-explore.png": {
+      "bytes": 486146,
+      "sha256": "be052787e894b36a3628050ed99295478b0741d238cfa68e4538f4402cbf20fb"
+    },
+    "atlas-captured-source.png": {
+      "bytes": 483093,
+      "sha256": "b5a3408749b011447fe7f7c1c5799259e9b01d5355ee3231ed98a5251dab856e"
+    },
+    "static-refresh.log": {
+      "bytes": 306,
+      "sha256": "6accdf68165a215d61699f0bd4687ed485b33d99d3801626a58a81bdb15c3ae3"
+    },
+    "preset-browser.log": {
+      "bytes": 4130,
+      "sha256": "8c07964b2dcfc931eb1f853616c20ef4d8fb6272d2663b86308a22a8756dd0c8"
+    },
+    "assistant-focused.log": {
+      "bytes": 1404,
+      "sha256": "100b5aea3eb4d051e54107b4ea44e1bc7abbf1e01fad179a6f3367ad633532bb"
+    },
+    "canvas-handoff.png": {
+      "bytes": 127508,
+      "sha256": "5bac215b7c95b1ac4945cde263e294e4a38de3d07eb5b7a1da52665ba3b3932b"
+    },
+    "park-investigation.excalidraw": {
+      "bytes": 383670,
+      "sha256": "1ae90dcaba6fe444906ea68040ce9c4efb57305873fe6b51d0263a23a057b1e3"
+    },
+    "browser-acceptance.log": {
+      "bytes": 1377,
+      "sha256": "749e3807225123fa32758eb5c1d8c236b1c30d127dd71d731d75274af5220625"
+    },
+    "restored-empty-backend.png": {
+      "bytes": 104535,
+      "sha256": "2654ec705528e1bf97408ee31ec7b66eab2c065804962d5e08be357fee1e88dd"
+    },
+    "terrain-tests.log": {
+      "bytes": 90,
+      "sha256": "bb3086b391b5ec42b823727505d81eca341237f4a3ec167f7e3a016ca2746940"
+    },
+    "map-tests.log": {
+      "bytes": 133,
+      "sha256": "234c99dd461ddbd4b4400e8024b2bcb37af5cc37ad275b04192a1c57439fafd3"
+    },
+    "python-suite.log": {
+      "bytes": 27626,
+      "sha256": "717ab95d3e2bd976202f1c12810e0da763e18c51b4e7fe809fe7183951d9b5c6"
+    },
+    "portability-tests.log": {
+      "bytes": 266,
+      "sha256": "2e52a3276998b199561b498403a0dd4871cd00b0ba6644c44d9675ceca7c39a0"
+    },
+    "restored-390.png": {
+      "bytes": 96301,
+      "sha256": "aca160c45355fe10dedae549ff2b3d7923814ef1e2e89adf0a2620cdd8f3332c"
+    },
+    "park-whiteboard.svg": {
+      "bytes": 316353,
+      "sha256": "905057c233296970077f59e45493e50c50af10d2d6abc9690ecd2362d19e9e7c"
+    },
+    "restored-768.png": {
+      "bytes": 178114,
+      "sha256": "a703603f4a341b68ede3c6f2ddaa1dd49a7b232f2f4d8845e44e029451b6be9e"
+    },
+    "park-edited.excalidraw": {
+      "bytes": 384064,
+      "sha256": "fbb66b26ca4310b45ef914b5e7b6cadca45622e45333cdc9b93015260e8144df"
+    },
+    "static-loading.log": {
+      "bytes": 469,
+      "sha256": "2d65e1107c5edc746c97af1bd81742938bfa685376de414c3724da360684ce52"
+    },
+    "npm-runtime-audit.json": {
+      "bytes": 366,
+      "sha256": "e04f348a7655cac329dc98d20d63839a2b1d819ce2e9d5c718d926f964ca82e5"
+    },
+    "static-method-grove.log": {
+      "bytes": 2669,
+      "sha256": "6bc6191601cf45da36f63779c9ca3e73f18cf32a8d698864135fa806f3c0d0c6"
+    },
+    "park-whiteboard.png": {
+      "bytes": 253973,
+      "sha256": "1fca92fcbe3b41cdc670ec11699a8f0b83a4f372452806fa5b73cb9304250964"
+    },
+    "frontend-build.log": {
+      "bytes": 17110,
+      "sha256": "059209e101c5b4b9a7cae8064d6f01c99f882115133664f32a23c8b4a2d2193c"
+    },
+    "static-data.log": {
+      "bytes": 2825,
+      "sha256": "eab9a8d428012e21ada022029ac226b3be27a4818202ce55dce149b379938e9d"
+    },
+    "frontend-tests.log": {
+      "bytes": 294,
+      "sha256": "e5290db009cffa6a565f22a9c9a1b0b19c1c7150118d4cc82693730d1c74e769"
+    },
+    "verification-summary.json": {
+      "bytes": 3527,
+      "sha256": "38bd33b1fe6585bda138d3b20a645780f61a376a50046dbd06d57d789ac7276a"
+    },
+    "interruption-trace.json": {
+      "bytes": 2443,
+      "sha256": "053b8bbecae49ebb3ab901c039876af5105c0f6db02f0dd83fc1d1ea07fa2d65"
+    },
+    "visual-tests.log": {
+      "bytes": 92,
+      "sha256": "e47f7f1134453ef52d4dc09e54ba375cb14cd5c86a73375b3d03bf6ca77e6a6b"
+    },
+    "editable-excalidraw.png": {
+      "bytes": 121900,
+      "sha256": "732b380f4aec06ce15ec95c5e1d21939c8e30a0fb6f569f89bdf141c4a229b8e"
+    },
+    "browser-report.json": {
+      "bytes": 1987,
+      "sha256": "cf21602499ef024ca7ca999a09de46078bce54f94424f1ad76ada6674d8007d6"
+    },
+    "edited-reopened-excalidraw.png": {
+      "bytes": 122282,
+      "sha256": "a8ebfb0f8a37eed5e6805487abaea3efc0e3aa00e053d2ffe6b499f89b7bd710"
+    },
+    "static-method-park.log": {
+      "bytes": 3182,
+      "sha256": "ffe8f5395cfedba360b96aa8b7f7adf177d7ac6a4479e18502da5303e5b2249f"
+    },
+    "presets/camp-2018-reader-verification.json": {
+      "bytes": 434,
+      "sha256": "686142b9999d5d58ba87bd91d99aa5d676217b3a2737c7f05dfe524c8086b53d"
+    },
+    "presets/park-2024-paired-story.png": {
+      "bytes": 63314,
+      "sha256": "63ac6841cb79aa0a50db86e348a65568c8d646d3b0f84ceb401a0b610fca64ab"
+    },
+    "presets/grove-2025-reader-verification.json": {
+      "bytes": 434,
+      "sha256": "3f97232b2ee6ad2eba142843931a33e911809d9b0e066c301013884e0620b6c8"
+    },
+    "presets/camp-2018-heat.png": {
+      "bytes": 149662,
+      "sha256": "d8effb28ee1d8346dc4efd16eb55f26803a658034111103f000bffa0c6349d19"
+    },
+    "presets/park-2024-reader.zip": {
+      "bytes": 543572,
+      "sha256": "95e50d473c21fac122a57296886e6911becb28fea552d51ae2889cab72d8af6d"
+    },
+    "presets/grove-2025-MODIS_SP-story-heat.png": {
+      "bytes": 7077,
+      "sha256": "49e2d70fd3c72de9e0b0979dbcf458b1b366f7dc27e32ad1ac77e49a1694388b"
+    },
+    "presets/park-2024-heat.png": {
+      "bytes": 53255,
+      "sha256": "93da8509651e6fdf5cd805049560e164abe15d43dc79df0da13bfb16e426a463"
+    },
+    "presets/report.json": {
+      "bytes": 2025,
+      "sha256": "47287782810f467657a13eda031f9feadfce6c1da8c7d0c1f0ff695b1b0c2b85"
+    },
+    "presets/grove-2025-paired-story.png": {
+      "bytes": 58670,
+      "sha256": "cde35b89470e12e5ad1663f95b3d5072485082e3195e07cf808ff0a736fe8b1c"
+    },
+    "presets/grove-2025-VIIRS_SNPP_SP-story-heat.png": {
+      "bytes": 5989,
+      "sha256": "1d972f120d78dbf59f6f678820eb3036b559cac4a6031d1c075a65f5fcd2f8e1"
+    },
+    "presets/park-2024-MODIS_SP-story-heat.png": {
+      "bytes": 7665,
+      "sha256": "1b0dc99e2aa1c1bfaf0338acd2fb98d275092eb63edf89ecd3d5b5d1c9b1f507"
+    },
+    "presets/camp-2018-VIIRS_SNPP_SP-story-heat.png": {
+      "bytes": 33930,
+      "sha256": "baf13a36ce770d708f28037ffe790574438058de8b6c252ef4f1a9ba8bc8eb93"
+    },
+    "presets/park-linked-board.png": {
+      "bytes": 140814,
+      "sha256": "b5a8b41e1ee0c3a157377436902912c27bbeebe56cca709ff9db5c73ac8745f0"
+    },
+    "presets/grove-2025-reader.zip": {
+      "bytes": 58293,
+      "sha256": "e17a523eb96fd239ba6add0d76689167a6f3f9a94e9c71a2498f7c231f322320"
+    },
+    "presets/park-2024-portable-reader-390.png": {
+      "bytes": 223205,
+      "sha256": "3989f4ba6dfc0542880c9f90484a30717320ac30b06ff1e94100a1be10106db6"
+    },
+    "presets/camp-2018-reader.zip": {
+      "bytes": 642455,
+      "sha256": "b65204feec590b6a8f30a6c250a842e79d1fcb4544c0baff6cb8e3dc089c3142"
+    },
+    "presets/presets-360.png": {
+      "bytes": 765410,
+      "sha256": "48361be245009c44ddae5ec781bfe85566675e3d6d1a1b5a37f9ce9e8db6330a"
+    },
+    "presets/camp-2018-paired-story.png": {
+      "bytes": 115108,
+      "sha256": "2a8651cef57a96e9682375e9ae30bddfbdc35bfd7da15d09236cb72df8cedd73"
+    },
+    "presets/grove-2025-paired-story.svg": {
+      "bytes": 25824,
+      "sha256": "4b69bd4e11f22c3c3b37a5bbd8274f268f538790ee315b4299f6ab37e2412fa4"
+    },
+    "presets/camp-2018-chart.csv": {
+      "bytes": 837,
+      "sha256": "97bd5077c1664452df2f416b0ff3416591ea9cf2b7e3d9ed73e41f5628944326"
+    },
+    "presets/grove-2025-chart.csv": {
+      "bytes": 253,
+      "sha256": "ad007d3cebced6094ab53d4535fc9632986bbaa29a3a2162d3475595732cf3fa"
+    },
+    "presets/grove-2025-portable-reader-390.png": {
+      "bytes": 168190,
+      "sha256": "8c551e3ece5008bc026e80516c8cd0ba201e73bec4acd2a60765853ffe9ee36d"
+    },
+    "presets/park-2024-paired-story.svg": {
+      "bytes": 31404,
+      "sha256": "0bee6758023dbd0b7c744c6c6dd54f61d5a49c626a0b835fa2dc37b2818ec936"
+    },
+    "presets/camp-2018-MODIS_SP-story-heat.png": {
+      "bytes": 31679,
+      "sha256": "7e99fc56fc98ee4de590c8e5b4a1e27e3a03540c0b0f303b073e5160be120369"
+    },
+    "presets/park-workflow.png": {
+      "bytes": 76032,
+      "sha256": "c3210b67ac80f8036eaa94f77489dedcc11363cdb1ec939e4f8ec6df62fee9c6"
+    },
+    "presets/preset-gallery.png": {
+      "bytes": 618378,
+      "sha256": "9bfe811a7bf63feb74ea8a8c11e1eb9fdee94e822329032915e590eda1afa1de"
+    },
+    "presets/park-2024-chart.csv": {
+      "bytes": 1340,
+      "sha256": "56138a3fc489eb33b3609587e58d4dd917689e97329f31a8e0e87f809a2d9bd2"
+    },
+    "presets/grove-short-story.png": {
+      "bytes": 931594,
+      "sha256": "21a465e38d4f21b0a42746f52da5b2990331be70f9c2f5c54745f553a96bca4b"
+    },
+    "presets/presets-390.png": {
+      "bytes": 771969,
+      "sha256": "26100a580578bb3ffdc08bac9ea2f60a4586aaefdf779a7cde434f2db93103df"
+    },
+    "presets/camp-2018-paired-story.svg": {
+      "bytes": 95876,
+      "sha256": "5ae903cae9e4c4e9f126e0cc6a670908c4738247dbd0fa820fe9c11baf37db81"
+    },
+    "presets/park-2024-reader-verification.json": {
+      "bytes": 434,
+      "sha256": "686142b9999d5d58ba87bd91d99aa5d676217b3a2737c7f05dfe524c8086b53d"
+    },
+    "presets/grove-2025-heat.png": {
+      "bytes": 51067,
+      "sha256": "e501d2b02a27978382b73e676150a7cb71d787ec475990e00689826cbf253538"
+    },
+    "presets/camp-2018-portable-reader-390.png": {
+      "bytes": 234972,
+      "sha256": "c772d0a66e72465bd0573781c853066b29a39c5187ea42053abb83dd06a22aea"
+    },
+    "presets/park-2024-VIIRS_SNPP_SP-story-heat.png": {
+      "bytes": 9589,
+      "sha256": "47220a550d2fb37937da12583536091c2afbb6aa307f26d53bc59ea233c84cb5"
+    },
+    "presets/presets-768.png": {
+      "bytes": 935619,
+      "sha256": "c1aa9a06f01617daa5cec560fc26285e64239183ac883cc0aede0077fd188470"
+    },
+    "presets/camp-2018-reader/index.json": {
+      "bytes": 408,
+      "sha256": "9295f3e7ed1be42d850e0f2759c1c59e1968a1905eb9c081c86b0d1820f1a43a"
+    },
+    "presets/grove-2025-reader/index.json": {
+      "bytes": 418,
+      "sha256": "38c55646bc795854133d1dc3946c8312db38064346aa22363caad1ca6fba08b5"
+    },
+    "presets/park-2024-reader/index.json": {
+      "bytes": 397,
+      "sha256": "a484555332b7e3edbc1134ddd4a1b58e8736c9572c2e1b8306af0979c3cc3a46"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/README.txt": {
+      "bytes": 757,
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/reader.js": {
+      "bytes": 11044,
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/reader.css": {
+      "bytes": 2570,
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/attribution.json": {
+      "bytes": 208,
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/manifest.json": {
+      "bytes": 3652,
+      "sha256": "5f959d1ad1d4c0f8760743319e6a8c873c0c2f5a1960de93725f23e620f1770c"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/story.json": {
+      "bytes": 507997,
+      "sha256": "a1f92d28bce71d713eff16c7ee53844b578a0d8f99abfd398a4295713c5d9790"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/captions.vtt": {
+      "bytes": 1246,
+      "sha256": "83bc1ab531361a6cda6904068c22530eb454a53ccb160600f4ca014a85f7c0b3"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/index.html": {
+      "bytes": 347,
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/transcript.txt": {
+      "bytes": 4232,
+      "sha256": "16de3d5ba0bc98c2a64274a0a48a36917ec170f1ab00b37cf72f417d8e3ee6d0"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-5.svg": {
+      "bytes": 3874,
+      "sha256": "2ebe63a6904f1a692d28ce6040a519551aed89f57e8fbb83e6e6e656af508021"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-6.svg": {
+      "bytes": 1313,
+      "sha256": "0cd49e1a3e08d482f51fbbca11c99e2df8ced72a73ea22ac017b52770bb6e67b"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-2.svg": {
+      "bytes": 3968,
+      "sha256": "e739da7c1340813e65419945aded9f23e02a013724f783d93c0a3c8d5b81a841"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-1.svg": {
+      "bytes": 95876,
+      "sha256": "5ae903cae9e4c4e9f126e0cc6a670908c4738247dbd0fa820fe9c11baf37db81"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-3.svg": {
+      "bytes": 4591,
+      "sha256": "86bed547c62667bca78172737aae8dacaff4466df6f15b2dfcc0254e33d1f93a"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/fallbacks/chapter-4.svg": {
+      "bytes": 1313,
+      "sha256": "ac0b27fda50e903d23e5f4145a7fa07b35b2feca83671be42134c5461711f236"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_NpB2qWBLHcWwHqN6.snapshot.json": {
+      "bytes": 3051,
+      "sha256": "c47ae2603ee41d0ce987f50d6b414ddbd985cd03ac87e0b26d65eb2e5610436b"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_NpB2qWBLHcWwHqN6.receipt.json.gz": {
+      "bytes": 7331,
+      "sha256": "d0443309b36ef31239037546376f8740b9b4136bb3340e14ec3ce363da181f6f"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_NTNTMXxOoFu-gAje.snapshot.json": {
+      "bytes": 3320,
+      "sha256": "3b22962d7e3716189d0dc1f25c90cb977536b0e2460bdd1e4fbb02a2eb57bb7c"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_zjkYrExAQI5jTBoh.snapshot.json": {
+      "bytes": 5072,
+      "sha256": "c316b9fd534d91b90f368ebda34908f0f00da12b7dcecbc6f4006a8f93e643b8"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_zjkYrExAQI5jTBoh.receipt.json.gz": {
+      "bytes": 1935,
+      "sha256": "884e91b7e7422c82e0caa8ff9c422ea5741deb833cb7f80ee3ac850e251500a1"
+    },
+    "presets/camp-2018-reader/camp-read-the-archive-honestly-0e1d9d15/evidence/snap_NTNTMXxOoFu-gAje.receipt.json.gz": {
+      "bytes": 390338,
+      "sha256": "8a575b9f476ba2c08892ad526297abbb0f291caa4fa33183a08a75484cc57aa0"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/README.txt": {
+      "bytes": 757,
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/reader.js": {
+      "bytes": 11044,
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/reader.css": {
+      "bytes": 2570,
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/attribution.json": {
+      "bytes": 208,
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/manifest.json": {
+      "bytes": 2821,
+      "sha256": "d601505196ada5ee7f190c07a4a9d869959ca94ce87652d67991482e1150ee24"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/story.json": {
+      "bytes": 98187,
+      "sha256": "79e154d739cf329e5379bd8f71182a129e00c026d5eb05596e9c30cbfc3d829b"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/captions.vtt": {
+      "bytes": 607,
+      "sha256": "c4fa7e698655120332cc14fdc9c81cf324f2d49546fec1337c378d286230ba8f"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/index.html": {
+      "bytes": 347,
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/transcript.txt": {
+      "bytes": 1825,
+      "sha256": "8835a0e465f5d342471a2de560dad13bf287aa9715e83ed70d68db946c8cd540"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/fallbacks/chapter-5.svg": {
+      "bytes": 3567,
+      "sha256": "a8fb1f5dbaae6ab9c4dc615218c5f7432d9b589c9cc938a767add5d1631b1082"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/fallbacks/chapter-2.svg": {
+      "bytes": 1799,
+      "sha256": "7c9c52afa7879c2720e008f170ff7448dfb717eaab156ff71530a71bc2f32575"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/fallbacks/chapter-1.svg": {
+      "bytes": 25824,
+      "sha256": "4b69bd4e11f22c3c3b37a5bbd8274f268f538790ee315b4299f6ab37e2412fa4"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/evidence/snap_0ghHGIz9-EP_R5x_.receipt.json.gz": {
+      "bytes": 3595,
+      "sha256": "7acfe4dbbb059d2190786cb76d043b7cf7121c2eda7e0adfbde75a64dc6abd53"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/evidence/snap_0ghHGIz9-EP_R5x_.snapshot.json": {
+      "bytes": 3320,
+      "sha256": "7730d0ebbf79338830268dc87b460b62bda4865a2285363c94c94691592881a5"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/evidence/snap_-uuA2HeXX8R5gGgK.snapshot.json": {
+      "bytes": 3053,
+      "sha256": "4819d8cf82367bffa603bdcdb63eb5a92ae9b674227043948defb3d7668ad546"
+    },
+    "presets/grove-2025-reader/grove-a-small-inspectable-example-e82d549f/evidence/snap_-uuA2HeXX8R5gGgK.receipt.json.gz": {
+      "bytes": 1479,
+      "sha256": "c9f0527016050828efadeadc7e86be67f804f0f642535d741d61c1718df53caa"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/README.txt": {
+      "bytes": 757,
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/reader.js": {
+      "bytes": 11044,
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/reader.css": {
+      "bytes": 2570,
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/attribution.json": {
+      "bytes": 208,
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/manifest.json": {
+      "bytes": 3645,
+      "sha256": "e5aff3002bd30f978bdfb87a18014af025e09e565482c10137cc48c7e112b4ea"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/story.json": {
+      "bytes": 313629,
+      "sha256": "5d9216b157e6cac7775554801ab3493225c8e9d23cc17a4c72af319e3f2146c4"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/captions.vtt": {
+      "bytes": 1246,
+      "sha256": "83bc1ab531361a6cda6904068c22530eb454a53ccb160600f4ca014a85f7c0b3"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/index.html": {
+      "bytes": 347,
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/transcript.txt": {
+      "bytes": 4044,
+      "sha256": "656446712f37b47be34d5e9c05ddf151fc1b1ddcb86d0e361ba1119e55366f33"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-5.svg": {
+      "bytes": 3886,
+      "sha256": "52ac72dd3dfb958ce5bf9c965542479dbd16b0570ba3d14363554fbca6fa8e0d"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-6.svg": {
+      "bytes": 1313,
+      "sha256": "75085c0038f5968cf4116b96257ec824228c2a2d911f9edca6ac04febeeb7515"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-2.svg": {
+      "bytes": 4059,
+      "sha256": "b5a8121c25c27c68d4117f4c4a410d1263056c2b8aff3c8b05a8f5c4e8c606eb"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-1.svg": {
+      "bytes": 31404,
+      "sha256": "0bee6758023dbd0b7c744c6c6dd54f61d5a49c626a0b835fa2dc37b2818ec936"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-3.svg": {
+      "bytes": 5892,
+      "sha256": "935d22bb964528f5b70d8af47a8dd9d2e28e839a2ae56349938791b191c4468c"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/fallbacks/chapter-4.svg": {
+      "bytes": 1313,
+      "sha256": "c5cd8bb23daf738ab5a6da77d1a336d3a8d0156d644491b7a3c5fab590ab755f"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_H1_IVE2X5yY6AnwO.receipt.json.gz": {
+      "bytes": 6973,
+      "sha256": "5503d90e7a01e4ba980928245fd966ef5d4fde9303bada78cf8ab30fa242a63d"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_zbCeM7-4rxKbArDP.snapshot.json": {
+      "bytes": 3317,
+      "sha256": "364fcfac0e572b977d3d9033a59cefbc500d676915a3803c98976bd0854787e1"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_3uHCPgiuD8UVbF1V.snapshot.json": {
+      "bytes": 4887,
+      "sha256": "639dd1b11c19e462cfe90202598a02c074aca384610e50a7c45fb422b9d176ec"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_zbCeM7-4rxKbArDP.receipt.json.gz": {
+      "bytes": 440665,
+      "sha256": "f5d455ab4bd89818a1de45ffacace95f6bf76e4cc7cf73038293a94dbf369b2e"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_3uHCPgiuD8UVbF1V.receipt.json.gz": {
+      "bytes": 2726,
+      "sha256": "8e2d0aa2d2433580e4d7e516b07c9adfbd8b5ea525032b41513b07741b6839b4"
+    },
+    "presets/park-2024-reader/park-two-sensors-one-study-7692537a/evidence/snap_H1_IVE2X5yY6AnwO.snapshot.json": {
+      "bytes": 3048,
+      "sha256": "4c92e0d86119e720b313a16d161286ac5e11613c79108c2a126d5508f3ec107a"
+    }
+  }
+}

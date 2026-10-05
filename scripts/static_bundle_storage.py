@@ -125,17 +125,40 @@ def assemble(data):
     return done
 
 
+def prune_parts(data):
+    """Drop redundant transport copies only after full archives are verified."""
+    data = Path(data)
+    done = assemble(data)
+    index = data / "bundles" / "archive-storage.json"
+    if not index.exists():
+        return done
+    storage = json.loads(index.read_text())
+    paths = []
+    for entry in storage["archives"]:
+        for number, part in enumerate(entry["parts"]):
+            if part["path"] != entry["path"] + f".part{number:03d}":
+                raise ValueError("Only named transport copies may be removed.")
+            paths.append(local_path(data, part["path"]))
+    for path in paths:
+        path.unlink(missing_ok=True)
+    return done
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--site", type=Path, default=Path("site"))
     parser.add_argument("--prepare", action="store_true", help="Prepare transport parts from verified full ZIPs")
+    parser.add_argument("--prune-parts", action="store_true", help="Remove redundant parts after assembly in a publishing checkout")
     args = parser.parse_args()
+    if args.prepare and args.prune_parts:
+        parser.error("Preparation and publication cleanup are separate actions.")
     data = args.site / "data" / "analysis"
     if args.prepare:
         result = prepare(data)
         print(f"Prepared {len(result['archives'])} archives in Git-sized parts.")
     else:
-        print(f"Verified/assembled {len(assemble(data))} exact frozen archives.")
+        operation = prune_parts if args.prune_parts else assemble
+        print(f"Verified/assembled {len(operation(data))} exact frozen archives.")
 
 
 if __name__ == "__main__":

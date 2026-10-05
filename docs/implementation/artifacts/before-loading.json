@@ -1,0 +1,535 @@
+{
+  "landing": [
+    {
+      "url": "http://127.0.0.1:8073/globe.css",
+      "bytes": 24240,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/styles.css",
+      "bytes": 19674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/design.css",
+      "bytes": 60591,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/ui-primitives.css",
+      "bytes": 2391,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.css",
+      "bytes": 33776,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/landing.css",
+      "bytes": 105400,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.css",
+      "bytes": 113894,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.css",
+      "bytes": 67811,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/",
+      "bytes": 35248,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/lucide-icons.svg",
+      "bytes": 5565,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/earth-embed.js",
+      "bytes": 3184,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.js",
+      "bytes": 7450,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/landing.js",
+      "bytes": 4372,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/globe-math.js",
+      "bytes": 1089,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/landing-overview.js",
+      "bytes": 3001,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/ui.js",
+      "bytes": 2429,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/globe.js?v=static-snapshot-20260930",
+      "bytes": 51706,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.js",
+      "bytes": 34722,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-views.js",
+      "bytes": 16418,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/legacy-redirect.js",
+      "bytes": 319,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.js",
+      "bytes": 7300,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-visuals.js",
+      "bytes": 22278,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/earth-poster-1440.webp",
+      "bytes": 34034,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/fonts/space-grotesk.ttf",
+      "bytes": 136676,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/fonts/dm-sans.ttf",
+      "bytes": 240164,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.css",
+      "bytes": 113894,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.css",
+      "bytes": 67811,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.js",
+      "bytes": 7450,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-views.js",
+      "bytes": 16418,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-visuals.js",
+      "bytes": 22278,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.js",
+      "bytes": 34722,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/regions.json",
+      "bytes": 29126,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/assistant/capabilities",
+      "bytes": 335,
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8073/terrain-earth.html?embed=landing",
+      "bytes": 17553,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/manifest.json",
+      "bytes": 83318,
+      "status": 200
+    }
+  ],
+  "calendar": [
+    {
+      "url": "http://127.0.0.1:8073/styles.css",
+      "bytes": 19674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/design.css",
+      "bytes": 60591,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.css",
+      "bytes": 33776,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/ui-primitives.css",
+      "bytes": 2391,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/ui.js",
+      "bytes": 2429,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.js",
+      "bytes": 7450,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.css",
+      "bytes": 113894,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.js",
+      "bytes": 7300,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.css",
+      "bytes": 67811,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-views.js",
+      "bytes": 16418,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-visuals.js",
+      "bytes": 22278,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.js",
+      "bytes": 34722,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/leaflet.css",
+      "bytes": 14145,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/harmonized.css",
+      "bytes": 27842,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/atlas.html?region=norcal&year=2026&month=6",
+      "bytes": 37885,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/lucide-icons.svg",
+      "bytes": 5565,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/static-atlas.js",
+      "bytes": 16664,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/leaflet.js",
+      "bytes": 147552,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/study-ui.js",
+      "bytes": 7208,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/app.js",
+      "bytes": 58997,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/harmonized.js",
+      "bytes": 50937,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/regions.json",
+      "bytes": 29126,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/regions.json",
+      "bytes": 29126,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/manifest.json",
+      "bytes": 83318,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/assistant/capabilities",
+      "bytes": 335,
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/calendar/norcal/2026.json",
+      "bytes": 1701674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/calendar/norcal/2026.json",
+      "bytes": 1701674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/observations/norcal/2026.json.gz",
+      "bytes": 42042,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/history/norcal.json",
+      "bytes": 2128068,
+      "status": 200
+    }
+  ],
+  "investigation": [
+    {
+      "url": "http://127.0.0.1:8073/styles.css",
+      "bytes": 19674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/design.css",
+      "bytes": 60591,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.css",
+      "bytes": 33776,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.css",
+      "bytes": 113894,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/leaflet.css",
+      "bytes": 14145,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.css",
+      "bytes": 67811,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.html?case=grove-2025",
+      "bytes": 22833,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/vendor/leaflet.js",
+      "bytes": 147552,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.js",
+      "bytes": 7450,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-views.js",
+      "bytes": 16418,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-visuals.js",
+      "bytes": 22278,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.js",
+      "bytes": 34722,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.js",
+      "bytes": 7300,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-map.js",
+      "bytes": 6922,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-workspace.js",
+      "bytes": 59619,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/replay-context/manifest.json",
+      "bytes": 4501,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/replay/catalog.json",
+      "bytes": 7161,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/replay-context/grove-2025/terrain.png",
+      "bytes": 101615,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/assistant/capabilities",
+      "bytes": 335,
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/replay/cases/grove-2025.json.gz",
+      "bytes": 3275,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/replay/catalog",
+      "bytes": 335,
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/replay?case=grove-2025",
+      "bytes": 335,
+      "status": 404
+    }
+  ],
+  "evidence": [
+    {
+      "url": "http://127.0.0.1:8073/styles.css",
+      "bytes": 19674,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.css",
+      "bytes": 33776,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/lab.js",
+      "bytes": 7450,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/ui.js",
+      "bytes": 2429,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.css",
+      "bytes": 113894,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/method.html?case=grove-2025",
+      "bytes": 24766,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/workspace.js",
+      "bytes": 7300,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.css",
+      "bytes": 67811,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-views.js",
+      "bytes": 16418,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant-visuals.js",
+      "bytes": 22278,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/assistant.js",
+      "bytes": 34722,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/validity.css",
+      "bytes": 32441,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/method.css",
+      "bytes": 26664,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/validity.js",
+      "bytes": 41027,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/calibration-validation.js",
+      "bytes": 12461,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/method.js",
+      "bytes": 23054,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/samples/calibration/norcal.json",
+      "bytes": 63903,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/data/v2/validity/grove-2025.json",
+      "bytes": 366282,
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8073/api/assistant/capabilities",
+      "bytes": 335,
+      "status": 404
+    }
+  ]
+}

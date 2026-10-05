@@ -1,0 +1,53 @@
+{
+  "checks": [
+    "Authentic Park: 6,224 eligible records and 2,228 joint cell-days retain distinct units.",
+    "Explicit handoff refresh restores the same saved board.",
+    "Manual grouped moves, keyboard movement, Undo, zoom and saved viewport restoration preserve frozen evidence.",
+    "Chart interval and common-cell inspection update compatible linked displays without mutating the saved study or receipts.",
+    "JARVIS runs checked source states through the existing orchestrator without a model key.",
+    "Interval, highlighted cell, multi-card gallery, audience duration and camera transition resolve into the shared scene contract.",
+    "Prepared map/chart/source states and chapter explore/resume preserve the saved scene.",
+    "Opt-in transcript scrolling selects the visible saved chapter through the actual browser observer.",
+    "Offline verifier reconstructs six narrated chapters, caption timing/text and transcript from frozen receipts.",
+    "Portable reader runs under a project subpath with no backend or external imagery requests.",
+    "React Flow lazy mounts alongside its keyboard/table editor.",
+    "React Flow recipe runs, saves node receipts and materializes a real editable story.",
+    "Silent documentary rendered the same six prepared scenes at 1080p, 30 fps, 12 seconds, including the resolved camera/gallery metadata.",
+    "The actual MP4 contains a default subtitle track with the same six resolved texts and UTC scene timings as captions.vtt.",
+    "The saved findings-to-story recipe runs and creates an editable story on the authentic Camp study context."
+  ],
+  "page_errors": [],
+  "initial_load": {
+    "requests": 17,
+    "response_body_bytes": 626609,
+    "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+  },
+  "narrow_layout": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ],
+  "interaction": {
+    "group_move_ms": 46.05,
+    "measurement": "Playwright click through visible saved-revision acknowledgment; includes automation overhead."
+  },
+  "browser_environment": {
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "device_memory_gib": 16,
+    "hardware_concurrency": 12,
+    "js_heap": {
+      "used_bytes": 14273574,
+      "total_bytes": 19340050,
+      "limit_bytes": 4395630592
+    }
+  }
+}

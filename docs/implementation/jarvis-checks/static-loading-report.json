@@ -1,0 +1,451 @@
+{
+  "cold_entries": {
+    "Explore": {
+      "requests": 29,
+      "decoded_response_body_bytes": 3182152,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked.",
+      "entries": [
+        {
+          "path": "/project/atlas.html",
+          "status": 200,
+          "response_body_bytes": 39430
+        },
+        {
+          "path": "/project/styles.css",
+          "status": 200,
+          "response_body_bytes": 19674
+        },
+        {
+          "path": "/project/design.css",
+          "status": 200,
+          "response_body_bytes": 60591
+        },
+        {
+          "path": "/project/vendor/leaflet.css",
+          "status": 200,
+          "response_body_bytes": 14145
+        },
+        {
+          "path": "/project/lab.css",
+          "status": 200,
+          "response_body_bytes": 33776
+        },
+        {
+          "path": "/project/harmonized.css",
+          "status": 200,
+          "response_body_bytes": 27842
+        },
+        {
+          "path": "/project/workspace.css",
+          "status": 200,
+          "response_body_bytes": 113894
+        },
+        {
+          "path": "/project/vendor/ui-primitives.css",
+          "status": 200,
+          "response_body_bytes": 2391
+        },
+        {
+          "path": "/project/analytical.css",
+          "status": 200,
+          "response_body_bytes": 3728
+        },
+        {
+          "path": "/project/assistant.css",
+          "status": 200,
+          "response_body_bytes": 67811
+        },
+        {
+          "path": "/project/jarvis-orchestration.css",
+          "status": 200,
+          "response_body_bytes": 963
+        },
+        {
+          "path": "/project/vendor/lucide-icons.svg",
+          "status": 200,
+          "response_body_bytes": 5565
+        },
+        {
+          "path": "/project/workspace-context.js",
+          "status": 200,
+          "response_body_bytes": 8901
+        },
+        {
+          "path": "/project/workspace-shell.js",
+          "status": 200,
+          "response_body_bytes": 6203
+        },
+        {
+          "path": "/project/vendor/leaflet.js",
+          "status": 200,
+          "response_body_bytes": 147552
+        },
+        {
+          "path": "/project/fonts/dm-sans.ttf",
+          "status": 200,
+          "response_body_bytes": 240164
+        },
+        {
+          "path": "/project/fonts/space-grotesk.ttf",
+          "status": 200,
+          "response_body_bytes": 136676
+        },
+        {
+          "path": "/project/assistant-views.js",
+          "status": 200,
+          "response_body_bytes": 16418
+        },
+        {
+          "path": "/project/workspace.js",
+          "status": 200,
+          "response_body_bytes": 7300
+        },
+        {
+          "path": "/project/harmonized.js",
+          "status": 200,
+          "response_body_bytes": 54423
+        },
+        {
+          "path": "/project/assistant.js",
+          "status": 200,
+          "response_body_bytes": 34722
+        },
+        {
+          "path": "/project/assistant-visuals.js",
+          "status": 200,
+          "response_body_bytes": 22278
+        },
+        {
+          "path": "/project/jarvis-orchestration.js",
+          "status": 200,
+          "response_body_bytes": 12628
+        },
+        {
+          "path": "/project/data/analysis/regions.json",
+          "status": 200,
+          "response_body_bytes": 29126
+        },
+        {
+          "path": "/project/api/assistant/capabilities",
+          "status": 404,
+          "response_body_bytes": 335
+        },
+        {
+          "path": "/project/favicon.svg",
+          "status": 200,
+          "response_body_bytes": 250
+        },
+        {
+          "path": "/project/data/analysis/calendar/norcal/2026.json",
+          "status": 200,
+          "response_body_bytes": 1702650
+        },
+        {
+          "path": "/project/data/analysis/manifest.json",
+          "status": 200,
+          "response_body_bytes": 372466
+        },
+        {
+          "path": "/project/favicon.svg",
+          "status": 200,
+          "response_body_bytes": 250
+        }
+      ]
+    },
+    "Investigate": {
+      "requests": 29,
+      "decoded_response_body_bytes": 1698340,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked.",
+      "entries": [
+        {
+          "path": "/project/investigate.html",
+          "status": 200,
+          "response_body_bytes": 23760
+        },
+        {
+          "path": "/project/styles.css",
+          "status": 200,
+          "response_body_bytes": 19674
+        },
+        {
+          "path": "/project/design.css",
+          "status": 200,
+          "response_body_bytes": 60591
+        },
+        {
+          "path": "/project/lab.css",
+          "status": 200,
+          "response_body_bytes": 33776
+        },
+        {
+          "path": "/project/workspace.css",
+          "status": 200,
+          "response_body_bytes": 113894
+        },
+        {
+          "path": "/project/assistant.css",
+          "status": 200,
+          "response_body_bytes": 67811
+        },
+        {
+          "path": "/project/analytical.css",
+          "status": 200,
+          "response_body_bytes": 3728
+        },
+        {
+          "path": "/project/vendor/leaflet.css",
+          "status": 200,
+          "response_body_bytes": 14145
+        },
+        {
+          "path": "/project/jarvis-orchestration.css",
+          "status": 200,
+          "response_body_bytes": 963
+        },
+        {
+          "path": "/project/assistant-views.js",
+          "status": 200,
+          "response_body_bytes": 16418
+        },
+        {
+          "path": "/project/workspace-context.js",
+          "status": 200,
+          "response_body_bytes": 8901
+        },
+        {
+          "path": "/project/assistant-map.js",
+          "status": 200,
+          "response_body_bytes": 6922
+        },
+        {
+          "path": "/project/workspace-shell.js",
+          "status": 200,
+          "response_body_bytes": 6203
+        },
+        {
+          "path": "/project/vendor/leaflet.js",
+          "status": 200,
+          "response_body_bytes": 147552
+        },
+        {
+          "path": "/project/fonts/dm-sans.ttf",
+          "status": 200,
+          "response_body_bytes": 240164
+        },
+        {
+          "path": "/project/fonts/space-grotesk.ttf",
+          "status": 200,
+          "response_body_bytes": 136676
+        },
+        {
+          "path": "/project/assistant-workspace.js",
+          "status": 200,
+          "response_body_bytes": 67892
+        },
+        {
+          "path": "/project/assistant.js",
+          "status": 200,
+          "response_body_bytes": 34722
+        },
+        {
+          "path": "/project/assistant-visuals.js",
+          "status": 200,
+          "response_body_bytes": 22278
+        },
+        {
+          "path": "/project/workspace.js",
+          "status": 200,
+          "response_body_bytes": 7300
+        },
+        {
+          "path": "/project/jarvis-orchestration.js",
+          "status": 200,
+          "response_body_bytes": 12628
+        },
+        {
+          "path": "/project/api/replay/catalog",
+          "status": 404,
+          "response_body_bytes": 335
+        },
+        {
+          "path": "/project/replay-context/manifest.json",
+          "status": 200,
+          "response_body_bytes": 4501
+        },
+        {
+          "path": "/project/data/replay/catalog.json",
+          "status": 200,
+          "response_body_bytes": 7161
+        },
+        {
+          "path": "/project/replay-context/park-2024/terrain.png",
+          "status": 200,
+          "response_body_bytes": 199249
+        },
+        {
+          "path": "/project/favicon.svg",
+          "status": 200,
+          "response_body_bytes": 250
+        },
+        {
+          "path": "/project/api/assistant/capabilities",
+          "status": 404,
+          "response_body_bytes": 335
+        },
+        {
+          "path": "/project/api/replay",
+          "status": 404,
+          "response_body_bytes": 335
+        },
+        {
+          "path": "/project/data/replay/cases/park-2024.json.gz",
+          "status": 200,
+          "response_body_bytes": 440176
+        }
+      ]
+    },
+    "Evidence": {
+      "requests": 26,
+      "decoded_response_body_bytes": 1103582,
+      "measurement": "Fresh browser context; summaries ready, then 1.5 seconds; external imagery blocked.",
+      "entries": [
+        {
+          "path": "/project/evidence.html",
+          "status": 200,
+          "response_body_bytes": 59621
+        },
+        {
+          "path": "/project/styles.css",
+          "status": 200,
+          "response_body_bytes": 19674
+        },
+        {
+          "path": "/project/research.css",
+          "status": 200,
+          "response_body_bytes": 16041
+        },
+        {
+          "path": "/project/design.css",
+          "status": 200,
+          "response_body_bytes": 60591
+        },
+        {
+          "path": "/project/lab.css",
+          "status": 200,
+          "response_body_bytes": 33776
+        },
+        {
+          "path": "/project/analytical.css",
+          "status": 200,
+          "response_body_bytes": 3728
+        },
+        {
+          "path": "/project/assistant.css",
+          "status": 200,
+          "response_body_bytes": 67811
+        },
+        {
+          "path": "/project/workspace.css",
+          "status": 200,
+          "response_body_bytes": 113894
+        },
+        {
+          "path": "/project/data.css",
+          "status": 200,
+          "response_body_bytes": 15122
+        },
+        {
+          "path": "/project/validity.css",
+          "status": 200,
+          "response_body_bytes": 32441
+        },
+        {
+          "path": "/project/method.css",
+          "status": 200,
+          "response_body_bytes": 26664
+        },
+        {
+          "path": "/project/review.css",
+          "status": 200,
+          "response_body_bytes": 9864
+        },
+        {
+          "path": "/project/jarvis-orchestration.css",
+          "status": 200,
+          "response_body_bytes": 963
+        },
+        {
+          "path": "/project/workspace-context.js",
+          "status": 200,
+          "response_body_bytes": 8901
+        },
+        {
+          "path": "/project/vendor/leaflet.js",
+          "status": 200,
+          "response_body_bytes": 147552
+        },
+        {
+          "path": "/project/fonts/dm-sans.ttf",
+          "status": 200,
+          "response_body_bytes": 240164
+        },
+        {
+          "path": "/project/fonts/space-grotesk.ttf",
+          "status": 200,
+          "response_body_bytes": 136676
+        },
+        {
+          "path": "/project/assistant-views.js",
+          "status": 200,
+          "response_body_bytes": 16418
+        },
+        {
+          "path": "/project/workspace-shell.js",
+          "status": 200,
+          "response_body_bytes": 6203
+        },
+        {
+          "path": "/project/assistant-visuals.js",
+          "status": 200,
+          "response_body_bytes": 22278
+        },
+        {
+          "path": "/project/workspace.js",
+          "status": 200,
+          "response_body_bytes": 7300
+        },
+        {
+          "path": "/project/analytical-panels.js",
+          "status": 200,
+          "response_body_bytes": 9965
+        },
+        {
+          "path": "/project/assistant.js",
+          "status": 200,
+          "response_body_bytes": 34722
+        },
+        {
+          "path": "/project/jarvis-orchestration.js",
+          "status": 200,
+          "response_body_bytes": 12628
+        },
+        {
+          "path": "/project/api/assistant/capabilities",
+          "status": 404,
+          "response_body_bytes": 335
+        },
+        {
+          "path": "/project/favicon.svg",
+          "status": 200,
+          "response_body_bytes": 250
+        }
+      ]
+    }
+  },
+  "checks": [
+    "Explore, Investigate and Evidence preserve project-relative assets; initial summaries fetch no full regional row archives or result ZIPs; static saving reports the missing service.",
+    "Actual editable Excalidraw companion opens with embedded images under /project/ without a scientific or private backend."
+  ],
+  "page_errors": [],
+  "comparison": "Final build only. No before/after improvement claimed."
+}

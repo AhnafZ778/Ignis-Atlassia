@@ -1,0 +1,12 @@
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /workspace.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /workspace-context.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /harmonized.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/regions.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/calendar/norcal/2024.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/observations/norcal/2024.json.gz HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/calendar/norcal/2006.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:11:00] "GET /data/v2/calendar/punjab-haryana/2024.json HTTP/1.1" 200 -
+Static calendar verified: 42 region-year calendars (2006–2026), 128 checksummed data files; July 25 NorCal opened 200 bundled source rows; no API calls were made.
+NorCal verdict: Northern California, July 2024: comparison not usable. Only 0 comparable years.
+Punjab–Haryana verdict: Punjab–Haryana, July 2024: comparison not usable. Only 0 comparable years.

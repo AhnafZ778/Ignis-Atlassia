@@ -1,0 +1,51 @@
+{
+  "checks": [
+    "All three preset selections create separate saved boards with authentic counts.",
+    "Paired geographic heat images and PNG exports contain real frozen occupied-cell heat.",
+    "Curated stories preserve both frozen heat images and one shared domain; all three portable readers recount successfully.",
+    "Chart CSV and numeric table use the frozen series.",
+    "Card details receive focus; expanded map source/statistic controls and Escape dispose it.",
+    "Saved seven-node typed workflows validate; Park executes all seven nodes with checked receipts and no invented measurements.",
+    "Presenter prose and resolved stories remain scoped; Grove uses three short scenes.",
+    "360, 390 and 768 pixel layouts fit."
+  ],
+  "presets": [
+    {
+      "case": "park-2024",
+      "document_id": "doc_S_YXDYWRigjvDRcF",
+      "records": 6224,
+      "joint_cell_days": 2228,
+      "cards": 8,
+      "links": 5,
+      "workflow_nodes": 7,
+      "chapters": 6
+    },
+    {
+      "case": "camp-2018",
+      "document_id": "doc_r3K15JzQaqKF14HU",
+      "records": 5644,
+      "joint_cell_days": 1375,
+      "cards": 8,
+      "links": 5,
+      "workflow_nodes": 7,
+      "chapters": 6
+    },
+    {
+      "case": "grove-2025",
+      "document_id": "doc_E-h3ZqJ97vqqAk9d",
+      "records": 7,
+      "joint_cell_days": 4,
+      "cards": 8,
+      "links": 5,
+      "workflow_nodes": 7,
+      "chapters": 3
+    }
+  ],
+  "page_errors": [],
+  "paired_video": {
+    "seconds": 10,
+    "narration": "disabled; no provider call",
+    "artifact": "paired-heat.mp4",
+    "story_revision": 1
+  }
+}

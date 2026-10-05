@@ -1,0 +1,33 @@
+{
+  "inference": "mocked model transport; no provider calls",
+  "inputs": "existing authentic database, read-only",
+  "private_stores": "isolated temporary stores",
+  "checks": [
+    "AI selects registered scientific tool",
+    "Invalid final references return exact checked evidence",
+    "Canvas source captured automatically before submission",
+    "Actual recipe persists matching cards, charts and workflow",
+    "Navigation acknowledged only after board DOM load",
+    "Refresh preserves cards without duplicates"
+  ],
+  "tool_trace": [
+    {
+      "tool": "investigate",
+      "arguments": {
+        "operation": "replay"
+      },
+      "day": "2024-07-25",
+      "source": "joint"
+    },
+    {
+      "tool": "run_studio_recipe",
+      "arguments": {
+        "recipe": "visualization_to_investigation",
+        "arguments": {}
+      },
+      "day": "2024-07-25",
+      "source": "joint"
+    }
+  ],
+  "page_errors": []
+}

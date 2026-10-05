@@ -1,0 +1,62 @@
+{
+  "files": {
+    ".vite/manifest.json": {
+      "matches": true,
+      "sha256": "2d0332ff215ec763ce19c61c4f05388917323623a31bfaac1c84c32a678af77f",
+      "bytes": 1524
+    },
+    "assets/TldrawBoard-3V4E6SKt.js": {
+      "matches": true,
+      "sha256": "8fac29834871994c4ee7811968da0ea7233c81cd2b0b0157a790c2abd380a4d7",
+      "bytes": 1716553
+    },
+    "assets/TldrawBoard-C272mPqd.css": {
+      "matches": true,
+      "sha256": "47a7d283ef670bc7d6fd9d65425feaf83e0ffacd04a2966c28202739017bbc4f",
+      "bytes": 78828
+    },
+    "assets/WorkflowPanel-BnuhLJ6X.css": {
+      "matches": true,
+      "sha256": "1243b61a71923367ce620fb944427c80c9b03e863e18374fcf4f74d6d06f63fc",
+      "bytes": 15869
+    },
+    "assets/WorkflowPanel-Dd4EMyUe.js": {
+      "matches": true,
+      "sha256": "51ba89464789e0f8f0a69b47889793f51b14df8a02d0c8c0cb4f561e1e4a5652",
+      "bytes": 192685
+    },
+    "assets/collaboration-iAdzrBg1.js": {
+      "matches": true,
+      "sha256": "82cc259a92dfbac4bfeb5ef0300f922d15f056c0dd612ad35f9090c4ecc8f10d",
+      "bytes": 196440
+    },
+    "assets/sanitizeSvg-BRz1NfP5.js": {
+      "matches": true,
+      "sha256": "109aca1b777b36d44d1538a2e9e81db24fab4e29448236cd4f26f11f274a092a",
+      "bytes": 7323
+    },
+    "assets/studio-BvyGvi9Z.css": {
+      "matches": true,
+      "sha256": "cf0f28ac3a8fd86a70c0efa9b81200d885a14f1dd4aa2f27d6f3e37cb5444375",
+      "bytes": 16248
+    },
+    "assets/studio-lgyMMFjt.js": {
+      "matches": true,
+      "sha256": "e6451dec7c60f7d8c1c8a9c66bd027fe763aa0acb38f4b659546109a0d60b526",
+      "bytes": 344813
+    },
+    "studio-entry.js": {
+      "matches": true,
+      "sha256": "8fc3b3f4b1c96cddb91450afff23c7a356edba6226379edb9a7f7cadeee2fda7",
+      "bytes": 215
+    },
+    "features.json": {
+      "matches": true,
+      "sha256": "b6b165c8c21818ac424c201a34421c27972964d87a9a7a7edf2a23cacaa74eae",
+      "bytes": 107
+    }
+  },
+  "all_match": true,
+  "indexed_files": 11,
+  "reader_and_manifest_match": true
+}

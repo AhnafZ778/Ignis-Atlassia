@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:20.000
+The map shows recorded observations inside the selected geographic and UTC window. Nearby detections are not a validated assignment to an incident.
+
+2
+00:00:20.000 --> 00:00:40.000
+The timeline compares recorded activity within the study. An occupied cell-day counts one detected common cell on one UTC date.
+
+3
+00:00:40.000 --> 00:01:00.000
+These source states distinguish collected records from unknown evidence and processing gaps. An empty record does not establish a fire-free day.
+
+4
+00:01:00.000 --> 00:01:20.000
+The cited result comes from frozen evidence. Its interpretation remains editable and does not change the source measurements.
+
+5
+00:01:20.000 --> 00:01:40.000
+Original satellite observations retain native source fields and acquisition time. Those rows and common-cell counts answer different questions.
+
+6
+00:01:40.000 --> 00:02:00.000
+The study supports inspection of dated thermal observations. It does not establish ignition, continuous spread, a perimeter, or a forecast.

@@ -1,0 +1,67 @@
+{
+  "captions_fallback": true,
+  "engine": "local-svg-ffmpeg",
+  "evidence": [
+    {
+      "receipt_sha256": "aab1e42fae597b32e9ed7f25fed6e8df3c7fbe19fca052679952f8770e88b2d1",
+      "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+      "snapshot_id": "snap_WVOBwjTnIbECvDHV",
+      "snapshot_sha256": "575568fcb505ae215dcc067166848291a635056821a1b50a823de0f6317fc43a"
+    }
+  ],
+  "files": {
+    "briefing.mp4": {
+      "bytes": 141098,
+      "sha256": "3b0859cfdf631bc93e473c9b9f36edefbaa21e09022bfcffcecf6302b010cd95"
+    },
+    "captions.vtt": {
+      "bytes": 226,
+      "sha256": "0677577d374b37753d5b756ee196fe02ca784ff1b00243235cc194c811884243"
+    },
+    "evidence-hashes.json": {
+      "bytes": 321,
+      "sha256": "581c5d6f1a97fdc0fe29c5cb853b625452d2aeb50f98ca3257ab602671c79907"
+    },
+    "transcript.txt": {
+      "bytes": 1037,
+      "sha256": "fa09f1fcd7fbac5d1878fb1677acce7fb8eff4a9548b334ca6e14607ef853b17"
+    }
+  },
+  "limitations": [
+    "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+  ],
+  "narration": {
+    "attempted_status": null,
+    "cached_segments": null,
+    "disclosure": null,
+    "reason": "The author chose a captioned video without AI narration.",
+    "segments": [],
+    "skipped_chapters": [],
+    "status": "captions-only",
+    "timing": {
+      "chapters": [],
+      "checked": false,
+      "reason": "No audio was selected for rendering."
+    }
+  },
+  "profile": {
+    "aspect": "landscape",
+    "duration_seconds": 10.0,
+    "fps": 30,
+    "height": 1080,
+    "id": "briefing-1080p-landscape",
+    "width": 1920
+  },
+  "rasterizer": "chromium",
+  "render_id": "rnd_8wbBDb2mF_-V1Skf",
+  "schema": "fireatlas-studio-render-manifest-v1",
+  "story_sha256": "13bfd1d9a0303992838ab3969dc3cd66ab2a4da9f81af5108d618953bf61c7ad",
+  "subtitles": {
+    "activation": "Default subtitle track; display support depends on the video player.",
+    "caption_version": 2,
+    "codec": "mov_text",
+    "embedded": true,
+    "source": "captions.vtt",
+    "text": "Saved resolved narration, with authored caption/title fallback."
+  }
+}

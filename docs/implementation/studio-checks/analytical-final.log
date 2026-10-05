@@ -1,0 +1,26 @@
+{
+  "passed": [
+    "Explore defaults, supported median, lazy archives, committed Back/Forward and subpath",
+    "Mixed gap totals, exact bundle links, unknown state and unsupported AOI retention",
+    "Malformed AOI/dates and unknown studies retain incoming selection and show useful errors without controller exceptions",
+    "Synchronized panes, stable heat domain after day/source changes, explicit relative setting and blocked terrain fallback",
+    "Actual calendar calibration, matching reproduction link, lazy-tab Back/Forward and cross-workspace tab isolation",
+    "Explicit research month intersection preserves full originating interval; static local-service limitation",
+    "Eight real aliases retain query, fragment and project base",
+    "360/390/768 widths, keyboard entry and reduced motion"
+  ],
+  "loading": {
+    "calendar": {
+      "requests": 25,
+      "bytes": 3167387
+    },
+    "investigation": {
+      "requests": 26,
+      "bytes": 1148220
+    },
+    "evidence": {
+      "requests": 25,
+      "bytes": 1584838
+    }
+  }
+}

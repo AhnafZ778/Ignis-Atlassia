@@ -1,0 +1,33 @@
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /evidence.html?tab=validity&case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /design.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /lab.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /research.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /analytical.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /method.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /validity.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /review.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /jarvis-orchestration.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /vendor/leaflet.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace-context.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant-views.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace-shell.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /analytical-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant-visuals.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /jarvis-orchestration.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /fonts/dm-sans.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /fonts/space-grotesk.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /method.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] code 404, message File not found
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /api/assistant/capabilities HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /validity.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data/v2/validity/grove-2025.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data/v2/validity/grove-2025-check.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:58] "GET /data/v2/validity/grove-2025-review-template.json HTTP/1.1" 200 -
+Static method verified: grove-2025; official context rendered without substitute media; recount passed; no scientific API calls (assistant capability availability may be probed).

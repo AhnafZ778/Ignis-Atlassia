@@ -1,6 +1,6 @@
 # Ignis-Atlassia — Comprehensive Project Documentation
 
-**Documentation date:** 4 October 2026, Asia/Dhaka  
+**Documentation date:** 5 October 2026, Asia/Dhaka
 **Project name in the current README:** Ignis-Atlassia  
 **Python package and internal project name:** FireAtlas / `fireatlas`  
 **Package version:** `0.1.0`  
@@ -130,6 +130,7 @@ All scientific acquisition dates are UTC. The local timezone on this document is
 | Shareable study selection | Validated URL state restoration and copying | Shared URLs use the recipient's current data |
 | Scientific assistant | Stored-data investigation tools, map/notebook/chart workspace, optional inference | Conversational models and speech require configured services |
 | Static hosting | Exported evidence and named studies without an API | Custom research and private assistant actions need a backend |
+| Research Studio | Private revisioned evidence board, deterministic investigation template, editable six-chapter story, portable reader export, typed workflow templates and optional local documentary renderer | Values remain bound to frozen scientific receipts; hosted collaboration, narration and Remotion remain capability-gated |
 
 Earlier fictional crew-response exercises, the synthetic website selector, and PWA/offline-shell instructions belong to historical work. They are not current public features. Synthetic generators remain in the repository for automated fixtures, and the scientific server rejects a database containing generated demonstration batches.
 
@@ -137,24 +138,22 @@ Earlier fictional crew-response exercises, the synthetic website selector, and P
 
 ### 6.1 Main workspaces
 
-| Page | Purpose | Typical user action |
+| Destination | Canonical route | Purpose |
 | --- | --- | --- |
-| `/` or `/index.html` | Earth overview and navigation into the project | Toggle satellite signals, inspect imported activity, open a workspace |
-| `/atlas.html` | Regional calendar, activity map, history, Sensor Bridge, evidence | Select a region/month/day, compare source observations, inspect rows |
-| `/replay.html` | Dated historical studies | Select Park/Camp/Grove, play the timeline, compare sensors |
-| `/research.html` | Exploratory research overview | Select a study and inspect paired activity |
-| `/research-candidates.html` | Candidate group examination | Change grouping assumptions and inspect membership |
-| `/research-exposure.html` | Observation opportunity and optional mask analysis | Inspect missingness or provide an explicit coverage contract |
-| `/research-validation.html` | Research assumptions and validation boundaries | Review evidence and limitations |
-| `/data.html` | Data ledger and local import status | Inspect sources, completeness, versions, and downloads |
-| `/method.html` | Harmonization, calibration and validity cases | Inspect model choice, held-out errors, native-mask gates, recounts |
-| `/review.html` | Native-mask human review form | Inspect queued cells and download a completed review record |
-| `/assistant.html` | Scientific investigation workspace | Ask about selected evidence, run tools, draw an area, save notes |
-| `/terrain-earth.html` | Terrain globe embedded by the current home page | Geographic camera focus and globe interaction |
+| Earth overview | `/` or `/index.html` | Existing dark globe, controls and frozen snapshot; logo destination |
+| Explore | `/atlas.html` | Default regional harmonized calendar, Sensor Bridge, separate combined-detection view and matching exports |
+| Investigate | `/investigate.html` | One study controller, synchronized 2D sensor panes, UTC timeline, rows, contextual JARVIS/private notebook and optional 3D |
+| Research Lab | `/research.html?tab=…` | Comparison, Candidate Groups, Sensitivity and Exposure |
+| Evidence | `/evidence.html?tab=…` | Sources, Method, Calibration, Validity and Reproduce/Review |
+| Research Studio | `/studio.html` | Private evidence board, Story Director, workflow checks, rooms and static-reader export |
+
+Real static compatibility pages forward `/replay.html` and `/assistant.html` to Investigate; candidate/exposure pages to the corresponding Research tab; data/method/review pages to the corresponding Evidence tab; and research-validation to Evidence Method. Explicit tabs take precedence over inferred tabs. Queries, meaningful fragments and project-subpath hosting are preserved. The home header forwards recognized legacy calendar fragments; ordinary visits retain the existing landing behavior.
+
+The landing protection boundary permits only its header/navigation block to change. The floating-header class, glass wrapper and mobile controls retain their original structure. Both source/generated HTML outside that header and 75 protected asset hashes are checked by `scripts/check_landing_preservation.py`. Analytical pages use their own context module and scoped styles; the landing retains its original shared scripts.
 
 The home page currently embeds `terrain-earth.html?embed=landing`. Legacy `earth.html` and `Globe.html` assets are still present; their existence does not establish which renderer the current home page uses.
 
-Its two evidence toggles have separate meanings. **Satellite signals** display imported recent thermal observations grouped into 1° geographic bins, which are different from the regional 1 km analysis cells. **Wildfires** display a curated historical casebook from `documented-fires.json`, with sixteen recorded selectable cases, approximate affected-area markers, dated summaries and source links. The casebook is not exhaustive, does not describe current conditions, and is not a NASA-derived incident classification or perimeter layer.
+Its two evidence toggles have separate meanings. **Satellite signals** display imported recent thermal observations grouped into 1° geographic bins, which are different from the regional 1 km analysis cells. **Wildfires** display a curated historical casebook from `documented-fires.json`, with fifteen records in the current checked-in artifact, approximate affected-area markers, dated summaries and source links. The casebook is not exhaustive, does not describe current conditions, and is not a NASA-derived incident classification or perimeter layer.
 
 ### 6.2 Regional calendar workflow
 
@@ -170,7 +169,7 @@ Data state is a separate visual dimension. Observed, estimated, documented-gap, 
 
 ### 6.4 Saved state and map performance
 
-The application carries selected study context between workspaces and restores URL-based selections. The current Atlas supports copying a study URL and downloading a study bundle. Named saved-view controls described in older requirements are absent from the current frontend. Browser persistence instead includes hash-bound native-review drafts and the assistant archive chooser's open/closed preference. Private assistant notebooks use separate server-side storage; URL restoration is not a frozen evidence bundle.
+Analytical pages share an applied `FireAtlasContext` superset carrying exact AOI/dates, region/case, selected day, metric/cohort, geometry, display state and provenance. Draft edits do not apply a result. Committed selections/tabs use browser history; frame scrubbing and display changes replace it. Back/Forward restores through the same context path. Camera focus does not alter the scientific selection, and cross-month studies keep their interval. Research explicitly selects a supported month intersection. Public URLs omit private notebook content, ownership tokens and evidence identifiers. The current Atlas supports copying a study URL and downloading a study bundle. Named saved-view controls described in older requirements are absent from the current frontend. Browser persistence instead includes hash-bound native-review drafts and the assistant archive chooser's open/closed preference. Private assistant notebooks use separate server-side storage; URL restoration is not a frozen evidence bundle.
 
 At low zoom, the generic map endpoint groups records into geographic bins. At detailed zoom, it displays a bounded sample of approximately 1,000 records rather than drawing every source row. Calendar calculations use the scientific input scope rather than this display sample. A daily source-row list can be limited to 200 entries with an explicit truncation flag. Full exports and calculation evidence must be used when exhaustive review is required.
 
@@ -656,9 +655,7 @@ Newly observed cells mean first recorded within the selected study/source. Persi
 
 The replay page supports 2D imagery/3D terrain, source toggles, concentration, persistence and single-source peak FRP. Joint FRP is disabled because a calibrated cross-source total is not defined. Selected-day and whole-case CSVs provide the underlying record scope.
 
-The replay-page heat display can normalize against each frame's own maximum. Visual brightness is consequently relative to that frame and cannot by itself support quantitative comparison between quiet and busy dates.
-
-The assistant map uses a different, study-fixed scale described in section 18. Reusing similar color ramps does not make their normalization contracts identical.
+The canonical Investigate controller defaults to a study-fixed normalization shared across sensor panes. Day changes, playback and source visibility do not rescale it. Relative contrast remains an explicit setting labeled as incomparable across dates. Occupied-cell heat, persistence and native peak FRP retain their own units and domains. Optional 3D consumes the same applicable scale and dated landscape layers, and its lifecycle releases listeners/scenes when disposed. Older replay controller files remain for compatibility/source history but are not co-loaded with Investigate.
 
 ### 16.4 Custom replay
 
@@ -718,7 +715,7 @@ An empty observed denominator or incomplete source export produces null. No join
 
 ### 18.1 Purpose and independent capabilities
 
-JARVIS is an implemented scientific copilot with a full `/assistant.html` study workspace and smaller contextual assistants on existing pages. It can retrieve calculations, inspect selected records, explain methods, help navigate, generate checked visualizations, annotate selected evidence, and keep a private notebook.
+JARVIS is an implemented scientific copilot with a full `/investigate.html` study workspace (`/assistant.html` is a compatibility alias) and smaller contextual assistants on existing pages. It can retrieve calculations, inspect selected records, explain methods, help navigate, generate checked visualizations, annotate selected evidence, and keep a private notebook.
 
 Deterministic stored-data buttons work without a model key. Conversational inference, image interpretation, speech and external connectors are optional capabilities with separate availability. The actual active private provider was not inspected for this documentation.
 
@@ -824,7 +821,35 @@ The private stdio MCP server exposes `describe_capabilities`, `investigate`, and
 
 The local document retriever uses bounded word-overlap ranking over selected project documents and reference links. This is a modest curated retrieval mechanism, not an embedding/vector-database RAG system.
 
+### 18.12 Research Studio
+
+Research Studio is a separate local authoring workspace at `/studio.html`. Its durable SQLite store is isolated from both the scientific database and the assistant notebook. Investigate and Research Lab handoffs carry the applied region or case, exact AOI, UTC interval, selected day, cohort, metric, method/unit and release/result identity into a newly created board; private notebook content and ownership tokens are never serialized into the public URL.
+
+The board supports bounded map, calendar, chart, table, source-evidence, method-note, image, quote and text cards, with durable groups, alignment, keyboard movement, undo/redo and a saved viewport. Offscreen scientific previews load on approach or explicit selection. Chart intervals and common-cell selections can focus compatible linked cards without changing the applied study or frozen receipt. Cards can resolve supported scientific operations into hash-bound evidence snapshots. Story Director uses a default two-minute 1920×1080, 30 fps profile, preserves captions when narration is unavailable, and exports a checked static reader bundle. Chapter scenes can carry a bounded UTC interval, highlighted common cells, a resolved multi-card gallery, audience profile/target duration and display-only camera transitions; these are resolved once and shared by the reader and renderer. Workflow validation enforces allowlisted operations, acyclic graphs and node/fan-out limits. Collaboration exposes Liveblocks and loopback adapters; absent hosted credentials are reported as unavailable rather than simulated as a public room. Managed rooms use a field-level LiveMap/LiveObject layout draft for concurrent moves/resizes, with explicit revision-checked save and participant undo. Scientific values remain server-owned. Card and saved-chapter comments require editor access, and chapter references retain their exact saved story revision.
+
+The Studio presentation collection provides selectable Park, Camp and Grove boards with paired heat-map images on a shared fixed scale, five evidence connections, eight cards, a saved seven-node workflow and a resolved presenter story. Park/Camp use six 15-second chapters; Grove uses three. The display date is explicitly selected from recorded paired activity while retaining the entire study and its source states. Selecting a preset creates a separate private board. Card details, accessible chart tables and CSV/SVG/context downloads, heat PNGs and expanded map controls are directly available. Audience profiles change marked starter prose while preserving manual text, checked fields and scientific values.
+
+New resolved scenes retain `fireatlas-story-narration-v1` interpolation inputs and an explicit authored/structured grounding label. The portable reader verifier reconstructs the checked fields from its bundled receipts and compares narration, prepared figures, captions and transcript. Legacy readers retain their original figure/caption behavior and report the narrower narration check separately. Run `python -m fireatlas.studio.story verify-reader path/to/extracted/story`. This verifies computational consistency rather than independently endorsing explanatory prose. Both video adapters now embed a default English `mov_text` subtitle track derived from the same resolved narration. Version-2 captions paginate complete text into short timed cues; older caption files retain their original bytes. No speech provider was invoked for the recorded silent-render tests.
+
+The curated opening Story figure now freezes both sensor heat images from the same replay receipt. `fireatlas-studio-heat-v1` uses the existing 1 km Gaussian with three-sigma support and the full-study joint maximum shared by both sensors. Its raster preparation changes presentation only; source counts, filtering and geographic selection remain unchanged. New gallery layout version 2 displays the study name, UTC date, exact bounds, counts and source-export states; earlier gallery/figure layouts remain reproducible. Offline verification regenerates the image bytes and scale from bundled receipts, rejecting forged pixels or counts even with refreshed checksums. Park/Camp presentation stories retain 90-second targets and Grove retains 45 seconds.
+
+Video jobs remain owned, revision-bound records and restore through Story Director's recent-export chooser. Delayed polling cannot replace another story or selected export. Before encoding, narration validates bounded local MP3 bytes, recorded hashes and measured chapter durations. Partial or overlong speech falls back to the complete captioned video, retaining same-revision cached audio without an automatic paid retry. Cancellation during speech preparation stops before the encoder starts. Local tone fixtures exercise chapter starts and silence between them; no real speech provider or word-level alignment was verified.
+
+The browser bundle includes a lazy tldraw evidence-card adapter, a React Flow workflow composer and an authenticated Liveblocks client. The tldraw canvas requires an operator-supplied public SDK license key; its built-in board/outline fallback keeps deterministic authoring available. The prepared Remotion adapter requires an operator license decision; an explicitly opt-in local Chromium/SVG/ffmpeg renderer has been exercised. Map camera motion transforms only geographic geometry; labels remain fixed, and interval maps distinguish common cell-days from single-date occupied cells. Liveblocks authorization and MCP Apps negotiation have mocked/protocol tests; hosted rooms, a licensed tldraw browser and an external MCP UI host remain unverified. Static story reading is available through `/studio-reader.html` and does not require the authoring service. Typed JARVIS proposals can arrange cards, draft stories or load a validated workflow draft; recipe saving and execution remain separate explicit actions. The latest tests, screenshots, loading measurements and remaining external gates are recorded in [the Studio implementation report](docs/implementation/STUDIO.md).
+
+Every chapter offers evidence exploration, including chapters without an authored question. Exploration retains the saved story revision and chapter identity and restores the viewer’s return position. Delayed playback ticks stop at crossed unanswered questions; stale answers cannot release another chapter. Studio store schema 6 retains render phases and adds durable instance contexts, commands/checkpoints, investigation packages, export jobs, remote mappings and imported historical projects/annotations. Cancellation is checked atomically before publication, terminal jobs cannot regress, and recovery removes controlled unfinished media. The earlier resource regression passed 305 Python tests, 48 frontend tests and seven renderer checks without provider calls; current orchestration counts and actual browser/static results are recorded in [the portability verification summary](docs/implementation/jarvis-checks/verification-summary.json). The renderer also monitors summed resident memory and sampled CPU use across its controlled session and observed descendants. Retained exports/audio have an 8 GiB admission capacity; low disk space refuses new jobs while preserving completed downloads. These are sampled application limits, with possible brief overshoot and unobserved short-lived processes, as documented in [the acceptance audit](docs/implementation/STUDIO_ACCEPTANCE_AUDIT.md).
+
 The main implementation modules are `contracts.py`, `science.py`, `store.py`, `service.py`, `agent.py`, `http.py`, `gateway.py`, `mcp_server.py`, and the smaller voice/geography/reference/figure adapters. Frontend modules separate conversation, navigation, study workspace, heat aggregation and checked visual explanation.
+
+### 18.13 JARVIS commands and editable board portability
+
+The shared deterministic runner packages a frozen submitted frame, compatible checked charts, saved receipts, runnable registered workflows and individually identified Canvas objects. Analytical **Send to Canvas** works without inference. Conversational Canvas requests automatically capture the current applied analytical view; **Attach this view to JARVIS** remains available for an explicit pane choice. The AI chooses among registered tools according to the request. Checked scientific results, saved commands and typed proposals survive final-wording validation failures, with wording availability labeled separately. Context is instance/tab/pane-specific under `fireatlas-jarvis-context-v1`, while `FireAtlasContext` remains the applied analytical study interface. Ownership, origin checks, cancellation and the existing paid-call accounting remain intact. [The tool-routing fix report](docs/implementation/JARVIS_TOOL_ROUTING_FIX.md) records 66 backend tests, 53 frontend tests and two successful live AI& requests, including a seven-card Canvas package with a saved workflow and browser acknowledgment. Other provider keys and external integrations were not validated by those requests.
+
+Saved-versus-opened states are separate. Stable command identities and atomic insertion/checkpoint persistence prevent duplicate delivery. Recovery reuses saved outputs; command undo preserves unrelated later edits and reports affected-object conflicts. Same-tab handoff provides a captured return selection. Selected-card context retains its actual pinned study rather than inheriting a different board frame.
+
+`fireatlas-board-v1` freezes the whole saved board, including offscreen objects, receipt content, exact chart inputs, view descriptors, assets, saved stories/workflows, recorded executions and attributed board discussion. Restoration validates hashes, sizes, schemas, graphs, references and image metadata, then remaps to fresh owned IDs. Imported evidence remains labeled frozen provenance. Native archives exclude scientific databases, credentials, unrelated notebooks/conversations and room invitations/membership/presence.
+
+The pinned Excalidraw 0.18.1 companion contains separate editable text/shapes/frames and bound arrows, with maps and complex charts as embedded visual objects and editable captions. SVG, bounded PNG and paginated PDF reuse frozen visuals without rerunning science. Excalidraw continuation has an independent static-capable editor; persistence/native restoration and new science require the local backend. Miro remains an explicit allowlisted operator-token action; endpoint/rate-limit/uncertain-outcome behavior has mock tests, while live transfer requires an authorized destination. Full contracts, limits, operating commands, screenshots, sample exports and actual validation results are in [JARVIS portability](docs/implementation/JARVIS_PORTABILITY.md).
 
 ## 19. System architecture and technology stack
 
@@ -901,11 +926,13 @@ NASA Spaceapps/
 │   ├── cli.py                      fireatlas command-line interface
 │   ├── provenance.py / settings.py Public evidence sanitization and private settings
 │   ├── assistant/                  Private tools, inference, notebooks, maps, gateway
+│   ├── studio/                     Private board, evidence snapshots, stories, workflows and rooms
 │   ├── static/                     Authoritative frontend source assets
 │   └── samples/                    Authentic compact data and scientific artifacts
 ├── scripts/                        Run, export, fingerprint, browser/release checks
 ├── tests/                          Scientific, API, assistant and export tests
 ├── requirements/                   Isolated assistant environment definitions
+├── studio-app/                     React/Vite Research Studio source and build
 ├── docs/                           Data/method/setup documents and historical guides
 ├── site/                           Publishable static snapshot and evidence
 ├── NASA_data/                      Owner-supplied original products; local data scope
@@ -931,6 +958,7 @@ The following is a functional reference to the current route handler, not an ind
 | `GET /api/observations` | Selected UTC date source evidence | `date`, `series`, `bbox`; up to 200 displayed rows |
 | `GET /api/map` | Zoom-aware mapped records | `year`, `month`, `series`, `bbox`, `zoom`, optional `day` |
 | `GET /api/export` | Source-row CSV download | Selected source/date scope |
+| `GET /api/v2/study` | Exact frozen regional harmonized ZIP | `region`, `year`, `month`, optional `day`, `expected_result_sha256` |
 | `GET /api/study` | Portable, hash-manifested study ZIP | Year/month/source/AOI and selected day/context |
 | `GET /api/research` | Exploratory report without uploaded mask | Year/month/AOI/cutoff/grouping parameters |
 | `POST /api/research` | Exploratory report with optional coverage mask | JSON `config` and optional `mask` |
@@ -970,6 +998,8 @@ curl 'http://127.0.0.1:8000/api/validity/export?case=park-2024' \
 ```
 
 The first two requests have different metric definitions. A tool consuming the API must read the method/unit fields instead of treating every calendar count as interchangeable.
+
+Research Studio routes are grouped under `/api/studio/`. They cover capability/identity and recovery, private documents and revisioned transactions, checked evidence snapshots, Story Director revisions and static-reader exports, bounded render jobs, workflow validation/runs, licensed assets, and optional collaboration rooms, invites, comments, presence and presenter state. `/studio-assets/` serves only files listed in the generated `studio-manifest.json`; unlisted or traversal paths return 404. The authoring page is `/studio.html`; a frozen reader bundle opens at `/studio-reader.html`.
 
 ### 21.3 Command-line entry point
 
@@ -1086,7 +1116,15 @@ Base package installation alone does not supply NASA raster products or the work
 
 ## 23. Static release and hosting
 
-### 23.1 Current bundled release
+### 23.1 Separate analytical release
+
+`site/data/analysis/manifest.json` is `fireatlas-analytical-release-v1`, dated 4 October 2026. It contains 42 regional annual calendars, history, bounded row-display files, exact calendar calibration evidence and four prebuilt, scientifically verified regional ZIPs: June 2026 and July 2024 for both regions. The manifest indexes 97 files totaling 459,404,228 bytes and has release ID `6236a3065af5c3091a0d15ee82bfcabe65abf63e1ab15b24a1f29bec7b9d5297`. These are release sizes, not initial browser download measurements. Other monthly selections keep exact bundle availability explicitly unavailable.
+
+Analytics were prepared from one captured authentic SQLite snapshot. The exact used calibration IDs match the older regional calendar release; standalone calibration artifact identities are not substituted. Older frozen replay, validity, review and globe evidence remain under their own namespace and dates. `site/data/combined/` contains separately labeled generic union-calendar outputs for 2024/2026 in both regions; a static output JSON is not a generic input study ZIP.
+
+`export_analytical.py` builds into a fresh namespace and refuses overwrite. Its `--refresh-calibration` mode checks released calendar bytes against the manifest before extracting their exact calibration assets, then updates only the analytical inventory. `refresh_static_assets.py` refreshes canonical analytical UI and the landing header while enforcing the protected landing hashes; it does not rebuild globe data. Static/custom-calculation differences remain explicit.
+
+### 23.2 Preserved globe and earlier evidence release
 
 The inspected release manifest is `site/data/v2/manifest.json`, schema `fireatlas-static-site-v1`, with snapshot UTC date **2026-10-01**. Its calendar range is **2006–2026**, yielding 42 region/year calendar files across the two regions.
 
@@ -1104,7 +1142,7 @@ The Punjab–Haryana parts contain four groups of 400,000 rows and one of 166,54
 
 The static globe contains an imported eight-day snapshot from 20–27 September 2026, with latest observation `2026-09-27T09:09:00Z`. It records 866,956 observations, 59,915 source/day/geographic-group aggregates, and 322,875 bounded source-evidence sample records. Static observation overlays are implemented through this bundle; they do not require a live database for the frozen snapshot and do not become a live feed merely because the page is online.
 
-### 23.2 Static versus live capability
+### 23.3 Static versus live capability
 
 | Capability | Static release | Local scientific service |
 | --- | --- | --- |
@@ -1121,7 +1159,9 @@ The static globe contains an imported eight-day snapshot from 20–27 September 
 
 Compressed static observation and replay bundles require a modern browser with `DecompressionStream('gzip')` support. Their frozen numerical inputs can be served locally, while external scene SDKs, imagery tiles and terrain still require network access.
 
-### 23.3 Build or refresh
+### 23.4 Build or refresh
+
+Large analytical archives use checksummed transport parts below GitHub's ordinary file limit. A fresh clone must run `python3 scripts/static_bundle_storage.py --site site` before serving the static release. CI and Pages assemble them automatically and check the final bytes against the original analytical manifest. These parts change repository storage only; archive download URLs, scientific content and release identities remain unchanged. Full local Punjab–Haryana ZIPs are ignored while their parts are versioned.
 
 For a new scientific snapshot:
 
@@ -1144,6 +1184,22 @@ The GitHub Pages workflow uploads the existing `site/` on a main-branch push or 
 The static export omits the full scientific SQLite database and does not copy the native HDF/netCDF directory wholesale. It does bundle selected MCD64A1 Burn Date/QA GeoTIFF inputs in an explicit evidence ZIP, alongside prepared context images and input inventories. Original binary downloads for other native products require the local service and its permitted asset inventory.
 
 ## 24. Reproducible exports and evidence bundles
+
+### 24.0 Exact regional harmonized bundle
+
+`fireatlas-regional-study-v1` is separate from the unchanged generic study contract below. `GET /api/v2/study` takes region, year, month, optional day and optional displayed `expected_result_sha256`; stale inputs return HTTP 409 and concurrent builds return HTTP 503. Regional calendar identity/availability fields are additive. Builds use one read transaction and capture external notices/corroboration before calculation, stream full required standard-source history into bounded JSONL chunks, serve completed ZIPs from disk and clean temporary artifacts.
+
+The package freezes exact region bounds, preparation horizon, UTC/eligibility/deduplication rules, original observations and identifiers, complete export windows including empty ones, batches/source ledgers, exact used calibration and fitting inputs, versions/notices, daily/monthly states, seasonal outputs, prior baseline eligibility/reasons and scoped context evidence. The verifier reconstructs SQLite from the package, checks entry/hash/size limits, reprojects coordinates, refits frozen calibration, and recomputes scientific outputs. It requires no live database or current notice/calibration files. Counts/identifiers/states compare exactly; floats use `rel_tol=1e-12`, `abs_tol=1e-9`. A changed numeric result still fails if an attacker refreshes its checksums.
+
+Limits: 2,000,000 observations, 3 GiB expanded, 512 MiB compressed, 100,000 rows or 128 MiB per JSONL chunk, 64 KiB per row and 32 MiB per metadata entry. Oversized exports reject without sampling. Generic limits remain unchanged.
+
+```bash
+uv run python -m fireatlas.regional_study build --db data/fireatlas.sqlite3 \
+  --region norcal --year 2026 --month 6 --output june.zip
+uv run python -m fireatlas.regional_study verify june.zip
+```
+
+Independent human review, source authentication and a complete exposure denominator remain separate scientific gates.
 
 ### 24.1 Generic study ZIP
 
@@ -1248,7 +1304,7 @@ Offline execution requires the relevant Python packages and browser installation
 
 ### 25.3 Verification performed for this document
 
-This documentation task inspected source/configuration files, parsed release metadata, inventoried tests, and queried the existing scientific database read-only. It did not rerun the complete software suite, reprocess scientific inputs, contact inference providers, deploy the website, or complete native human review. The resulting Markdown was checked for internal navigation and local source-link validity.
+The original documentation task inspected source/configuration files, parsed release metadata, inventoried tests, and queried the existing scientific database read-only. The later analytical implementation and executed checks are recorded separately in [the implementation report](docs/implementation/REPORT.md). It did not rerun the complete software suite, reprocess scientific inputs, contact inference providers, deploy the website, or complete native human review. The resulting Markdown was checked for internal navigation and local source-link validity.
 
 ## 26. Security, privacy, and responsible interpretation
 
@@ -1354,6 +1410,7 @@ For a short presentation, choose a few of these steps and keep the same source r
 
 ### 30.2 Implementation and release sources
 
+- [Regional result bundle/verifier](fireatlas/regional_study.py), [implementation report](docs/implementation/REPORT.md), [landing regression](scripts/check_landing_preservation.py).
 - [Scientific core](fireatlas/core.py), [regional calendar](fireatlas/calendar_v2.py), [calibration](fireatlas/calibration.py), [replay](fireatlas/replay.py), [research](fireatlas/research.py).
 - [Native mask processor](fireatlas/masks.py), [review validator](fireatlas/mask_review.py), [validity report](fireatlas/validity.py), [analytical recount](fireatlas/validation_check.py).
 - [Scientific HTTP server](fireatlas/web.py), [study bundle](fireatlas/study.py), [source provenance](fireatlas/provenance.py), [regional definitions](fireatlas/regions.py).

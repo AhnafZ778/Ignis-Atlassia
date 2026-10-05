@@ -1,16 +1,26 @@
 # MODIS–VIIRS harmonization method
 
-The perfected plan names the primary unit **VIIRS-equivalent active-fire cell-days on a
+The regional calendar uses the primary unit **VIIRS-equivalent active-fire cell-days on a
 common 1 km grid**. “VIIRS-equivalent” identifies the selected reference scale; it is not a
 claim that the two instruments have equal detection probability. Native source detail remains
 available: MODIS is represented as approximately 1 km source pixels and the imported Suomi NPP
-record as 375 m VIIRS source pixels. The landing page’s Sensor Bridge shows the transformation
+record as 375 m VIIRS source pixels. Explore’s Sensor Bridge shows the transformation
 and keeps sensor-only, shared, and gap days separate.
 
 FireAtlas exposes a month-level method audit at `/api/harmonization` and on the
-Data & Method page (`/method.html#harmonization-audit`). The audit is intentionally descriptive: it makes the
+Evidence (`/evidence.html?tab=method`). The audit is intentionally descriptive: it makes the
 comparison reproducible without claiming that the two instruments have equal
 detection probability.
+
+## Display and reproduction contracts
+
+Explore defaults to **Harmonized activity**, with observed, estimated and unknown UTC day counts. A supported median/difference remains visible when the ten-year percentile threshold is unmet. Northern California June 2026 retains 113 observed cell-days, median 109 over three comparable prior years and difference +4; its percentile remains unavailable.
+
+The matching regional bundle is `fireatlas-regional-study-v1`, available at `GET /api/v2/study?region=…&year=…&month=…&expected_result_sha256=…`. It freezes the exact calibration from the calendar preparation, full required authentic standard-source history, empty complete windows, metadata, notices, MCD64A1 context scope and baseline inclusion/exclusion reasons. Standalone calibration artifact identities are not substituted. The core verifier reconstructs grid assignments, counts, completeness, calibration fitting, daily/monthly states and seasonal/baseline outputs without the live database or current artifact files. Counts, states and identifiers compare exactly; deterministic floats use relative tolerance `1e-12` and absolute tolerance `1e-9`. Checksums identify bytes and do not authenticate a NASA source or attest independent review.
+
+**Combined detections** remains the eligible daily common-cell union, with its unchanged generic `fireatlas-study-v2` bundle and verifier. Replay applies additional source-alias deduplication; Research retains all selected standard rows. These outputs keep separate units and filtering contracts. Source visibility affects the map and row inspection; changing an analysis cohort is a separate selection.
+
+Investigate uses a shared study-fixed heat domain across UTC frames and MODIS/VIIRS panes. Kernel dimensions remain geographic and fixed with zoom. Relative contrast is an explicit option labeled “brightness not comparable across dates.” Persistence and single-source native peak FRP keep separate domains and units; joint FRP stays unavailable. The optional 3D lifecycle consumes the applicable domain and dated context, and disposes its scene when returning to comparison.
 
 ## Input contract
 
@@ -27,7 +37,7 @@ detection probability.
   do not contribute to the displayed calendar, harmonization audit, or daily
   aggregate bundle.
 
-## Calculation
+## Combined-detection audit
 
 For each UTC day, the joint series takes the union of the selected source grid
 cells. A grid cell contributes at most one detected cell-day, even when several
@@ -44,10 +54,14 @@ Northern California box, while July 2025 uses `61.03`; the audit marks the
 2025 historical comparison as mixed-version and the interface treats its
 cell-day difference as descriptive.
 
-Monthly totals are the sum of complete daily cell-day counts. A month without a
-verified complete export remains unknown; partial records are shown as a lower
-bound. Prior-year medians require at least three complete same-month years;
-percentiles require ten. A year enters the calendar baseline only when every day
+The generic union calendar sums complete daily cell-day counts and requires three prior complete same-month years for its median. It retains its source-cohort contract; the regional composition rules below belong to the harmonized calendar.
+
+## Regional harmonized calculation
+
+Outside the pre-VIIRS era and documented processing-gap dates, a complete S-NPP export supplies observed occupied cells. Permitted estimates require a complete MODIS export, an available selected model and exact calibrated MODIS version; missing modern S-NPP exports are not automatically filled. The July 2024 notice spans July 24 at 05:24 UTC through July 29 at 15:18 UTC, with partial-day endpoints retained and all six intersecting dates treated conservatively as gap dates.
+
+A month with any unknown daily value has a null official total. Known daily values retain observed/scaled states; positive partial rows remain separate evidence. Prior-year medians require at least three comparable same-month years;
+percentiles require ten. A year enters the regional calendar baseline only when every day
 is known and its daily mix of observed VIIRS and MODIS-scaled estimates,
 including the product version used for each source, matches the selected month.
 This prevents a mixed month from being ranked against a month made entirely

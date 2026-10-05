@@ -1,0 +1,112 @@
+{
+  "files": [
+    {
+      "bytes": 757,
+      "path": "README.txt",
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    {
+      "bytes": 208,
+      "path": "attribution.json",
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    {
+      "bytes": 1246,
+      "path": "captions.vtt",
+      "sha256": "83bc1ab531361a6cda6904068c22530eb454a53ccb160600f4ca014a85f7c0b3"
+    },
+    {
+      "bytes": 390338,
+      "path": "evidence/snap_NTNTMXxOoFu-gAje.receipt.json.gz",
+      "sha256": "8a575b9f476ba2c08892ad526297abbb0f291caa4fa33183a08a75484cc57aa0"
+    },
+    {
+      "bytes": 3320,
+      "path": "evidence/snap_NTNTMXxOoFu-gAje.snapshot.json",
+      "sha256": "3b22962d7e3716189d0dc1f25c90cb977536b0e2460bdd1e4fbb02a2eb57bb7c"
+    },
+    {
+      "bytes": 7331,
+      "path": "evidence/snap_NpB2qWBLHcWwHqN6.receipt.json.gz",
+      "sha256": "d0443309b36ef31239037546376f8740b9b4136bb3340e14ec3ce363da181f6f"
+    },
+    {
+      "bytes": 3051,
+      "path": "evidence/snap_NpB2qWBLHcWwHqN6.snapshot.json",
+      "sha256": "c47ae2603ee41d0ce987f50d6b414ddbd985cd03ac87e0b26d65eb2e5610436b"
+    },
+    {
+      "bytes": 1935,
+      "path": "evidence/snap_zjkYrExAQI5jTBoh.receipt.json.gz",
+      "sha256": "884e91b7e7422c82e0caa8ff9c422ea5741deb833cb7f80ee3ac850e251500a1"
+    },
+    {
+      "bytes": 5072,
+      "path": "evidence/snap_zjkYrExAQI5jTBoh.snapshot.json",
+      "sha256": "c316b9fd534d91b90f368ebda34908f0f00da12b7dcecbc6f4006a8f93e643b8"
+    },
+    {
+      "bytes": 95876,
+      "path": "fallbacks/chapter-1.svg",
+      "sha256": "5ae903cae9e4c4e9f126e0cc6a670908c4738247dbd0fa820fe9c11baf37db81"
+    },
+    {
+      "bytes": 3968,
+      "path": "fallbacks/chapter-2.svg",
+      "sha256": "e739da7c1340813e65419945aded9f23e02a013724f783d93c0a3c8d5b81a841"
+    },
+    {
+      "bytes": 4591,
+      "path": "fallbacks/chapter-3.svg",
+      "sha256": "86bed547c62667bca78172737aae8dacaff4466df6f15b2dfcc0254e33d1f93a"
+    },
+    {
+      "bytes": 1313,
+      "path": "fallbacks/chapter-4.svg",
+      "sha256": "ac0b27fda50e903d23e5f4145a7fa07b35b2feca83671be42134c5461711f236"
+    },
+    {
+      "bytes": 3874,
+      "path": "fallbacks/chapter-5.svg",
+      "sha256": "2ebe63a6904f1a692d28ce6040a519551aed89f57e8fbb83e6e6e656af508021"
+    },
+    {
+      "bytes": 1313,
+      "path": "fallbacks/chapter-6.svg",
+      "sha256": "0cd49e1a3e08d482f51fbbca11c99e2df8ced72a73ea22ac017b52770bb6e67b"
+    },
+    {
+      "bytes": 347,
+      "path": "index.html",
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    {
+      "bytes": 2570,
+      "path": "reader.css",
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    {
+      "bytes": 11044,
+      "path": "reader.js",
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    {
+      "bytes": 507997,
+      "path": "story.json",
+      "sha256": "a1f92d28bce71d713eff16c7ee53844b578a0d8f99abfd398a4295713c5d9790"
+    },
+    {
+      "bytes": 4232,
+      "path": "transcript.txt",
+      "sha256": "16de3d5ba0bc98c2a64274a0a48a36917ec170f1ab00b37cf72f417d8e3ee6d0"
+    }
+  ],
+  "generated_utc": "2026-10-05T12:11:13+00:00",
+  "manifest_sha256": "deca0b3979cdeaf17bd03c17a78d41e9b57d2b085c6a7fb8e859a409da6caa60",
+  "private_identifiers": false,
+  "requires_backend": false,
+  "schema": "fireatlas-studio-reader-v1",
+  "slug": "camp-read-the-archive-honestly-0e1d9d15",
+  "story_sha256": "0e1d9d15317a6bd085f6535ad7e0502d8f5081bb8713d9ec9635b01d53ca9667",
+  "title": "Camp \u00b7 read the archive honestly"
+}

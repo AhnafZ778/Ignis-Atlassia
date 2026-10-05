@@ -1,0 +1,544 @@
+{
+  "implementation_date": "2026-10-05",
+  "python_suite": {
+    "tests": 305,
+    "passed": true,
+    "seconds": 295.277,
+    "log": "resource-full-python.log",
+    "provider_calls": false,
+    "warning": "Optional runtime retains an unclosed event-loop ResourceWarning."
+  },
+  "focused_python": {
+    "tests": 15,
+    "passed": true,
+    "seconds": 11.154,
+    "log": "lifecycle-render-tests.log",
+    "scope": "Render phase persistence, migration-compatible inserts, late cancel/recovery rejection, cleanup, input preflight, actual Node working-storage termination."
+  },
+  "frontend_tests": {
+    "tests": 48,
+    "files": 12,
+    "passed": true,
+    "log": "lifecycle-frontend-tests.log"
+  },
+  "build": {
+    "typescript": true,
+    "vite": true,
+    "remotion_bundle_compiled": true,
+    "licensed_remotion_render": false,
+    "frontend_log": "frontend-curated-build.log"
+  },
+  "landing": {
+    "protected_assets": 75,
+    "outside_header_html_boundaries": 2,
+    "unchanged": true
+  },
+  "browser": {
+    "report": "lifecycle-release/browser-report.json",
+    "checks": 17,
+    "page_errors": 0,
+    "cold_requests": 17,
+    "response_body_bytes": 630731,
+    "measurement": "Same-origin decoded body bytes; HTTP headers excluded.",
+    "widths": [
+      360,
+      390,
+      768
+    ],
+    "overflow": false,
+    "render_phases": [
+      "queued",
+      "preparing-assets",
+      "rendering",
+      "encoding",
+      "completed"
+    ]
+  },
+  "reader": {
+    "cases": [
+      "park-2024",
+      "camp-2018",
+      "grove-2025"
+    ],
+    "core_environment": true,
+    "artifacts": "lifecycle-presets/",
+    "explore_resume_all_chapters": true,
+    "grounding_contrast": 10.42
+  },
+  "rooms": {
+    "adapter": "loopback (local QA only)",
+    "checks": [
+      "Owner issues one-use viewer/editor invitations; separate identities join; viewer writes are rejected by server and UI.",
+      "Editor change converges through saved revision polling across separate browser contexts.",
+      "Same-object stale write rejects; distinct-object edits merge without losing the winning note.",
+      "Opt-in presenter follow selects the intended card without replacing a viewer\u2019s study.",
+      "Reconnect reloads the saved board revision and preserves role restrictions."
+    ],
+    "page_errors": []
+  },
+  "source_static": {
+    "report": "lifecycle-asset-parity.json",
+    "indexed_files": 11,
+    "all_match": true,
+    "manifest_and_readers_match": true
+  },
+  "video": {
+    "engine": "local-svg-ffmpeg",
+    "manifest": "lifecycle-release/render-manifest.json",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 360,
+    "seconds": 12,
+    "embedded_captions_verified": true,
+    "speech_requested": false,
+    "frames_reviewed": [
+      "lifecycle-release/video-opening.png",
+      "lifecycle-release/video-sources.png"
+    ]
+  },
+  "pending_external_verification": [
+    "licensed tldraw browser",
+    "operator Remotion license decision and licensed render",
+    "configured managed Liveblocks multi-user transport",
+    "supporting external MCP Apps host"
+  ],
+  "scientific_gates": [
+    "independent native-mask review signatures",
+    "validated observation-exposure denominator"
+  ],
+  "scientific_numerical_method_changes": false,
+  "public_deployment": false,
+  "push": false,
+  "external_messages": false,
+  "paid_provider_calls": false,
+  "previous_python_suite": {
+    "tests": 276,
+    "passed": true,
+    "seconds": 282.885,
+    "log": "python-suite-presets.log"
+  },
+  "presentation_presets": {
+    "report": "lifecycle-presets/report.json",
+    "cases": [
+      "park-2024",
+      "camp-2018",
+      "grove-2025"
+    ],
+    "checks": 9,
+    "page_errors": 0,
+    "scope_counts_preserved": true,
+    "shared_heat_domains_preserved": true,
+    "readers_verified": true,
+    "provider_calls": false
+  },
+  "previous_browser": {
+    "checks": [
+      "Authentic Park: 6,224 eligible records and 2,228 joint cell-days retain distinct units.",
+      "Explicit handoff refresh restores the same saved board.",
+      "Manual grouped moves, keyboard movement, Undo, zoom and saved viewport restoration preserve frozen evidence.",
+      "Chart interval and common-cell inspection update compatible linked displays without mutating the saved study or receipts.",
+      "JARVIS runs checked source states through the existing orchestrator without a model key.",
+      "Interval, highlighted cell, multi-card gallery, audience duration and camera transition resolve into the shared scene contract.",
+      "Prepared map/chart/source states and chapter explore/resume preserve the saved scene.",
+      "Opt-in transcript scrolling selects the visible saved chapter through the actual browser observer.",
+      "Portable reader runs under a project subpath with no backend or external imagery requests.",
+      "React Flow lazy mounts alongside its keyboard/table editor.",
+      "React Flow recipe runs, saves node receipts and materializes a real editable story.",
+      "The saved findings-to-story recipe runs and creates an editable story on the authentic Camp study context."
+    ],
+    "page_errors": [],
+    "initial_load": {
+      "requests": 17,
+      "response_body_bytes": 602185,
+      "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+    },
+    "narrow_layout": [
+      {
+        "width": 360,
+        "scroll": 360
+      },
+      {
+        "width": 390,
+        "scroll": 390
+      },
+      {
+        "width": 768,
+        "scroll": 768
+      }
+    ],
+    "interaction": {
+      "group_move_ms": 62.08,
+      "measurement": "Playwright click through visible saved-revision acknowledgment; includes automation overhead."
+    },
+    "browser_environment": {
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "device_memory_gib": 16,
+      "hardware_concurrency": 12,
+      "js_heap": {
+        "used_bytes": 14016824,
+        "total_bytes": 18746172,
+        "limit_bytes": 4395630592
+      }
+    }
+  },
+  "previous_reader": {
+    "verified": true,
+    "problems": [],
+    "receipts_checked": 3,
+    "snapshots": 3,
+    "figures_checked": 6,
+    "figures_unchecked": []
+  },
+  "narrative_exports": {
+    "verified": true,
+    "reader_cli_core": "narrative-caption-release/reader-core-cli-verification.json",
+    "legacy_reader": "legacy-reader-narrative-verification.json",
+    "frozen_narration_schema": "fireatlas-story-narration-v1",
+    "caption_version": 2,
+    "tampering_recounted": true,
+    "focused_tests": 46,
+    "focused_log": "gallery-focused-final.log",
+    "renderer_tests": 7,
+    "renderer_test_log": "renderer-curated-tests.log",
+    "embedded_subtitles": true,
+    "subtitle_text_timing_matches_vtt": true,
+    "generated_voice_alignment_verified": false,
+    "reviewed_frame": "narrative-caption-release/subtitle-frame.png"
+  },
+  "previous_focused_python": {
+    "tests": 37,
+    "passed": true,
+    "seconds": 10.617,
+    "log": "story-narrative-focused.log",
+    "scope": "Narration, story, reader, captions and render lifecycle; earlier wider Studio scope retained in studio-focused-final.log."
+  },
+  "previous_frontend_tests": {
+    "tests": 41,
+    "files": 9,
+    "passed": true,
+    "log": "frontend-narrative-tests.log"
+  },
+  "previous_video": {
+    "artifact": "narrative-caption-release/briefing.mp4",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 360,
+    "seconds": 12,
+    "narration": "captions only; no provider call",
+    "rasterizer": "chromium",
+    "subtitle_codec": "mov_text",
+    "subtitle_track_default": true,
+    "probe": "narrative-caption-release/video-probe.json",
+    "manifest": "narrative-caption-release/render-manifest.json"
+  },
+  "previous_presentation_presets": {
+    "verified": true,
+    "report": "narrative-caption-presets/report.json",
+    "cases": [
+      "park-2024",
+      "camp-2018",
+      "grove-2025"
+    ],
+    "cards_per_board": 8,
+    "links_per_board": 5,
+    "workflow_nodes": 7,
+    "park_workflow_executed": true,
+    "preset_page_errors": [],
+    "browser_regression": "narrative-caption-release/browser-report.json",
+    "asset_parity": "narrative-asset-parity.json",
+    "cold_load": {
+      "requests": 17,
+      "response_body_bytes": 626609,
+      "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+    }
+  },
+  "previous_narrative_exports": {
+    "verified": true,
+    "reader_cli_core": "narrative-caption-release/reader-core-cli-verification.json",
+    "legacy_reader": "legacy-reader-narrative-verification.json",
+    "frozen_narration_schema": "fireatlas-story-narration-v1",
+    "caption_version": 2,
+    "tampering_recounted": true,
+    "focused_tests": 37,
+    "focused_log": "story-narrative-focused.log",
+    "renderer_tests": 6,
+    "renderer_test_log": "renderer-subtitles-tests.log",
+    "embedded_subtitles": true,
+    "subtitle_text_timing_matches_vtt": true,
+    "generated_voice_alignment_verified": false,
+    "reviewed_frame": "narrative-caption-release/subtitle-frame.png"
+  },
+  "previous_source_static": {
+    "indexed_bundle_files_checked": 11,
+    "reader_style_script_parity": true,
+    "report": "narrative-asset-parity.json",
+    "problems": []
+  },
+  "export_recovery": {
+    "recent_jobs": 30,
+    "ownership_enforced": true,
+    "restoration_and_stale_poll_tests": true,
+    "browser_screenshot": "curated-release-final/restored-export.png",
+    "narration_outcome_screenshot": "curated-release-final/render-outcome.png"
+  },
+  "audio_integrity_and_fit": {
+    "hashes_and_local_mp3_probe": true,
+    "single_file_limit_bytes": 8388608,
+    "total_limit_bytes": 67108864,
+    "overlong_or_partial_failure": "complete captions-only output; no automatic paid retry",
+    "cache_scope": "saved story revision",
+    "cancellation_before_encoder_verified": true,
+    "actual_audio_fixture": "local tone segments at two saved chapter starts; silence between them; retained audio and subtitles",
+    "provider_speech_quality_verified": false,
+    "word_level_alignment_verified": false
+  },
+  "frozen_heat_gallery": {
+    "schema": "fireatlas-studio-heat-v1",
+    "gallery_version": 2,
+    "legacy_version_preserved": 1,
+    "authentic_board_story_scale_checks": {
+      "park-2024": {
+        "board": 6.240770107354527,
+        "story": 6.240770107354527
+      },
+      "camp-2018": {
+        "board": 6.239513902163361,
+        "story": 6.239513902163361
+      },
+      "grove-2025": {
+        "board": 2.3873819616655307,
+        "story": 2.3873819616655307
+      }
+    },
+    "portable_readers_verified": 3,
+    "refreshed_checksum_tampering_rejected": true,
+    "numeric_frame_tables": true,
+    "narrow_reader_grounding_text_contrast": {
+      "park-2024": 10.42,
+      "camp-2018": 10.42,
+      "grove-2025": 10.42
+    },
+    "paired_video": {
+      "seconds": 10,
+      "narration": "disabled; no provider call",
+      "artifact": "paired-heat.mp4",
+      "story_revision": 1
+    }
+  },
+  "local_website": {
+    "url": "http://127.0.0.1:8000/",
+    "studio": "http://127.0.0.1:8000/studio.html?case=park-2024",
+    "running": true,
+    "launch": "FIREATLAS_STUDIO_LOCAL_RENDER=1 bash scripts/run_website.sh --host 127.0.0.1 --port 8000 --db data/fireatlas.sqlite3",
+    "private_configuration": "existing launcher behavior preserved; no credential edits or inference requests"
+  },
+  "previous_lifecycle_frontend_tests": {
+    "tests": 45,
+    "files": 11,
+    "passed": true,
+    "log": "frontend-curated-tests.log"
+  },
+  "previous_lifecycle_focused_python": {
+    "tests": 46,
+    "passed": true,
+    "seconds": 17.887,
+    "log": "gallery-focused-final.log",
+    "scope": "Story, frozen heat-gallery/reader recount, captions, audio fitting/cancellation and actual local render fixtures."
+  },
+  "previous_lifecycle_browser": {
+    "checks": [
+      "Authentic Park: 6,224 eligible records and 2,228 joint cell-days retain distinct units.",
+      "Explicit handoff refresh restores the same saved board.",
+      "Manual grouped moves, keyboard movement, Undo, zoom and saved viewport restoration preserve frozen evidence.",
+      "Chart interval and common-cell inspection update compatible linked displays without mutating the saved study or receipts.",
+      "JARVIS runs checked source states through the existing orchestrator without a model key.",
+      "Interval, highlighted cell, multi-card gallery, audience duration and camera transition resolve into the shared scene contract.",
+      "Prepared map/chart/source states and chapter explore/resume preserve the saved scene.",
+      "Opt-in transcript scrolling selects the visible saved chapter through the actual browser observer.",
+      "Offline verifier reconstructs six narrated chapters, caption timing/text and transcript from frozen receipts.",
+      "Portable reader runs under a project subpath with no backend or external imagery requests.",
+      "React Flow lazy mounts alongside its keyboard/table editor.",
+      "React Flow recipe runs, saves node receipts and materializes a real editable story.",
+      "Silent documentary rendered the same six prepared scenes at 1080p, 30 fps, 12 seconds, including the resolved camera/gallery metadata.",
+      "The actual MP4 contains a default subtitle track with the same paginated resolved texts and chapter timings as captions.vtt.",
+      "A real browser refresh restores the completed export, saved story revision, caption outcome and video download through the owned recent-export chooser.",
+      "The saved findings-to-story recipe runs and creates an editable story on the authentic Camp study context."
+    ],
+    "page_errors": [],
+    "initial_load": {
+      "requests": 17,
+      "response_body_bytes": 630274,
+      "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+    },
+    "narrow_layout": [
+      {
+        "width": 360,
+        "scroll": 360
+      },
+      {
+        "width": 390,
+        "scroll": 390
+      },
+      {
+        "width": 768,
+        "scroll": 768
+      }
+    ],
+    "interaction": {
+      "group_move_ms": 60.83,
+      "measurement": "Playwright click through visible saved-revision acknowledgment; includes automation overhead."
+    },
+    "browser_environment": {
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+      "device_memory_gib": 16,
+      "hardware_concurrency": 12,
+      "js_heap": {
+        "used_bytes": 13974528,
+        "total_bytes": 20129936,
+        "limit_bytes": 4395630592
+      }
+    }
+  },
+  "previous_lifecycle_reader": {
+    "verified": true,
+    "problems": [],
+    "receipts_checked": 3,
+    "snapshots": 3,
+    "figures_checked": 6,
+    "figures_unchecked": [],
+    "narrations_checked": 6,
+    "legacy_narrations_checked": 0,
+    "narrations_unchecked": [],
+    "captions_checked": true,
+    "transcript_checked": true,
+    "scope": "Bundled receipt scalars, prepared figures and narrative representations; not source authentication or independent interpretation review."
+  },
+  "previous_lifecycle_source_static": {
+    "indexed_bundle_files_checked": 11,
+    "reader_style_script_parity": true,
+    "problems": [],
+    "report": "curated-asset-parity.json"
+  },
+  "previous_lifecycle_video": {
+    "artifact": "curated-release-final/briefing.mp4",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 360,
+    "seconds": 12,
+    "narration": "captions only; no provider call",
+    "rasterizer": "chromium",
+    "subtitle_codec": "mov_text",
+    "subtitle_track_default": true,
+    "probe": "curated-release-final/video-probe.json",
+    "manifest": "curated-release-final/render-manifest.json"
+  },
+  "previous_lifecycle_presentation_presets": {
+    "verified": true,
+    "report": "curated-heat-final/report.json",
+    "cases": [
+      "park-2024",
+      "camp-2018",
+      "grove-2025"
+    ],
+    "cards_per_board": 8,
+    "links_per_board": 5,
+    "workflow_nodes": 7,
+    "park_workflow_executed": true,
+    "preset_page_errors": [],
+    "browser_regression": "curated-release-final/browser-report.json",
+    "asset_parity": "curated-asset-parity.json",
+    "cold_load": {
+      "requests": 17,
+      "response_body_bytes": 630274,
+      "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+    }
+  },
+  "store_story_regression": {
+    "tests": 74,
+    "passed": true,
+    "seconds": 27.342,
+    "log": "lifecycle-focused.log",
+    "note": "Preceded addition of the separately passing actual Node working-storage check."
+  },
+  "render_lifecycle": {
+    "store_version": 4,
+    "cancel_publication_race_verified": true,
+    "interrupted_job_cleanup_verified": true,
+    "terminal_regression_rejected": true,
+    "actual_worker_storage_limit_test": "lifecycle-worker-bound.log",
+    "node_heap_mib": 768,
+    "working_bytes": 1073741824,
+    "input_bytes": 32000000,
+    "output_bytes": 536870912,
+    "deadline_seconds": 900,
+    "whole_process_tree_memory_bounded": null,
+    "cumulative_durable_export_capacity_bounded": true,
+    "whole_process_tree_memory_note": "Sampled session/observed descendants are bounded; no kernel quota or guarantee for unobserved short-lived descendants.",
+    "sampled_session_memory_bytes": 2147483648,
+    "retained_render_audio_capacity_bytes": 8589934592
+  },
+  "acceptance_audit": "../STUDIO_ACCEPTANCE_AUDIT.md",
+  "previous_lifecycle_python_suite": {
+    "tests": 291,
+    "passed": true,
+    "seconds": 287.535,
+    "log": "python-suite-curated-final.log"
+  },
+  "previous_resource_limits": {
+    "store_version": 4,
+    "cancel_publication_race_verified": true,
+    "interrupted_job_cleanup_verified": true,
+    "terminal_regression_rejected": true,
+    "actual_worker_storage_limit_test": "lifecycle-worker-bound.log",
+    "node_heap_mib": 768,
+    "working_bytes": 1073741824,
+    "input_bytes": 32000000,
+    "output_bytes": 536870912,
+    "deadline_seconds": 900,
+    "whole_process_tree_memory_bounded": null,
+    "cumulative_durable_export_capacity_bounded": true,
+    "whole_process_tree_memory_note": "Sampled session/observed descendants are bounded; no kernel quota or guarantee for unobserved short-lived descendants.",
+    "sampled_session_memory_bytes": 2147483648,
+    "retained_render_audio_capacity_bytes": 8589934592
+  },
+  "render_resource_checks": {
+    "focused_tests": 24,
+    "focused_seconds": 13.582,
+    "focused_log": "resource-focused.log",
+    "http_tests": 14,
+    "http_seconds": 12.728,
+    "http_log": "resource-http.log",
+    "presentation_report": "resource-presentation/report.json",
+    "actual_render_observation": {
+      "basis": "Controlled Linux session and observed descendants; shared RSS counted per process. CPU retains sampled ticks of exited processes; very short-lived work can fall between samples.",
+      "peak_summed_resident_bytes": 1351409664,
+      "sampled_cpu_seconds": 5.06,
+      "sampling_seconds": 0.2,
+      "tracked_process_identities": 17
+    },
+    "preset_page_errors": [],
+    "provider_calls": false,
+    "memory_scope": "Controlled Linux session and observed descendants, summed RSS, sampled every 0.2 seconds; brief overshoot and missed short-lived work possible.",
+    "retained_storage_capacity_bytes": 8589934592,
+    "completed_exports_automatically_deleted": false,
+    "worker_recovery_identity_checks_passed": true
+  },
+  "previous_python_suite_296": {
+    "tests": 291,
+    "passed": true,
+    "seconds": 287.535,
+    "log": "python-suite-curated-final.log"
+  },
+  "runtime_capability_check": {
+    "studio_status": 200,
+    "capabilities_status": 200,
+    "store_version": 4,
+    "video_available": true,
+    "resource_policy": "Sampled process limits and storage admission; no automatic deletion of completed exports."
+  }
+}

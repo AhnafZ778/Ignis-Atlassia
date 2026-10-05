@@ -1,0 +1,55 @@
+{
+  "transport": "Live configured AI&; one bounded conversational investigation",
+  "status": "completed",
+  "provider": "aiand",
+  "model": "zai-org/GLM-5.3-Flash",
+  "kind": "AI-assisted interpretation",
+  "ai_wording_unavailable": false,
+  "inference_calls": 1,
+  "estimated_cost_usd": 0.001585,
+  "claims": [
+    {
+      "path": "/frames/1/date_utc",
+      "label": "Both sensors date utc \u00b7 2024-07-25",
+      "value": "2024-07-25",
+      "unit": "reported metadata"
+    },
+    {
+      "path": "/frames/1/products/MODIS_SP/detections",
+      "label": "MODIS detections \u00b7 2024-07-25",
+      "value": 603,
+      "unit": "records"
+    },
+    {
+      "path": "/frames/1/products/MODIS_SP/cell_days",
+      "label": "MODIS occupied cells \u00b7 2024-07-25",
+      "value": 415,
+      "unit": "cells"
+    },
+    {
+      "path": "/frames/1/products/VIIRS_SNPP_SP/detections",
+      "label": "VIIRS S-NPP detections \u00b7 2024-07-25",
+      "value": 0,
+      "unit": "records"
+    },
+    {
+      "path": "/frames/1/products/VIIRS_SNPP_SP/cell_days",
+      "label": "VIIRS S-NPP occupied cells \u00b7 2024-07-25",
+      "value": 0,
+      "unit": "cells"
+    },
+    {
+      "path": "/frames/1/products/MODIS_SP/label",
+      "label": "MODIS label \u00b7 2024-07-25",
+      "value": "Complete export request",
+      "unit": "reported metadata"
+    },
+    {
+      "path": "/frames/1/products/VIIRS_SNPP_SP/label",
+      "label": "VIIRS S-NPP label \u00b7 2024-07-25",
+      "value": "Documented product gap",
+      "unit": "reported metadata"
+    }
+  ],
+  "error": null
+}

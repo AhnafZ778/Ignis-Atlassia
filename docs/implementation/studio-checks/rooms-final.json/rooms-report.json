@@ -1,0 +1,11 @@
+{
+  "adapter": "loopback (local QA only)",
+  "checks": [
+    "Owner issues one-use viewer/editor invitations; separate identities join; viewer writes are rejected by server and UI.",
+    "Editor change converges through saved revision polling across separate browser contexts.",
+    "Same-object stale write rejects; distinct-object edits merge without losing the winning note.",
+    "Opt-in presenter follow selects the intended card without replacing a viewer\u2019s study.",
+    "Reconnect reloads the saved board revision and preserves role restrictions."
+  ],
+  "page_errors": []
+}

@@ -1,0 +1,87 @@
+{
+  "files": [
+    {
+      "bytes": 757,
+      "path": "README.txt",
+      "sha256": "c5c7a288d24a9dc97d142657edce5346c5e4f5c5c586563cdf3c96d006b26630"
+    },
+    {
+      "bytes": 208,
+      "path": "attribution.json",
+      "sha256": "03f3fe0559e63eb033c5d83f289ab79177fb379dd1a66e6208535ad362d6ec6a"
+    },
+    {
+      "bytes": 607,
+      "path": "captions.vtt",
+      "sha256": "c4fa7e698655120332cc14fdc9c81cf324f2d49546fec1337c378d286230ba8f"
+    },
+    {
+      "bytes": 1479,
+      "path": "evidence/snap_-uuA2HeXX8R5gGgK.receipt.json.gz",
+      "sha256": "c9f0527016050828efadeadc7e86be67f804f0f642535d741d61c1718df53caa"
+    },
+    {
+      "bytes": 3053,
+      "path": "evidence/snap_-uuA2HeXX8R5gGgK.snapshot.json",
+      "sha256": "4819d8cf82367bffa603bdcdb63eb5a92ae9b674227043948defb3d7668ad546"
+    },
+    {
+      "bytes": 3595,
+      "path": "evidence/snap_0ghHGIz9-EP_R5x_.receipt.json.gz",
+      "sha256": "7acfe4dbbb059d2190786cb76d043b7cf7121c2eda7e0adfbde75a64dc6abd53"
+    },
+    {
+      "bytes": 3320,
+      "path": "evidence/snap_0ghHGIz9-EP_R5x_.snapshot.json",
+      "sha256": "7730d0ebbf79338830268dc87b460b62bda4865a2285363c94c94691592881a5"
+    },
+    {
+      "bytes": 25824,
+      "path": "fallbacks/chapter-1.svg",
+      "sha256": "4b69bd4e11f22c3c3b37a5bbd8274f268f538790ee315b4299f6ab37e2412fa4"
+    },
+    {
+      "bytes": 1799,
+      "path": "fallbacks/chapter-2.svg",
+      "sha256": "7c9c52afa7879c2720e008f170ff7448dfb717eaab156ff71530a71bc2f32575"
+    },
+    {
+      "bytes": 3567,
+      "path": "fallbacks/chapter-5.svg",
+      "sha256": "a8fb1f5dbaae6ab9c4dc615218c5f7432d9b589c9cc938a767add5d1631b1082"
+    },
+    {
+      "bytes": 347,
+      "path": "index.html",
+      "sha256": "506a8be59f5cf4dd613feb23d775fdbb1c3100f2408acb028b43ddeb2a290404"
+    },
+    {
+      "bytes": 2570,
+      "path": "reader.css",
+      "sha256": "b3ee68df3fe5fb90f7fd5345ef9fe254a68cc09c5f5a83712c0de42118eb7c2f"
+    },
+    {
+      "bytes": 11044,
+      "path": "reader.js",
+      "sha256": "a9276c01532256428d5f4f0f3ff9839b9816dd7a9044fbe6d256ffaed7e1f2a4"
+    },
+    {
+      "bytes": 98187,
+      "path": "story.json",
+      "sha256": "79e154d739cf329e5379bd8f71182a129e00c026d5eb05596e9c30cbfc3d829b"
+    },
+    {
+      "bytes": 1825,
+      "path": "transcript.txt",
+      "sha256": "8835a0e465f5d342471a2de560dad13bf287aa9715e83ed70d68db946c8cd540"
+    }
+  ],
+  "generated_utc": "2026-10-05T12:11:15+00:00",
+  "manifest_sha256": "8b9315b04ad4daf143d5866d65e01f2966b4c252d16506e3514c3581864f0d00",
+  "private_identifiers": false,
+  "requires_backend": false,
+  "schema": "fireatlas-studio-reader-v1",
+  "slug": "grove-a-small-inspectable-example-e82d549f",
+  "story_sha256": "e82d549f0a2db01f4e94e9b3d7b852b3d15da0311a4ae13de82ed5c6c1b34482",
+  "title": "Grove \u00b7 a small, inspectable example"
+}

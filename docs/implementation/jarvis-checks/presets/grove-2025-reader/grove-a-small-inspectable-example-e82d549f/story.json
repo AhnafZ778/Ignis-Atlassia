@@ -1,0 +1,1393 @@
+{
+  "assets": [],
+  "evidence_files": {
+    "snap_-uuA2HeXX8R5gGgK": {
+      "receipt": "evidence/snap_-uuA2HeXX8R5gGgK.receipt.json.gz",
+      "receipt_bundled": true,
+      "snapshot": "evidence/snap_-uuA2HeXX8R5gGgK.snapshot.json"
+    },
+    "snap_0ghHGIz9-EP_R5x_": {
+      "receipt": "evidence/snap_0ghHGIz9-EP_R5x_.receipt.json.gz",
+      "receipt_bundled": true,
+      "snapshot": "evidence/snap_0ghHGIz9-EP_R5x_.snapshot.json"
+    }
+  },
+  "resolved": {
+    "assets": [],
+    "audience": "presenter",
+    "audience_profile": {
+      "max_visible_cards": 3,
+      "reading_note": "A compact gallery keeps the selected conclusion legible while retaining citations.",
+      "source_detail": "summary"
+    },
+    "caption_version": 2,
+    "duration_adapted": false,
+    "limitations": [
+      "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+    ],
+    "method": [
+      {
+        "filter": "Authentic batches; requested sources; UTC acquisition interval; inclusive bbox. No replay deduplication.",
+        "id": "assistant-original-records-v1",
+        "unit": "imported records"
+      },
+      {
+        "filter": "Standard MODIS/S-NPP; vegetation type 0 or missing; alias-aware exact-repeat deduplication.",
+        "id": "fireatlas-observation-replay-v1",
+        "unit": "observed cell-days"
+      }
+    ],
+    "profile": {
+      "aspect": "landscape",
+      "duration_seconds": 45.0,
+      "fps": 30,
+      "height": 1080,
+      "id": "briefing-1080p-landscape",
+      "width": 1920
+    },
+    "release": {
+      "frozen": false,
+      "ids": [
+        "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b"
+      ]
+    },
+    "scenes": [
+      {
+        "audience": "presenter",
+        "audience_profile": {
+          "max_visible_cards": 3,
+          "reading_note": "A compact gallery keeps the selected conclusion legible while retaining citations.",
+          "source_detail": "summary"
+        },
+        "authored_visible_cards": [
+          "starter-1",
+          "presentation-viirs"
+        ],
+        "camera": {},
+        "caption": "The study boundary",
+        "card": {
+          "asset_id": null,
+          "display": {
+            "day": "2025-07-04",
+            "preview": "heat",
+            "source": "MODIS_SP"
+          },
+          "id": "starter-1",
+          "text": "Recorded observations inside the applied study.",
+          "title": "MODIS \u00b7 occupied-cell heat",
+          "type": "map"
+        },
+        "chapter_id": "chapter-1",
+        "duration_seconds": 15.0,
+        "evidence": [
+          "snap_0ghHGIz9-EP_R5x_",
+          "snap_0ghHGIz9-EP_R5x_"
+        ],
+        "fallback": {
+          "kind": "table",
+          "rows": [
+            {
+              "label": "Eligible unique detections",
+              "state": "observed",
+              "unit": "records",
+              "value": 7
+            },
+            {
+              "label": "Distinct union",
+              "state": "observed",
+              "unit": "cell-days",
+              "value": 4
+            },
+            {
+              "label": "Days with imported detections",
+              "state": "observed",
+              "unit": "UTC days",
+              "value": 1
+            },
+            {
+              "label": "Eligible unique detections",
+              "state": "observed",
+              "unit": "records",
+              "value": 7
+            },
+            {
+              "label": "Distinct union",
+              "state": "observed",
+              "unit": "cell-days",
+              "value": 4
+            },
+            {
+              "label": "Days with imported detections",
+              "state": "observed",
+              "unit": "UTC days",
+              "value": 1
+            }
+          ],
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "unit": "mixed units (see values)"
+        },
+        "figure_version": 2,
+        "gallery_version": 2,
+        "layers": [],
+        "narration_checked": true,
+        "narration_grounding": {
+          "mode": "authored",
+          "note": "Authored explanation; numeric references are screened against cited evidence. Interpretation is not independently verified."
+        },
+        "narration_input": {
+          "authored_text": "Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.",
+          "schema": "fireatlas-story-narration-v1",
+          "segments": []
+        },
+        "narration_text": "Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.",
+        "narration_unmatched_numbers": [],
+        "question": null,
+        "resolved_fields": [],
+        "scale": {
+          "basis": "full applicable study",
+          "domain": [
+            0.0,
+            7.0
+          ],
+          "mode": "study",
+          "observed_values": 1,
+          "statistic": "/summary/eligible_unique_detections",
+          "unit": "records"
+        },
+        "selection": {
+          "day": "2025-07-04"
+        },
+        "source_filter": null,
+        "start_seconds": 0.0,
+        "study": null,
+        "title": "The study boundary",
+        "transition": "fade",
+        "visible_card_views": [
+          {
+            "display": {
+              "day": "2025-07-04",
+              "preview": "heat",
+              "source": "MODIS_SP"
+            },
+            "frozen": true,
+            "id": "starter-1",
+            "selection": {
+              "day": "2025-07-04"
+            },
+            "snapshot_id": "snap_0ghHGIz9-EP_R5x_",
+            "source_filter": "MODIS_SP",
+            "text": "Recorded observations inside the applied study.",
+            "title": "MODIS \u00b7 occupied-cell heat",
+            "type": "map",
+            "visual": {
+              "count": 3,
+              "data": "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",
+              "day": "2025-07-04",
+              "domain": [
+                0,
+                2.3873819616655307
+              ],
+              "height": 170,
+              "kind": "heat",
+              "label": "Schematic common-cell heat; no perimeter or burned-area estimate",
+              "mime": "image/png",
+              "products": {
+                "MODIS_SP": {
+                  "cell_days": 3,
+                  "detections": 3,
+                  "frp_max_mw": 146.0,
+                  "frp_sum_mw": 163.6,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "61.03"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "397e0a1ffec3a6cc9323f0d9d4733a2370a499084079610eb7545d397e46bb71",
+                    "5f019cf9aee0ba3afed0898e001d466f86730aa33473d186ddfa769cc5e8bb31",
+                    "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165",
+                    "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+                  ],
+                  "state": "complete_export"
+                },
+                "VIIRS_SNPP_SP": {
+                  "cell_days": 2,
+                  "detections": 4,
+                  "frp_max_mw": 30.13,
+                  "frp_sum_mw": 72.63,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "2"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "0863512be7baadec0cc7315dc7c24d30bd5768f4c7f5c3f16b4d42a019abcf36",
+                    "4696e65205e49dd53fc567a902f5ab2f70ce56a7fb5411f4ba91b8ff71048364",
+                    "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478",
+                    "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+                  ],
+                  "state": "complete_export"
+                }
+              },
+              "receipt_sha256": "3d2b41cec53f5a5b180b6a48e3d0393b8b1c3dd6967223a3355fc81aefb1bfdb",
+              "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+              "scale_scope": "full frozen study, all dates and both sensors",
+              "schema": "fireatlas-studio-heat-v1",
+              "scope": {
+                "bbox": [
+                  -121.55,
+                  39.25,
+                  -121.28,
+                  39.48
+                ],
+                "case": "grove-2025",
+                "day": null,
+                "end": "2025-07-06",
+                "geometry": null,
+                "region": "norcal",
+                "series": "joint",
+                "source": "joint",
+                "start": "2025-07-04"
+              },
+              "sha256": "49e2d70fd3c72de9e0b0979dbcf458b1b366f7dc27e32ad1ac77e49a1694388b",
+              "sigma_km": 1,
+              "source": "MODIS_SP",
+              "support_sigma": 3,
+              "unit": "Gaussian occupied-cell concentration",
+              "width": 360
+            }
+          },
+          {
+            "display": {
+              "day": "2025-07-04",
+              "preview": "heat",
+              "source": "VIIRS_SNPP_SP"
+            },
+            "frozen": true,
+            "id": "presentation-viirs",
+            "selection": {
+              "day": "2025-07-04"
+            },
+            "snapshot_id": "snap_0ghHGIz9-EP_R5x_",
+            "source_filter": "VIIRS_SNPP_SP",
+            "text": "Recorded observations inside the applied study.",
+            "title": "S-NPP VIIRS \u00b7 occupied-cell heat",
+            "type": "map",
+            "visual": {
+              "count": 2,
+              "data": "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",
+              "day": "2025-07-04",
+              "domain": [
+                0,
+                2.3873819616655307
+              ],
+              "height": 170,
+              "kind": "heat",
+              "label": "Schematic common-cell heat; no perimeter or burned-area estimate",
+              "mime": "image/png",
+              "products": {
+                "MODIS_SP": {
+                  "cell_days": 3,
+                  "detections": 3,
+                  "frp_max_mw": 146.0,
+                  "frp_sum_mw": 163.6,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "61.03"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "397e0a1ffec3a6cc9323f0d9d4733a2370a499084079610eb7545d397e46bb71",
+                    "5f019cf9aee0ba3afed0898e001d466f86730aa33473d186ddfa769cc5e8bb31",
+                    "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165",
+                    "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+                  ],
+                  "state": "complete_export"
+                },
+                "VIIRS_SNPP_SP": {
+                  "cell_days": 2,
+                  "detections": 4,
+                  "frp_max_mw": 30.13,
+                  "frp_sum_mw": 72.63,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "2"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "0863512be7baadec0cc7315dc7c24d30bd5768f4c7f5c3f16b4d42a019abcf36",
+                    "4696e65205e49dd53fc567a902f5ab2f70ce56a7fb5411f4ba91b8ff71048364",
+                    "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478",
+                    "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+                  ],
+                  "state": "complete_export"
+                }
+              },
+              "receipt_sha256": "3d2b41cec53f5a5b180b6a48e3d0393b8b1c3dd6967223a3355fc81aefb1bfdb",
+              "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+              "scale_scope": "full frozen study, all dates and both sensors",
+              "schema": "fireatlas-studio-heat-v1",
+              "scope": {
+                "bbox": [
+                  -121.55,
+                  39.25,
+                  -121.28,
+                  39.48
+                ],
+                "case": "grove-2025",
+                "day": null,
+                "end": "2025-07-06",
+                "geometry": null,
+                "region": "norcal",
+                "series": "joint",
+                "source": "joint",
+                "start": "2025-07-04"
+              },
+              "sha256": "1d972f120d78dbf59f6f678820eb3036b559cac4a6031d1c075a65f5fcd2f8e1",
+              "sigma_km": 1,
+              "source": "VIIRS_SNPP_SP",
+              "support_sigma": 3,
+              "unit": "Gaussian occupied-cell concentration",
+              "width": 360
+            }
+          }
+        ],
+        "visible_cards": [
+          "starter-1",
+          "presentation-viirs"
+        ],
+        "visual": {
+          "count": 4,
+          "date_states": [
+            {
+              "date": "2025-07-04",
+              "products": {
+                "MODIS_SP": {
+                  "cell_days": 3,
+                  "detections": 3,
+                  "frp_max_mw": 146.0,
+                  "frp_sum_mw": 163.6,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "61.03"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "397e0a1ffec3a6cc9323f0d9d4733a2370a499084079610eb7545d397e46bb71",
+                    "5f019cf9aee0ba3afed0898e001d466f86730aa33473d186ddfa769cc5e8bb31",
+                    "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165",
+                    "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+                  ],
+                  "state": "complete_export"
+                },
+                "VIIRS_SNPP_SP": {
+                  "cell_days": 2,
+                  "detections": 4,
+                  "frp_max_mw": 30.13,
+                  "frp_sum_mw": 72.63,
+                  "label": "Complete export request",
+                  "pass_cloud_opportunity": "unknown",
+                  "product_versions": [
+                    "2"
+                  ],
+                  "request_coverage_basis": [
+                    "request-metadata"
+                  ],
+                  "request_hashes": [
+                    "0863512be7baadec0cc7315dc7c24d30bd5768f4c7f5c3f16b4d42a019abcf36",
+                    "4696e65205e49dd53fc567a902f5ab2f70ce56a7fb5411f4ba91b8ff71048364",
+                    "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478",
+                    "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+                  ],
+                  "state": "complete_export"
+                }
+              }
+            }
+          ],
+          "day": "2025-07-04",
+          "kind": "map",
+          "label": "Schematic common-cell centers; no basemap, perimeter or exposure footprint",
+          "points": [
+            {
+              "highlight": false,
+              "key": "-11717:4644",
+              "lat": 39.36602208784442,
+              "lon": -121.43177216007489,
+              "observed_dates": [
+                "2025-07-04"
+              ],
+              "source_dates": {
+                "MODIS_SP": [
+                  "2025-07-04"
+                ],
+                "VIIRS_SNPP_SP": []
+              },
+              "sources": [
+                "MODIS_SP"
+              ]
+            },
+            {
+              "highlight": false,
+              "key": "-11716:4645",
+              "lat": 39.3761073571401,
+              "lon": -121.4214079922637,
+              "observed_dates": [
+                "2025-07-04"
+              ],
+              "source_dates": {
+                "MODIS_SP": [
+                  "2025-07-04"
+                ],
+                "VIIRS_SNPP_SP": [
+                  "2025-07-04"
+                ]
+              },
+              "sources": [
+                "MODIS_SP",
+                "VIIRS_SNPP_SP"
+              ]
+            },
+            {
+              "highlight": false,
+              "key": "-11715:4644",
+              "lat": 39.36602208784442,
+              "lon": -121.41104382445248,
+              "observed_dates": [
+                "2025-07-04"
+              ],
+              "source_dates": {
+                "MODIS_SP": [
+                  "2025-07-04"
+                ],
+                "VIIRS_SNPP_SP": []
+              },
+              "sources": [
+                "MODIS_SP"
+              ]
+            },
+            {
+              "highlight": false,
+              "key": "-11715:4645",
+              "lat": 39.3761073571401,
+              "lon": -121.41104382445248,
+              "observed_dates": [
+                "2025-07-04"
+              ],
+              "source_dates": {
+                "MODIS_SP": [],
+                "VIIRS_SNPP_SP": [
+                  "2025-07-04"
+                ]
+              },
+              "sources": [
+                "VIIRS_SNPP_SP"
+              ]
+            }
+          ],
+          "products": {
+            "MODIS_SP": {
+              "cell_days": 3,
+              "detections": 3,
+              "frp_max_mw": 146.0,
+              "frp_sum_mw": 163.6,
+              "label": "Complete export request",
+              "pass_cloud_opportunity": "unknown",
+              "product_versions": [
+                "61.03"
+              ],
+              "request_coverage_basis": [
+                "request-metadata"
+              ],
+              "request_hashes": [
+                "397e0a1ffec3a6cc9323f0d9d4733a2370a499084079610eb7545d397e46bb71",
+                "5f019cf9aee0ba3afed0898e001d466f86730aa33473d186ddfa769cc5e8bb31",
+                "b65a9565bf3473abe26701b9a53c896ad540163d1af31180f0654b5010702165",
+                "df89cff5b3a6d78122f98b59bab2aee1caac2b202ed7263f776c0a571c4f577b"
+              ],
+              "state": "complete_export"
+            },
+            "VIIRS_SNPP_SP": {
+              "cell_days": 2,
+              "detections": 4,
+              "frp_max_mw": 30.13,
+              "frp_sum_mw": 72.63,
+              "label": "Complete export request",
+              "pass_cloud_opportunity": "unknown",
+              "product_versions": [
+                "2"
+              ],
+              "request_coverage_basis": [
+                "request-metadata"
+              ],
+              "request_hashes": [
+                "0863512be7baadec0cc7315dc7c24d30bd5768f4c7f5c3f16b4d42a019abcf36",
+                "4696e65205e49dd53fc567a902f5ab2f70ce56a7fb5411f4ba91b8ff71048364",
+                "4e0ad98372415621a0dd6f50c5dfbf68c8e3d18ddf1cef814484edd91dcc1478",
+                "f71c07d37d8537ed4a4fc4424639be323b517719e3bd155ca0d6b9eaa37b91ab"
+              ],
+              "state": "complete_export"
+            }
+          },
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "source": "joint",
+          "unit": "occupied common cells on this UTC date",
+          "viewport": [
+            -121.55,
+            39.25,
+            -121.28,
+            39.48
+          ]
+        },
+        "visual_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 960 540\" role=\"img\" aria-label=\"The study boundary \u2014 paired frozen heat maps\"><rect width=\"960\" height=\"540\" fill=\"#fbf7ef\"/><text x=\"32\" y=\"40\" font-family=\"sans-serif\" font-size=\"26\" fill=\"#172b31\">The study boundary</text><text x=\"32\" y=\"67\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#46606a\">Grove study \u00b7 2025-07-04 UTC \u00b7 two sensors, one frozen study</text><text x=\"32\" y=\"102\" font-family=\"sans-serif\" font-size=\"22\" fill=\"#172b31\">\u25cf MODIS</text><rect x=\"32\" y=\"116\" width=\"432\" height=\"260\" rx=\"8\" fill=\"#102b35\" stroke=\"#8bb0b4\"/><image x=\"42\" y=\"126\" width=\"412\" height=\"240\" preserveAspectRatio=\"none\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACqCAYAAACAstXeAAAbbElEQVR42u2dh5dV1fmG8z8k0ZgqiRokolIGhhl6Hxiw0RRRQQWkKKAgGASpKoIoUhQpAlJEig0LUVEJmkSTWIiKJCIRBUGIGE1MMnPvb7/fPvuUO3cQXUl+UZ5nrb2Ee8/Z59yR9d533v3t73zjGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHCsk/9o47f82PDt1DguNY73Y30tI7yfOSc1l5+fnzQAwBGFeMO3UgIcRPY7bpyQ/4vGuu9G43vJuP/7nz/WfT97TjSP5vXzfycl5kHAEW4AOKYFOS3GkRCnRdgE9gdu/DB/aK3Gj/y478Ro1PFjTZ38wTU/rjEO2aiTHBfOC/O4Of38P4iEPIj3CYl4p0UbwQaAr6cgfzNyyMUEORHjWIglpEF4V//EjZPyB1ednP/Qxin5D1f+NBn31j3yiI89xZ/r5ji4+mQ/p+aWkAcBzwh3ItpZwfYO+/DGb/J/FgC+wsJcIMpyp1lB/lHshr0YByE+JRbfAytOdaNe/sDyn+X3LzvNjfr5/fdonJ7/QGPpGUce7pj9Nur7c5efZnPZnG7uWMTdNQ+uioQ7I9oFgl1TrPk/DQBfwfhCorw+LcrBIRcIcizGKSEO4rvkzPy+xQ3y+xY1dKNRfu/djfN7F5bYeP+uJn7c2bT4iN4Px+tczbFvcUObU3PrGl68g3AH0Q6CHVy2d9iJWKedNTEIAHwlhDm45RBfeKdsQheJ8YF7vStOC7EX4UiAI9F9b0Fp/r15Zfk9c8vze+5onn93Tov8u7e3zP/5tlZ+zG5tY/etbZLXomGvRe+H13Su5tBcmvO9+WV2DV1L1/QC7sR7SYNIuE/3jltfHJHTDqIdO2uLQRBqAPifFOZvxo5ZztJy5JAhF4qyueP6kTOOBDlywrEYmxC3jEV296y2+XduaZffNaNDftdNHfNv39gp//b0zvk/Teuc/+PkrjZ2TqosMvx7f5zSxY7VOTpXc2guzam5g7gH4dY9mGib8/aO+4Mg2O7ezWW7z5IRa8UhUX6dFmpyagD4fxPnJL5I8uQQXSgiOGCxRSLKsUuWKN+ZEmS5YjlhifGM9l6IJcJTKySyuZ03VObemtA99+Z15+TeGHdu7o1rz8u9PqZH7vXRPXN/uMaNq3vZ2D7Kj/B3vff66B52rM7RuW/+/Gyby81pAq5r6Fq65ju3tLd70L3onkywncs2h+3uOSvW3llbHKL8Os6uT8y66/Un8C8FAP4LbjnkyusKhVmZcsotrzjVogGLL5QhF4jyu074gkOWKEoczRFP6eKEs1tux/VnmRhLWE14R/TOvXrl+blXhvXNvTzkwtzvB/fL/X7gRbnfXX5x7neXXZL77aVuDOifHe41vadjdOzL7hyd+8qwC2yu7SN729y6hkR7x/WRaMtxx4LdLnbYwV1nxfrMKAaJsuvgqtckrjol1MFd8y8JAP4Dwry+iDC7X/Gt/G1l3ThXDm5Zma7FF/ObmcD92bnSIMpvS5Sde905KeWOncvdPioS4yF9c78fdJGJ7Ev9B+RevOjS3K/7Xp77VZ+BuRd6Dc493+OK3LZzh+S2nTM098uz3ThLY1g0/GvbzhmSe94do2N1js79jZtDc73Uv7+b24n3oH65V4b2zb0m0XbX1j1ELttikj9Nq7B7NXft7t2c9dzm9pneD7n14gJX/blCfTxCDQD/BnG2HX3FHXNWmEOM0dCyW1vkk1ue08Iig3dmtsvvutk7ZSd8sSjLwb42oo+5Y4mlnO+LFzsxvuByJ6qDTGAlus91vzL3TPerck93G5l7qnJU7heV1+Q2V47OPdFVY0zucRvXRmOMvab3dMyTlVfnnuo2ys7VHM91H25zPn/eFblf9R5kwv/ixQPs2nLnctm6J3PX7h4l1haHuHvfdXMH91kUg7Ryvwm0SFy1CXXDoxBqX67nK0CO518YAHxZcY6qMVKLf9koI+2YG0YxRtP8nkiYd9/a2mICLc5ZfDGxW26Hc6feKfcyIZRLViTxm36XOYc7yERzqxPPZyMxlhBLbB/rMrb6kS7XVT9UMb76wc7XV2/sPKF6Q6eJ1es73VC9rtOk6vs7akyOxiR7Te/pGB2rcx6u+Hn1pi7XaS6bU3PrGrrW1iDYzmW/2O9Sd0+X2BfGq+4eFYXonneMP1sRjM+towjE8uo5hUJdxFFrc0wmo/aleiwkAsAXE+aoZC5TJhcv/vmKDGXM2gQSRxkpx+yFuX0szG9NjNzy6B657c6ZvnzFhRYvKGr41fkDI1Eennum2whzu048qx/tMs4E9QEnrhLatU5413SYWr2qw/Tqe9vfWL283c3V97SbUb207S3VS9rOtLE4GuHvem+ZO0bH6hydqzkk4przgUi0HzXBHu2c+dXOYY+IxfrX7t7k5nWvyq+VW8euemI3y6v1GY8k1HFGbZUffjHRtqGnYg9fmodQA8ARhblYyVwqzlBVhkrl7qkfL/6FjFm/7luUkXLMTsRiYVZkoIU6OdPfXHiZZcLKieVeFT8EUZZDluuViK7uMM2EVSIrwb27za1Vd7W+rWp+q9ur5ra6o+qOlnOrbm8xr+q2FvNtzI5G+PvtLefZMTpW57hzNYfNtSwS7SDYGztPtGu7e8htlli7e3q2+5W5be4eFYPI4SsC0ZeLxR+jC4RajnqmF2pf/eEz6ngxUSV6cdVHiD0SN01pHgDULs5hW3a0GGhZc7pkTpUZhXHGglLb8GEVGbPa+ox5aoVVYmihLc6Xh/Q1cTNh7jnY8l85Vbnlx7teay5WMYSiCYnyivY3mfuVIN/pBHluyztMiG9tvuBftzS/6583ld/9j2nliz6bUr7ks0llS/9+gxsTy+75+4Ro6M/uNb2nY3SsztG5msPmmudE281dvcgJ9j3uWrrmaifWikbk2h+puM7y7CfNVV9lC4/6UglCrYXF4KgV26gCRAuKyqj1s/CLieX2M7Kqj5BPa+NL2k2HbDpZPGT7OABk4wy/A/CEOHO2SCOTNRdxzWEBUHHG9E5Ws6wSuZAxK79ViZuijBecC5XISewkeo9FwrzBOde1HadUr2w/3ZzyojazYlF2LtgE+UYnxpPLl0h8P/152fJPxja796+jm638eFTpqsMjSlcfvqp0zUdXlt6XHnrt8MjS1R9fXbpKx+ocnSvxlmi7Oe+umukEW05b15JYL24zy5y1opC1kat295gV6shR6zMpP391+AX2Wd8Ye64+uy0m+tijvY89tJCYdtNLU27asmlfP51sH0/1+cBNAxzr4nycObfCErqDmUjjdNugEbJmWwRUydysNuYYnXP0rjnEGVf5nFnlccpxVQ6nuECxweNdx8idmmOWCEqYlSXLLS9odXvVnJbzqmY1v1OOV6L8t+vLljlxXfHXa5pJjNd8NKx07aHBTdcdvLzp+g8vbbLhw/5NNh64uMkDBy5q8uD+aOjPek3v6ZiDA5uuP3RF0/t1rubQXJ+Ma7bibxPKlplYu2s5Z32nu/Zc3YO+JOzLQkLt448JWqC0hUV9BlWUWEZ9weU1Y49CNx2V5iXZdKifDiJd137WmUw6dtNsGwc4xsU59M1wDi5UahSI8760OCvSMHFua5s5LGue0N126anaQY5SztIWAM01D8tt6TZCFRNajLNqCsUIijK0eOdca9WC1rebOEqYnbP9+6SypXK7cr4S1L8Mbbr2kBPZDwc02SgB/qBvyUP7epc8srdn403vn9f40ffPafzYe2fbeDwaj+k1vadj9vUpeUTnOOF+QHMcGtR0neaUw/7rmGYrPx1ftvyzSWXeVbt7sNzaHHXbWXaPutd1nW6ofrBifE4Liqr+UESj3wj0GV+6ZICv+LjyfNu9+OY4n02r2kOxTxx5zCuPFxD1hZcR6ajCI9vfI4o8EGmAY1icM2V0PtqwWKPQOZs4t8rvntnWFsVicXa/3odIQzv3LNLoOdgqM1TG9kTX0VYil7jmG5UxVy1sPdsW8Ga3WPDPm8sXmmMeX7ZMomnCPKTp/XLKcsMmyr1KHnn/3MaPvndW48f3VDZ64s8VDX+xu1ODJ9/pcMaTu9qf8dSudqf74f78Toczn9R7OkbH6hwJtoTdxPqSJg9obhPqEaWrPxnT7F65dTnqf93cfKFFH/NazalaqIzauWk5fblp5dObooXELe6zqeJD2bTqqBXn6AvKyvLcF5bVT0/tYl9kxUU6cdLpMjx1/SvY1IJIAxxTmXNhrBH30fC5c5w5u1/Js7FG5JynFjjndN6cEecQaUysvq/jFKucWOLEWdUYcqq3mmtepEW9T8c1W6HM+KPhpffJ5R7o32RjJMyb5Ij3dPOiLEH+U5v6T/+x1c+2vNW83jM7yus++2YzjZ9Go+6zek3v6Zi329Z/WoJtYu3mcCL/mIR6/4UlDykG0bV0zY+vbrbq0+uaLZeDNzetBUXl03e1nm2Llrp35eUh8pBIP30Ekc466Q4WCcVxR0GFRzqPTjvpbNxBJg3w9RbodK/m9O5A6z53UtxLw6o1FjW0NpxhQVB56q4Z7bWjLs6c9Su9frVXrKFf9dOxxubK0XKbNZyzE7yUON8di/MoJ87DStcqM5bD/eCCkof39mi8Se733a6NNr/T8UwT5p0t623ZUVb32TdKT3nu9ZKTt25vfNLW7Q1/8svXGv7YxvZGP/nlH9xrek/HSKx3tvRCvdvNobkUhSj+cNcwN60IxV07iPSKGiK9MBLpGk66crR91jju6N/fdiNq67iaOSWZdGdrBOUXDn0ZXrq6w/fyKKjsMJH+bqpDHi4a4BiINo4vukPQnmQSZc/ahJKJNm5rZXW+VuOcrtYY2Tv3ypALfRld38uiBcGoUkOZc8V4y5xXdZhmC29aDFR0oAqNKNawvPmaZitVfSE3+2HknPc656w8eY8T1N0dGzwpgZXQmjg3PeU5ibAE+dUz62x79Yw6214540Qb+vOrDepsk2jrGB2rc7xIn/7U7k4NLPaQK1dsYk5a2fTgpusOu3tQ9q2oxeKOGVHcMb/VHCvJWxZl0tro8lDFeFWj2GfVIqi2pauUUP1DQhme7UC8vnuqVrqtZfhWghdFHYqS9DMvWiOdiTpYNAT4Grvnwuy5mHsOfTXONIfnN6E09+V0sXuuNGeYuOd+3j33GZi4565yzyF39tHG0lS0Masg2jgK9+wFul4i0CXOOTu3/FqDSKRTQ6+Zky4pFOiMi36siIteq5jFXPQNtUQdKy3qKO6iVbUiF61NOa9ddX6o7LAe1eqSF8rvbDNLVCOdbAs/NY46sr07Ui4agQb4OscbBc2PUguDceMj2ynoFwcz8YZK6qZW+B2C485JqjaUPV98NNnzTKtxDgI9vXj2LActVxstCqay5xBxOBddfuozypslvq83OXmrhFhu2Yb7s3vtOb2nY95yxwZx1hzvVjTavKe7ZdGPxln0gBpZdFqgfWWHdiIWy6KfKMiiX0pn0arquO4c38NDpXczotK7Ob4+unCxMNO3o7D0zu825F8ywDEp0OnSutBjw7m8LybQw4pUbkyptXJjiq/cUBWFqilUVWGVG87Rmkg7AVX1RbpyQ25a1Rp+ofC0LRLfnS3qbXmrRb1nNPRnvab3dIyO1TlxRcfZSUWHrqHFSDl3XfvjkaWrP7m2oKJjtlV03FG1sM1s23WoHHrtESo6TKAHFQj0xJoCnS25i2KOqC666GKh38DCv2SAY16g4/I6v507u0BYGS8QajFMi2L6tV7d6LTTTjXCcd1zlEGn657vTFVwhA0pEmknjB+PKl1tTlqbUS5rsiEW6j4lD+/tWbLJyuxU89zdC7aiine7NNos8U0Pvab3TJC7R7XRqovuVbJp3/klD5swq9TOXUPXMuc8KiXOk+MNLAtSddEz3We4yfp3xBl0l7HxLkPr29FnYO63NSMOv1A4PVkoTGfQNWqiV9XmoBFogK+5QNes4Mh0qktt694bldi9F5XYxY2QChcJh/a1jm9qhq/m+Oq3HFy0cugHrM/GZFsoLBRp56S1EPePaeWLLe7QVu4xXqi1YGebVAZJrJvGuwb39/ObVT5wQivhlhO20Sv6bxjuPWXZOlbn2O7CAc4tu7nizSpXla5RvCJhtq3g7h7Uu8MWB2ent4GbOIdNK5OsE15wzz7eGG6/QajMULXgtkg4KiwSpraAz2yXdL0r1kwpZNAZgaaSA+DrL9C1blCpk3qOYKop0qKG8ULhnmih8Ehbu1XJoe3Pz583xLZDP21d6nypXdhBKPcZNUOqCtu7g1Cr78b0qO/GxBp9N1bbVm/12hhWulabWLR9W+5XYqsFvngMil5z7/3FHaNjdY716HBzaEEy6s+xoqA/xyJrqOTuxe5J277V/S7kzmusmdIN9lnS4qwvpM/f+t3Z4o348Vm1NVGy5xuGBv8/ZJEQ4FgR6MOhnej6o10oLHDRqVpo26gyMamF1q/zvv9Gfy/SPXyP52ibt5XcJV3rJsdd65TpqkGSqjtUfjfHxHq+FhGV/0o0/zG1fPFnk8uWyN3+bULZPYpDJKxayFNPDQmthFwu2P7rh72nY3SsztG51uXOfQFoTi0AmlPW9m6V0kmU57t7uMu63M2yHYQSZt2rOu3p3tU8SaV1+kz6bNY72n1W/fagBw+ob7S+sNLtSLVRRdGG+mR/vnsmfwbARRd10dla6P0FDfnj3YQhjw4LhunWokN9a1E9lUQbN/TMwGfNTY/MbU4JdWjErwqPVUGsC/o+y13PK+j7LHcrQZ3pBNy5XRtOZIsOvaeOde5Yq8TQuek+0fpCWGB9omen+kRLlG8yUdbiZmjsr/ajQZi9a77Snnmo3N1ijcuyLUi9c06Lc5saDf0zi4O19InGPQMc01l0EOkfZURav24XE+liT03Rg18tkx6rbd89o4ZJ/ZJHWUmozx1iUcCW+Kkpo9V4yErxFBmo7agiEImiPTmlffEnp6glqNytRHyhRuvZNu4qGOF1Ca+GzlHzoyM9aUXX1j2oNPDBikiUu4z1Dfy1EGiOebh9FhPm0MR/cL+4YkNb35U574zbjhZ/2kpanA+YOKejjSL1z2TPAMdY1LGhlgfCxiKdbjca9eVIP6U7btTfQRUKVt2xY/xZUfOk3iZaL1/Rz9yl+lT4B8EONudpj7iKnjsYBFs9ovVUFYl27c8enGwlbnLe90ViXtu4r+PU+Li10fMKiz2rUNfSNfU0FfV+liDrnsJDZoMo6971gFltyrHHYF1xoW3USfeD1oaUt6f7vFk/mzhzLnzCiqo2Yud8JHEm2gA4xkW6SNxxxKd2lxQ8tdt3uJNQS5zSXe4snx7Rx5opyWlK2JRTy1lr151Ezz+5e6g5bG0Tl8sOT++WUNoTvOOnd19rUYOcreKSR+MxrmDY6/64rmPjJ35rDs2lOdNP+9Y1FcVstSd+D7WFThPkCwaaU9Y9qzpDXzjWpH9k79wfRve0z2hd67SVe3qnjDB/sad+1xJrIM4AxB21th5NVXdkn0eYFerYUd/axqIPdbxT3a/FH+PPtl/97aGxzm1qEU1P9JYD1SYXxQQSQGW56mUhp60IQQL5Qo/BViEhB6s8W3XW2k6+NR7DbUjc0yO8Ho7TOTpXc2guzamyuBd6DbLaZV1T19aGGxNj5/p1b+aS3b3qnnXvypctxhh/Vrx9e1f0hG99drVj9Y45EmZVaixq6J+kErnmJNI4KdtilFgDAGqIdKqJUs3IwzdSCm1IM0LtRMcctfJpRR96RuG8cu+qg1irwZLEepp31iEGUYWDaoQl2tqRKEeqShC5Uy22qRpCjls78iSUcq9y3xJzPXhW+bY2hLyUGQOikbymY+xYnePO1RyaS3MqJ9c1dC1dU9c2IZY7dveke9M96l6DIMsp67OEh8SaKEduWYuo+hnoZ5F1zEGYT63RVjRxzTxJBQA+N/IIbrpINp1y1FbpYdHHadb5LnbVkVhri7g567kpwXa/+pu7VhRyYycTOv+Q2UqrBtFCo9y2BFFbyRUfmIg71yqxVPtORSY2nICGIWdbbKSPCedpDptrzHk2t66ha6nqQl8cb13f3e7FapenVphD1r3qnnXvcXzhPpM+mznltCjLLVvGfHoSZRRxzOldgr5bHZEGAByVm65NqAuij1UpV73iZyZItqBozrqBLYjFgq0oxJ4C3tzETeV6qm6QAzXhdm7UxHtGBxNDxQZexCtMKOVcbUzuYrvyNHZOCqOyltHVqinC8fEcU7t48XVzm/i6a9k1Z7S3ezBn7O4pdsfuXmNBlhgruogFuZF9VnPKKVGO3bIyZi0AZhxzUWGmIT8AHK1QZx11+onf2fjjxyZA4Qng3llHMUgs2Gd4h22i3TB+MngQbVU4BLctAVeGayIeCbmJuRPKeMxuZeL+xUarzBxh3nAdXdOuLRFWVKF7isQ4VF/YvUuM3WfxglzfC7LiC7UKlVNW0/1IlGu45ThjTj3Kyv2MDyPMAPClxXrDt7IVH3FOnRXrdAxigq1NL2nRlrMMwr2sfrLgKOFe7IVbpXxypnsXNrYFNhsS8/SQaH6ZkZrDHHCYX9cLbtgccSLEXoTTQlwvJcY/9dGFCXKIL+pknXIkyolbJmMGgP+AUPucOlpQjMQ6dtYZwf5hItpr6iQuOxbulHjbqJvsXlx+WiLgkYhbdBANy7uXRq78i4zo3P2ZUT+5jq65/LSkNnll3eT+dK8S4SDEsTuuEzvkrCB/L+WUU6Lsfna4ZQD4L8Ugqby6hmBnRVtlZBnhjhx3PCTiYaRF3IQ8Leb/rnFKMn8Q3+j6h2LxrZPcq4lwEOKaYqysPivIx+GUAeB/TbALRTsl3IXiHYaJeO0jEfQiwn7U48Qa4/Oum7nHcN/rU0JsOXJKjPXZEWQA+OoKdxDv4xIRj4X8CGNDIoZZ4Tz68WWvl4xvB1eMEAMAHPWXQEZIj+MnAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwv8D/Ac1mI+K4H/owAAAAAElFTkSuQmCC\"/><text x=\"32\" y=\"403\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#172b31\">3 occupied common cells</text><text x=\"32\" y=\"424\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#46606a\">complete export</text><text x=\"496\" y=\"102\" font-family=\"sans-serif\" font-size=\"22\" fill=\"#172b31\">\u25c6 S-NPP VIIRS</text><rect x=\"496\" y=\"116\" width=\"432\" height=\"260\" rx=\"8\" fill=\"#102b35\" stroke=\"#8bb0b4\"/><image x=\"506\" y=\"126\" width=\"412\" height=\"240\" preserveAspectRatio=\"none\" href=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACqCAYAAACAstXeAAAXLElEQVR42u2dh5sVVZ6G53+QHcZRZ0VM7OqOErubnHODgCAoEgUlKAYUkaAkJYuSc85BFIzrzjhjHHXM2RUDkgQBw6gjt+6e71fn1K17uxvjuuzM+z7PeYR7b1f3OD5vff3Vr0796lcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJyTZI1t+k1onJ+twBetI3rKv498iAMD3lu62SvHa+i+p9evs4c2nxGvTqX6dZuvTjb9LrX/9niv+/GEtf5zkuP776Hvm/Qzxz8X/QwDwTyLirZUSAR/ZWtkl2spJGs7J1wl1w+luVbF1aP0ZblXNHlqndaZfZ2UPrT0rezBZZ1ew4vf12dzXnhkfy457hv8+p8fLy1w/Sy6pV/Y/bxA44gaAfwghp2XsRbz5t7bSIjZZegGbVNc4ua45J3tw9bnZT1ZXy36y6t/itfLfswdWnpc9sCKs8+O1PKz/8Mv/PbzvP6+vt2XHq2bH1vew7+WEnhN51Tx5xyn7t742CdKunJM2wgaAE1vIJ/mEXJ6QT0lqikTGIfk6OSYSloAlUyfZ/ct+79YF2f1LL8zuW+LW4upu1cjuXVQzXgtrxWtB7eyeCpbeSz7nv07HsGO5Y+5fekH8fYLUg8Tdz5In7pS0k3rESzvpt5E1AJxwYi6Q8uHNJ+cJWUk5EbKSsVJxIuPzTY4SZSxhL2AJdn6d7J55RdmP5xZnP55Tkt09u2529931sh/dVd+tBtmPZjXIfnhnw9ya2Sh/pd7TZ+Ovq2/H0LF0TB1b32NPELkJ3MvbnRwsjSfSdml7zbmJsONK5HcpYSNrADjR6gtJeUtayqFHruLrCp+Qg5CVWCVkJ0IJ0dKuF7HEaSKVfJ1kP5jROPv+tCbZ96c2y+6a3Dy7644W2fdub5l9b1Kr7H9PdGtCa1vvjm9Tdk1oE78/sbV99r1JLe1rd01ukd01pbk7ZtPsB9Ob2PcIEjd5z6kbi9udIBJpL6luP3MibJ1gfMLWiSf012VlnatBjm47if9yAOCXEHNIy6G+OC3plFUDlCdlpdK9i2rE6VhCVipWIg4ydrJ8f0qzWMKTYvm+O65t9M6t7aK3x5RGb43qEL15S8fozZsvit4Y0Sl646bO0es3doleH94lem34xdFrNxQs95re02f0WX3NmyMvit5yx3hrdIfo7bHts+/c1s5kLonH8s6JWz+TJe7Z+cJWylftov9NQdb6rUC/JXy6vkoqWfsapCBVI2oA+JnFfFJ+Yi4j5ip+0uIsE5bEFVcXvrbwUt7tpCzpKbEGIb93ewsTpGTspBmL2En4dSdVifbVa7tFr1xzSfTy0B7RS4MvjV686rLohYGXR38d4Fb/XtHz/XrHq2+f/OVe+2t/t67oFb3gPvvCwJ72tTqGjvXKsEuiV6/raiKXwE3eTtzv3NreS7uVnSyU3kPK1glFJ5acrHPJ2moQd1KyvtouMKYqkDKipvoAgJ9DzqFjdr+u56qMAjGvTYk5Scs1TWRWXTixBSnvMim3lAQlQxPyGzd3srQrGb98dffopUGXxhJ2gn2ud9/o2Z79omcuvSJ6+pKB0VNdr4ye7HxV9MRFg6LHOw6OHu8wJPqzraGpFb+m955wn3mi06DoyS5X2dc+3X1A9Bd3rGcv7xc916ePCfzFK3uauF+5prtJW6nbC9tSttK8TiRB1laHhGTtTj77FsWp2iqQledZ115W1IXVBx01APxIMR8tLzU7ydissq8ybCxuzTkmJSXmPDGHtDyzUfb9aU0tjTrRWWVhUh7RyRKykqzkKCE/37e3ifOZHgOipy6+0iQs0T5WenX0h/bDokfbXxf9Z7vro4fbDY8eantj9GDbm6IH2ozI3G/r5vSK3GvRA+59fUaffbjdDfa1/+WO8Ud3rD+5Y0rgTzp5P9V1oJ0Anu3V104KEvbLQ3rYCUMnDiX6t8eUZt8Z1zZO1pObxzVISNVB1FZ/5BJ1ckFRog4ddTL9QZoGgJ9UaVT2o3IFqXld1XhEbvW5ccdsF/1qmKSSxDyzoYn5vSDmse2tQ1Y6taTsBKjaQXXEX3r2j57uNtCSrhLwH0tjGUvETrKZnU6697W+JXNPq9GZra3GZra0vDWzqcW4zMYW4zMb3FrffEJmXfOJydLftfTeRve5TS1vs6/Z1mpMZrs7ho4liT/oxP2IE7dJu/QaOxkonStl60ShmuTFq3paqn/t+q7upNJZJ5c4VU9snS9qJep5Rbnqw3fU4UKiftMom6aTbpr/6gDgB8h5SzlyXl/Fp+azrW89UJCaNQGhX/8/mN7Y5OUkFidmE3NnE7Ol5QGXW3WhpCwhSoxKyEq4Tpom5HtbjzIZb2pxm8l2bbNJmVXN7sisaDols6zJ1MySxtMzixrPOLaw0cxjC9ya3+jOZC2wNfPYwsYzM4sbz8gsaTLNvmZF08mZ1c1uz6x1Epe8NztxS9qxsEe4pD3cTgyStdK1UrzqkOf79LGTibrrV03Unaz+eNclal3QVJdu1Yf7jcE66qT2uMDmq22m2tJ01fjmF0vTSBoAfqigK0rOBXJOKg2XGO0CoEuQSpIhNatj1vSF+mWlT8lNNYZ632d6XGFi/lPpUJder7X6QTVFkLJSryQqIUusTrIm3rkN7zp2d4PZx+6sP/fYjHrzjk2rN//bqfUWfDu53sK/31F3UbIm11347ZR6C/Xesen15h+bWX/esVn15xyb3eBud4xZkrcJfrmTvYStE8CmnKytGlGyVhXy5yDqy/pbBaMLjeqqXx9+sfXUmgZRRx3StPXT7kRlFxLdiUvdtNUdZSRdXpKm7gCACuVcqZzOOb/WsOS88jwv55pl5awLgOPa2kSEpiNCatbEhWoD9b1Kp5KfJPhAEHPLWy3VrnHClDgl5XmNZiVCnlZvgeT7zYS6S766rWTZ38aULP/ylpKVX95cvOqLEcWrv7jJrRv90p9HFK/6cmTxqr+NKlnxlfvs17eVLP1mYt0lkrdJe5Y75uyGdyttm6yVrtc2n2Qnh23uJCFRq79Wqn/MJWr14U9fMiB6rldf+w1AJxyrPdwJSP205q7Vs+ckXZKS9AUpSX9H3cGFQwAoW21USqqNcDdg7oJg1fimE90F6EQj4SS1huSsWmNak1xyHl1qfW1azuqZlUTVMVtqbjs8s7PNyMw9LrVussQ8yeoLE7NLuXc1mCORSspfj6+71ITsZPz58OI1n11XtO7o1UXrjwwp2nh4UJ1Nn15ZZ/OnA90aUGeLLf3Zvab39Jmj1xSt/+z6orWSt6T+1diS5RK9krela50E5kvUTaZnVjpRq8dW/aG+WtVHSNOPdxhsXfmzvfrlSdouIqaTdGHdoYuHy34fz0yrk9ZmTwUXDm26w/b3oOoAgO9Mz4XVxjnJKJ3urNvrLwhKRBJS6Jw1yyxhWa0xpIeNscXJ+UqrC4Kcdzg5q1LY6FPzsiZTrU9WqnXS/NYlXRPz6JIVSshOymuPDC3acPiqOpsOXVFny8G+tbd90qv2PQcuq7V9/6W17t3fvdZ9yerhlnvtQM/a2/WZg/1qbz3kxC1hS9af31C8VrI3UbtUbVWIUvrchnep17YThU4Y6r9jSd8cS7p0mI32WZLu3dd66Veu9nXHLR3ji4fqpKc2s+kVm/AIFw7dbxz6zcM2aPquqoMUDQD5gi6new7jdHbLdjo910guCn44q6DaGNXBLghqfE4TENY5dx9gFYEuvjnR2VicxGfJudkkVRq6oBfkbKl5XMlSpV0lZklVcpWYP+ltUr533yW1duy9uObOPZ1r3r/nopoPfNyx5oMfd/CrY80H9Jre29u11k5JW7I+2Kf2NhP14Dobj15btE5ViE4AXytNT3FpOkh6sa88lKQ1/XFv61HWSz/a7jobz1N/bp10v972G8Kr13WzC4dJ1WF9tE/Rc0OKrm4TL7kUXTh+RxcNAOXI+WhqciPcjFJxveGnNqx7jm9A0e3RmmZwCdJG6XR3nkbTdFFQdYBqgcdtUuNaTUpkdrQeaRcD1TnrQuCSJtOsb57VYI7SrOoHS85OoEeHFa1L5OzSsJLxvq61dki+kvHu9jUe+qhtjYc/alPj4Q9bV3/kIy33593utd2lNR6SrPd2qXn/vm61dkjskrRqEFUfqkq+CEl6Ut3F1k2r7lAvrYuTSvbqpFXD7ExS9DV284tOOjr56CSkk5HGBzWCZ5Md7mSlPUTSFwxVc2iiIxb0uX70Lr6RhZoDACpOz2UEfWqBoM8uX9A279zIfqV3v9rbSJ0mG3QDik1tDLi8TL3xUNsbnaBvyWxtOdamJ1Y2vUMX6ax3nlV/jkuyC74e7wQ9qmTF5zf69Kxao3/trZ9cXnu70rAlZ6XmUifodk7QknOr6o980OrCRz7UCpJ270niezo5QTupS+5K4JK9UvRnStEjilfrIuI3E52gpzlB3+X76KVNptmEhyqYbV7Qmsu2LjpVc+imFt2KXlbQTZP5aBP0ohq5G1gQNAD8lARtu9Id9wJhanrDEnRLS9A28zy8i3Wz6mglMd2irQtsmnV2krOLg6F/lgSdDG2MTnJ0KVZpVqlWkxhKuUq7Sr1Kv+qcrd7o4iXtU7SJWkm6bSxmvRbkvPdiX3M4wauP1gXEI1cXbbAuemTxSk2F/P32uotsdE+jeAsbzcwstwQ9yWqYvIuFfqJDo4K6ycbG7pSgb+ocz0aPb2MXS8M0R3yhsDBBc6EQAH5Iiq5g/jm+pfus1EXC83N3Dep2brsxpYmNmCUTHGG8btBl1tPqZg/1trplW2NrujtQo3Xqd9XzanJisUvRc32KVs0x0aXoMYmk7QKhxCrB+ouD9+5z0lUyNlmri/ZLlYZStmqN0D8nydml8aM5Oa/66taSZUm9kU7Pql42tJhgSd8lfrtdXL8BaApF0yjP9uxvF0BfGhImOTqVP8kxt9hfJKzud7+rluugK7xphQ4aAPJqjkoV7LtR0Qx0LZtQKKg5kh66TIq2C4WDw4VCuzFlu5O0xtnSklYXHUbsXKrV/LLqDvXRlqadXG20bmCdzao9bJrDyVfSVgViS392r+k9SVmftQuDNm5XvFbSt4uD4+sutbloJefQPQc5q37RbHaYh9YFwsf8BULt21EmPR+n3vjOWejNp9poI5soAcDxa46KJjlSKdp2rEv23igpf9Qu6aLji4Vx1RFLWjd+hCR9n++jN/i6Q+N2uoVbdw3OypuFXqLaQ5Md6o2TeehhReuViJWw00sy1gVGzT/rs7oYaDetKDFP9DPQQczzGs7ykxtTrNaIb1YZo4uZlpx1+3eY3shVG757dieityocsTtOel5fpYIJDuoNAPhBKbr8LtokHXauS+/BETZH8pJWktbFNO1p8cylhbd5D7cd6La3Hm2Vh2qF1cndhNOtm57T8G67VdsJVfWHkrUk+/W4ukslXIlbdYhbK/w/l+s1dctKyboAKMnbvLNuTFFC1wnAbvl2iVkjdbGYx9vJwsbqfOf8h8LbvbWB0qDLUpMbKTlPaZZs9G/Vhh+vy79J5czyLw4m6ZkN/QGgIklv/RGSDn10SNJTcnWHzUWnb/nWjSu9fJruNMiSqRe11R5K1Ntsk6RxVjNI1kq2qh6UrBfYnhyzbGZa6Vfi1vyy1ky/wt8lYn1Ggp/n9+BQUtYI3UovZZ0QVLPcY4k5tw9HLOahto+0UvNztmFS6hZvzT2PLs3VGlOb5pJzRXJOT25YtXFKqtrgBhUA+Bkkfcg/azDZoH9x7s7CsDl/smnShDZJ5WG9tN//WaLWvha2o12XeEc79dO2zWjbnKxti9GWsbAlU22ipPnkeGe7yZa0JVytpf6fWprC0HsSsT4rGa9L7WKnOWx14DvajDQpP+y3HX3M9okenOxkl4g57A9tfXNHjRTmbznqN/Hfk9w5GORcrZzknJYzdw8CwM8g6cNlNus/O3tAzx083mb9U5smT1B5u3BPaJdGrfro5zfq7x7LWoIMm/SHDfofbHuTVSG6yUUTIBp9U+pV2pbAdUFvi1/x38dajyzBS8SS/U4nY43LhX2gH0027x9qN59IypaWbeP+XnYRMNkLOi1mTWrocVjhYmC5m/antxlNT2ykH4FFcgaAHyvpbbnHXR05zuOu8tK09unQFqQVPVXFpU6rPkZ3sNG05FFXkrUToiXrPvEm/hK2bnJRFaI7ESVSXWCUuFWLhCesaEm4YYXXNHmhz+gORu2jIemrttCNJurBn+o20IRsm/P37WM31mg0UFJOP/rKbuHW01Qm+aepTCt4moqf1NBJan/y2Ktzjv/Yq61MbADAT5T00e/zwNh1cTcd5qQTUZf3XMIZjW3SwR4WOyGWtfaNVrJ+I/WgWHs2oR4S6xK2pK29mO35hE6mulgnsUrguglGt5JL5LkVv6b39BldmNTXhOcQKrFLxprEeGlIeBZh/Hgr24zf/SyaaX43POLKHh7bNP95hPPixKx9SfYt9WL2T/mOb0KpWkFqZtYZAP5X0nQYw0vVHgWJOr3r3QF7snd8ITGdqiVrm/qQrJWsXSpVDRILO/V0b5deJUwlWRO3k6g6bAnVnvI9JH7Stx4yq+T7ol/6s72uJ3i7z0j2JuFh3eInebtj6Zg6tk4MydO8Tcit7WfZNaW57adhUxnph8R+7yd6V/QMQiY1AOCXFHWSqHMddfzklXPznvatfTzyZO1SqD0mywtbMtQFNyXsRNouwUrckqfStsb3lLjfGl1qElcvrMT7ZsHSa/aek6/ubpT0JWGNxOl2bB1TlYUuZOp7WUKe3jgnZNUX7mSim3HipFwzvvDnpRzScuiZLS3nVRmFiZk6AwB+cVHH1UfcURem6tOTjvpgkPVKn6ytBgnCrmkS1P4eVoc4aVvKVn8dxO3StsnbJW7JVDPHSrmSa2618Cv1mvuchG8CdolYEv5gRiOrWyRifQ/tymcyDgk5CNlS8oX+AbDnx0k5JeX44l+Qcjotpy4Aun9HR0nMAHCipOpE1qlknUx+eGEn6VpTIOqtTdoXWJ8rMWr3N4nb0rbJu46lWUlUdy9aVSKRz06ven6lXnOfCfI1ASsRu2NZKnbHjkVcw6djL+OQkNNCDnPMvsawUbmQlMuRMmkZAE7wZO1rkDxhn+r76ljYlrC1nWmSsqulxH2ejauFxC2Bq2KwqkTp20nV1uIKVnhf0xWSr77WjhMkfH6eiO1pJ17GISHrAmjcK1cpR8i/QcoA8P9V1if5eWov7CRh56QdqpBE2hrdkxQL5e0FbhJfXS0R+XevavHnE/l6Aa85O5ZwSMVBxOurJBf54o2MCmWMkAHgHzphB2mnxV056a+TC44mySDwWOL2jEQT+Rk5oR935T4bX8irkjteOH7okN33z0/Fv879nO7npksGgH9aedvMtQSeknhcjfh6JCwTeeE6LbXKeX/zqaljhGOe7AVcKfm+SBgA4Kcm8a2Vc2tLBSt+n39bAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8H/C/wBY+GNR75gYgwAAAABJRU5ErkJggg==\"/><text x=\"496\" y=\"403\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#172b31\">2 occupied common cells</text><text x=\"496\" y=\"424\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#46606a\">complete export</text><text x=\"32\" y=\"467\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#172b31\">0\u20132.39 Gaussian occupied-cell concentration \u00b7 1 km sigma \u00b7 3 sigma support</text><rect x=\"32\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,242,178)\"/><rect x=\"34\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,240,174)\"/><rect x=\"36\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,238,170)\"/><rect x=\"38\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,236,165)\"/><rect x=\"40\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,234,161)\"/><rect x=\"42\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,232,157)\"/><rect x=\"44\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,230,153)\"/><rect x=\"46\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,228,149)\"/><rect x=\"48\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,227,145)\"/><rect x=\"50\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,225,140)\"/><rect x=\"52\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,223,136)\"/><rect x=\"54\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(255,221,132)\"/><rect x=\"56\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,219,128)\"/><rect x=\"58\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,217,124)\"/><rect x=\"60\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,215,120)\"/><rect x=\"62\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,213,115)\"/><rect x=\"64\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,211,111)\"/><rect x=\"66\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,209,107)\"/><rect x=\"68\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,207,103)\"/><rect x=\"70\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,205,99)\"/><rect x=\"72\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,203,95)\"/><rect x=\"74\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,201,90)\"/><rect x=\"76\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,199,86)\"/><rect x=\"78\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,197,82)\"/><rect x=\"80\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,195,79)\"/><rect x=\"82\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,193,78)\"/><rect x=\"84\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,191,77)\"/><rect x=\"86\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,188,76)\"/><rect x=\"88\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,186,76)\"/><rect x=\"90\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(254,184,75)\"/><rect x=\"92\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,182,74)\"/><rect x=\"94\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,179,73)\"/><rect x=\"96\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,177,72)\"/><rect x=\"98\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,175,72)\"/><rect x=\"100\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,172,71)\"/><rect x=\"102\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,170,70)\"/><rect x=\"104\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,168,69)\"/><rect x=\"106\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,165,68)\"/><rect x=\"108\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,163,68)\"/><rect x=\"110\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,161,67)\"/><rect x=\"112\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,158,66)\"/><rect x=\"114\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(253,156,65)\"/><rect x=\"116\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,154,64)\"/><rect x=\"118\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,151,64)\"/><rect x=\"120\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,149,63)\"/><rect x=\"122\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,147,62)\"/><rect x=\"124\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,144,61)\"/><rect x=\"126\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(252,142,60)\"/><rect x=\"128\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(251,140,60)\"/><rect x=\"130\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(250,137,59)\"/><rect x=\"132\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(249,134,59)\"/><rect x=\"134\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(248,131,59)\"/><rect x=\"136\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(247,128,58)\"/><rect x=\"138\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(246,125,58)\"/><rect x=\"140\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(245,123,58)\"/><rect x=\"142\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(244,120,57)\"/><rect x=\"144\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(243,117,57)\"/><rect x=\"146\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(242,114,56)\"/><rect x=\"148\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(241,111,56)\"/><rect x=\"150\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(240,109,56)\"/><rect x=\"152\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(239,106,55)\"/><rect x=\"154\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(238,103,55)\"/><rect x=\"156\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(237,100,55)\"/><rect x=\"158\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(236,97,54)\"/><rect x=\"160\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(235,94,54)\"/><rect x=\"162\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(234,92,53)\"/><rect x=\"164\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(233,89,53)\"/><rect x=\"166\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(231,86,53)\"/><rect x=\"168\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(230,83,52)\"/><rect x=\"170\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(229,80,52)\"/><rect x=\"172\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(228,78,51)\"/><rect x=\"174\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(227,75,51)\"/><rect x=\"176\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(225,72,49)\"/><rect x=\"178\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(223,69,47)\"/><rect x=\"180\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(221,65,45)\"/><rect x=\"182\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(219,62,43)\"/><rect x=\"184\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(217,59,41)\"/><rect x=\"186\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(215,56,39)\"/><rect x=\"188\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(213,53,37)\"/><rect x=\"190\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(211,50,34)\"/><rect x=\"192\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(209,47,32)\"/><rect x=\"194\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(207,44,30)\"/><rect x=\"196\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(205,41,28)\"/><rect x=\"198\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(203,37,26)\"/><rect x=\"200\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(201,34,24)\"/><rect x=\"202\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(199,31,21)\"/><rect x=\"204\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(197,28,19)\"/><rect x=\"206\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(195,25,17)\"/><rect x=\"208\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(193,22,15)\"/><rect x=\"210\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(191,19,13)\"/><rect x=\"212\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(189,16,11)\"/><rect x=\"214\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(187,12,9)\"/><rect x=\"216\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(185,9,6)\"/><rect x=\"218\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(183,6,4)\"/><rect x=\"220\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(181,3,2)\"/><rect x=\"222\" y=\"478\" width=\"2\" height=\"9\" fill=\"rgb(179,0,0)\"/><text x=\"237\" y=\"488\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">Scale fixed across all study dates and both sensors</text><text x=\"32\" y=\"513\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#46606a\">Schematic common-cell heat; no perimeter or burned-area estimate</text><text x=\"32\" y=\"532\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#46606a\">Study UTC 2025-07-04\u20132025-07-06 \u00b7 bounds W,S,E,N [-121.55, 39.25, -121.28, 39.48]</text></svg>"
+      },
+      {
+        "audience": "presenter",
+        "audience_profile": {
+          "max_visible_cards": 3,
+          "reading_note": "A compact gallery keeps the selected conclusion legible while retaining citations.",
+          "source_detail": "summary"
+        },
+        "authored_visible_cards": [
+          "starter-2"
+        ],
+        "camera": {},
+        "caption": "Activity through time",
+        "card": {
+          "asset_id": null,
+          "display": {
+            "template": "study-investigation"
+          },
+          "id": "starter-2",
+          "text": "Checked activity values for the applied period.",
+          "title": "Activity chart",
+          "type": "chart"
+        },
+        "chapter_id": "chapter-2",
+        "duration_seconds": 15.0,
+        "evidence": [
+          "snap_0ghHGIz9-EP_R5x_"
+        ],
+        "fallback": {
+          "kind": "table",
+          "rows": [
+            {
+              "label": "Eligible unique detections",
+              "state": "observed",
+              "unit": "records",
+              "value": 7
+            },
+            {
+              "label": "Distinct union",
+              "state": "observed",
+              "unit": "cell-days",
+              "value": 4
+            },
+            {
+              "label": "Days with imported detections",
+              "state": "observed",
+              "unit": "UTC days",
+              "value": 1
+            }
+          ],
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "unit": "mixed units (see values)"
+        },
+        "figure_version": 2,
+        "gallery_version": 2,
+        "layers": [],
+        "narration_checked": true,
+        "narration_grounding": {
+          "mode": "authored",
+          "note": "Authored explanation; numeric references are screened against cited evidence. Interpretation is not independently verified."
+        },
+        "narration_input": {
+          "authored_text": "Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.",
+          "schema": "fireatlas-story-narration-v1",
+          "segments": []
+        },
+        "narration_text": "Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.",
+        "narration_unmatched_numbers": [],
+        "question": null,
+        "resolved_fields": [],
+        "scale": {
+          "basis": "full applicable study",
+          "domain": [
+            0.0,
+            7.0
+          ],
+          "mode": "study",
+          "observed_values": 1,
+          "statistic": "/summary/eligible_unique_detections",
+          "unit": "records"
+        },
+        "selection": null,
+        "source_filter": null,
+        "start_seconds": 15.0,
+        "study": null,
+        "title": "Activity through time",
+        "transition": "fade",
+        "visible_card_views": [
+          {
+            "display": {
+              "template": "study-investigation"
+            },
+            "frozen": true,
+            "id": "starter-2",
+            "selection": {},
+            "snapshot_id": "snap_0ghHGIz9-EP_R5x_",
+            "source_filter": "joint",
+            "text": "Checked activity values for the applied period.",
+            "title": "Activity chart",
+            "type": "chart",
+            "visual": {
+              "day": null,
+              "domain": [
+                0,
+                4
+              ],
+              "highlight_dates": [],
+              "interval": {
+                "end": "2025-07-06",
+                "start": "2025-07-04"
+              },
+              "kind": "daily-bars",
+              "label": "Recorded replay counts; positive partial records are not complete daily coverage",
+              "scope": {
+                "bbox": [
+                  -121.55,
+                  39.25,
+                  -121.28,
+                  39.48
+                ],
+                "case": "grove-2025",
+                "day": null,
+                "end": "2025-07-06",
+                "geometry": null,
+                "region": "norcal",
+                "series": "joint",
+                "source": "joint",
+                "start": "2025-07-04"
+              },
+              "source": "joint",
+              "unit": "occupied common cells per UTC date",
+              "values": [
+                {
+                  "date": "2025-07-04",
+                  "states": {
+                    "MODIS_SP": "complete_export",
+                    "VIIRS_SNPP_SP": "complete_export"
+                  },
+                  "value": 4
+                },
+                {
+                  "date": "2025-07-05",
+                  "states": {
+                    "MODIS_SP": "complete_export",
+                    "VIIRS_SNPP_SP": "complete_export"
+                  },
+                  "value": 0
+                },
+                {
+                  "date": "2025-07-06",
+                  "states": {
+                    "MODIS_SP": "complete_export",
+                    "VIIRS_SNPP_SP": "complete_export"
+                  },
+                  "value": 0
+                }
+              ]
+            }
+          }
+        ],
+        "visible_cards": [
+          "starter-2"
+        ],
+        "visual": {
+          "day": null,
+          "domain": [
+            0,
+            4
+          ],
+          "highlight_dates": [],
+          "interval": {
+            "end": "2025-07-06",
+            "start": "2025-07-04"
+          },
+          "kind": "daily-bars",
+          "label": "Recorded replay counts; positive partial records are not complete daily coverage",
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "source": "joint",
+          "unit": "occupied common cells per UTC date",
+          "values": [
+            {
+              "date": "2025-07-04",
+              "states": {
+                "MODIS_SP": "complete_export",
+                "VIIRS_SNPP_SP": "complete_export"
+              },
+              "value": 4
+            },
+            {
+              "date": "2025-07-05",
+              "states": {
+                "MODIS_SP": "complete_export",
+                "VIIRS_SNPP_SP": "complete_export"
+              },
+              "value": 0
+            },
+            {
+              "date": "2025-07-06",
+              "states": {
+                "MODIS_SP": "complete_export",
+                "VIIRS_SNPP_SP": "complete_export"
+              },
+              "value": 0
+            }
+          ]
+        },
+        "visual_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 960 540\" role=\"img\" aria-label=\"Activity through time\"><rect width=\"960\" height=\"540\" fill=\"#fbf7ef\"/><defs><pattern id=\"unknown\" width=\"8\" height=\"8\" patternUnits=\"userSpaceOnUse\"><rect width=\"8\" height=\"8\" fill=\"#edf1ea\"/><path d=\"M-2 2L2-2M0 8L8 0M6 10L10 6\" stroke=\"#7c8689\" fill=\"none\"/></pattern></defs><text x=\"32\" y=\"42\" font-family=\"sans-serif\" font-size=\"26\" fill=\"#172b31\">Activity through time</text><rect x=\"650\" y=\"22\" width=\"134\" height=\"24\" rx=\"4\" fill=\"#e7f0ed\" stroke=\"#9aaca5\"/><text x=\"657\" y=\"38\" font-family=\"sans-serif\" font-size=\"10\" fill=\"#24414a\">chart: Activity chart</text><text x=\"32\" y=\"72\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#46606a\">UTC 2025-07-04 \u2013 2025-07-06</text><path d=\"M80 110V420H880\" stroke=\"#46606a\" fill=\"none\"/><rect x=\"82.00\" y=\"140.00\" width=\"261.67\" height=\"280.00\" fill=\"#2b59c3\"/><text x=\"82\" y=\"460\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">07-04</text><rect x=\"348.67\" y=\"420.00\" width=\"261.67\" height=\"1.00\" fill=\"#2b59c3\"/><text x=\"349\" y=\"460\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">07-05</text><rect x=\"615.33\" y=\"420.00\" width=\"261.67\" height=\"1.00\" fill=\"#2b59c3\"/><text x=\"615\" y=\"460\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">07-06</text><text x=\"80\" y=\"98\" font-family=\"sans-serif\" font-size=\"15\" fill=\"#172b31\">Study-fixed domain 0\u20134 occupied common cells per UTC date</text><text x=\"32\" y=\"495\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#46606a\">Recorded replay counts; positive partial records are not complete daily coverage</text><text x=\"32\" y=\"518\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#172b31\">Hatched strip: at least one incomplete source export. Zero is a stored count, not proof of no fire.</text></svg>"
+      },
+      {
+        "audience": "presenter",
+        "audience_profile": {
+          "max_visible_cards": 3,
+          "reading_note": "A compact gallery keeps the selected conclusion legible while retaining citations.",
+          "source_detail": "summary"
+        },
+        "authored_visible_cards": [
+          "starter-5"
+        ],
+        "camera": {},
+        "caption": "Behind the result",
+        "card": {
+          "asset_id": null,
+          "display": {
+            "template": "study-investigation"
+          },
+          "id": "starter-5",
+          "text": "Original source rows remain inspectable.",
+          "title": "Source observation",
+          "type": "observation"
+        },
+        "chapter_id": "chapter-5",
+        "duration_seconds": 15.0,
+        "evidence": [
+          "snap_-uuA2HeXX8R5gGgK"
+        ],
+        "fallback": {
+          "kind": "table",
+          "rows": [
+            {
+              "label": "Full matching original records",
+              "state": "observed",
+              "unit": "records",
+              "value": 7
+            },
+            {
+              "label": "Records in this page",
+              "state": "observed",
+              "unit": "records",
+              "value": 7
+            }
+          ],
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "unit": "records"
+        },
+        "figure_version": 2,
+        "gallery_version": 2,
+        "layers": [],
+        "narration_checked": true,
+        "narration_grounding": {
+          "mode": "authored",
+          "note": "Authored explanation; numeric references are screened against cited evidence. Interpretation is not independently verified."
+        },
+        "narration_input": {
+          "authored_text": "Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.",
+          "schema": "fireatlas-story-narration-v1",
+          "segments": []
+        },
+        "narration_text": "Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.",
+        "narration_unmatched_numbers": [],
+        "question": null,
+        "resolved_fields": [],
+        "scale": {
+          "basis": "full applicable study",
+          "domain": [
+            0.0,
+            7.0
+          ],
+          "mode": "study",
+          "observed_values": 1,
+          "statistic": "/total",
+          "unit": "records"
+        },
+        "selection": null,
+        "source_filter": null,
+        "start_seconds": 30.0,
+        "study": null,
+        "title": "Behind the result",
+        "transition": "fade",
+        "visible_card_views": [
+          {
+            "display": {
+              "template": "study-investigation"
+            },
+            "frozen": true,
+            "id": "starter-5",
+            "selection": {},
+            "snapshot_id": "snap_-uuA2HeXX8R5gGgK",
+            "source_filter": "joint",
+            "text": "Original source rows remain inspectable.",
+            "title": "Source observation",
+            "type": "observation",
+            "visual": {
+              "available_rows": 7,
+              "day": null,
+              "kind": "source-rows",
+              "label": "First source rows in this frozen receipt; bounded preview. Full records and raw-field scope are retained in the cited evidence.",
+              "rows": [
+                {
+                  "acquisition_utc": "2025-07-04T22:10:00Z",
+                  "confidence": null,
+                  "confidence_raw": "n",
+                  "frp_mw": null,
+                  "frp_raw": "15.39",
+                  "lat": 39.37331,
+                  "latitude": null,
+                  "lon": -121.41714,
+                  "longitude": null,
+                  "product_version": "2",
+                  "source_id": "VIIRS_SNPP_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:10:00Z",
+                  "confidence": null,
+                  "confidence_raw": "h",
+                  "frp_mw": null,
+                  "frp_raw": "30.13",
+                  "lat": 39.3743,
+                  "latitude": null,
+                  "lon": -121.40968,
+                  "longitude": null,
+                  "product_version": "2",
+                  "source_id": "VIIRS_SNPP_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:10:00Z",
+                  "confidence": null,
+                  "confidence_raw": "h",
+                  "frp_mw": null,
+                  "frp_raw": "15.39",
+                  "lat": 39.37339,
+                  "latitude": null,
+                  "lon": -121.40932,
+                  "longitude": null,
+                  "product_version": "2",
+                  "source_id": "VIIRS_SNPP_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:10:00Z",
+                  "confidence": null,
+                  "confidence_raw": "n",
+                  "frp_mw": null,
+                  "frp_raw": "11.72",
+                  "lat": 39.37419,
+                  "latitude": null,
+                  "lon": -121.41746,
+                  "longitude": null,
+                  "product_version": "2",
+                  "source_id": "VIIRS_SNPP_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:29:00Z",
+                  "confidence": null,
+                  "confidence_raw": "56",
+                  "frp_mw": null,
+                  "frp_raw": "7.7",
+                  "lat": 39.3786,
+                  "latitude": null,
+                  "lon": -121.4175,
+                  "longitude": null,
+                  "product_version": "61.03",
+                  "source_id": "MODIS_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:29:00Z",
+                  "confidence": null,
+                  "confidence_raw": "100",
+                  "frp_mw": null,
+                  "frp_raw": "146",
+                  "lat": 39.3697,
+                  "latitude": null,
+                  "lon": -121.4155,
+                  "longitude": null,
+                  "product_version": "61.03",
+                  "source_id": "MODIS_SP"
+                },
+                {
+                  "acquisition_utc": "2025-07-04T22:29:00Z",
+                  "confidence": null,
+                  "confidence_raw": "63",
+                  "frp_mw": null,
+                  "frp_raw": "9.9",
+                  "lat": 39.3681,
+                  "latitude": null,
+                  "lon": -121.4271,
+                  "longitude": null,
+                  "product_version": "61.03",
+                  "source_id": "MODIS_SP"
+                }
+              ],
+              "scope": {
+                "bbox": [
+                  -121.55,
+                  39.25,
+                  -121.28,
+                  39.48
+                ],
+                "case": "grove-2025",
+                "day": null,
+                "end": "2025-07-06",
+                "geometry": null,
+                "region": "norcal",
+                "series": "joint",
+                "source": "joint",
+                "start": "2025-07-04"
+              },
+              "source": "joint",
+              "unit": "original source records"
+            }
+          }
+        ],
+        "visible_cards": [
+          "starter-5"
+        ],
+        "visual": {
+          "available_rows": 7,
+          "day": null,
+          "kind": "source-rows",
+          "label": "First source rows in this frozen receipt; bounded preview. Full records and raw-field scope are retained in the cited evidence.",
+          "rows": [
+            {
+              "acquisition_utc": "2025-07-04T22:10:00Z",
+              "confidence": null,
+              "confidence_raw": "n",
+              "frp_mw": null,
+              "frp_raw": "15.39",
+              "lat": 39.37331,
+              "latitude": null,
+              "lon": -121.41714,
+              "longitude": null,
+              "product_version": "2",
+              "source_id": "VIIRS_SNPP_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:10:00Z",
+              "confidence": null,
+              "confidence_raw": "h",
+              "frp_mw": null,
+              "frp_raw": "30.13",
+              "lat": 39.3743,
+              "latitude": null,
+              "lon": -121.40968,
+              "longitude": null,
+              "product_version": "2",
+              "source_id": "VIIRS_SNPP_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:10:00Z",
+              "confidence": null,
+              "confidence_raw": "h",
+              "frp_mw": null,
+              "frp_raw": "15.39",
+              "lat": 39.37339,
+              "latitude": null,
+              "lon": -121.40932,
+              "longitude": null,
+              "product_version": "2",
+              "source_id": "VIIRS_SNPP_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:10:00Z",
+              "confidence": null,
+              "confidence_raw": "n",
+              "frp_mw": null,
+              "frp_raw": "11.72",
+              "lat": 39.37419,
+              "latitude": null,
+              "lon": -121.41746,
+              "longitude": null,
+              "product_version": "2",
+              "source_id": "VIIRS_SNPP_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:29:00Z",
+              "confidence": null,
+              "confidence_raw": "56",
+              "frp_mw": null,
+              "frp_raw": "7.7",
+              "lat": 39.3786,
+              "latitude": null,
+              "lon": -121.4175,
+              "longitude": null,
+              "product_version": "61.03",
+              "source_id": "MODIS_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:29:00Z",
+              "confidence": null,
+              "confidence_raw": "100",
+              "frp_mw": null,
+              "frp_raw": "146",
+              "lat": 39.3697,
+              "latitude": null,
+              "lon": -121.4155,
+              "longitude": null,
+              "product_version": "61.03",
+              "source_id": "MODIS_SP"
+            },
+            {
+              "acquisition_utc": "2025-07-04T22:29:00Z",
+              "confidence": null,
+              "confidence_raw": "63",
+              "frp_mw": null,
+              "frp_raw": "9.9",
+              "lat": 39.3681,
+              "latitude": null,
+              "lon": -121.4271,
+              "longitude": null,
+              "product_version": "61.03",
+              "source_id": "MODIS_SP"
+            }
+          ],
+          "scope": {
+            "bbox": [
+              -121.55,
+              39.25,
+              -121.28,
+              39.48
+            ],
+            "case": "grove-2025",
+            "day": null,
+            "end": "2025-07-06",
+            "geometry": null,
+            "region": "norcal",
+            "series": "joint",
+            "source": "joint",
+            "start": "2025-07-04"
+          },
+          "source": "joint",
+          "unit": "original source records"
+        },
+        "visual_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 960 540\" role=\"img\" aria-label=\"Behind the result\"><rect width=\"960\" height=\"540\" fill=\"#fbf7ef\"/><defs><pattern id=\"unknown\" width=\"8\" height=\"8\" patternUnits=\"userSpaceOnUse\"><rect width=\"8\" height=\"8\" fill=\"#edf1ea\"/><path d=\"M-2 2L2-2M0 8L8 0M6 10L10 6\" stroke=\"#7c8689\" fill=\"none\"/></pattern></defs><text x=\"32\" y=\"42\" font-family=\"sans-serif\" font-size=\"26\" fill=\"#172b31\">Behind the result</text><rect x=\"650\" y=\"22\" width=\"134\" height=\"24\" rx=\"4\" fill=\"#e7f0ed\" stroke=\"#9aaca5\"/><text x=\"657\" y=\"38\" font-family=\"sans-serif\" font-size=\"10\" fill=\"#24414a\">observation: Source ob</text><text x=\"32\" y=\"72\" font-family=\"sans-serif\" font-size=\"16\" fill=\"#46606a\">UTC 2025-07-04 \u2013 2025-07-06</text><text x=\"32\" y=\"111\" font-family=\"sans-serif\" font-size=\"17\" fill=\"#172b31\">Previewing 7 of 7 records available in this receipt</text><text x=\"32\" y=\"148\" font-family=\"sans-serif\" font-size=\"14\" fill=\"#172b31\">Source / acquisition UTC                       lon, lat                 confidence / FRP MW / version</text><text x=\"32\" y=\"184\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">VIIRS_SNPP 2025-07-04T22:10:00Z</text><text x=\"420\" y=\"184\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.41714, 39.37331</text><text x=\"720\" y=\"184\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">n / 15.39 / 2</text><text x=\"32\" y=\"216\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">VIIRS_SNPP 2025-07-04T22:10:00Z</text><text x=\"420\" y=\"216\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.40968, 39.3743</text><text x=\"720\" y=\"216\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">h / 30.13 / 2</text><text x=\"32\" y=\"248\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">VIIRS_SNPP 2025-07-04T22:10:00Z</text><text x=\"420\" y=\"248\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.40932, 39.37339</text><text x=\"720\" y=\"248\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">h / 15.39 / 2</text><text x=\"32\" y=\"280\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">VIIRS_SNPP 2025-07-04T22:10:00Z</text><text x=\"420\" y=\"280\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.41746, 39.37419</text><text x=\"720\" y=\"280\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">n / 11.72 / 2</text><text x=\"32\" y=\"312\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">MODIS 2025-07-04T22:29:00Z</text><text x=\"420\" y=\"312\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.4175, 39.3786</text><text x=\"720\" y=\"312\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">56 / 7.7 / 61.03</text><text x=\"32\" y=\"344\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">MODIS 2025-07-04T22:29:00Z</text><text x=\"420\" y=\"344\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.4155, 39.3697</text><text x=\"720\" y=\"344\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">100 / 146 / 61.03</text><text x=\"32\" y=\"376\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">MODIS 2025-07-04T22:29:00Z</text><text x=\"420\" y=\"376\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">-121.4271, 39.3681</text><text x=\"720\" y=\"376\" font-family=\"sans-serif\" font-size=\"13\" fill=\"#172b31\">63 / 9.9 / 61.03</text><text x=\"32\" y=\"500\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#172b31\">First source rows in this frozen receipt; bounded preview. Full records and raw-field scope are</text><text x=\"32\" y=\"518\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#172b31\">retained in the cited evidence.</text></svg>"
+      }
+    ],
+    "schema": "fireatlas-resolved-story-v1",
+    "sha256": "e82d549f0a2db01f4e94e9b3d7b852b3d15da0311a4ae13de82ed5c6c1b34482",
+    "snapshots": {
+      "snap_-uuA2HeXX8R5gGgK": {
+        "captured_utc": "2026-10-05T12:11:14+00:00",
+        "context": {
+          "as_of": "2025-07-06",
+          "bbox": [
+            -121.55,
+            39.25,
+            -121.28,
+            39.48
+          ],
+          "case": "grove-2025",
+          "day": "",
+          "distance_km": 2.0,
+          "end": "2025-07-06",
+          "gap_days": 1,
+          "layer": "ndvi",
+          "metric": "density",
+          "month": 7,
+          "region": "norcal",
+          "revision": 0,
+          "series": "joint",
+          "source": "joint",
+          "start": "2025-07-04",
+          "year": 2025
+        },
+        "dependency_hashes": {
+          "export_inventory": "046b5fe09945be052c0ee8d556dc670da4a9414ab2003956d95d49ca823e8f64",
+          "file:manifest.json": "17bcb39954a25a5312b4957a4957c4c0effb3930c2fa5350dc646605afab0327",
+          "file:norcal.json": "c597720264afefea2e4ee7f8eaeb01721c3e8386a154f9937b26031b0c19c5d1",
+          "file:punjab-haryana.json": "0a76c948d5eb839f1651824b59192808b207a899a14cf59c3adf2c4d246a98b9",
+          "file:sensor_notices.json": "f5c0baf741f6b11324233eb931b45e000c36a03c35465df598f45c4df72abb82",
+          "file:validity_cmr_inventory.json": "27cf34a5c72e6439a88061fe5c024445c70c669f14090e961117d8770775e6a1",
+          "file:validity_incident_cohort.json": "7b2cec1cd2fbf6e4473288ee318ae3093f2cd5fed31a360753e9ccb2df427960",
+          "file:validity_masks.sqlite3": "8888de6eb4596de98d8b3c2b2c44ff0153c6b0da8fd0fb13d762714b7ac7cb5c",
+          "schema": "a7705bc5740e1a49f8423e52a8491fbacbf5241144f235034e9c953553425e4d",
+          "source_ledger": "ceaafbff91da419876ac57cfc92cb6522756a9d1e0bf9381f5f67805f4227a89"
+        },
+        "facts": [
+          {
+            "label": "Full matching original records",
+            "method_id": "assistant-original-records-v1",
+            "path": "/total",
+            "state": "observed",
+            "unit": "records",
+            "value": 7
+          },
+          {
+            "label": "Records in this page",
+            "method_id": "assistant-original-records-v1",
+            "path": "/returned",
+            "state": "observed",
+            "unit": "records",
+            "value": 7
+          }
+        ],
+        "grid": "ease6933-centroid-1km-v1",
+        "id": "snap_-uuA2HeXX8R5gGgK",
+        "limitations": [
+          "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+        ],
+        "method": {
+          "filter": "Authentic batches; requested sources; UTC acquisition interval; inclusive bbox. No replay deduplication.",
+          "id": "assistant-original-records-v1",
+          "unit": "imported records"
+        },
+        "operation": "observations",
+        "receipt_sha256": "c3e234ea9bcda457b726508c81da4731254bb16849564c319cf302ab2a22fad5",
+        "release_frozen": false,
+        "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+        "result_id": "res_oUGBN8E3wumiHvRA5QJOTA",
+        "schema": "fireatlas-studio-evidence-snapshot-v1",
+        "scope": {
+          "bbox": [
+            -121.55,
+            39.25,
+            -121.28,
+            39.48
+          ],
+          "case": "grove-2025",
+          "day": null,
+          "end": "2025-07-06",
+          "geometry": null,
+          "region": "norcal",
+          "series": "joint",
+          "source": "joint",
+          "start": "2025-07-04"
+        },
+        "snapshot_sha256": "3d15e1fc995a5de6706594a7086f4efeb9518b67ba13730bfbcfa6ef4d752f2a",
+        "unit": "records"
+      },
+      "snap_0ghHGIz9-EP_R5x_": {
+        "captured_utc": "2026-10-05T12:11:14+00:00",
+        "context": {
+          "as_of": "2025-07-06",
+          "bbox": [
+            -121.55,
+            39.25,
+            -121.28,
+            39.48
+          ],
+          "case": "grove-2025",
+          "day": "",
+          "distance_km": 2.0,
+          "end": "2025-07-06",
+          "gap_days": 1,
+          "layer": "ndvi",
+          "metric": "density",
+          "month": 7,
+          "region": "norcal",
+          "revision": 0,
+          "series": "joint",
+          "source": "joint",
+          "start": "2025-07-04",
+          "year": 2025
+        },
+        "dependency_hashes": {
+          "export_inventory": "046b5fe09945be052c0ee8d556dc670da4a9414ab2003956d95d49ca823e8f64",
+          "file:manifest.json": "17bcb39954a25a5312b4957a4957c4c0effb3930c2fa5350dc646605afab0327",
+          "file:norcal.json": "c597720264afefea2e4ee7f8eaeb01721c3e8386a154f9937b26031b0c19c5d1",
+          "file:punjab-haryana.json": "0a76c948d5eb839f1651824b59192808b207a899a14cf59c3adf2c4d246a98b9",
+          "file:sensor_notices.json": "f5c0baf741f6b11324233eb931b45e000c36a03c35465df598f45c4df72abb82",
+          "file:validity_cmr_inventory.json": "27cf34a5c72e6439a88061fe5c024445c70c669f14090e961117d8770775e6a1",
+          "file:validity_incident_cohort.json": "7b2cec1cd2fbf6e4473288ee318ae3093f2cd5fed31a360753e9ccb2df427960",
+          "file:validity_masks.sqlite3": "8888de6eb4596de98d8b3c2b2c44ff0153c6b0da8fd0fb13d762714b7ac7cb5c",
+          "schema": "a7705bc5740e1a49f8423e52a8491fbacbf5241144f235034e9c953553425e4d",
+          "source_ledger": "ceaafbff91da419876ac57cfc92cb6522756a9d1e0bf9381f5f67805f4227a89"
+        },
+        "facts": [
+          {
+            "label": "Eligible unique detections",
+            "method_id": "fireatlas-observation-replay-v1",
+            "path": "/summary/eligible_unique_detections",
+            "state": "observed",
+            "unit": "records",
+            "value": 7
+          },
+          {
+            "label": "Distinct union",
+            "method_id": "fireatlas-observation-replay-v1",
+            "path": "/summary/joint_cell_days",
+            "state": "observed",
+            "unit": "cell-days",
+            "value": 4
+          },
+          {
+            "label": "Days with imported detections",
+            "method_id": "fireatlas-observation-replay-v1",
+            "path": "/summary/detected_days",
+            "state": "observed",
+            "unit": "UTC days",
+            "value": 1
+          }
+        ],
+        "grid": "ease6933-centroid-1km-v1",
+        "id": "snap_0ghHGIz9-EP_R5x_",
+        "limitations": [
+          "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+        ],
+        "method": {
+          "filter": "Standard MODIS/S-NPP; vegetation type 0 or missing; alias-aware exact-repeat deduplication.",
+          "id": "fireatlas-observation-replay-v1",
+          "unit": "observed cell-days"
+        },
+        "operation": "replay",
+        "receipt_sha256": "3d2b41cec53f5a5b180b6a48e3d0393b8b1c3dd6967223a3355fc81aefb1bfdb",
+        "release_frozen": false,
+        "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+        "result_id": "res__oIa3CebGa9WrKzdGPiXTg",
+        "schema": "fireatlas-studio-evidence-snapshot-v1",
+        "scope": {
+          "bbox": [
+            -121.55,
+            39.25,
+            -121.28,
+            39.48
+          ],
+          "case": "grove-2025",
+          "day": null,
+          "end": "2025-07-06",
+          "geometry": null,
+          "region": "norcal",
+          "series": "joint",
+          "source": "joint",
+          "start": "2025-07-04"
+        },
+        "snapshot_sha256": "49869e07950e4d2550ac6fdf3d5fabe479b3318742bf40b4331f2b40c2aa45b4",
+        "unit": "mixed units (see values)"
+      }
+    },
+    "story_ref": "5df5bb261b91e976",
+    "story_revision": 2,
+    "target_duration_seconds": 45.0,
+    "title": "Grove \u00b7 a small, inspectable example",
+    "units": [
+      "mixed units (see values)",
+      "records"
+    ],
+    "viewer_states": [
+      "reading",
+      "question-paused",
+      "exploring",
+      "returning"
+    ],
+    "warnings": []
+  },
+  "schema": "fireatlas-studio-reader-v1",
+  "story_files": {
+    "captions": "captions.vtt",
+    "fallbacks": {
+      "chapter-1": "fallbacks/chapter-1.svg",
+      "chapter-2": "fallbacks/chapter-2.svg",
+      "chapter-5": "fallbacks/chapter-5.svg"
+    },
+    "transcript": "transcript.txt"
+  }
+}

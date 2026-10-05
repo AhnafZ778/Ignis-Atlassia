@@ -1,0 +1,24 @@
+
+> fireatlas-studio-app@0.1.0 build
+> tsc --noEmit && vite build && node scripts/postbuild.mjs
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1035 modules transformed.
+rendering chunks...
+computing gzip size...
+../fireatlas/static/studio-assets/.vite/manifest.json                    1.52 kB │ gzip:   0.41 kB
+../fireatlas/static/studio-assets/assets/WorkflowPanel-BnuhLJ6X.css     15.87 kB │ gzip:   2.67 kB
+../fireatlas/static/studio-assets/assets/studio-BvyGvi9Z.css            16.25 kB │ gzip:   4.14 kB
+../fireatlas/static/studio-assets/assets/TldrawBoard-C272mPqd.css       78.83 kB │ gzip:  14.64 kB
+../fireatlas/static/studio-assets/assets/sanitizeSvg-BRz1NfP5.js         7.32 kB │ gzip:   2.98 kB
+../fireatlas/static/studio-assets/assets/WorkflowPanel-BQmHHkVF.js     192.69 kB │ gzip:  63.20 kB
+../fireatlas/static/studio-assets/assets/collaboration-iAdzrBg1.js     196.44 kB │ gzip:  60.71 kB
+../fireatlas/static/studio-assets/assets/studio-wPk4mKuV.js            342.94 kB │ gzip: 107.59 kB
+../fireatlas/static/studio-assets/assets/TldrawBoard-DnNfE1Ww.js     1,716.55 kB │ gzip: 521.66 kB
+
+(!) Some chunks are larger than 600 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.15s

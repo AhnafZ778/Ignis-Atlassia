@@ -1,0 +1,90 @@
+{
+  "captured_utc": "2026-10-05T12:11:14+00:00",
+  "context": {
+    "as_of": "2025-07-06",
+    "bbox": [
+      -121.55,
+      39.25,
+      -121.28,
+      39.48
+    ],
+    "case": "grove-2025",
+    "day": "",
+    "distance_km": 2.0,
+    "end": "2025-07-06",
+    "gap_days": 1,
+    "layer": "ndvi",
+    "metric": "density",
+    "month": 7,
+    "region": "norcal",
+    "revision": 0,
+    "series": "joint",
+    "source": "joint",
+    "start": "2025-07-04",
+    "year": 2025
+  },
+  "dependency_hashes": {
+    "export_inventory": "046b5fe09945be052c0ee8d556dc670da4a9414ab2003956d95d49ca823e8f64",
+    "file:manifest.json": "17bcb39954a25a5312b4957a4957c4c0effb3930c2fa5350dc646605afab0327",
+    "file:norcal.json": "c597720264afefea2e4ee7f8eaeb01721c3e8386a154f9937b26031b0c19c5d1",
+    "file:punjab-haryana.json": "0a76c948d5eb839f1651824b59192808b207a899a14cf59c3adf2c4d246a98b9",
+    "file:sensor_notices.json": "f5c0baf741f6b11324233eb931b45e000c36a03c35465df598f45c4df72abb82",
+    "file:validity_cmr_inventory.json": "27cf34a5c72e6439a88061fe5c024445c70c669f14090e961117d8770775e6a1",
+    "file:validity_incident_cohort.json": "7b2cec1cd2fbf6e4473288ee318ae3093f2cd5fed31a360753e9ccb2df427960",
+    "file:validity_masks.sqlite3": "8888de6eb4596de98d8b3c2b2c44ff0153c6b0da8fd0fb13d762714b7ac7cb5c",
+    "schema": "a7705bc5740e1a49f8423e52a8491fbacbf5241144f235034e9c953553425e4d",
+    "source_ledger": "ceaafbff91da419876ac57cfc92cb6522756a9d1e0bf9381f5f67805f4227a89"
+  },
+  "facts": [
+    {
+      "label": "Full matching original records",
+      "method_id": "assistant-original-records-v1",
+      "path": "/total",
+      "state": "observed",
+      "unit": "records",
+      "value": 7
+    },
+    {
+      "label": "Records in this page",
+      "method_id": "assistant-original-records-v1",
+      "path": "/returned",
+      "state": "observed",
+      "unit": "records",
+      "value": 7
+    }
+  ],
+  "grid": "ease6933-centroid-1km-v1",
+  "id": "snap_-uuA2HeXX8R5gGgK",
+  "limitations": [
+    "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+  ],
+  "method": {
+    "filter": "Authentic batches; requested sources; UTC acquisition interval; inclusive bbox. No replay deduplication.",
+    "id": "assistant-original-records-v1",
+    "unit": "imported records"
+  },
+  "operation": "observations",
+  "receipt_sha256": "c3e234ea9bcda457b726508c81da4731254bb16849564c319cf302ab2a22fad5",
+  "release_frozen": false,
+  "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+  "result_id": "res_oUGBN8E3wumiHvRA5QJOTA",
+  "schema": "fireatlas-studio-evidence-snapshot-v1",
+  "scope": {
+    "bbox": [
+      -121.55,
+      39.25,
+      -121.28,
+      39.48
+    ],
+    "case": "grove-2025",
+    "day": null,
+    "end": "2025-07-06",
+    "geometry": null,
+    "region": "norcal",
+    "series": "joint",
+    "source": "joint",
+    "start": "2025-07-04"
+  },
+  "snapshot_sha256": "3d15e1fc995a5de6706594a7086f4efeb9518b67ba13730bfbcfa6ef4d752f2a",
+  "unit": "records"
+}

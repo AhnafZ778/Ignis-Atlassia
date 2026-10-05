@@ -1,0 +1,315 @@
+.............../home/ahnaf-zakaria/Desktop/NASA Spaceapps/.venv-assistant/lib/python3.12/site-packages/pydantic_graph/_utils.py:67: DeprecationWarning: There is no current event loop
+  event_loop = asyncio.get_event_loop()
+                 pydantic-ai v2.53.0 • Python 3.12.3
+
+      / \        agent: agent • model: function:function:respond: • output: Draft • tools: 6
+     /   \         capabilities: 0
+   /___.___\
+  /    |    \    observability: off — see every model and tool call live, with cost
+/      |      \    set it up free with Logfire and a GitHub login: https://pydantic.dev/ai-setup.md
+`---.._|_..---'    or use any OpenTelemetry backend: https://pydantic.dev/docs/ai/logfire/#otel
+
+                 goes away once observability is on — or PYDANTIC_AI_NO_BANNER=1
+................127.0.0.1 - - [05/Oct/2026 04:31:08] "POST /api/assistant/sessions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:08] "POST /api/assistant/views HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:08] "POST /api/assistant/runs HTTP/1.1" 202 -
+127.0.0.1 - - [05/Oct/2026 04:31:09] "GET /assistant.html HTTP/1.1" 200 -
+....................................127.0.0.1 - - [05/Oct/2026 04:31:19] "GET /api/globe HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:19] "GET /api/globe HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:19] "GET /api/globe?demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:31:19] "GET /api/globe HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:19] "GET /api/globe/detail?cell=200:87 HTTP/1.1" 200 -
+............................................127.0.0.1 - - [05/Oct/2026 04:31:26] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /atlas.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /tour.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /tour.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /data.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /research.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/meta HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/calendar?year=2015&series=joint HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/meta?demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/calendar?demo=0 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/presentation HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/context?year=2026&month=9&layer=ndvi HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:26] "GET /api/research/coverage-example HTTP/1.1" 404 -
+.....127.0.0.1 - - [05/Oct/2026 04:31:30] "GET /api/v2/calendar?region=norcal&year=2024&month=7 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:30] "GET /api/v2/study?region=norcal&year=2024&month=7&expected_result_sha256=f64deb855620eca766ff94e7da95044166f5acbae5ccf3f9f2a3e12e39525ead HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:31] "GET /api/v2/study?region=norcal&year=2024&month=7&expected_result_sha256=stale HTTP/1.1" 409 -
+127.0.0.1 - - [05/Oct/2026 04:31:31] "GET /api/v2/study?region=norcal&year=2024&month=7&expected_result_sha256=f64deb855620eca766ff94e7da95044166f5acbae5ccf3f9f2a3e12e39525ead HTTP/1.1" 503 -
+............................127.0.0.1 - - [05/Oct/2026 04:31:43] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:43] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/documents/doc_hSOUx6D55MwspWFP/assets HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "GET /api/studio/assets/asset_SsreUZ-srPA HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "GET /api/studio/assets/asset_SsreUZ-srPA HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/documents/doc_hSOUx6D55MwspWFP/assets HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/documents/doc_hSOUx6D55MwspWFP/assets HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:44] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/bindings/resolve HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "GET /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/snapshots/snap_86AHruRrGUfWFfA1 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "GET /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/snapshots/snap_86AHruRrGUfWFfA1 HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/documents/doc_GdOa9VNeGJRMWHnJ/stories HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/stories/story_J5qGn4EzPXHoLw/resolve HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "GET /api/studio/stories/story_J5qGn4EzPXHoLw/export HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "GET /api/studio/stories/story_J5qGn4EzPXHoLw HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:45] "POST /api/studio/stories/story_J5qGn4EzPXHoLw/renders HTTP/1.1" 503 -
+.127.0.0.1 - - [05/Oct/2026 04:31:46] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:46] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:46] "GET /api/studio/capabilities HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:31:46] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:46] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/documents/doc_5MdfVoQTMJL5uRl4/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/documents/doc_5MdfVoQTMJL5uRl4/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/documents/doc_5MdfVoQTMJL5uRl4/transactions HTTP/1.1" 409 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "PATCH /api/studio/documents/doc_5MdfVoQTMJL5uRl4 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/documents/doc_5MdfVoQTMJL5uRl4/undo HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "GET /api/studio/documents/doc_5MdfVoQTMJL5uRl4 HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "PATCH /api/studio/documents/doc_5MdfVoQTMJL5uRl4 HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:47] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "GET /api/studio/documents/doc_ev3J6-g8fMIumIm- HTTP/1.1" 401 -
+.127.0.0.1 - - [05/Oct/2026 04:31:48] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "GET /api/studio/documents HTTP/1.1" 401 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "GET /api/studio/documents HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:48] "POST /api/studio/principals HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:31:49] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:49] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:49] "POST /api/studio/documents HTTP/1.1" 403 -
+127.0.0.1 - - [05/Oct/2026 04:31:49] "POST /api/studio/documents HTTP/1.1" 403 -
+127.0.0.1 - - [05/Oct/2026 04:31:49] "POST /api/studio/documents HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/recovery HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/recover HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "GET /api/studio/documents/doc_zDvOCLmBamkyViSK HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:50] "POST /api/studio/recover HTTP/1.1" 403 -
+.127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/documents/doc_jJ3kbouj4ZsrXKDX/room HTTP/1.1" 503 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/documents/doc_jJ3kbouj4ZsrXKDX/room HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/rooms/room_cTpfJ2yXoDX7W-o9/invites HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/invites/redeem HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/invites/redeem HTTP/1.1" 403 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "GET /api/studio/documents/doc_jJ3kbouj4ZsrXKDX HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:51] "POST /api/studio/rooms/room_cTpfJ2yXoDX7W-o9/comments HTTP/1.1" 403 -
+.127.0.0.1 - - [05/Oct/2026 04:31:52] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:52] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:52] "GET /api/studio/workflows/templates HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:52] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:52] "POST /api/studio/documents/doc_Ly4tW7Kc-fSFqz3Y/actions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:52] "POST /api/studio/documents/doc_Ly4tW7Kc-fSFqz3Y/actions HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:31:53] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:53] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:53] "GET /api/studio/not-a-route HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:53] "POST /api/studio/documents/doc_missing/transactions HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/principals HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/documents HTTP/1.1" 201 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/workflows/validate HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/workflows/validate HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/documents/doc_uISljQvULfg4XeFA/workflow HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "POST /api/studio/workflows/wf_Ybx1DEjS2BXFoQ/run HTTP/1.1" 202 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "GET /api/studio/runs/run_rWWHjvPslGLeCQ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:54] "GET /api/studio/runs/run_rWWHjvPslGLeCQ HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:31:55] "GET /studio-assets/../web.py HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:55] "GET /studio-assets/not-in-manifest.js HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:31:55] "GET /studio-assets/.vite/manifest.json HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /studio.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /studio-reader.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /investigate.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /research.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /atlas.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /evidence.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /replay.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:31:56] "GET /assistant.html HTTP/1.1" 200 -
+.[10/05/26 04:31:57] Error calling tool 'studio_open_board'                      
+                    ╭─────────── Traceback (most recent call last) ────────────╮
+                    │ /home/ahnaf-zakaria/Desktop/NASA                         │
+                    │ Spaceapps/.venv-assistant/lib/python3.12/site-packages/f │
+                    │ astmcp/server/server.py:1505 in call_tool                │
+                    │                                                          │
+                    │ /home/ahnaf-zakaria/Desktop/NASA                         │
+                    │ Spaceapps/.venv-assistant/lib/python3.12/site-packages/f │
+                    │ astmcp/tools/base.py:440 in _run                         │
+                    │                                                          │
+                    │                 ... 11 frames hidden ...                 │
+                    │                                                          │
+                    │ /home/ahnaf-zakaria/Desktop/NASA                         │
+                    │ Spaceapps/fireatlas/studio/store.py:252 in get_document  │
+                    │                                                          │
+                    │   249 │                                                  │
+                    │   250 │   def get_document(self, principal, document_id) │
+                    │   251 │   │   with self.connection() as db:              │
+                    │ ❱ 252 │   │   │   self.require(db, principal, document_i │
+                    │   253 │   │   │   return self._view(db, document_id, pri │
+                    │   254 │                                                  │
+                    │   255 │   def list_documents(self, principal):           │
+                    │                                                          │
+                    │ /home/ahnaf-zakaria/Desktop/NASA                         │
+                    │ Spaceapps/fireatlas/studio/store.py:205 in require       │
+                    │                                                          │
+                    │   202 │   def require(self, db, principal, document_id,  │
+                    │   203 │   │   role = self.role(db, principal, document_i │
+                    │   204 │   │   if role is None:                           │
+                    │ ❱ 205 │   │   │   raise NotFound("Document not found.",  │
+                    │   206 │   │   if RANK[role] < RANK[minimum]:             │
+                    │   207 │   │   │   raise Forbidden(f"This action needs th │
+                    │       code="insufficient-role")                          │
+                    │   208 │   │   return role                                │
+                    ╰──────────────────────────────────────────────────────────╯
+                    NotFound: Document not found.                               
+................................................................................................../usr/lib/python3.12/asyncio/base_events.py:726: ResourceWarning: unclosed event loop <_UnixSelectorEventLoop running=False closed=False debug=False>
+  _warn(f"unclosed event loop {self!r}", ResourceWarning, source=self)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity?case=grove-2025&date=2025-07-05 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity/export?case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity/review-template?case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity?case=park-2024&date=2025-07-04 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity?case=park-2024&demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity?case=unknown HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:33:30] "GET /api/validity/review-template?case=unknown HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:34:02] "GET /api/validity/check?case=park-2024 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /api/validity/export?case=park-2024 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /api/validity/check?case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /api/validity/export?case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /api/validity/check?case=park-2024&demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /api/validity/check?case=unknown HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /evidence.html?tab=validity HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /method.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /method.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:28] "GET /calibration-validation.js HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:34:30] "GET /api/v2/calendar?region=norcal&year=2024&month=7 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:34:30] "GET /api/observations?date=2024-07-25&series=joint&bbox=-122.2,38.8,-120,41 HTTP/1.1" 200 -
+......127.0.0.1 - - [05/Oct/2026 04:35:25] "POST /api/data/import?source=VIIRS_NOAA20_NRT HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:25] "POST /api/data/import?source=VIIRS_NOAA20_NRT HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "GET /api/calendar?year=2024&series=viirs-noaa20-nrt&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "POST /api/data/import?source=VIIRS_SNPP_NRT HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "POST /api/data/import?source=VIIRS_NOAA20_SP HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "POST /api/data/import?source=VIIRS_NOAA20_NRT HTTP/1.1" 403 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "POST /api/data/import?source=VIIRS_NOAA20_NRT&complete_month=2024-07&bbox=-122,39,-120,41 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "POST /api/data/import?source=MODIS_SP&complete_month=2024-07&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "GET /api/data/status HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:26] "GET /training.html HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "GET /api/training/scenario HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:26] "GET /api/training/snapshot HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:35:27] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /atlas.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /harmonized.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /validity.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /validity.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /documented-fires.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /earth.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /terrain-earth.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /earth-embed.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/calendar?year=2015&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/map?year=2015&series=joint&bbox=-122,39,-120,41&month=7&zoom=3 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/map?year=2015&series=joint&bbox=-122,39,-120,41&month=7&zoom=8 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/map?year=2015&series=joint&bbox=-122,39,-120,41&month=7&day=1&zoom=8 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/map?year=2015&series=joint&bbox=-122,39,-120,41&month=7&day=32&zoom=8 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/observations?date=2015-07-01&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/export?kind=calendar&year=2015&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:27] "GET /api/export?kind=observations&year=2015&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /evidence.html?tab=calibration HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /calibration-validation.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /samples/calibration/norcal.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /samples/calibration/punjab-haryana.json HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:28] "GET /api/data/status HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:28] "POST /api/data/sync HTTP/1.1" 403 -
+.127.0.0.1 - - [05/Oct/2026 04:35:29] "GET /api/events HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:29] "GET /events.js HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:29] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /atlas.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /investigate.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /research.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /evidence.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /replay.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /assistant.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /research-candidates.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /research-exposure.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /research-validation.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /data.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /method.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:30] "GET /review.html HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:31] "GET /api/harmonization?year=2015&month=7&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:31] "GET /api/briefing?year=2015&month=7&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:32] "GET /api/calendar?year=2015&bbox=bad HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:35:33] "GET /docs/NASA_DATA_IMPORT.md HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:33] "GET /docs/DATA.md HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:33] "GET /docs/AI_USE.md HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:33] "GET /api/v2/regions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:33] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:34] "GET /evidence.html?tab=reproduce&case=grove-2025 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:34] "GET /review.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:34] "GET /api/validity/review-template?case=grove-2025 HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:35] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:35] "GET /samples/aggregates/norcal.json.gz HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:35] "GET /samples/aggregates/punjab-haryana.json.gz HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:36] "GET /api/v2/regions HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:37] "GET /api/v2/calendar?region=norcal&year=2024&month=7 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:37] "GET /api/v2/calendar?region=norcal&year=2024&month=7&history=1 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:37] "GET /api/v2/calendar?region=world&year=2024 HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /install.html HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /install.js HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /manifest.webmanifest HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /app-sw.js HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /offline.html HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /app-icon-192.png HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /api/replay/catalog HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:38] "GET /api/replay?case=park-2024 HTTP/1.1" 200 -
+.127.0.0.1 - - [05/Oct/2026 04:35:39] "GET /research.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "GET /api/research HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "GET /api/research/coverage-example HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "POST /api/research HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "POST /api/research?demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "POST /api/research HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "POST /api/research HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:39] "POST /api/research HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:35:40] "GET /api/study?year=2015&month=7&day=2015-07-01 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:40] "GET /api/study?year=2015&month=7&day=2014-07-01 HTTP/1.1" 400 -
+.127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/meta HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/calendar?year=2015&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/briefing?year=2015&series=joint&bbox=-122,39,-120,41&month=7 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/harmonization?year=2015&series=joint&bbox=-122,39,-120,41&month=7 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/observations?date=2015-07-01&series=joint&bbox=-122,39,-120,41 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/research HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/data/status HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/meta?demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/calendar?demo=0 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/research?demo=1 HTTP/1.1" 400 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/presentation HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/context?year=2026 HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 04:35:41] "GET /api/research/coverage-example HTTP/1.1" 404 -
+.127.0.0.1 - - [05/Oct/2026 04:35:42] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:42] "GET /evidence.html?tab=calibration HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 04:35:42] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+.
+----------------------------------------------------------------------
+Ran 289 tests in 298.424s
+
+OK
+SYNTHETIC_MODIS_SP_2001_07.csv: 2 inserted
+SYNTHETIC_MODIS_SP_2002_07.csv: 3 inserted
+SYNTHETIC_MODIS_SP_2003_07.csv: 4 inserted
+SYNTHETIC_MODIS_SP_2004_07.csv: 1 inserted
+SYNTHETIC_MODIS_SP_2012_07.csv: 1 inserted
+SYNTHETIC_VIIRS_SNPP_SP_2012_07.csv: 3 inserted
+SYNTHETIC_MODIS_SP_2013_07.csv: 2 inserted
+SYNTHETIC_VIIRS_SNPP_SP_2013_07.csv: 6 inserted
+SYNTHETIC_MODIS_SP_2014_07.csv: 3 inserted
+SYNTHETIC_VIIRS_SNPP_SP_2014_07.csv: 9 inserted
+SYNTHETIC_MODIS_SP_2015_07.csv: 4 inserted
+SYNTHETIC_VIIRS_SNPP_SP_2015_07.csv: 12 inserted

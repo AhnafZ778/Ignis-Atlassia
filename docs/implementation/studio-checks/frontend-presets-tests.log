@@ -1,0 +1,13 @@
+
+> fireatlas-studio-app@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /home/ahnaf-zakaria/Desktop/NASA Spaceapps/studio-app
+
+
+ Test Files  9 passed (9)
+      Tests  41 passed (41)
+   Start at  03:38:59
+   Duration  939ms (transform 442ms, setup 0ms, import 906ms, tests 230ms, environment 4.45s)
+

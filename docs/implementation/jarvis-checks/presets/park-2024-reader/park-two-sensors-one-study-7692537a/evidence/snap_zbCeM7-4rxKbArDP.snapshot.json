@@ -1,0 +1,98 @@
+{
+  "captured_utc": "2026-10-05T12:11:01+00:00",
+  "context": {
+    "as_of": "2024-08-14",
+    "bbox": [
+      -122.0,
+      39.5,
+      -121.3,
+      40.5
+    ],
+    "case": "park-2024",
+    "day": "",
+    "distance_km": 2.0,
+    "end": "2024-08-14",
+    "gap_days": 1,
+    "layer": "ndvi",
+    "metric": "density",
+    "month": 7,
+    "region": "norcal",
+    "revision": 0,
+    "series": "joint",
+    "source": "joint",
+    "start": "2024-07-24",
+    "year": 2024
+  },
+  "dependency_hashes": {
+    "export_inventory": "046b5fe09945be052c0ee8d556dc670da4a9414ab2003956d95d49ca823e8f64",
+    "file:manifest.json": "17bcb39954a25a5312b4957a4957c4c0effb3930c2fa5350dc646605afab0327",
+    "file:norcal.json": "c597720264afefea2e4ee7f8eaeb01721c3e8386a154f9937b26031b0c19c5d1",
+    "file:punjab-haryana.json": "0a76c948d5eb839f1651824b59192808b207a899a14cf59c3adf2c4d246a98b9",
+    "file:sensor_notices.json": "f5c0baf741f6b11324233eb931b45e000c36a03c35465df598f45c4df72abb82",
+    "file:validity_cmr_inventory.json": "27cf34a5c72e6439a88061fe5c024445c70c669f14090e961117d8770775e6a1",
+    "file:validity_incident_cohort.json": "7b2cec1cd2fbf6e4473288ee318ae3093f2cd5fed31a360753e9ccb2df427960",
+    "file:validity_masks.sqlite3": "8888de6eb4596de98d8b3c2b2c44ff0153c6b0da8fd0fb13d762714b7ac7cb5c",
+    "schema": "a7705bc5740e1a49f8423e52a8491fbacbf5241144f235034e9c953553425e4d",
+    "source_ledger": "ceaafbff91da419876ac57cfc92cb6522756a9d1e0bf9381f5f67805f4227a89"
+  },
+  "facts": [
+    {
+      "label": "Eligible unique detections",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/eligible_unique_detections",
+      "state": "observed",
+      "unit": "records",
+      "value": 6224
+    },
+    {
+      "label": "Distinct union",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/joint_cell_days",
+      "state": "observed",
+      "unit": "cell-days",
+      "value": 2228
+    },
+    {
+      "label": "Days with imported detections",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/detected_days",
+      "state": "observed",
+      "unit": "UTC days",
+      "value": 21
+    }
+  ],
+  "grid": "ease6933-centroid-1km-v1",
+  "id": "snap_zbCeM7-4rxKbArDP",
+  "limitations": [
+    "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+  ],
+  "method": {
+    "filter": "Standard MODIS/S-NPP; vegetation type 0 or missing; alias-aware exact-repeat deduplication.",
+    "id": "fireatlas-observation-replay-v1",
+    "unit": "observed cell-days"
+  },
+  "operation": "replay",
+  "receipt_sha256": "aab1e42fae597b32e9ed7f25fed6e8df3c7fbe19fca052679952f8770e88b2d1",
+  "release_frozen": false,
+  "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+  "result_id": "res_wWqkecrONFgTye6JDM2IKQ",
+  "schema": "fireatlas-studio-evidence-snapshot-v1",
+  "scope": {
+    "bbox": [
+      -122.0,
+      39.5,
+      -121.3,
+      40.5
+    ],
+    "case": "park-2024",
+    "day": null,
+    "end": "2024-08-14",
+    "geometry": null,
+    "region": "norcal",
+    "series": "joint",
+    "source": "joint",
+    "start": "2024-07-24"
+  },
+  "snapshot_sha256": "f05ee614ff4774b0c24eda35fe40a775e355b689b53f459fb7f0d0040a22ab8d",
+  "unit": "mixed units (see values)"
+}

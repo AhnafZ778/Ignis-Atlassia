@@ -1,0 +1,34 @@
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /compatibility-route.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /evidence.html?tab=sources HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /design.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /lab.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /research.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /analytical.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /validity.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /review.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /method.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /vendor/leaflet.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /jarvis-orchestration.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace-shell.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace-context.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant-views.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /analytical-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /workspace.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant-visuals.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /jarvis-orchestration.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /assistant.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /fonts/dm-sans.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /fonts/space-grotesk.ttf HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] code 404, message File not found
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /api/assistant/capabilities HTTP/1.1" 404 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data/analysis/regions.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data/v2/regions.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /data/v2/manifest.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 18:12:57] "GET /favicon.svg HTTP/1.1" 200 -
+Static data page verified: 2 study areas · 190 complete region-product-month exports recorded. Reconstructed archive rows are labeled partial; missing dates remain unknown. Export completeness is not a pass or cloud mask.; badge=; no scientific API calls (assistant capability availability may be probed) or browser errors.

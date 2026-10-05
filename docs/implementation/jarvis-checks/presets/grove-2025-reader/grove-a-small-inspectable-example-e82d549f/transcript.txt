@@ -1,0 +1,26 @@
+Grove · a small, inspectable example
+====================================
+Narration text (AI voice only when generated and labelled)
+
+[00:00:00.000] The study boundary
+Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.
+  - Eligible unique detections: 7 records (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Distinct union: 4 cell-days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Days with imported detections: 1 UTC days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Eligible unique detections: 7 records (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Distinct union: 4 cell-days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Days with imported detections: 1 UTC days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+
+[00:00:15.000] Activity through time
+Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.
+  - Eligible unique detections: 7 records (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Distinct union: 4 cell-days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+  - Days with imported detections: 1 UTC days (observed; receipt 3d2b41cec53f, release e18841ce496b)
+
+[00:00:30.000] Behind the result
+Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.
+  - Full matching original records: 7 records (observed; receipt c3e234ea9bcd, release e18841ce496b)
+  - Records in this page: 7 records (observed; receipt c3e234ea9bcd, release e18841ce496b)
+
+Limitations:
+- Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire.

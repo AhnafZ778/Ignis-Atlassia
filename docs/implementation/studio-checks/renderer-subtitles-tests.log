@@ -1,0 +1,18 @@
+
+> fireatlas-studio-render@0.1.0 test
+> node --test input.test.mjs subtitles.test.mjs
+
+✔ camera crops only frozen map geometry and keeps headings and units stationary (1.140713ms)
+✔ one frozen scene is accepted without altering its timing or text (0.526105ms)
+✔ render inputs reject remote resources and executable markup (0.552106ms)
+✔ oversized or changed timing and traversal audio are rejected (3.890326ms)
+✔ prepared camera transitions are bounded numeric scene metadata (0.554874ms)
+✔ actual MP4 retains picture, sound, frozen subtitle text and timing (326.677828ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 384.96068

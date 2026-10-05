@@ -2,11 +2,15 @@
 
 The Research Lab is a reproducible exploratory workspace. It does not yet supply calibrated sensor sensitivity, validated fire-event identities or a regional spread model. Synthetic FIRMS-shaped records and generated observation exposure are test fixtures only; the website has no generated-data mode.
 
+## Consolidated workspace
+
+`/research.html` hosts Comparison, Candidate Groups, Sensitivity and Exposure. Candidate/exposure legacy pages are query-preserving aliases. Sensitivity reuses the bounded deterministic assistant operation and does not require conversational inference. A cross-month incoming study keeps its full interval and requires an explicit UTC month intersection. Form edits remain drafts until a calculation succeeds. Late responses from an inactive tab are aborted and cannot commit a newer study’s context. Static hosting provides evidence alternatives and disables new calculations that require the local service.
+
 ## Study scope and provenance
 
 Each study selects an AOI, UTC month, inclusive acquisition-date cutoff, candidate distance and date-gap threshold. Only `MODIS_SP` and `VIIRS_SNPP_SP` records are included. NRT and other VIIRS platforms are excluded. Synthetic and authentic source batches cannot be mixed in a study.
 
-The cutoff filters acquisition times, not retrieval/publication history. A later reprocessed record acquired before the cutoff can be included. This is a retrospective study; Phase 3's separate replay uses publication-time filtering.
+The cutoff filters acquisition times, not retrieval/publication history. A later reprocessed record acquired before the cutoff can be included. This is a retrospective study. The implemented historical replay also filters acquisition dates; it does not reconstruct past publication availability.
 
 The report includes method `fireatlas-research-v1`, grid version, parameters, completeness per source, original product versions, source URIs and file hashes. Its SHA-256 identifier hashes the canonical JSON before the `report_id` field is added: sorted keys, compact separators, Python `json.dumps` default ASCII encoding. It identifies content, not scientific approval or a digital signature. The browser export wraps this report and the supplied mask; the hash identifies the report only.
 

@@ -1,0 +1,31 @@
+:root { color: #172b31; background: #fbf7ef; font: 16px/1.5 system-ui, sans-serif; }
+body { margin: 0; }
+.reader { max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
+.reader header { margin-bottom: 20px; }
+.reader .eyebrow { color: #c4501e; font-size: 12px; letter-spacing: .12em; font-weight: 700; text-transform: uppercase; }
+.reader h1, .reader h2 { line-height: 1.15; }
+.scene { background: #10242a; color: #f6efe0; border-radius: 12px; padding: clamp(20px, 5vw, 52px); min-height: 330px; display: grid; grid-template-columns: minmax(180px, 42%) 1fr; align-items: center; gap: 24px; }
+.scene-art img { width: 100%; max-height: 300px; border-radius: 8px; background: #fbf7ef; }
+.scene h2 { color: #fff; margin: 0; font-size: clamp(24px, 4vw, 44px); }
+.scene p { max-width: 70ch; font-size: clamp(16px, 2vw, 22px); }
+.reader-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+button { min-height: 40px; border: 1px solid #cfc4af; border-radius: 8px; padding: 8px 14px; background: #fff; color: #172b31; font: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid #2b59c3; outline-offset: 2px; }
+.reader-note, .reader table { background: #fff; border: 1px solid #d9cfba; border-radius: 10px; padding: 12px; }
+.reader table { border-collapse: collapse; width: 100%; }
+.reader th, .reader td { text-align: left; padding: 6px; border-bottom: 1px solid #eee4d2; }
+.reader pre { white-space: pre-wrap; background: #f6f1e6; border-radius: 8px; padding: 12px; overflow: auto; }
+.scene[data-state="exploring"] { outline: 3px solid #efb041; }
+.reader .muted { color: #4a5d62; font-size: 14px; }
+.reader .scene .muted { color: #c2d4d1; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (max-width: 640px) { .scene { grid-template-columns: 1fr; } }
+ .reader table { width: 100%; border-collapse: collapse; font-size: 14px; }
+ .reader th, .reader td { text-align: left; padding: 8px; border-bottom: 1px solid #bec8c6; overflow-wrap: anywhere; }
+ .reader [data-evidence] code { overflow-wrap: anywhere; }
+ .reader [data-exploration] { border: 2px solid #2b59c3; padding: 20px; border-radius: 10px; margin: 20px 0; overflow-x: auto; }
+ .reader .transcript-chapter { padding: 20px 0; border-top: 1px solid #bec8c6; }
+ .reader :focus-visible { outline: 3px solid #2b59c3; outline-offset: 3px; }
+ .reader button:disabled { opacity: .5; cursor: default; }
+ .reader [data-heat-table] { overflow-x: auto; margin: 12px 0; }
+ .reader [data-heat-table] table { min-width: 570px; }

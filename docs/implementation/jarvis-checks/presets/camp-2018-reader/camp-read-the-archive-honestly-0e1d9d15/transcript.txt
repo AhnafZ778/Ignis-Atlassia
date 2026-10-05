@@ -1,0 +1,49 @@
+Camp · read the archive honestly
+================================
+Narration text (AI voice only when generated and labelled)
+
+[00:00:00.000] The study boundary
+Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.
+  - Eligible unique detections: 5644 records (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Distinct union: 1375 cell-days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Days with imported detections: 14 UTC days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Eligible unique detections: 5644 records (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Distinct union: 1375 cell-days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Days with imported detections: 14 UTC days (observed; receipt d1582a7570a1, release e18841ce496b)
+
+[00:00:15.000] Activity through time
+Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.
+  - Eligible unique detections: 5644 records (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Distinct union: 1375 cell-days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Days with imported detections: 14 UTC days (observed; receipt d1582a7570a1, release e18841ce496b)
+
+[00:00:30.000] The observation record
+Show why a blank record can remain unknown. Collected exports, documented processing gaps and actual observation opportunity are different questions.
+  - MODIS incomplete export days: 14 UTC days (observed; receipt b8d0882c6569, release e18841ce496b)
+  - MODIS incomplete export dates: 2018-11-08, 2018-11-09, 2018-11-10, 2018-11-11, 2018-11-12, 2018-11-13, 2018-11-14, 2018-11-15, 2018-11-16, 2018-11-17, 2018-11-18, 2018-11-19, 2018-11-20, 2018-11-21 reported UTC dates (observed; receipt b8d0882c6569, release e18841ce496b)
+  - MODIS days without imported records: 1 UTC days (observed; receipt b8d0882c6569, release e18841ce496b)
+  - MODIS dates without imported records: 2018-11-21 reported UTC dates (observed; receipt b8d0882c6569, release e18841ce496b)
+  - VIIRS S-NPP incomplete export days: 14 UTC days (observed; receipt b8d0882c6569, release e18841ce496b)
+  - VIIRS S-NPP incomplete export dates: 2018-11-08, 2018-11-09, 2018-11-10, 2018-11-11, 2018-11-12, 2018-11-13, 2018-11-14, 2018-11-15, 2018-11-16, 2018-11-17, 2018-11-18, 2018-11-19, 2018-11-20, 2018-11-21 reported UTC dates (observed; receipt b8d0882c6569, release e18841ce496b)
+  - VIIRS S-NPP days without imported records: 0 UTC days (observed; receipt b8d0882c6569, release e18841ce496b)
+  - VIIRS S-NPP dates without imported records: None in this study reported UTC dates (observed; receipt b8d0882c6569, release e18841ce496b)
+
+[00:00:45.000] A finding to inspect
+Present the checked finding, then open its evidence. Keep the explanatory interpretation distinct from the saved measurement.
+  - Eligible unique detections: 5644 records (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Distinct union: 1375 cell-days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Days with imported detections: 14 UTC days (observed; receipt d1582a7570a1, release e18841ce496b)
+
+[00:01:00.000] Behind the result
+Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.
+  - Full matching original records: 5691 records (observed; receipt ea7c2e28ee54, release e18841ce496b)
+  - Records in this page: 100 records (observed; receipt ea7c2e28ee54, release e18841ce496b)
+
+[00:01:15.000] What we can conclude
+Close with the supported observation and the matching evidence download. Keep ignition, continuous spread, perimeter and forecast claims outside the conclusions.
+  - Eligible unique detections: 5644 records (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Distinct union: 1375 cell-days (observed; receipt d1582a7570a1, release e18841ce496b)
+  - Days with imported detections: 14 UTC days (observed; receipt d1582a7570a1, release e18841ce496b)
+
+Limitations:
+- Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire.

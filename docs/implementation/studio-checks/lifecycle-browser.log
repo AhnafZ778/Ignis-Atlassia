@@ -1,0 +1,69 @@
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /subpath/story/park-observations-browser-qa-d4cf9b63/index.html HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /subpath/story/park-observations-browser-qa-d4cf9b63/reader.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /subpath/story/park-observations-browser-qa-d4cf9b63/reader.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /subpath/story/park-observations-browser-qa-d4cf9b63/story.json HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 05:15:43] code 404, message File not found
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /subpath/story/park-observations-browser-qa-d4cf9b63/fallbacks/chapter-1.svg HTTP/1.1" 200 -
+127.0.0.1 - - [05/Oct/2026 05:15:43] "GET /favicon.ico HTTP/1.1" 404 -
+{
+  "checks": [
+    "Authentic Park: 6,224 eligible records and 2,228 joint cell-days retain distinct units.",
+    "Explicit handoff refresh restores the same saved board.",
+    "Manual grouped moves, keyboard movement, Undo, zoom and saved viewport restoration preserve frozen evidence.",
+    "Chart interval and common-cell inspection update compatible linked displays without mutating the saved study or receipts.",
+    "JARVIS runs checked source states through the existing orchestrator without a model key.",
+    "Interval, highlighted cell, multi-card gallery, audience duration and camera transition resolve into the shared scene contract.",
+    "A chapter without an authored question opens chapter-specific exploration and resumes its saved display.",
+    "Prepared map/chart/source states and chapter explore/resume preserve the saved scene.",
+    "Opt-in transcript scrolling selects the visible saved chapter through the actual browser observer.",
+    "Offline verifier reconstructs six narrated chapters, caption timing/text and transcript from frozen receipts.",
+    "Portable reader runs under a project subpath with no backend or external imagery requests.",
+    "React Flow lazy mounts alongside its keyboard/table editor.",
+    "React Flow recipe runs, saves node receipts and materializes a real editable story.",
+    "Silent documentary rendered the same six prepared scenes at 1080p, 30 fps, 12 seconds, including the resolved camera/gallery metadata.",
+    "The actual MP4 contains a default subtitle track with the same paginated resolved texts and chapter timings as captions.vtt.",
+    "A real browser refresh restores the completed export, saved story revision, caption outcome and video download through the owned recent-export chooser.",
+    "The saved findings-to-story recipe runs and creates an editable story on the authentic Camp study context."
+  ],
+  "page_errors": [],
+  "initial_load": {
+    "requests": 17,
+    "response_body_bytes": 630731,
+    "measurement": "Cold browser context; same-origin decoded response bodies, without HTTP headers."
+  },
+  "narrow_layout": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ],
+  "interaction": {
+    "group_move_ms": 66.22,
+    "measurement": "Playwright click through visible saved-revision acknowledgment; includes automation overhead."
+  },
+  "browser_environment": {
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "device_memory_gib": 16,
+    "hardware_concurrency": 12,
+    "js_heap": {
+      "used_bytes": 13003953,
+      "total_bytes": 20654929,
+      "limit_bytes": 4395630592
+    }
+  },
+  "render_phases": [
+    "queued",
+    "preparing-assets",
+    "rendering",
+    "encoding",
+    "completed"
+  ]
+}

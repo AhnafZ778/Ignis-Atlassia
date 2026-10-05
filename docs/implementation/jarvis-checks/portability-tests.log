@@ -1,0 +1,7 @@
+........./usr/lib/python3.12/zipfile/__init__.py:1620: UserWarning: Duplicate name: 'board.json'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+........
+----------------------------------------------------------------------
+Ran 17 tests in 13.060s
+
+OK

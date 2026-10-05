@@ -1,0 +1,19 @@
+
+> fireatlas-studio-render@0.1.0 test
+> node --test input.test.mjs subtitles.test.mjs audio.test.mjs
+
+✔ real local narration must fit its saved chapter and preserve recorded bytes (275.005883ms)
+✔ camera crops only frozen map geometry and keeps headings and units stationary (2.372692ms)
+✔ one frozen scene is accepted without altering its timing or text (0.855868ms)
+✔ render inputs reject remote resources and executable markup (0.935607ms)
+✔ oversized or changed timing and traversal audio are rejected (1.153272ms)
+✔ prepared camera transitions are bounded numeric scene metadata (0.557341ms)
+✔ actual MP4 retains picture, sound, frozen subtitle text and timing (405.927327ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 464.64633

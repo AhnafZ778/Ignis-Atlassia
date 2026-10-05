@@ -1,0 +1,138 @@
+{
+  "captured_utc": "2026-10-05T12:11:09+00:00",
+  "context": {
+    "as_of": "2018-11-21",
+    "bbox": [
+      -121.85,
+      39.6,
+      -121.3,
+      40.0
+    ],
+    "case": "camp-2018",
+    "day": "",
+    "distance_km": 2.0,
+    "end": "2018-11-21",
+    "gap_days": 1,
+    "layer": "ndvi",
+    "metric": "density",
+    "month": 11,
+    "region": "norcal",
+    "revision": 0,
+    "series": "joint",
+    "source": "joint",
+    "start": "2018-11-08",
+    "year": 2018
+  },
+  "dependency_hashes": {
+    "export_inventory": "046b5fe09945be052c0ee8d556dc670da4a9414ab2003956d95d49ca823e8f64",
+    "file:manifest.json": "17bcb39954a25a5312b4957a4957c4c0effb3930c2fa5350dc646605afab0327",
+    "file:norcal.json": "c597720264afefea2e4ee7f8eaeb01721c3e8386a154f9937b26031b0c19c5d1",
+    "file:punjab-haryana.json": "0a76c948d5eb839f1651824b59192808b207a899a14cf59c3adf2c4d246a98b9",
+    "file:sensor_notices.json": "f5c0baf741f6b11324233eb931b45e000c36a03c35465df598f45c4df72abb82",
+    "file:validity_cmr_inventory.json": "27cf34a5c72e6439a88061fe5c024445c70c669f14090e961117d8770775e6a1",
+    "file:validity_incident_cohort.json": "7b2cec1cd2fbf6e4473288ee318ae3093f2cd5fed31a360753e9ccb2df427960",
+    "file:validity_masks.sqlite3": "8888de6eb4596de98d8b3c2b2c44ff0153c6b0da8fd0fb13d762714b7ac7cb5c",
+    "schema": "a7705bc5740e1a49f8423e52a8491fbacbf5241144f235034e9c953553425e4d",
+    "source_ledger": "ceaafbff91da419876ac57cfc92cb6522756a9d1e0bf9381f5f67805f4227a89"
+  },
+  "facts": [
+    {
+      "label": "MODIS incomplete export days",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/MODIS_SP/incomplete_export_days",
+      "state": "observed",
+      "unit": "UTC days",
+      "value": 14
+    },
+    {
+      "label": "MODIS incomplete export dates",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/MODIS_SP/incomplete_export_dates",
+      "state": "observed",
+      "unit": "reported UTC dates",
+      "value": "2018-11-08, 2018-11-09, 2018-11-10, 2018-11-11, 2018-11-12, 2018-11-13, 2018-11-14, 2018-11-15, 2018-11-16, 2018-11-17, 2018-11-18, 2018-11-19, 2018-11-20, 2018-11-21"
+    },
+    {
+      "label": "MODIS days without imported records",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/MODIS_SP/no_imported_record_days",
+      "state": "observed",
+      "unit": "UTC days",
+      "value": 1
+    },
+    {
+      "label": "MODIS dates without imported records",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/MODIS_SP/no_imported_record_dates",
+      "state": "observed",
+      "unit": "reported UTC dates",
+      "value": "2018-11-21"
+    },
+    {
+      "label": "VIIRS S-NPP incomplete export days",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/VIIRS_SNPP_SP/incomplete_export_days",
+      "state": "observed",
+      "unit": "UTC days",
+      "value": 14
+    },
+    {
+      "label": "VIIRS S-NPP incomplete export dates",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/VIIRS_SNPP_SP/incomplete_export_dates",
+      "state": "observed",
+      "unit": "reported UTC dates",
+      "value": "2018-11-08, 2018-11-09, 2018-11-10, 2018-11-11, 2018-11-12, 2018-11-13, 2018-11-14, 2018-11-15, 2018-11-16, 2018-11-17, 2018-11-18, 2018-11-19, 2018-11-20, 2018-11-21"
+    },
+    {
+      "label": "VIIRS S-NPP days without imported records",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/VIIRS_SNPP_SP/no_imported_record_days",
+      "state": "observed",
+      "unit": "UTC days",
+      "value": 0
+    },
+    {
+      "label": "VIIRS S-NPP dates without imported records",
+      "method_id": "fireatlas-observation-replay-v1",
+      "path": "/summary/VIIRS_SNPP_SP/no_imported_record_dates",
+      "state": "observed",
+      "unit": "reported UTC dates",
+      "value": "None in this study"
+    }
+  ],
+  "grid": "ease6933-centroid-1km-v1",
+  "id": "snap_zjkYrExAQI5jTBoh",
+  "limitations": [
+    "Satellite detections are observations, not fire perimeters or forecasts. Missing observations do not establish no fire."
+  ],
+  "method": {
+    "filter": "Standard MODIS/S-NPP; vegetation type 0 or missing; alias-aware exact-repeat deduplication.",
+    "id": "fireatlas-observation-replay-v1",
+    "unit": "observed cell-days"
+  },
+  "operation": "missingness",
+  "receipt_sha256": "b8d0882c6569d3cebce96a337d85954959ff9eb88138b2e78603820bdea69fcc",
+  "release_frozen": false,
+  "release_id": "e18841ce496bd8efec8d57d52afe225220df420c88527157cd8770d14e91361b",
+  "result_id": "res_NQo4gxYbFENtSjzyw_rx4Q",
+  "schema": "fireatlas-studio-evidence-snapshot-v1",
+  "scope": {
+    "bbox": [
+      -121.85,
+      39.6,
+      -121.3,
+      40.0
+    ],
+    "case": "camp-2018",
+    "day": null,
+    "end": "2018-11-21",
+    "geometry": null,
+    "region": "norcal",
+    "series": "joint",
+    "source": "joint",
+    "start": "2018-11-08"
+  },
+  "snapshot_sha256": "665a88130f938d157afc7f09c7b6e2a4aa9631f61c764f8344de872192637e3c",
+  "unit": "mixed units (see values)"
+}

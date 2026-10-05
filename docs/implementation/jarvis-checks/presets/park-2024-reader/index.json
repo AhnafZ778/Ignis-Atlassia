@@ -1,0 +1,13 @@
+{
+  "schema": "fireatlas-studio-catalog-v1",
+  "stories": [
+    {
+      "duration_seconds": 90.0,
+      "manifest": "park-two-sensors-one-study-7692537a/manifest.json",
+      "manifest_sha256": "9a8160e6326e53dcc7fc9c870641332e2042b14c68f30c00a2c92212bdf12600",
+      "scenes": 6,
+      "slug": "park-two-sensors-one-study-7692537a",
+      "title": "Park \u00b7 two sensors, one study"
+    }
+  ]
+}

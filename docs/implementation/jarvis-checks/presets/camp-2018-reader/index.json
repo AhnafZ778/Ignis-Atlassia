@@ -1,0 +1,13 @@
+{
+  "schema": "fireatlas-studio-catalog-v1",
+  "stories": [
+    {
+      "duration_seconds": 90.0,
+      "manifest": "camp-read-the-archive-honestly-0e1d9d15/manifest.json",
+      "manifest_sha256": "deca0b3979cdeaf17bd03c17a78d41e9b57d2b085c6a7fb8e859a409da6caa60",
+      "scenes": 6,
+      "slug": "camp-read-the-archive-honestly-0e1d9d15",
+      "title": "Camp \u00b7 read the archive honestly"
+    }
+  ]
+}

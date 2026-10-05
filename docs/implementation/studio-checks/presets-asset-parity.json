@@ -1,0 +1,17 @@
+{
+  "verified": true,
+  "files": [
+    ".vite/manifest.json",
+    "assets/TldrawBoard-C-P_Xxkf.js",
+    "assets/TldrawBoard-C272mPqd.css",
+    "assets/WorkflowPanel-B_2Jnomh.js",
+    "assets/WorkflowPanel-BnuhLJ6X.css",
+    "assets/collaboration-iAdzrBg1.js",
+    "assets/sanitizeSvg-BRz1NfP5.js",
+    "assets/studio-BvyGvi9Z.css",
+    "assets/studio-Ch1zHVWJ.js",
+    "studio-entry.js",
+    "features.json"
+  ],
+  "manifest_parity": true
+}
