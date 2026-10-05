@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { checkInput } from './input.mjs';
-import { cameraSvg } from './camera.mjs';
+import { filmFrame } from './film-frame.mjs';
 import { muxSubtitles } from './subtitles.mjs';
 import { checkAudioFiles } from './audio.mjs';
 const directory = resolve(process.argv[2] || '');
@@ -18,13 +18,14 @@ const frames = join(directory, 'frames'); await mkdir(frames, { recursive: true 
 const esc = (text) => String(text || '').replace(/[<>&"']/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]));
 const quote = (file) => file.replaceAll("'", "'\\''");
 function run(command, args) { const result = spawnSync(command, args, { encoding: 'utf8', maxBuffer: 2000000 }); if (result.status !== 0) throw new Error(`${command} failed: ${(result.stderr || '').slice(-300)}`); }
-const images = [], sounds = [];
+const sounds = [], clips = [];
 const browser = ['chromium', 'chromium-browser', 'google-chrome'].find((name) => spawnSync(name, ['--version'], { encoding: 'utf8' }).status === 0);
 if (!browser) throw new Error('Local SVG rendering needs Chromium or Google Chrome.');
-const sceneSvg = (scene, index, progress = 0) => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="#112a32"/><text x="64" y="52" fill="#bacdc8" font-family="DejaVu Sans" font-size="24">IGNIS-ATLASSIA / FROZEN STUDY BRIEFING</text>' + `<g transform="translate(160 75) scale(1.6666666667)">` + cameraSvg(scene.visual_svg, scene.visual, progress).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>' + `<text x="64" y="1020" fill="#fbf7ef" font-family="DejaVu Sans" font-size="24">${esc(scene.caption.slice(0, 120))}</text><text x="64" y="1054" fill="#bacdc8" font-family="DejaVu Sans" font-size="18">NASA FIRMS observations · schematic views · UTC dates · ${index + 1}/${story.scenes.length}</text></svg>`;
+const sceneSvg = (scene, index, progress = 0) => filmFrame(scene, index, story.scenes.length, progress);
 process.stdout.write('PHASE rendering\n');
 for (let index = 0; index < story.scenes.length; index++) {
   const scene = story.scenes[index];
+  const sceneImages = [];
   const keyframes = scene.visual?.camera_transition ? [0, 0.5, 1] : [0];
   for (let keyframe = 0; keyframe < keyframes.length; keyframe++) {
     const filename = join(frames, `scene-${index}-${keyframe}.png`), svgfile = join(frames, `scene-${index}-${keyframe}.svg`);
@@ -35,8 +36,17 @@ for (let index = 0; index < story.scenes.length; index++) {
     await writeFile(htmlfile, '<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;width:1920px;height:1080px;overflow:hidden}svg{width:1920px;height:1080px;display:block}</style></head><body>' + sceneSvg(scene, index, keyframes[keyframe]) + '</body></html>');
     run(browser, ['--headless', '--no-sandbox', '--disable-gpu', '--no-first-run', '--disable-background-networking', '--hide-scrollbars', '--disable-dev-shm-usage', '--force-device-scale-factor=1', '--window-size=1920,1080', '--virtual-time-budget=1000', '--user-data-dir=' + join(directory, 'browser-profile'), '--screenshot=' + filename, pathToFileURL(htmlfile).href]);
     const duration = scene.duration_seconds / keyframes.length;
-    images.push(`file '${quote(filename)}'\nduration ${duration}`);
+    sceneImages.push(`file '${quote(filename)}'\nduration ${duration}`);
   }
+  const finalImage = join(frames, `scene-${index}-${keyframes.length-1}.png`);
+  sceneImages.push(`file '${quote(finalImage)}'`);
+  const sceneList = join(frames, `scene-${index}.txt`), clip = join(frames, `scene-${index}.mp4`);
+  await writeFile(sceneList, sceneImages.join('\n'));
+  const fade = scene.transition === 'cut' ? '' : `,fade=t=in:st=0:d=0.45,fade=t=out:st=${Math.max(0, scene.duration_seconds-.45)}:d=0.45`;
+  run('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', sceneList,
+    '-t', String(scene.duration_seconds), '-vf', `tpad=stop_mode=clone:stop_duration=1,fps=30,scale=1920:1080${fade}`,
+    '-frames:v', String(Math.round(scene.duration_seconds*30)), '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', clip]);
+  clips.push(`file '${quote(clip)}'`);
   if (audio?.length) {
     const target = join(frames, `scene-${index}.wav`);
     const segments = audio.filter((a) => a.chapter_id === scene.chapter_id).sort((a, b) => a.index - b.index);
@@ -49,13 +59,10 @@ for (let index = 0; index < story.scenes.length; index++) {
   }
   process.stdout.write(`PROGRESS ${0.05 + 0.25 * ((index + 1) / story.scenes.length)}\n`);
 }
-const lastScene = story.scenes[story.scenes.length - 1];
-const lastFrame = lastScene.visual?.camera_transition ? 2 : 0;
-images.push(`file '${quote(join(frames, `scene-${story.scenes.length - 1}-${lastFrame}.png`))}'`);
-const imageList = join(frames, 'images.txt'); await writeFile(imageList, images.join('\n'));
+const imageList = join(frames, 'clips.txt'); await writeFile(imageList, clips.join('\n'));
 const silent = join(directory, audio?.length ? 'silent.mp4' : 'briefing.mp4');
 process.stdout.write('PHASE encoding\n');
-run('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', imageList, '-t', String(story.profile.duration_seconds), '-vf', 'tpad=stop_mode=clone:stop_duration=1,fps=30,scale=1920:1080', '-frames:v', String(Math.round(story.profile.duration_seconds * 30)), '-c:v', 'libx264', '-threads', '2', '-preset', 'veryfast', '-crf', '22', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', silent]);
+run('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', imageList, '-t', String(story.profile.duration_seconds), '-c:v', 'copy', '-movflags', '+faststart', silent]);
 if (sounds.length) {
   const soundList = join(frames, 'sounds.txt'); await writeFile(soundList, sounds.join('\n'));
   run('ffmpeg', ['-v', 'error', '-y', '-i', silent, '-f', 'concat', '-safe', '0', '-i', soundList, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy', '-c:a', 'aac', '-t', String(story.profile.duration_seconds), '-movflags', '+faststart', join(directory, 'briefing.mp4')]);

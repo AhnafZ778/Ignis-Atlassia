@@ -2,7 +2,9 @@ import { InvestigationActions } from './components/InvestigationActions';
 import { PresentationPresets } from './components/PresentationPresets';
 import { Component, lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { api, ApiError, uid } from './api';
+import { api, ApiError, uid, idempotencyKey } from './api';
+import { DeleteInvestigationDialog } from './components/DeleteInvestigationDialog';
+import { InvestigationName, NewInvestigationDialog } from './components/InvestigationName';
 import { Board } from './components/Board';
 import { BoardTools } from './components/BoardTools';
 import { Inspector } from './components/Inspector';
@@ -10,6 +12,7 @@ import { StoryDirector } from './components/StoryDirector';
 import { Outline } from './components/Outline';
 import { RoomPanel } from './components/RoomPanel';
 import { StudyPanel } from './components/StudyPanel';
+import { WorkflowWorkspace } from './components/WorkflowWorkspace';
 import { StudioProvider, useStudio } from './store';
 import { CARD_TYPES, type CardType, type Study } from './types';
 import './styles.css';
@@ -41,7 +44,6 @@ function studyFromLocation(): Study | undefined {
 
 type Tab = 'board' | 'outline' | 'story' | 'workflow' | 'room';
 const TldrawBoard = lazy(() => import('./components/TldrawBoard').then((module) => ({ default: module.TldrawBoard })));
-const WorkflowPanel = lazy(() => import('./components/WorkflowPanel').then((module) => ({ default: module.WorkflowPanel })));
 class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
@@ -127,11 +129,17 @@ function TemplateButton() {
 }
 
 function App() {
-  const { doc, caps, open, setCaps, undo, redo, busy, conflict, resolveConflict, transact, notice } = useStudio();
-  const [tab, setTab] = useState<Tab>('board');
+  const { doc, caps, open, setCaps, undo, redo, busy, conflict, resolveConflict, transact, notice, notify } = useStudio();
+  const [tab, setTab] = useState<Tab>(() => {
+    const requested = new URLSearchParams(location.search).get('tab');
+    return requested && ['board', 'outline', 'story', 'workflow', 'room'].includes(requested) ? requested as Tab : 'board';
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [boards, setBoards] = useState<{ id: string; title: string }[]>([]);
+  const [creating, setCreating] = useState<{ study?: Study; title: string } | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; title: string; revision: number; key: string } | null>(null);
+  useEffect(() => { if (doc) setBoards((all) => all.map((board) => board.id === doc.id ? { ...board, title: doc.title } : board)); }, [doc?.id, doc?.title]);
   useEffect(() => {
     let active = true;
     (async () => {
@@ -150,43 +158,66 @@ function App() {
         // must never be replaced by another private board's saved context.
         const handoff = listed.documents.find((board) => board.id === handoffBoard);
         const requestedBoard = new URLSearchParams(location.search).get('board');
-        let current = requestedBoard ? await api.getDocument(requestedBoard) : incoming ? (handoff && handoffKey === savedHandoff ? await api.getDocument(handoff.id) : null) : (recent ? await api.getDocument(recent.id) : null);
-        if (!current) {
+        let missingBoard = false;
+        let current = null;
+        if (requestedBoard) {
+          try { current = await api.getDocument(requestedBoard); }
+          catch (reason) { if (reason instanceof ApiError && reason.status === 404) missingBoard = true; else throw reason; }
+        } else current = incoming ? (handoff && handoffKey === savedHandoff ? await api.getDocument(handoff.id) : null) : (recent ? await api.getDocument(recent.id) : null);
+        if (!current && incoming && !requestedBoard) {
           const study = incoming;
           const label = study?.context?.case || study?.context?.region ? `Research Studio · ${String(study.context.case || study.context.region)}` : 'Research Studio board';
           current = await api.createDocument(label, study);
         }
-        if (active) { setCaps(capability); open(current); setBoards([{ id: current.id, title: current.title }, ...listed.documents.filter((board) => board.id !== current!.id)]); sessionStorage.setItem('fireatlas-studio-board', current.id); if (handoffKey) { sessionStorage.setItem('fireatlas-studio-handoff', handoffKey); sessionStorage.setItem('fireatlas-studio-handoff-board', current.id); } }
+        if (active) { setCaps(capability); open(current); setBoards(current ? [{ id: current.id, title: current.title }, ...listed.documents.filter((board) => board.id !== current!.id)] : listed.documents); if (current) { sessionStorage.setItem('fireatlas-studio-board', current.id); if (handoffKey) { sessionStorage.setItem('fireatlas-studio-handoff', handoffKey); sessionStorage.setItem('fireatlas-studio-handoff-board', current.id); } } if (missingBoard) { sessionStorage.removeItem('fireatlas-studio-board'); sessionStorage.removeItem('fireatlas-studio-handoff'); sessionStorage.removeItem('fireatlas-studio-handoff-board'); history.replaceState(null, '', new URL('./studio.html', document.baseURI)); notify('This investigation is no longer available. Select a saved investigation or create a new one.'); } }
       } catch (reason) { if (active) setError(reason instanceof Error ? reason.message : 'Studio could not start.'); }
       finally { if (active) setLoading(false); }
     })();
     return () => { active = false; };
-  }, [open, setCaps]);
+  }, [open, setCaps, notify]);
   const title = doc?.title || 'Research Studio';
-  const rename = (value: string) => { if (doc && value.trim() && value !== doc.title) void transact([{ op: 'set_title', title: value.trim() }]); };
-  const changeBoard = async (id: string) => { setLoading(true); try { const next = await api.getDocument(id); open(next); sessionStorage.setItem('fireatlas-studio-board', id); setTab('board'); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Could not open the board.'); } finally { setLoading(false); } };
-  const createBoard = async (study?: Study) => { setLoading(true); try { const next = await api.createDocument(study?.context?.case === 'park-2024' ? 'Park investigation' : 'Untitled investigation', study); open(next); setBoards((all) => [{ id: next.id, title: next.title }, ...all]); sessionStorage.setItem('fireatlas-studio-board', next.id); setTab('board'); } catch (reason) { setError(reason instanceof ApiError ? reason.message : 'Could not create the board.'); } finally { setLoading(false); } };
+  const rename = async (value: string) => Boolean(await transact([{ op: 'set_title', title: value }]));
+  const rememberBoard = (id: string) => { sessionStorage.setItem('fireatlas-studio-board', id); const url = new URL(location.href); url.searchParams.set('board', id); url.searchParams.delete('command'); url.searchParams.delete('tab'); history.replaceState(null, '', url); };
+  useEffect(() => {
+    const showStory = () => setTab('story');
+    window.addEventListener('fireatlas-studio-open-story', showStory);
+    return () => window.removeEventListener('fireatlas-studio-open-story', showStory);
+  }, []);
+  const changeBoard = async (id: string) => { setLoading(true); try { const next = await api.getDocument(id); open(next); rememberBoard(id); setTab('board'); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Could not open the board.'); } finally { setLoading(false); } };
+  const createBoard = async (name: string) => { const next = await api.createDocument(name, creating?.study); open(next); setBoards((all) => [{ id: next.id, title: next.title }, ...all]); rememberBoard(next.id); setTab('board'); };
+  const deleteBoard = async () => {
+    if (!deleting) return;
+    await api.deleteDocument(deleting.id, deleting.revision, deleting.key);
+    const remaining = boards.filter((board) => board.id !== deleting.id);
+    setBoards(remaining); open(null); setTab('board');
+    sessionStorage.removeItem('fireatlas-studio-board'); sessionStorage.removeItem('fireatlas-studio-handoff'); sessionStorage.removeItem('fireatlas-studio-handoff-board');
+    const url = remaining.length ? new URL(location.href) : new URL('./studio.html', document.baseURI); for (const key of ['board', 'command', 'tab']) url.searchParams.delete(key); history.replaceState(null, '', url);
+    notify(`Deleted “${deleting.title}”.`);
+    if (remaining[0]) { try { const next = await api.getDocument(remaining[0].id); open(next); rememberBoard(next.id); } catch { notify('Investigation deleted. Select another saved investigation to continue.'); } }
+  };
   const tabContent = useMemo(() => {
     if (!doc) return null;
     if (tab === 'outline') return <div className="workspace"><div className="panel"><h2>Linear outline</h2><Outline /></div><Inspector /></div>;
     if (tab === 'story') return <div className="workspace full"><StoryDirector key={doc.id} /></div>;
-    if (tab === 'workflow') return <div className="workspace full"><Suspense fallback={<p>Opening Workflow Composer…</p>}><WorkflowPanel key={doc.id} /></Suspense></div>;
+    if (tab === 'workflow') return <div className="workspace full"><WorkflowWorkspace key={doc.id} onReturnToBoard={() => setTab('board')} /></div>;
     if (tab === 'room') return null;
     return <div className="workspace"><div>{caps?.canvas?.active === 'tldraw' ? <CanvasBoundary key={`canvas:${doc.id}`}><Suspense fallback={<p>Opening the evidence canvas…</p>}><TldrawBoard key={doc.id} /></Suspense></CanvasBoundary> : <Board key={`board:${doc.id}`} />}<BoardTools key={`tools:${doc.id}`} /><div style={{ marginTop: 16 }}><Library /></div></div><Inspector /></div>;
   }, [doc, tab, caps]);
   if (loading) return <div className="studio-app"><p className="noscript">Opening the local Studio workspace…</p></div>;
   if (error) return <div className="studio-app"><div className="banner error"><strong>Studio unavailable.</strong><span>{error}</span><a href="./investigate.html">Return to Investigate</a></div></div>;
   return <div className="studio-app">
-    <header className="st-head"><div><span className="st-eyebrow">RESEARCH STUDIO / LOCAL AUTHORING</span><input className="st-title-input" aria-label="Board title" defaultValue={title} key={`${doc?.id}-${doc?.title}`} disabled={!doc || doc.role === 'viewer'} onBlur={(event) => rename(event.currentTarget.value)} /><p className="st-sub">Arrange checked evidence into a reproducible board, story and optional briefing. The underlying scientific calculations remain unchanged.</p></div><div className="st-actions"><a className="btn" href="./investigate.html">Back to Investigate</a><button className="btn" type="button" disabled={!doc || busy} onClick={() => void undo()}>Undo</button><button className="btn" type="button" disabled={!doc || busy} onClick={() => void redo()}>Redo</button><span className="chip off">{busy ? 'Saving…' : `${doc?.role || 'viewer'} · rev ${doc?.revision || 0}`}</span></div></header>
+    {creating ? <NewInvestigationDialog defaultName={creating.title} onCreate={createBoard} onClose={() => setCreating(null)} /> : null}
+    {deleting ? <DeleteInvestigationDialog title={deleting.title} onDelete={deleteBoard} onClose={() => setDeleting(null)} /> : null}
+    <header className="st-head"><div><span className="st-eyebrow">RESEARCH STUDIO / LOCAL AUTHORING</span><InvestigationName key={doc?.id} title={title} disabled={!doc || busy || doc.role === 'viewer'} onSave={rename} /><p className="st-sub">Arrange checked evidence into a reproducible board, story and optional briefing. The underlying scientific calculations remain unchanged.</p></div><div className="st-actions"><a className="btn" href="./investigate.html">Back to Investigate</a><button className="btn" type="button" disabled={!doc || busy} onClick={() => void undo()}>Undo</button><button className="btn" type="button" disabled={!doc || busy} onClick={() => void redo()}>Redo</button><span className="chip off">{busy ? 'Saving…' : `${doc?.role || 'viewer'} · rev ${doc?.revision || 0}`}</span></div></header>
     <CapabilityChips />
     {doc ? <InvestigationActions key={doc.id} /> : null}
-    <PresentationPresets opened={(next) => { setBoards((all) => [{ id: next.id, title: next.title }, ...all.filter((b) => b.id !== next.id)]); sessionStorage.setItem('fireatlas-studio-board', next.id); }} navigate={setTab} />
+    {tab !== 'story' ? <PresentationPresets opened={(next) => { setBoards((all) => [{ id: next.id, title: next.title }, ...all.filter((b) => b.id !== next.id)]); rememberBoard(next.id); }} navigate={setTab} /> : null}
     {notice ? <div className="banner" role="status">{notice}</div> : null}
-    <div className="row" style={{ padding: '12px clamp(16px, 4vw, 40px)' }}><label className="field">Saved investigation<select value={doc?.id || ''} disabled={busy} onChange={(e) => void changeBoard(e.target.value)}>{boards.map((board) => <option value={board.id} key={board.id}>{board.id === doc?.id ? title : board.title}</option>)}</select></label><button className="btn" disabled={busy} onClick={() => void createBoard({ context: { case: 'park-2024' } })}>Start from Park</button><button className="btn" disabled={busy} onClick={() => void createBoard(doc?.state.study)}>New board from current study</button><button className="btn" disabled={busy} onClick={() => void createBoard()}>Blank investigation</button><span className="muted">Applied study: {doc?.state.study.context?.case || doc?.state.study.context?.region || 'Custom selection'} · {String(doc?.state.study.context?.start || '')} → {String(doc?.state.study.context?.end || '')} UTC</span></div>
+    <div className="row" style={{ padding: '12px clamp(16px, 4vw, 40px)' }}><label className="field">Saved investigation<select value={doc?.id || ''} disabled={busy} onChange={(e) => void changeBoard(e.target.value)}>{!doc ? <option value="" disabled>Select an investigation</option> : null}{boards.map((board) => <option value={board.id} key={board.id}>{board.id === doc?.id ? title : board.title}</option>)}</select></label><button className="btn" disabled={busy} onClick={() => setCreating({ study: { context: { case: 'park-2024' } }, title: 'Park investigation' })}>Start from Park</button><button className="btn" disabled={busy} onClick={() => setCreating({ study: doc?.state.study, title: (doc?.title || 'Investigation').slice(0, 110) + ' · new' })}>New board from current study</button><button className="btn" disabled={busy} onClick={() => setCreating({ title: 'Untitled investigation' })}>Blank investigation</button><button className="btn danger-outline" type="button" disabled={!doc?.owner || busy} onClick={() => doc && setDeleting({ id: doc.id, title: doc.title, revision: doc.revision, key: idempotencyKey() })}>Delete investigation</button><span className="muted">Applied study: {doc?.state.study.context?.case || doc?.state.study.context?.region || 'Custom selection'} · {String(doc?.state.study.context?.start || '')} → {String(doc?.state.study.context?.end || '')} UTC</span></div>
     {conflict ? <div className="banner warn" role="alert"><strong>Board changed elsewhere.</strong><span>{conflict.message}</span><button className="btn small" type="button" onClick={() => void resolveConflict('reload')}>Reload</button><button className="btn small" type="button" onClick={() => void resolveConflict('retry')}>Retry my edit</button></div> : null}
-    {doc ? <StudyPanel key={`study:${doc.id}`} /> : null}
+    {doc && tab !== 'story' ? <StudyPanel key={`study:${doc.id}`} /> : null}
     <nav className="tabs" aria-label="Studio views">{(['board', 'outline', 'story', 'workflow', 'room'] as Tab[]).map((value) => <button className="tab" key={value} type="button" aria-pressed={tab === value} onClick={() => setTab(value)}>{value === 'room' ? 'Shared room' : value[0].toUpperCase() + value.slice(1)}</button>)}</nav>
-    <RoomPanel key={`room:${doc?.id}`} expanded={tab === 'room'} />
+    {doc ? <RoomPanel key={`room:${doc.id}`} expanded={tab === 'room'} /> : <div className="studio-empty" role="status"><span className="st-eyebrow">A FRESH CANVAS</span><h2>No investigation open</h2><p>Create a named investigation above or choose a curated presentation preset to begin.</p></div>}
     {tabContent}
     {caps?.static_reader ? <p className="muted" style={{ padding: '16px clamp(16px, 4vw, 40px)' }}>Stories can be exported as static readers with frozen evidence, captions and schematic fallbacks.</p> : null}
   </div>;

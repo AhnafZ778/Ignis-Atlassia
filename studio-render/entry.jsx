@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, Audio, Composition, Img, Sequence, interpolate, registerRoot, useCurrentFrame, useVideoConfig } from 'remotion';
-import { cameraSvg } from './camera.mjs';
+import { filmFrame } from './film-frame.mjs';
 
 function Scene({ scene, index, total, audio }) {
   const frame = useCurrentFrame();
@@ -9,15 +9,10 @@ function Scene({ scene, index, total, audio }) {
   const opacity = scene.transition === 'cut' ? 1 : interpolate(frame, [0, 8, duration - 8, duration], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const camera = scene.visual?.camera_transition;
   const cameraProgress = camera ? Math.max(0, Math.min(1, frame / Math.max(1, duration - 1))) : 0;
-  const sceneSvg = cameraSvg(scene.visual_svg, scene.visual, cameraProgress);
-  return <AbsoluteFill style={{ backgroundColor: '#112a32', color: '#fbf7ef', fontFamily: 'sans-serif', padding: 48 }}>
-    <div style={{ fontSize: 24, letterSpacing: 3, color: '#bacdc8' }}>IGNIS-ATLASSIA / FROZEN STUDY BRIEFING</div>
-    <div style={{ opacity, transform: scene.transition === 'slide' ? `translateX(${interpolate(frame, [0, 10], [25, 0], { extrapolateRight: 'clamp' })}px)` : undefined }}>
-      <h1 style={{ fontSize: 42, margin: '20px 0 14px' }}>{scene.title}</h1>
-      <div><Img src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(sceneSvg)}`} style={{ display: 'block', width: 1360, height: 765, objectFit: 'contain', margin: '0 auto', borderRadius: 12 }} /></div>
-    </div>
-    <div style={{ position: 'absolute', left: 52, right: 52, bottom: 36, background: '#112a32', padding: '18px 28px', borderTop: '2px solid #3b5b63', fontSize: 28 }}>
-      <div>{scene.caption}</div><div style={{ display: 'flex', justifyContent: 'space-between', color: '#bacdc8', fontSize: 18, marginTop: 10 }}><span>NASA FIRMS observations · schematic views · UTC dates</span><span>{index + 1} / {total}</span></div>
+  const sceneSvg = filmFrame(scene, index, total, cameraProgress);
+  return <AbsoluteFill style={{ backgroundColor: '#edf2ff' }}>
+    <div style={{ opacity, position: 'absolute', inset: 0, transform: scene.transition === 'slide' ? `translateY(${interpolate(frame, [0, 14], [12, 0], { extrapolateRight: 'clamp' })}px)` : undefined }}>
+      <Img src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(sceneSvg)}`} style={{ width: 1920, height: 1080, display: 'block' }} />
     </div>
     {audio?.src ? <Audio src={audio.src} /> : null}
   </AbsoluteFill>;

@@ -64,7 +64,7 @@
 
 /* Board */
 .studio-app .board-wrap { position: relative; border: 1px solid var(--line); border-radius: var(--radius); background-color: var(--paper-2);
-  background-image: radial-gradient(circle, #cbbf9f 1px, transparent 1px); background-size: 24px 24px; overflow: auto; height: min(72vh, 760px); min-height: 380px; touch-action: pan-x pan-y; }
+  background-image: radial-gradient(circle, #cbbf9f 1px, transparent 1px); background-size: 24px 24px; overflow: auto; height: min(72vh, 760px); min-height: 380px; touch-action: none; cursor: grab; }
 .studio-app .board-canvas { position: relative; }
 .studio-app .board-links { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
 .studio-app .board-links path { fill: none; stroke: var(--blue); stroke-width: 2; opacity: .75; }
@@ -206,3 +206,70 @@
 .orchestration-panel details { margin-top: 12px; }
 .portable-details { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
 @media (max-width: 768px) { .orchestration-panel .row { align-items: stretch; } .orchestration-panel .field { min-width: 0; width: 100%; } }
+
+.studio-app .jarvis-prompt-presets { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.studio-app .jarvis-destination { margin:16px 0; padding:16px; border:1px solid #c5d4cb; border-radius:12px; background:#f2f6f0; min-width:0; }
+
+.studio-app .board-wrap.pan-ready .card-head {cursor:grab}
+.studio-app .board-wrap.is-panning,.studio-app .board-wrap.is-panning * {cursor:grabbing!important;user-select:none}
+.studio-app .canvas-help {font-size:12px;color:var(--muted)}
+
+.studio-app .investigation-name {margin:12px 0 6px;max-width:100%}
+.studio-app .name-label {display:block;font-size:12px;font-weight:650;color:var(--muted);margin-bottom:4px}
+.studio-app .investigation-name .row {flex-wrap:wrap}
+.studio-app .investigation-name .st-title-input {width:min(600px,75vw);border-bottom:2px solid var(--line)}
+.studio-app .new-investigation-dialog {width:min(480px,calc(100vw - 32px));max-width:calc(100vw - 32px);padding:24px;border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);background:var(--paper)}
+.studio-app .new-investigation-dialog::backdrop {background:rgba(21,38,60,.42)}
+.studio-app .new-investigation-dialog input {width:100%;box-sizing:border-box}
+
+/* Investigation removal: scoped native modal, with keyboard focus containment. */
+.studio-app .delete-investigation-dialog {width:min(480px,calc(100vw - 32px));max-width:calc(100vw - 32px);box-sizing:border-box;padding:28px;border:1px solid #e8d9d5;border-radius:20px;color:var(--ink);background:var(--paper);box-shadow:0 24px 80px rgba(21,38,60,.24)}
+.studio-app .delete-investigation-dialog::backdrop {background:rgba(21,38,60,.48);backdrop-filter:blur(4px)}
+.studio-app .delete-icon {display:grid;place-items:center;width:56px;height:56px;border-radius:16px;margin-bottom:18px;color:#b62b2b;background:#fff0ed}
+.studio-app .delete-investigation-dialog h2 {margin:10px 0 14px;font-size:1.5rem;line-height:1.2}
+.studio-app .delete-investigation-dialog p {line-height:1.6}
+.studio-app .delete-title {overflow-wrap:anywhere}
+.studio-app .delete-actions {display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:24px}
+.studio-app .btn.danger {background:#b62b2b;color:#fff;border-color:#b62b2b}
+.studio-app .btn.danger:hover:not(:disabled) {background:#962121}
+.studio-app .btn.danger-outline {color:#a92a2a;border-color:#e4bcbc}
+.studio-app .delete-error {padding:12px;background:#fff0ed;border-radius:10px;color:#962121}
+.studio-app .studio-empty {margin:24px clamp(16px,4vw,40px);padding:32px;border:1px dashed var(--line);border-radius:var(--radius);background:var(--paper)}
+@media(max-width:480px) {.studio-app .delete-investigation-dialog {padding:22px}.studio-app .delete-actions {flex-direction:column}.studio-app .delete-actions .btn {width:100%}}
+
+.studio-app .map-background-control {display:flex;justify-content:flex-end;margin:2px 0}
+.studio-app .map-background-dot {display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;touch-action:manipulation}
+.studio-app .map-background-indicator {display:block;width:14px;height:14px;box-sizing:border-box;border-radius:50%;border:2px solid #87919b;background:#d2d7dc;box-shadow:0 0 0 4px rgba(135,145,155,.12);transition:background .15s ease,border-color .15s ease,box-shadow .15s ease}
+.studio-app .map-background-dot[aria-checked=true] .map-background-indicator {border-color:#167548;background:#27aa6a;box-shadow:inset 0 1px 2px rgba(255,255,255,.4),0 0 0 4px rgba(39,170,106,.14)}
+.studio-app .map-background-dot:hover:not(:disabled) {background:rgba(39,170,106,.08)}
+.studio-app .map-background-dot:focus-visible {outline:2px solid #2454d7;outline-offset:2px}
+.studio-app .map-background-dot:disabled {opacity:.5;cursor:default}
+@media(prefers-reduced-motion:reduce) {.studio-app .map-background-indicator {transition:none}}
+
+/* Lean story creation; animation communicates progress without changing evidence. */
+.studio-app .story-hero { display:flex; gap:20px; align-items:center; padding:24px 0; flex-wrap:wrap; }
+.studio-app .story-hero > div:nth-child(2) { flex:1 1 280px; }
+.studio-app .story-hero h2 { font-size:clamp(24px,3vw,36px); margin-top:8px; }
+.studio-app .story-hero p { color:var(--ink-2); max-width:56ch; }
+.studio-app .story-spark { display:grid; place-items:center; width:64px; height:64px; border-radius:22px; font-size:36px; color:#fff; background:linear-gradient(145deg,#2b59c3,#6e66d9); box-shadow:0 8px 32px #4d63cc30; }
+.studio-app .story-create { background:linear-gradient(115deg,#244dc5,#6556cb); border:0; padding:14px 24px; border-radius:14px; box-shadow:0 6px 20px #2b59c325; }
+.studio-app .story-progress { padding:20px; background:#f2f4fc; border:1px solid #dce3f5; border-radius:16px; }
+.studio-app .story-progress .row { justify-content:space-between; }
+.studio-app .story-progress-track { height:9px; border-radius:9px; background:#dfe6f6; margin:18px 0; overflow:hidden; }
+.studio-app .story-progress-track > div { height:100%; background:linear-gradient(90deg,#2854d0,#8d73e4,#2854d0); background-size:200% 100%; border-radius:inherit; transition:width .6s ease; }
+.studio-app .story-progress.active .story-progress-track > div { animation:story-shimmer 2s linear infinite; }
+.studio-app .story-steps { list-style:none; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:0; margin:0; font-size:12px; color:var(--ink-2); }
+.studio-app .story-empty { text-align:center; padding:64px 12px; background:radial-gradient(ellipse at center,#e9eefb,transparent 70%); border-radius:20px; }
+.studio-app .story-empty > span { display:inline-grid; place-items:center; height:76px; width:76px; border-radius:18px; background:white; border:1px solid #dce3ef; box-shadow:0 8px 24px #172b310c; color:#4367c0; font-size:30px; margin:0 8px; transform:rotate(-5deg); }
+.studio-app .story-empty > span:nth-child(2) { transform:translateY(-12px) rotate(5deg); }
+.studio-app .story-empty p { color:var(--ink-2); margin-top:28px; }
+.studio-app .story-edit { border-top:1px solid var(--line); margin-top:24px; padding-top:18px; }
+.studio-app .story-edit > summary { cursor:pointer; font-weight:600; padding:10px 0; }
+.studio-app .story-film video { width:100%; max-height:70vh; background:#112a32; border-radius:16px; }
+.studio-app .story-film .row { margin-top:14px; }
+.studio-app .story-panel .player-stage { border-radius:18px; background:linear-gradient(145deg,#eff3fd,#fffdf8); }
+.studio-app .story-panel .scene-schematic-wrap { animation:story-scene-in .55s ease both; }
+@keyframes story-shimmer { to { background-position:-200% 0; } }
+@keyframes story-scene-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@media (max-width:600px) { .studio-app .story-hero { gap:12px; }.studio-app .story-create { width:100%; }.studio-app .story-empty > span { width:60px;height:60px;margin:0 4px; }.studio-app .story-panel .director-layout { display:block; }.studio-app .story-panel .chapter-list { margin-bottom:14px; } }
+@media (prefers-reduced-motion:reduce) { .studio-app .story-progress-track > div,.studio-app .story-panel .scene-schematic-wrap { animation:none!important; transition:none!important; } }

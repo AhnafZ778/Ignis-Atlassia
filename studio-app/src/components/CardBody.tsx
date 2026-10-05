@@ -5,6 +5,8 @@ import { api } from '../api';
 import type { Card, Fact, Snapshot, StudyContext, DisplaySelection } from '../types';
 import { useStudio } from '../store';
 import { HeatPreview } from './HeatPreview';
+import { MapBackgroundControls } from './MapBackgroundControls';
+import { mapLandscape } from '../lib/mapLandscape';
 import { effectiveStudy } from '../lib/graph';
 
 export const MAX_LIVE_MAPS = 2;
@@ -56,12 +58,12 @@ function PreparedCard({ card, snapshot, documentId, context }: { card: Card; sna
     let active = true;
     setSvg(''); setVisual(null); setStatus('Preparing frozen preview…');
     if (JSON.stringify(context.bbox) !== JSON.stringify(snapshot.scope.bbox)) { setStatus('This card’s applied boundary differs from its frozen receipt. Refreeze explicitly to inspect the new study.'); return; }
-    api.snapshotPreview(documentId, snapshot.id, card.type, context.day ? String(context.day) : undefined, String(context.source || 'joint'), (context as any).display_selection || {}).then((result) => {
+    api.snapshotPreview(documentId, snapshot.id, card.type, context.day ? String(context.day) : undefined, String(context.source || 'joint'), { ...((context as any).display_selection || {}), background: context.background === 'ndvi-online' ? 'none' : String(context.background || 'auto') }).then((result) => {
       if (!active) return;
       setSvg(result.svg); setVisual(result.visual); setStatus('Prepared frozen evidence · schematic view');
     }).catch((error) => active && setStatus(error.message));
     return () => { active = false; };
-  }, [documentId, snapshot.id, card.type, context.day, context.source, JSON.stringify(context.bbox), JSON.stringify(snapshot.scope.bbox), JSON.stringify((context as any).display_selection)]);
+  }, [documentId, snapshot.id, card.type, context.day, context.source, context.background, JSON.stringify(context.bbox), JSON.stringify(snapshot.scope.bbox), JSON.stringify((context as any).display_selection)]);
   const table = chartTable(visual);
   const filename = `chart-${snapshot.id}`;
   const emit = (value: DisplaySelection) => { if (doc) publishSelection(card.id, value, doc.context_revision, doc.id); };
@@ -84,7 +86,7 @@ function MapCard({ card, snapshot, documentId, context, expanded = false }: { ca
     if (!L || !FM || !host.current) { setStatus('Map SDK unavailable. The prepared schematic remains usable.'); setInteractive(false); release(slot); return; }
     let canceled = false, map: any = null;
     setStatus('Loading frozen frame…');
-    api.snapshotReceipt(documentId, snapshot.id).then(({ receipt }) => {
+    api.snapshotReceipt(documentId, snapshot.id).then(async ({ receipt }) => {
       if (canceled || !host.current) return;
       const bundle = receipt.payload;
       if (!Array.isArray(bundle?.frames) || !bundle.frames.length) throw new Error('This receipt has no map frames.');
@@ -93,8 +95,11 @@ function MapCard({ card, snapshot, documentId, context, expanded = false }: { ca
       const at = context.day ? frames.findIndex((f) => f.date_utc === context.day) : 0;
       if (at < 0) throw new Error('The applied day is outside the frozen map frames.');
       const [w, s, e, n] = snapshot.scope.bbox;
+      const landscape = await mapLandscape(documentId, snapshot, String(context.background || 'auto'), String(context.day || snapshot.scope.start));
+      if (canceled || !host.current) return;
       map = L.map(host.current, { preferCanvas: true, zoomControl: true, attributionControl: true, scrollWheelZoom: true });
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Imagery © Esri · observations NASA FIRMS', maxZoom: 18 }).addTo(map);
+      if (!landscape.layers.length && context.background !== 'none') L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Imagery © Esri · observations NASA FIRMS', maxZoom: 18 }).addTo(map);
+      for (const layer of landscape.layers) { const [a,b,c,d] = layer.metadata.bounds; L.imageOverlay(layer.url || `data:${layer.mime};base64,${layer.data}`, [[b,a],[d,c]], { crossOrigin: true, opacity: layer.name.startsWith('ndvi') ? .82 : .45, attribution: `NASA ${layer.metadata.product} ${layer.metadata.version}` }).addTo(map); }
       L.rectangle([[s, w], [n, e]], { color: '#237745', weight: 1, fill: false, dashArray: '4 4' }).addTo(map);
       map.fitBounds([[s, w], [n, e]], { padding: [8, 8] });
       const source = String(context.source || 'joint'), metric = String(context.metric || 'density');
@@ -119,8 +124,8 @@ function MapCard({ card, snapshot, documentId, context, expanded = false }: { ca
       requestAnimationFrame(() => map?.invalidateSize());
     }).catch((error) => { if (!canceled) { setStatus(error.message); setInteractive(false); } });
     return () => { canceled = true; map?.remove(); release(slot); };
-  }, [interactive, card.id, documentId, snapshot.id, context.day, context.source, context.metric, JSON.stringify(context.bbox)]);
-  return <div>{interactive ? <div ref={host} className="map-box" style={{ height: expanded ? 'min(65vh, 650px)' : 170 }} aria-label={`${card.title} interactive map`} /> : card.display?.preview === 'heat' && !(context as any).display_selection?.start && (!context.metric || context.metric === 'density') ? <HeatPreview title={card.title} snapshot={snapshot} documentId={documentId} context={context} /> : <PreparedCard card={card} snapshot={snapshot} documentId={documentId} context={context} />}<button className="btn small" onClick={() => setInteractive((value) => !value)}>{interactive ? 'Pause map interaction' : 'Interact with map'}</button>{!expanded ? <button className="btn small" onClick={() => { setInteractive(false); setExpand(true); }}>Expand map</button> : null}{expand ? <ExpandedMap card={card} snapshot={snapshot} documentId={documentId} context={context} close={() => setExpand(false)} /> : null}{status ? <p className="map-note" role="status">{status}</p> : null}<details><summary>Inspect a common cell</summary><label className="field">Common cell to inspect<input value={cell} placeholder="grid_x:grid_y" onChange={(e) => setCell(e.target.value)} /></label><button className="btn small" disabled={!/^-?\d{1,8}:-?\d{1,8}$/.test(cell)} onClick={() => { if (doc) publishSelection(card.id, { day: String(context.day || snapshot.scope.day || snapshot.scope.start), cell }, doc.context_revision, doc.id); }}>Focus linked cell evidence</button><p className="muted">Click a cell in the interactive map or enter its grid ID. Linked observations show matching rows within their frozen receipt.</p></details></div>;
+  }, [interactive, card.id, documentId, snapshot.id, context.day, context.source, context.metric, context.background, JSON.stringify(context.bbox)]);
+  return <div><MapBackgroundControls card={card} snapshot={snapshot} documentId={documentId} day={context.day ? String(context.day) : undefined} />{interactive ? <div ref={host} className="map-box" style={{ height: expanded ? 'min(65vh, 650px)' : 170 }} aria-label={`${card.title} interactive map`} /> : card.display?.preview === 'heat' && !(context as any).display_selection?.start && (!context.metric || context.metric === 'density') ? <HeatPreview title={card.title} snapshot={snapshot} documentId={documentId} context={context} /> : <PreparedCard card={card} snapshot={snapshot} documentId={documentId} context={context} />}<button className="btn small" onClick={() => setInteractive((value) => !value)}>{interactive ? 'Pause map interaction' : 'Interact with map'}</button>{!expanded ? <button className="btn small" onClick={() => { setInteractive(false); setExpand(true); }}>Expand map</button> : null}{expand ? <ExpandedMap card={card} snapshot={snapshot} documentId={documentId} context={context} close={() => setExpand(false)} /> : null}{status ? <p className="map-note" role="status">{status}</p> : null}<details><summary>Inspect a common cell</summary><label className="field">Common cell to inspect<input value={cell} placeholder="grid_x:grid_y" onChange={(e) => setCell(e.target.value)} /></label><button className="btn small" disabled={!/^-?\d{1,8}:-?\d{1,8}$/.test(cell)} onClick={() => { if (doc) publishSelection(card.id, { day: String(context.day || snapshot.scope.day || snapshot.scope.start), cell }, doc.context_revision, doc.id); }}>Focus linked cell evidence</button><p className="muted">Click a cell in the interactive map or enter its grid ID. Linked observations show matching rows within their frozen receipt.</p></details></div>;
 }
 
 export function CardBody({ card, snapshot, documentId, details = true }: { card: Card; snapshot: Snapshot | null; documentId: string; details?: boolean }) {
@@ -133,7 +138,7 @@ export function CardBody({ card, snapshot, documentId, details = true }: { card:
     observer.observe(host.current);
     return () => observer.disconnect();
   }, [loaded]);
-  const render = loaded || selected === card.id || Boolean(displaySelections[card.id]) || !snapshot;
+  const render = loaded || card.display?.preview_on_open === true || selected === card.id || Boolean(displaySelections[card.id]) || !snapshot;
   return <div ref={host} className="card-content-actions" onPointerDown={(e) => e.stopPropagation()}>{details ? <button className="btn small" onClick={() => { select(card.id); requestAnimationFrame(() => { const panel = document.querySelector<HTMLElement>('[aria-label="Inspector"]'); panel?.scrollIntoView({ block: 'nearest' }); panel?.focus(); }); }}>Open details</button> : null}{render ? <CardContent card={card} snapshot={snapshot} documentId={documentId} /> : <div><p className="muted">Frozen {snapshot.unit} preview loads when this card enters view.</p><button className="btn small" onClick={() => setLoaded(true)}>Load card preview</button></div>}</div>;
 }
 
@@ -141,7 +146,7 @@ function CardContent({ card, snapshot, documentId }: { card: Card; snapshot: Sna
   const { doc, displaySelections } = useStudio();
   const applied = doc ? effectiveStudy(card, doc.state).context || {} : {};
   const display = displaySelections[card.id];
-  const visible = { ...applied, ...(card.display?.source ? { source: card.display.source } : {}), ...(card.display?.day ? { day: card.display.day } : {}) };
+  const visible = { ...applied, background: String(card.display?.background || 'auto'), ...(card.display?.source ? { source: card.display.source } : {}), ...(card.display?.day ? { day: card.display.day } : {}) };
   const context = display ? { ...visible, ...(display.day ? { day: display.day } : {}), display_selection: display } : visible;
   if (card.type === 'text' || card.type === 'quote' || card.type === 'note-question') return card.text ? <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{card.type === 'quote' ? `“${card.text}”` : card.text}</p> : <p className="empty">Empty note or question</p>;
   if (card.type === 'image') return card.asset_id ? <img src={api.assetUrl(card.asset_id)} alt={card.title || 'Uploaded image'} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <p className="empty">No image uploaded.</p>;

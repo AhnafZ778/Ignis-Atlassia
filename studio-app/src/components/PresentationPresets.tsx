@@ -11,7 +11,7 @@ export function PresentationPresets({ opened, navigate }: { opened: (doc: Docume
   const ready = readyId === doc?.id;
   return <section className="presentation-presets" aria-label="Presentation presets">
     <div className="preset-heading"><div><span className="st-eyebrow">PRESENTATION COLLECTION</span><h2>A study, ready to walk through</h2><p>Two sensor heat maps. Connected evidence. A story you can explain.</p></div><span className="chip off">Stored observations · no model required</span></div>
-    <div className="preset-gallery">{PRESENTATIONS.map((preset, index) => <button className={`preset-option ${preset.tone}`} key={preset.id} disabled={Boolean(busy) || !canEdit} onClick={async () => {
+    <div className="preset-gallery">{PRESENTATIONS.map((preset, index) => <button className={`preset-option ${preset.tone}`} key={preset.id} disabled={Boolean(busy) || Boolean(doc && !canEdit)} onClick={async () => {
       setBusy(preset.id); setReadyId(null);
       try { const board = await buildPresentation(preset.id, { open: (next) => { open(next); opened(next); navigate('board'); }, current: isCurrent, progress: setStatus }); opened(board); setReadyId(board.id); notify('Presentation preset prepared. The workflow is saved; execution and exports remain explicit.'); }
       catch (error) { setStatus(error instanceof Error ? error.message : 'Preset preparation failed. Its saved draft remains inspectable.'); }

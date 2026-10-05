@@ -7,6 +7,7 @@ import { api } from '../api';
 import type { DocumentView, RenderJob, StoryView } from '../types';
 vi.mock('../api', () => ({ ApiError: class extends Error {}, uid: () => 'unused', api: {
   projects: vi.fn(), getStory: vi.fn(), getRender: vi.fn(), cancelRender: vi.fn(), artifactUrl: (id: string) => `/exports/${id}`,
+  generateStory: vi.fn(), storyGeneration: vi.fn(), cancelStoryGeneration: vi.fn(), resumeStoryGeneration: vi.fn(), exportUrl: (id: string) => `/stories/${id}/export`,
 } }));
 vi.mock('../components/StoryPlayer', () => ({ StoryPlayer: () => null }));
 let value: StudioValue, root: ReturnType<typeof createRoot>, host: HTMLDivElement;
@@ -57,4 +58,41 @@ it('keeps the selected recent export when an older request finishes late', async
   await act(async () => finish(render('old')));
   expect(host.querySelector('[data-narration-outcome]')?.textContent).toContain('new: complete silent captions');
   expect(host.querySelector('a[href="/exports/old"]')).toBeNull();
+});
+
+it('Create story calls the AI director with the applied revision and shows real progress in the lean view', async () => {
+  vi.mocked(api.projects).mockResolvedValue({ stories: [], workflow: null });
+  const job = { id: 'generation', document_id: 'board', document_revision: 1, status: 'running', phase: 'writing-story', progress: .18, story_id: null, render_id: null, error: null };
+  vi.mocked(api.generateStory).mockResolvedValue(job);
+  vi.mocked(api.storyGeneration).mockResolvedValue(job);
+  await act(async () => { value.setCaps({ story_generation: { available: true } } as any); value.open({ ...board(), state: { ...board().state, order: ['c1'], cards: { c1: { title: 'Checked map' } as any } } }); });
+  expect(host.querySelector<HTMLDetailsElement>('.story-edit')!.open).toBe(false);
+  await act(async () => { [...host.querySelectorAll('button')].find((b) => b.textContent === '✦ Create story')!.click(); });
+  expect(api.generateStory).toHaveBeenCalledWith('board', 1, ['c1']);
+  expect(host.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow')).toBe('18');
+  expect(host.textContent).toContain('AI& is writing the story');
+});
+
+it('cancellation prevents a late completed storyboard from replacing the selected story', async () => {
+  vi.mocked(api.projects).mockResolvedValue({ stories: [], workflow: null });
+  const job = { id: 'generation', document_id: 'board', document_revision: 1, status: 'running', phase: 'writing-story', progress: .18, story_id: null, render_id: null, error: null };
+  let finish: (v: any) => void = () => undefined;
+  vi.mocked(api.generateStory).mockResolvedValue(job);
+  vi.mocked(api.storyGeneration).mockReturnValue(new Promise((resolve) => { finish = resolve; }));
+  vi.mocked(api.cancelStoryGeneration).mockResolvedValue({ ...job, status: 'cancelled', phase: 'cancelled' });
+  await act(async () => { value.setCaps({ story_generation: { available: true } } as any); value.open({ ...board(), state: { ...board().state, order: ['c1'], cards: { c1: { title: 'Map' } as any } } }); });
+  await act(async () => { [...host.querySelectorAll('button')].find((b) => b.textContent === '✦ Create story')!.click(); });
+  await act(async () => { [...host.querySelectorAll('button')].find((b) => b.textContent === 'Cancel')!.click(); });
+  await act(async () => finish({ ...job, status: 'completed', story_id: 'Late story' }));
+  expect(api.getStory).not.toHaveBeenCalled();
+  expect(host.textContent).toContain('Cancelled. Saved story material remains available.');
+});
+
+it('refresh reconnects to a saved generation without creating another AI request', async () => {
+  vi.mocked(api.projects).mockResolvedValue({ stories: [], workflow: null, story_generations: [{ id: 'saved-generation', status: 'running', story_id: null }] });
+  vi.mocked(api.storyGeneration).mockResolvedValue({ id: 'saved-generation', document_id: 'board', document_revision: 1, status: 'running', phase: 'rendering', progress: .75, story_id: null, render_id: null, error: null });
+  await act(async () => value.open(board()));
+  expect(api.storyGeneration).toHaveBeenCalledWith('saved-generation');
+  expect(api.generateStory).not.toHaveBeenCalled();
+  expect(host.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow')).toBe('75');
 });

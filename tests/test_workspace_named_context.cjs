@@ -1,0 +1,13 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const window={};
+vm.runInNewContext(fs.readFileSync('fireatlas/static/workspace-context.js','utf8'),{window,URLSearchParams,URL,Date,Number,JSON,location:{search:'',href:'https://example.test/project/investigate.html'},document:{addEventListener(){}},addEventListener(){}});
+const ctx=window.FireAtlasContext;
+const park=ctx.read('?case=park-2024&day=2024-07-30');
+assert.equal(park.start,'2024-07-24');assert.equal(park.end,'2024-08-14');assert.equal(park.as_of,park.end);assert.equal(park.day,'2024-07-30');assert.equal(park.errors.length,0);
+const camp=ctx.read('?case=camp-2018');assert.equal(camp.year,2018);assert.equal(camp.month,11);assert.equal(camp.bbox,'-121.85,39.6,-121.3,40');assert.equal(camp.errors.length,0);
+const grove=ctx.read('?case=grove-2025');assert.equal(grove.start,'2025-07-04');assert.equal(grove.end,'2025-07-06');assert.equal(grove.errors.length,0);
+const explicit=ctx.read('?case=park-2024&start=2024-07-29&end=2024-07-31&bbox=-122,39,-121,40&day=2024-07-30');assert.equal(explicit.start,'2024-07-29');assert.equal(explicit.end,'2024-07-31');assert.equal(explicit.bbox,'-122,39,-121,40');assert.equal(explicit.errors.length,0);
+assert.equal(ctx.read('?case=park-2024&day=2025-07-30').errors.length,1);
+assert.equal(ctx.read('?case=unsupported').errors.includes('Unknown named study'),true);
+const restored=ctx.read(ctx.write(park));assert.equal(restored.end,park.end);assert.equal(restored.day,park.day);assert.equal(restored.errors.length,0);
+console.log('Named study URLs: real intervals, explicit scope precedence, invalid day retention and cross-month round trips passed.');

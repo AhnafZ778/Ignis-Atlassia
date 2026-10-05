@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "render": "node render.mjs", "test": "node --test input.test.mjs subtitles.test.mjs audio.test.mjs" },
+  "scripts": { "render": "node render.mjs", "test": "node --test input.test.mjs subtitles.test.mjs audio.test.mjs film-frame.test.mjs" },
   "dependencies": {
     "@remotion/bundler": "4.0.532",
     "@remotion/renderer": "4.0.532",

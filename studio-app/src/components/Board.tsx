@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useStudio } from '../store';
 import type { Card, Transform, Viewport } from '../types';
 import { CardBody } from './CardBody';
@@ -10,9 +10,12 @@ export function Board() {
   const { doc, selected, select, transact, canEdit, canvasCards } = useStudio();
   const [view, setView] = useState<Viewport>(doc!.state.viewport || { x: 0, y: 0, zoom: 1 });
   const [panMode, setPanMode] = useState(false);
+  const [spacePan, setSpacePan] = useState(false);
+  const spaceHeld = useRef(false);
+  const [panning, setPanning] = useState(false);
   const boardHost = useRef<HTMLDivElement>(null);
   const awaitingFirstCards = useRef(doc!.state.order.length === 0 || (new URLSearchParams(location.search).has('command') && doc!.state.viewport?.zoom === 1));
-  const pan = useRef<{ x: number; y: number; origin: Viewport } | null>(null);
+  const pan = useRef<{ x: number; y: number; pointerId: number; origin: Viewport } | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
   const state = { ...doc!.state, cards: canvasCards };
@@ -62,50 +65,28 @@ export function Board() {
     setDrag(null);
   };
 
-  // The board is a document surface rather than a page-sized list.  Wheel
-  // input over the canvas therefore zooms around the pointer; wheel input in
-  // a card's own scrollable evidence region remains a normal scroll.  Keeping
-  // the zoom anchor under the pointer makes the preset usable at any scale
-  // instead of jumping back to the upper-left corner.
-  const wheel = (event: WheelEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement;
-    const insideCardScroll = target.closest('.card-body, .card-table-scroll, .chapter-transcript, button, input, textarea, select, details, summary, a');
-    if (insideCardScroll && !event.ctrlKey && !event.metaKey) return;
-    event.preventDefault();
-    const host = boardHost.current;
-    if (!host) return;
-    const rect = host.getBoundingClientRect();
-    const pointerX = event.clientX - rect.left;
-    const pointerY = event.clientY - rect.top;
-    const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaMode === 2 ? event.deltaY * rect.height : event.deltaY;
-    const factor = Math.exp(Math.max(-0.22, Math.min(0.22, -delta * 0.0015)));
-    setView((current) => {
-      const zoom = Math.max(0.1, Math.min(4, current.zoom * factor));
-      if (zoom === current.zoom) return current;
-      const worldX = (pointerX - current.x) / current.zoom;
-      const worldY = (pointerY - current.y) / current.zoom;
-      return { x: pointerX - worldX * zoom, y: pointerY - worldY * zoom, zoom };
-    });
-  };
-  // Some browsers dispatch a wheel generated over a nested scrolling board to
-  // the page section that originally held the pointer. Resolve that case at
-  // document capture time using the actual hit-tested element. The fallback is
-  // scoped to this board and leaves card evidence scrolling untouched.
+  // Every wheel gesture inside this canvas zooms, even over scrollable cards
+  // or embedded controls. Native capture prevents nested maps and React's
+  // passive wheel listener from consuming it or scrolling the board/page.
+  // Scrollbar dragging and pointer panning remain independent interactions.
   useEffect(() => {
     const onDocumentWheel = (event: globalThis.WheelEvent) => {
       const host = boardHost.current;
       if (!host) return;
       const rect = host.getBoundingClientRect();
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) return;
-      const target = event.target as Element | null;
-      if (target?.closest('.board-wrap')) return;
-      const hit = document.elementFromPoint(event.clientX, event.clientY);
-      if (!hit?.closest('.board-wrap')) return;
-      if (hit.closest('.card-body, .card-table-scroll, .chapter-transcript, button, input, textarea, select, details, summary, a')) return;
-      event.preventDefault();
-      const pointerX = event.clientX - rect.left;
-      const pointerY = event.clientY - rect.top;
-      const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaMode === 2 ? event.deltaY * rect.height : event.deltaY;
+      const target = event.target as Node | null;
+      if (!target || !host.contains(target)) {
+        const hit = document.elementFromPoint(event.clientX, event.clientY);
+        if (!hit || !host.contains(hit)) return;
+      }
+      event.preventDefault(); event.stopImmediatePropagation();
+      // Include manual scrollbar offsets so the same world point stays under
+      // the pointer when a previously scrolled board is zoomed.
+      const pointerX = event.clientX - rect.left - host.clientLeft + host.scrollLeft;
+      const pointerY = event.clientY - rect.top - host.clientTop + host.scrollTop;
+      const wheelDelta = event.deltaY || event.deltaX;
+      const delta = event.deltaMode === 1 ? wheelDelta * 16 : event.deltaMode === 2 ? wheelDelta * host.clientHeight : wheelDelta;
       const factor = Math.exp(Math.max(-0.22, Math.min(0.22, -delta * 0.0015)));
       setView((current) => {
         const zoom = Math.max(0.1, Math.min(4, current.zoom * factor));
@@ -118,6 +99,31 @@ export function Board() {
     document.addEventListener('wheel', onDocumentWheel, { capture: true, passive: false });
     return () => document.removeEventListener('wheel', onDocumentWheel, true);
   }, []);
+  const endPan = () => { pan.current = null; setPanning(false); };
+  const clearSpace = () => { spaceHeld.current = false; setSpacePan(false); };
+  useEffect(() => {
+    const release = (event: globalThis.KeyboardEvent) => { if (event.code === 'Space') clearSpace(); };
+    const blur = () => { clearSpace(); endPan(); };
+    window.addEventListener('keyup', release); window.addEventListener('blur', blur);
+    return () => { window.removeEventListener('keyup', release); window.removeEventListener('blur', blur); };
+  }, []);
+  const beginPan = (event: PointerEvent<HTMLDivElement>) => {
+    if (pan.current || ![0, 1].includes(event.button)) return;
+    const host = event.currentTarget, rect = host.getBoundingClientRect();
+    // Native scrollbar tracks remain draggable instead of starting a pan.
+    if (event.clientX >= rect.left + host.clientLeft + host.clientWidth || event.clientY >= rect.top + host.clientTop + host.clientHeight) return;
+    const target = event.target as HTMLElement;
+    // Controls and live maps retain their own gestures. Capture on the board
+    // lets Pan canvas and Space-drag also work over frozen card previews.
+    if (target.closest('button,input,textarea,select,a,summary,details,[contenteditable="true"],.leaflet-container,.resize')) return;
+    const background = !target.closest('.card');
+    if (!background && !panMode && !spaceHeld.current && event.button !== 1) return;
+    event.preventDefault(); event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    pan.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId, origin: view };
+    setPanning(true);
+    if (background) { select(null); event.currentTarget.focus({ preventScroll: true }); }
+  };
   const keys = (event: KeyboardEvent<HTMLElement>, card: Card) => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(card.id); return; }
     const step = event.shiftKey ? 64 : 16;
@@ -134,12 +140,12 @@ export function Board() {
     return <div className="board-wrap"><div className="empty-state"><h2>Your board is empty</h2><p>Add a card from the library, then bind it to evidence in the inspector.</p></div></div>;
   }
   return (
-    <section aria-label="Evidence canvas"><div className="row canvas-toolbar"><button className="btn" aria-pressed={!panMode} onClick={() => setPanMode(false)}>Select cards</button><button className="btn" aria-pressed={panMode} onClick={() => setPanMode(true)}>Pan canvas</button><button className="btn" onClick={() => setView((v) => ({ ...v, zoom: Math.min(4, v.zoom * 1.25) }))}>Zoom in</button><button className="btn" onClick={() => setView((v) => ({ ...v, zoom: Math.max(0.1, v.zoom / 1.25) }))}>Zoom out</button><button className="btn" onClick={fit}>Fit all cards</button><button className="btn" onClick={() => setView({ x: 0, y: 0, zoom: 1 })}>Reset view</button><button className="btn" disabled={!canEdit} onClick={() => void transact([{ op: 'set_viewport', viewport: view }])}>Save canvas view</button><button className="btn" onClick={() => setView(state.viewport || { x: 0, y: 0, zoom: 1 })}>Restore saved view</button><span>{Math.round(view.zoom * 100)}%</span></div>
-    <div ref={boardHost} className="board-wrap" role="region" aria-label="Evidence board. Drag a card header or empty card surface, scroll the canvas to zoom, or focus a card and use arrow keys to move it." tabIndex={0}
-      onWheel={wheel}
-      onPointerDown={(e) => { if (!panMode || (e.target as HTMLElement).closest('button,input,textarea,select,.card-body')) return; e.currentTarget.setPointerCapture(e.pointerId); pan.current = { x: e.clientX, y: e.clientY, origin: view }; }}
-      onPointerMove={(e) => { if (pan.current) setView({ ...pan.current.origin, x: pan.current.origin.x + e.clientX - pan.current.x, y: pan.current.origin.y + e.clientY - pan.current.y }); }}
-      onPointerUp={() => { pan.current = null; }} onPointerCancel={() => { pan.current = null; }}>
+    <section aria-label="Evidence canvas"><div className="row canvas-toolbar"><button className="btn" aria-pressed={!panMode} onClick={() => setPanMode(false)}>Select cards</button><button className="btn" aria-pressed={panMode} onClick={() => setPanMode(true)}>Pan canvas</button><button className="btn" onClick={() => setView((v) => ({ ...v, zoom: Math.min(4, v.zoom * 1.25) }))}>Zoom in</button><button className="btn" onClick={() => setView((v) => ({ ...v, zoom: Math.max(0.1, v.zoom / 1.25) }))}>Zoom out</button><button className="btn" onClick={fit}>Fit all cards</button><button className="btn" onClick={() => setView({ x: 0, y: 0, zoom: 1 })}>Reset view</button><button className="btn" disabled={!canEdit} onClick={() => void transact([{ op: 'set_viewport', viewport: view }])}>Save canvas view</button><button className="btn" onClick={() => setView(state.viewport || { x: 0, y: 0, zoom: 1 })}>Restore saved view</button><span>{Math.round(view.zoom * 100)}%</span><span className="canvas-help">Drag empty canvas to pan · Space + drag anywhere · scroll to zoom</span></div>
+    <div ref={boardHost} className={`board-wrap${panMode || spacePan ? ' pan-ready' : ''}${panning ? ' is-panning' : ''}`} role="region" aria-label="Evidence board. Drag empty canvas to pan, Space-drag to pan over cards, drag card headers to move cards, or scroll to zoom." tabIndex={0}
+      onKeyDownCapture={(e) => { if (e.code !== 'Space' || (e.target as HTMLElement).closest('button,input,textarea,select,a,summary,[contenteditable="true"]')) return; e.preventDefault(); e.stopPropagation(); spaceHeld.current = true; setSpacePan(true); }}
+      onPointerDownCapture={beginPan}
+      onPointerMove={(e) => { const active = pan.current; if (active?.pointerId === e.pointerId) { e.preventDefault(); setView({ ...active.origin, x: active.origin.x + e.clientX - active.x, y: active.origin.y + e.clientY - active.y }); } }}
+      onPointerUp={endPan} onPointerCancel={endPan} onLostPointerCapture={endPan}>
       <div style={{ width: Math.max(1100, size.w * view.zoom + view.x), height: Math.max(640, size.h * view.zoom + view.y), position: 'relative' }}>
       <div className="board-canvas" style={{ width: size.w, height: size.h, transform: `translate(${view.x}px,${view.y}px) scale(${view.zoom})`, transformOrigin: '0 0' }} onPointerDown={(e) => { if (e.target === e.currentTarget) select(null); }}>
         <svg className="board-links" width={size.w} height={size.h} aria-hidden="true">

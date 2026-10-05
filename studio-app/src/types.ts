@@ -38,6 +38,7 @@ export interface DocState {
 export interface Selection { board_id: string; document_revision: number; epoch: number; card_id: string | null }
 export interface CapabilityState { available: boolean; reason?: string | null; [key: string]: unknown }
 export interface Capabilities {
+  story_generation?: CapabilityState & { provider?: string; disclosure?: string };
   canvas: CapabilityState & { engine?: string }; workflow: CapabilityState & { engine?: string }; video: CapabilityState; narration: CapabilityState;
   collaboration: CapabilityState & { adapter?: string }; mcp_apps?: CapabilityState; limits?: Record<string, number>; operations?: string[]; release?: { id: string } | null;
   assistant?: { ai_available: boolean; reason?: string };
@@ -91,6 +92,11 @@ export interface RenderJob {
   phase?: 'queued' | 'preparing-assets' | 'rendering' | 'encoding' | 'finalizing' | 'completed' | 'failed' | 'canceled';
   id: string; story_id: string; story_revision: number; created: number; status: 'queued' | 'running' | 'completed' | 'failed' | 'canceled'; progress: number; error: string | null;
   manifest: { narration: { status: string; reason?: string | null; disclosure?: string }; captions_fallback: boolean } | null; artifacts: Record<string, string>;
+}
+export interface StoryGenerationJob {
+  id: string; document_id: string; document_revision: number; status: string; phase: string; progress: number;
+  story_id: string | null; render_id: string | null; error: string | null; render?: RenderJob;
+  receipt?: { provider: string; model: string } | null; can_resume?: boolean;
 }
 export type RenderSummary = Pick<RenderJob, 'id' | 'story_id' | 'story_revision' | 'status' | 'phase'> & { created: number };
 export interface WorkflowNode { id: string; type: string; label?: string; params?: Record<string, unknown>; inputs?: Record<string, string | string[]>; position?: { x: number; y: number } }

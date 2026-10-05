@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, ApiError, uid } from '../api';
 import { useStudio } from '../store';
-import type { Chapter, StoryBody, StoryView, RenderJob, RenderSummary } from '../types';
+import type { Chapter, StoryBody, StoryView, RenderJob, RenderSummary, StoryGenerationJob } from '../types';
 import { StoryPlayer } from './StoryPlayer';
 import { adaptAudience } from '../lib/audience';
 
@@ -24,6 +24,9 @@ export function StoryDirector() {
   const storyRequest = useRef(0);
   const [chosenCards, setChosenCards] = useState<string[]>(doc!.state.order);
   const timer = useRef<number | undefined>(undefined);
+  const generationTimer = useRef<number | undefined>(undefined);
+  const generationEpoch = useRef(0);
+  const [generation, setGeneration] = useState<StoryGenerationJob | null>(null);
   const dirty = Boolean(story && draft && JSON.stringify(story.body) !== JSON.stringify(draft));
 
   const accept = (next: StoryView, history = savedRenders) => {
@@ -42,6 +45,10 @@ export function StoryDirector() {
       if (!live || request !== storyRequest.current) return;
       setSavedStories(projects.stories);
       setSavedRenders(projects.renders || []);
+      const pending = projects.story_generations?.[0];
+      if (pending && (!pending.story_id || pending.story_id === projects.stories[0]?.id)) {
+        setBusy(true); void watchGeneration(pending.id, ++generationEpoch.current);
+      }
       if (!projects.stories.length) { setStatus('Choose evidence cards on the board, then create your story.'); return; }
       const next = await api.getStory(projects.stories[0].id);
       if (!live || request !== storyRequest.current) return;
@@ -52,7 +59,7 @@ export function StoryDirector() {
       }
       setStatus(`Restored saved story revision ${next.revision}.`);
     }).catch((error) => live && setStatus(errorText(error)));
-    return () => { live = false; ++storyRequest.current; ++renderEpoch.current; window.clearTimeout(timer.current); };
+    return () => { live = false; ++storyRequest.current; ++renderEpoch.current; ++generationEpoch.current; window.clearTimeout(timer.current); window.clearTimeout(generationTimer.current); };
   }, [boardId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!story || !draft) return;
@@ -63,10 +70,34 @@ export function StoryDirector() {
     } catch { notify('Browser draft storage is unavailable. Save this revision before leaving.'); }
   }, [boardId, story, draft, dirty, notify]);
 
+  const watchGeneration = async (id: string, epoch: number) => {
+    try {
+      const job = await api.storyGeneration(id);
+      if (active.current !== boardId || epoch !== generationEpoch.current) return;
+      setGeneration(job);
+      if (job.story_id && activeStory.current !== job.story_id) {
+        const next = await api.getStory(job.story_id);
+        if (active.current !== boardId || epoch !== generationEpoch.current) return;
+        accept(next);
+      }
+      if (job.render) setRender(job.render);
+      setStatus(job.error || (job.status === 'completed' ? 'Your infographic story is ready.' : 'JARVIS is preparing your infographic story…'));
+      if (['queued', 'running'].includes(job.status)) generationTimer.current = window.setTimeout(() => void watchGeneration(id, epoch), 900);
+      else setBusy(false);
+    } catch (error) {
+      if (active.current === boardId && epoch === generationEpoch.current) { setStatus(errorText(error)); setBusy(false); }
+    }
+  };
   const create = async () => {
     setBusy(true);
-    try { const next = await api.createStory(boardId, { selected_cards: chosenCards }); accept(next); setStatus('Six chapters created from the selected material. Edit the selection and prose, then save and resolve.'); }
-    catch (error) { setStatus(errorText(error)); } finally { setBusy(false); }
+    const epoch = ++generationEpoch.current;
+    window.clearTimeout(generationTimer.current); setGeneration(null);
+    setStatus('Capturing the investigation for JARVIS…');
+    try {
+      const job = await api.generateStory(boardId, doc!.revision, chosenCards);
+      if (active.current !== boardId || epoch !== generationEpoch.current) return;
+      setGeneration(job); void watchGeneration(job.id, epoch);
+    } catch (error) { if (active.current === boardId && epoch === generationEpoch.current) { setStatus(errorText(error)); setBusy(false); } }
   };
   const save = async (): Promise<StoryView | null> => {
     if (!story || !draft) return null;
@@ -99,6 +130,7 @@ export function StoryDirector() {
     catch (error) { if (active.current === boardId && epoch === renderEpoch.current) setStatus(errorText(error)); } finally { if (active.current === boardId) setBusy(false); }
   };
   const selectStory = async (id: string) => {
+    ++generationEpoch.current; window.clearTimeout(generationTimer.current); setGeneration(null);
     const request = ++storyRequest.current;
     ++renderEpoch.current; window.clearTimeout(timer.current); setRender(null); activeStory.current = id;
     setBusy(true);
@@ -125,11 +157,18 @@ export function StoryDirector() {
     setDraft({ ...draft, chapters: [...draft.chapters, next] }); setSelected(draft.chapters.length);
   };
   const chapter = draft?.chapters[selected];
+  const running = generation && ['queued', 'running'].includes(generation.status);
+  const labels: Record<string, string> = { capturing: 'Capturing your evidence', 'writing-story': 'AI& is writing the story', 'checking-evidence': 'Checking citations and composing scenes', 'preparing-assets': 'Preparing infographic visuals', rendering: 'Animating the film', encoding: 'Encoding your video', finalizing: 'Preparing downloads', completed: 'Your film is ready', saved: 'Your story is ready', 'story-ready': 'Your story is ready', failed: 'Story preparation stopped', cancelled: 'Cancelled', interrupted: 'Preparation interrupted' };
   return <section className="panel story-panel" aria-label="Story Director">
-    <div className="row"><h2>Story Director</h2><span className="chip off">{story ? `revision ${story.revision} · ${dirty ? 'unsaved draft' : 'saved'}` : 'new story'}</span></div>
-    <p role="status">{status}</p>
+    <header className="story-hero"><div className="story-spark" aria-hidden="true">✦</div><div><span className="st-eyebrow">JARVIS · Infographic stories</span><h2>Turn evidence into a story.</h2><p>Maps, checked charts and a clear narrative, composed from this investigation.</p></div><button className="btn primary story-create" disabled={busy || !canEdit || dirty || !chosenCards.length || !caps?.story_generation?.available} onClick={() => void create()}>{running ? 'Creating your story…' : '✦ Create story'}</button></header>
+    {!caps?.story_generation?.available ? <p className="muted">{caps?.story_generation?.reason || 'AI& story creation requires the local service.'}</p> : null}
+    {generation ? <div className={`story-progress ${running ? 'active' : ''}`} aria-label="Story preparation"><div className="row"><strong>{labels[generation.phase] || generation.phase.replaceAll('-', ' ')}</strong><span>{Math.round(generation.progress * 100)}%</span>{running ? <button className="btn small" onClick={async () => { const id = generation.id, epoch = generationEpoch.current; try { const job = await api.cancelStoryGeneration(id); if (epoch === generationEpoch.current) { ++generationEpoch.current; window.clearTimeout(generationTimer.current); setGeneration(job); setBusy(false); setStatus('Cancelled. Saved story material remains available.'); } } catch (error) { setStatus(errorText(error)); } }}>Cancel</button> : null}</div><div className="story-progress-track" role="progressbar" aria-label="Story creation progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(generation.progress * 100)}><div style={{ width: `${generation.progress * 100}%` }} /></div><ol className="story-steps"><li>Evidence</li><li>Narrative</li><li>Infographics</li><li>Film</li></ol></div> : null}
+    <p role="status" className="muted">{status}</p>
+    {generation?.can_resume ? <button className="btn" disabled={busy || !canEdit} onClick={async () => { setBusy(true); const epoch = ++generationEpoch.current; try { const job = await api.resumeStoryGeneration(generation.id); if (active.current === boardId && epoch === generationEpoch.current) { setGeneration(job); void watchGeneration(job.id, epoch); } } catch (error) { if (epoch === generationEpoch.current) { setBusy(false); setStatus(errorText(error)); } } }}>Finish saved storyboard</button> : null}
+    {render?.status === 'completed' && render.artifacts.video ? <div className="story-film"><video controls preload="metadata" aria-label="Generated infographic film" src={api.artifactUrl(render.id, 'video')}><track default kind="captions" srcLang="en" label="Checked story narration" src={api.artifactUrl(render.id, 'captions')} /></video><div className="row"><a className="btn primary" download="ignis-infographic.mp4" href={api.artifactUrl(render.id, 'video')}>Download film</a>{story?.resolved ? <a className="btn" href={api.exportUrl(story.id)}>Download interactive story</a> : null}</div></div> : story?.resolved && !dirty ? <StoryPlayer key={story.resolved.sha256} story={story.resolved} identity={{ story_id: story.id, story_revision: story.revision }} /> : !story ? <div className="story-empty" aria-hidden="true"><span>◉</span><span>▥</span><span>✦</span><p>Your investigation, beautifully connected.</p></div> : null}
+    <details className="story-edit"><summary>Edit story &amp; export settings{dirty ? ' · unsaved changes' : ''}</summary>
     <details><summary>Choose material for the story</summary><div className="row">{doc!.state.order.map((id) => <label key={id}><input type="checkbox" checked={chosenCards.includes(id)} onChange={(e) => setChosenCards((all) => e.target.checked ? [...all, id] : all.filter((v) => v !== id))} /> {doc!.state.cards[id].title}</label>)}</div></details>
-    <div className="row"><button className="btn primary" disabled={busy || !canEdit || dirty || !chosenCards.length} onClick={() => void create()}>Create six-chapter story</button>{savedStories.length ? <label className="field">Saved story<select value={story?.id || ''} disabled={dirty || busy} onChange={(e) => void selectStory(e.target.value)}>{savedStories.map((s) => <option value={s.id} key={s.id}>{s.title}</option>)}</select></label> : null}</div>
+    <div className="row"><button className="btn" disabled={busy || !canEdit || dirty || !chosenCards.length} onClick={async () => { setBusy(true); try { const next = await api.createStory(boardId, { selected_cards: chosenCards }); if (active.current === boardId) { accept(next); setStatus('Manual draft created. Save and resolve to preview.'); } } catch (error) { setStatus(errorText(error)); } finally { setBusy(false); } }}>Start a manual draft</button>{savedStories.length ? <label className="field">Saved story<select value={story?.id || ''} disabled={dirty || busy} onChange={(e) => void selectStory(e.target.value)}>{savedStories.map((s) => <option value={s.id} key={s.id}>{s.title}</option>)}</select></label> : null}</div>
     {draft && story ? <>
       <div className="grid2"><label className="field">Story title<input maxLength={120} value={draft.title} disabled={!canEdit || busy} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></label><label className="field">Audience<select value={draft.audience || 'researcher'} disabled={!canEdit || busy} onChange={(e) => setDraft(adaptAudience(draft, e.target.value as NonNullable<StoryBody['audience']>))}>{['public', 'student', 'researcher', 'reviewer', 'presenter'].map((v) => <option key={v}>{v}</option>)}</select></label><label className="field">Target reading duration (seconds)<input type="number" min={10} max={600} value={draft.target_duration_seconds || 120} disabled={!canEdit || busy} onChange={(e) => setDraft({ ...draft, target_duration_seconds: Number(e.target.value) })} /></label></div>
       <p className="muted">Audience changes adapt marked starter prose and explanatory detail. Your manual text and checked fields stay unchanged; values, methods and evidence scope stay fixed.</p><div className="row"><button className="btn primary" disabled={busy || !dirty || !canEdit} onClick={async () => { setBusy(true); try { await save(); } catch (error) { setStatus(errorText(error)); } finally { setBusy(false); } }}>Save revision</button><button className="btn" disabled={busy || !canEdit} onClick={() => void resolve()}>Resolve checked scenes</button><button className="btn" disabled={!canEdit || busy || draft.chapters.length >= 24} onClick={() => add()}>Add chapter</button><a className="btn" aria-disabled={dirty || !story.resolved} href={!dirty && story.resolved ? api.exportUrl(story.id) : undefined}>Export reader ZIP</a><button className="btn" disabled={busy || dirty || !story.resolved || !canEdit || !caps?.video.available} onClick={() => void startRender()}>Render documentary</button></div>
@@ -157,7 +196,8 @@ export function StoryDirector() {
         <label className="field">Viewer question<input maxLength={300} disabled={!canEdit || busy} value={chapter.question?.prompt || ''} onChange={(e) => edit(selected, { question: e.target.value ? { prompt: e.target.value, answer: chapter.question?.answer || '' } : null })} /></label>
         {chapter.question ? <label className="field">Author's answer (interpretation)<textarea maxLength={600} disabled={!canEdit || busy} value={chapter.question.answer || ''} onChange={(e) => edit(selected, { question: { ...chapter.question!, answer: e.target.value } })} /></label> : null}
       </article> : null}</div>
-      {story.resolved && !dirty ? <StoryPlayer key={story.resolved.sha256} story={story.resolved} identity={{ story_id: story.id, story_revision: story.revision }} /> : <p className="muted">Save and resolve the revision to preview its checked visuals. Editing the draft does not change an exported story or a running video.</p>}
+      <p className="muted">Editing the draft does not change a saved film. Save and resolve your changes before rendering another revision.</p>
     </> : null}
+    </details>
   </section>;
 }

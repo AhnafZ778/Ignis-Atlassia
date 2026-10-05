@@ -13,7 +13,7 @@ export interface StudioValue {
   setSharedGeometry(documentId: string, transforms: Record<string, Transform>): void;
   registerLayoutBridge(bridge: LayoutBridge | null): void;
   publishSelection(origin: string, selection: DisplaySelection, contextRevision: number, documentId: string): void;
-  open(doc: DocumentView): void; setCaps(caps: Capabilities): void; isCurrent(id: string, contextRevision?: number): boolean;
+  open(doc: DocumentView | null): void; setCaps(caps: Capabilities): void; isCurrent(id: string, contextRevision?: number): boolean;
   transact(ops: unknown[], extra?: Record<string, unknown>): Promise<DocumentView | null>;
   undo(): Promise<void>; redo(): Promise<void>; reload(): Promise<boolean>; resolveConflict(choice: 'reload' | 'retry'): Promise<void>;
   select(id: string | null): void; notify(message: string | null): void; addSnapshot(snapshot: Snapshot): void; loadReport(id: string): Promise<SnapshotReport | null>;
@@ -76,7 +76,7 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isCurrent = useCallback((id: string, contextRevision?: number) => docRef.current?.id === id && (contextRevision === undefined || docRef.current?.context_revision === contextRevision), []);
-  const open = useCallback((next: DocumentView) => { epoch.current++; setReports({}); setBusy(false); setConflict(null); setSelected(next.selection?.card_id ?? null); commit(mergeDocument(docRef.current, next)); }, [commit]);
+  const open = useCallback((next: DocumentView | null) => { epoch.current++; setReports({}); setBusy(false); setConflict(null); setSelected(next?.selection?.card_id ?? null); commit(next ? mergeDocument(docRef.current, next) : null); }, [commit]);
 
   const run = useCallback(async (ops: unknown[], extra: Record<string, unknown>, target: string, requestEpoch: number): Promise<DocumentView | null> => {
     const current = docRef.current;

@@ -32,6 +32,8 @@ async function request<T>(method: string, path: string, body?: unknown, key?: st
 
 const enc = encodeURIComponent;
 export const api = {
+  promptPresets: () => request<{presets: {id:string; title:string; prompt:string; operation?:string}[]}>('GET','prompt-presets'),
+  promptCommand: (body: unknown, key = idempotencyKey()) => request<any>('POST','prompt-commands',body,key),
   registerContext: (body: unknown) => request<any>('POST', 'contexts', body),
   submitCommand: (body: unknown, key = idempotencyKey()) => request<any>('POST', 'commands', body, key),
   instanceCommands: (instance: string) => request<{ commands: any[] }>('GET', `contexts/${enc(instance)}/commands`),
@@ -54,7 +56,8 @@ export const api = {
   listDocuments: () => request<{ documents: { id: string; title: string; revision: number; updated: number; owner: boolean }[] }>('GET', 'documents'),
   createDocument: (title: string, study?: unknown) => request<DocumentView>('POST', 'documents', { title, study }, idempotencyKey()),
   getDocument: (id: string) => request<DocumentView>('GET', `documents/${enc(id)}`),
-  projects: (id: string) => request<{ stories: { id: string; title: string; revision: number }[]; workflow: { id: string; revision: number; definition: WorkflowDefinition } | null; renders?: import('./types').RenderSummary[]; renders_total?: number }>('GET', `documents/${enc(id)}/projects`),
+  deleteDocument: (id: string, expectedRevision: number, key = idempotencyKey()) => request<{ id: string; deleted: boolean }>('DELETE', `documents/${enc(id)}`, { expected_revision: expectedRevision }, key),
+  projects: (id: string) => request<{ story_generations?: { id: string; status: string; story_id: string | null }[]; stories: { id: string; title: string; revision: number }[]; workflow: { id: string; revision: number; definition: WorkflowDefinition } | null; renders?: import('./types').RenderSummary[]; renders_total?: number }>('GET', `documents/${enc(id)}/projects`),
   transact: (id: string, baseRevision: number, ops: unknown[], extra: Record<string, unknown> = {}) =>
     request<DocumentView>('POST', `documents/${enc(id)}/transactions`, { base_revision: baseRevision, ops, ...extra }, idempotencyKey()),
   undo: (id: string) => request<DocumentView>('POST', `documents/${enc(id)}/undo`, {}, idempotencyKey()),
@@ -64,11 +67,16 @@ export const api = {
   resolveBinding: (id: string, binding: Binding) => request<{ snapshot: Snapshot; freshness: { fresh: boolean } }>('POST', `documents/${enc(id)}/bindings/resolve`, { binding }),
   snapshotReport: (id: string, sid: string) => request<SnapshotReport>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}`),
   snapshotReceipt: (id: string, sid: string) => request<{ receipt: { payload: any; operation: string } }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/receipt`),
-  snapshotPreview: (id: string, sid: string, type: string, day?: string, source = 'joint', selection: { start?: string; end?: string; cell?: string } = {}) => request<{ svg: string; visual: any; snapshot_sha256: string }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/preview?${new URLSearchParams({ type, source, ...(day ? { day } : {}), ...selection })}`),
+  snapshotLandscape: (id: string, sid: string, background: string) => request<any>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/landscape?background=${enc(background)}`),
+  snapshotPreview: (id: string, sid: string, type: string, day?: string, source = 'joint', selection: { start?: string; end?: string; cell?: string; background?: string } = {}) => request<{ svg: string; visual: any; snapshot_sha256: string }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/preview?${new URLSearchParams({ type, source, ...(day ? { day } : {}), ...selection })}`),
   uploadAsset: (id: string, data: string, license: string, attribution: string) =>
     request<{ id: string; sha256: string; mime: string }>('POST', `documents/${enc(id)}/assets`, { data, license, attribution }),
   assetUrl: (assetId: string) => base() + `assets/${enc(assetId)}`,
   createStory: (id: string, body: Partial<StoryBody> & { selected_cards?: string[] } = {}) => request<StoryView>('POST', `documents/${enc(id)}/stories`, body, idempotencyKey()),
+  generateStory: (id: string, revision: number, cards: string[]) => request<import('./types').StoryGenerationJob>('POST', `documents/${enc(id)}/story-generations`, { expected_revision: revision, selected_cards: cards }, idempotencyKey()),
+  storyGeneration: (id: string) => request<import('./types').StoryGenerationJob>('GET', `story-generations/${enc(id)}`),
+  cancelStoryGeneration: (id: string) => request<import('./types').StoryGenerationJob>('POST', `story-generations/${enc(id)}/cancel`, {}),
+  resumeStoryGeneration: (id: string) => request<import('./types').StoryGenerationJob>('POST', `story-generations/${enc(id)}/resume`, {}),
   getStory: (id: string, revision?: number) => request<StoryView>('GET', `stories/${enc(id)}${revision ? `?revision=${revision}` : ''}`),
   updateStory: (id: string, expectedRevision: number, story: StoryBody) => request<StoryView>('PATCH', `stories/${enc(id)}`, { expected_revision: expectedRevision, story }, idempotencyKey()),
   resolveStory: (id: string) => request<{ resolved: StoryView['resolved']; document_revision: number }>('POST', `stories/${enc(id)}/resolve`, {}),
