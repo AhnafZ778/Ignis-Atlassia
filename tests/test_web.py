@@ -43,26 +43,29 @@ class WebMvpTests(unittest.TestCase):
         limit = b"Ignis-Atlassia is a research and learning tool. It is not an operational fire-management, evacuation, or flight-planning tool."
         _, home = self.get("/")
         self.assertIn(limit, home)
-        _, method = self.get("/method.html")
+        _, method = self.get("/evidence.html?tab=calibration")
         self.assertIn(limit, method)
-        _, sources = self.get("/data.html")
+        _, sources = self.get("/evidence.html?tab=sources")
         self.assertIn(b"archive-coverage", sources)
         self.assertIn(b"Source versions, request dates and file fingerprints", sources)
-        self.assertIn(b"/docs/DATA.md", sources)
+        self.assertIn(b"docs/DATA.md", sources)
         self.assertIn(b"AI assistance helped with code and documentation", sources)
         self.assertIn(b"No independent scientific reviewer is recorded yet", sources)
 
     def test_focused_analysis_pages_load_directly(self):
         pages = {
             "/atlas.html": b'id="harmonized-calendar"',
-            "/replay.html": b"Observed detections, not simulated spread",
+            "/investigate.html": b'id="mission-map-stage"',
             "/research.html": b'id="overview-controls"',
-            "/research-candidates.html": b'id="candidate-list"',
-            "/research-exposure.html": b'id="coverage-file"',
-            "/research-validation.html": b'id="validation-gates"',
-            "/data.html": b'id="archive-region-list"',
-            "/method.html": b'id="data-flow"',
-            "/review.html": b'id="review-samples"',
+            "/evidence.html": b'id="review-samples"',
+            "/replay.html": b'fireatlas-canonical',
+            "/assistant.html": b'fireatlas-canonical',
+            "/research-candidates.html": b'research.html?tab=candidates',
+            "/research-exposure.html": b'research.html?tab=exposure',
+            "/research-validation.html": b'evidence.html?tab=method',
+            "/data.html": b'evidence.html?tab=sources',
+            "/method.html": b'evidence.html?tab=method',
+            "/review.html": b'evidence.html?tab=reproduce',
         }
         for route, marker in pages.items():
             with self.subTest(route=route):
@@ -82,7 +85,7 @@ class WebMvpTests(unittest.TestCase):
         self.assertEqual(len(bundle["frames"]), 22)
 
     def test_native_review_form_is_served_and_hash_bound_template_is_available(self):
-        _, page = self.get("/review.html?case=grove-2025")
+        _, page = self.get("/evidence.html?tab=reproduce&case=grove-2025")
         self.assertIn(b"id=\"review-samples\"", page)
         self.assertIn(b"Download review JSON", page)
         _, script = self.get("/review.js")
@@ -101,12 +104,12 @@ class WebMvpTests(unittest.TestCase):
             for product in region["products"].values():
                 self.assertIn("complete_months", product)
                 self.assertIn("missing_months", product)
-        _, page = self.get("/data.html")
+        _, page = self.get("/evidence.html?tab=sources")
         self.assertIn(b'id="archive-region-list"', page)
         self.assertIn(b"Which months are actually loaded?", page)
 
     def test_paired_daily_evidence_bundles_download_from_data_page(self):
-        _, page = self.get("/data.html")
+        _, page = self.get("/evidence.html?tab=sources")
         self.assertIn(b"Reproducible daily bundles", page)
         for region in ("norcal", "punjab-haryana"):
             headers, compressed = self.get(f"/samples/aggregates/{region}.json.gz")
@@ -118,11 +121,11 @@ class WebMvpTests(unittest.TestCase):
             self.assertEqual(len(evidence["inputs"]), 8)
 
     def test_calibration_artifacts_are_downloadable_and_method_page_uses_them(self):
-        _, page = self.get("/method.html")
+        _, page = self.get("/evidence.html?tab=calibration")
         self.assertIn(b'id="calibration-download"', page)
         self.assertIn(b'id="calibration-provenance"', page)
         _, script = self.get("/calibration-validation.js")
-        self.assertIn(b"new URL(`samples/calibration/", script)
+        self.assertIn(b"calibration actually used by the selected calendar", script)
         self.assertIn(b"document.baseURI", script)
         self.assertNotIn(b"/api/v2/calendar?", script)
         for region in ("norcal", "punjab-haryana"):
@@ -136,7 +139,8 @@ class WebMvpTests(unittest.TestCase):
     def test_calendar_map_observations_and_exports(self):
         _, home = self.get("/")
         _, atlas = self.get("/atlas.html")
-        self.assertIn(b"NASA SPACE APPS 2026", atlas)
+        self.assertIn(b"Harmonized activity", atlas)
+        self.assertIn(b"Combined detections", atlas)
         self.assertIn(b'id="harm-official-links"', atlas)
         _, calendar_script = self.get("/harmonized.js")
         self.assertIn(b"state?.availability?.notices", calendar_script)
@@ -159,12 +163,12 @@ class WebMvpTests(unittest.TestCase):
         self.assertIn(b"validity-unknown", validity_script)
         _, validity_style = self.get("/validity.css")
         self.assertIn(b"same state grammar", validity_style)
-        calendar_panel = atlas.split(b'<section id="harmonized-calendar"', 1)[1]
+        calendar_panel = atlas.split(b'id="harmonized-calendar"', 1)[1]
         verdict_index = calendar_panel.index(b'id="harm-verdict"')
         links_index = calendar_panel.index(b'id="harm-official-links"')
         heading_index = calendar_panel.index(b'class="harmonized-heading"')
         self.assertLess(verdict_index, links_index)
-        self.assertLess(links_index, heading_index)
+        self.assertLess(heading_index, verdict_index)
         self.assertNotIn(b"archive-timeline", atlas)
         self.assertNotIn(b"Burning activity calendar", home)
         self.assertIn(b"Open the atlas", home)
@@ -247,7 +251,7 @@ class WebMvpTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, 400)
 
     def test_data_status_and_cross_origin_sync_rejection(self):
-        _, page = self.get("/data.html")
+        _, page = self.get("/evidence.html?tab=sources")
         self.assertIn(b"NASA FIRMS", page)
         _, body = self.get("/api/data/status")
         status = json.loads(body)
@@ -355,14 +359,16 @@ class WebMvpTests(unittest.TestCase):
                 self.get(path)
             self.assertEqual(caught.exception.code, 404)
         _, home = self.get("/")
-        _, data = self.get("/data.html")
+        _, data = self.get("/evidence.html?tab=sources")
         for page in (home, data):
             self.assertNotIn(b"live-events", page)
             self.assertNotIn(b"NASA EONET", page)
 
     def test_research_report_mask_import_and_input_validation(self):
         _, page = self.get("/research.html")
-        self.assertIn(b"EXPLORATORY RESEARCH", page)
+        self.assertIn(b"Research Lab", page)
+        for tab in (b"Comparison", b"Candidate Groups", b"Sensitivity", b"Exposure"):
+            self.assertIn(tab, page)
         _, body = self.get("/api/research")
         report = json.loads(body)
         self.assertEqual(report["raw_pixels"], 16)

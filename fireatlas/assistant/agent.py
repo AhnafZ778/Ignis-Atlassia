@@ -9,7 +9,38 @@ import time
 from pathlib import Path
 from typing import Literal
 
-from .contracts import DESTINATIONS, LIMITATION, normalize_context, pointer
+from .contracts import DESTINATIONS, LIMITATION, normalize_context, pointer, digest
+
+
+def infer_tool_plan(message, context, view=None):
+    """Conservative recovery hints; the model still chooses all registered tools.
+
+    Never pre-query a new place/date or substitute a context for an explicit
+    question. Hints apply only to the submitted selection and are not an
+    allowlist. The scientific registry validates every actual operation.
+    """
+    text = str(message or "").lower()
+    scoped = bool(re.search(r"\b(this|selected|current|displayed|these|our)\b", text))
+    if not scoped or re.search(r"\b(canvas|whiteboard|workflow|export|undo|arrange|navigate|zoom|pan|annotate|label)\b", text):
+        return None
+    if (view or {}).get('selection'):
+        return None
+    # Explicit dates/locations must be resolved by the model, not inferred.
+    if re.search(r"\b(?:in|near|around|at|for|of|from|between|during|on)\s+(?!this\b|the\b|our\b|selected\b|current\b)[a-z]|\d|\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b", text):
+        return None
+    rules = (
+        ('missingness', r'\b(missing|gaps?|coverage|cloud|availability|export status)\b'),
+        ('availability', r'\b(inventory|which sources|what data)\b'),
+        ('harmonized', r'\b(harmonized|viirs.equivalent|regional calendar|median|percentile|anomaly)\b'),
+        ('sensitivity', r'\b(sensitivity|thresholds?)\b'),
+        ('research', r'\b(overlap|candidate|clusters?|compare sensors|compare sources)\b'),
+        ('persistence', r'\b(persistence|persist|repeated)\b'),
+        ('observations', r'\b(original|raw|records)\b'),
+        ('replay', r'\b(heatmap|map|detections?|observations?|graph|chart|plot|counts?|modis|viirs)\b'),
+        ('method', r'\b(method|definition|means?|meaning|how)\b'),
+    )
+    operation = next((name for name, pattern in rules if re.search(pattern, text)), None)
+    return {'operation': operation, 'arguments': {}} if operation else None
 
 
 def provider_config():
@@ -146,6 +177,19 @@ def guided_answer(evidence):
         add("/summary/eligible_unique_detections","Eligible unique detections","records")
         add("/summary/joint_cell_days","Distinct union","cell-days")
         add("/summary/detected_days","Days with imported detections","UTC days")
+    elif op=="harmonized":
+        selected=f"{evidence['context']['year']:04d}-{evidence['context']['month']:02d}"
+        for i,month in enumerate(payload.get('months',[])):
+            if month.get('month')!=selected:continue
+            for key,label,unit in (
+                ('value','Harmonized monthly activity','VIIRS-equivalent cell-days'),
+                ('observed_days','Observed days','UTC days'),('estimated_days','Estimated days','UTC days'),
+                ('unknown_days','Unknown days','UTC days'),('baseline_median','Comparable prior median','VIIRS-equivalent cell-days'),
+                ('anomaly_cell_days','Difference from prior median','VIIRS-equivalent cell-days'),
+                ('n_years','Comparable prior years','years'),('percentile_rank','Supported percentile','percent'),
+                ('verdict','Available comparison and limitations','reported interpretation')):
+                add(f'/months/{i}/'+key,label,unit)
+            break
     elif op=="observations":
         add("/total","Full matching original records","records")
         add("/returned","Records in this page","records")
@@ -177,6 +221,7 @@ def guided_answer(evidence):
 
 def run_agent(service, owner, message, context, view, cancel, deadline, progress, images=None, model=None):
     config = provider_config()
+    plan = infer_tool_plan(message, context, view)
     if not config["configured"]:
         raise ValueError("AI is not configured. Add a server-side provider key and verified pricing. The scientific action buttons already work with stored data.")
     from pydantic import BaseModel, Field
@@ -224,12 +269,60 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
     if not free_only and (config["input_price"] is None or config["output_price"] is None or min(config["input_price"],config["output_price"])<=0):
         raise ValueError("Provider pricing must be positive and verified before public AI is enabled.")
     results=[]
+    used_models=[]
+    call_costs=[]
+    completed_effects=[]
+
+    def checked_fallback(reason=None):
+        """Publish checked deterministic evidence when wording cannot be verified.
+
+        A provider/model is allowed to fail after a tool has completed.  In
+        that case throwing away the verified calculation is the wrong user
+        experience: the cards and evidence inspector can still answer the
+        request exactly.  This function never fabricates prose or values.
+        """
+        if not results:
+            return None
+        preferred = (plan or {}).get("operation")
+        evidence = next((r for r in reversed(results) if not preferred or r.get("operation") == preferred), results[-1])
+        answer = guided_answer(evidence)
+        if evidence['operation'] == 'replay' and context.get('day') and re.search(r'\b(selected (?:utc )?day|displayed (?:day|frame)|this frame|this day)\b', message, re.I):
+            # A fallback about a frame must not silently answer with whole-study
+            # totals. These candidates retain the date and each source's unit.
+            answer['claims'] = evidence_preview(evidence, context).get('selected_frame_claims', [])[:12]
+            answer['title'] = 'Selected UTC frame evidence'
+        answer.update({
+            "provider": config.get("provider"),
+            "model": used_models[-1] if used_models else config.get("model"),
+            "free_only": config.get("free_only", False),
+            "analysis_depth": config.get("analysis_depth"),
+            "ai_wording_unavailable": True,
+            "tool_route": {"operation": evidence.get("operation"), "basis": "checked tool output"},
+            "estimated_cost_usd": sum(call_costs)/1e6 if call_costs and all(c is not None for c in call_costs) else None,
+        })
+        if reason:
+            answer["fallback_reason"] = type(reason).__name__ if isinstance(reason, Exception) else str(reason)
+        return answer
+
+    def effect_answer():
+        if not completed_effects:
+            return None
+        commands = [e['result'] for e in completed_effects if e['tool'] == 'run_studio_recipe']
+        proposals = [e['result'] for e in completed_effects if e['tool'] == 'draft_studio_action']
+        text = ('The Canvas command is saved. Its progress and saved board are available below; opening the board is acknowledged separately.'
+                if commands else 'The presentation draft is saved. Inspect and apply its typed changes below.')
+        return {'title': 'Canvas command saved' if commands else 'Presentation draft prepared', 'summary': text,
+                'kind': 'Checked Canvas operation', 'claims': [], 'evidence_ids': [], 'actions': [],
+                'studio_commands': commands, 'studio_proposals': proposals, 'limitations': [], 'spoken_summary': text,
+                'provider': config['provider'], 'model': used_models[-1] if used_models else config['model']}
+
     visual_requested=bool(re.search(r'\b(?:graph|chart|diagram)\b|\bexplain\b.*\bvisually\b',message,re.I))
     diagram_requested=bool(re.search(r'\bdiagram\b',message,re.I)) and not re.search(r'\b(?:graph|chart)\b',message,re.I)
     # The three published examples have known workflows. Supply their exact
     # evidence once, instead of making the model rediscover it over many turns.
     preset=None
-    selection_preset=message.startswith(('Inspect the selected cell.','Inspect the selected observation using its exact evidence path.'))
+    selection_preset=(message.startswith(('Inspect the selected cell.','Inspect the selected observation using its exact evidence path.'))
+        or bool((view.get('selection') or {}).get('path') and re.search(r'\b(?:selected (?:cell|sample|observation|record)|this (?:cell|sample|observation|record))\b',message,re.I)))
     if message.startswith('Check the selected study’s source availability.'):
         preset='missingness'
     elif message.startswith('Search historical detection windows from 2006 onward'):
@@ -257,6 +350,12 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
         prepared_selection={'result_id':previous['id'],'path':chosen['path'],'selected_observation':cell,'scalar_claim_paths':{k:chosen['path']+'/'+k for k,v in cell.items() if type(v) in (int,float,str)}}
         if chosen['path'].startswith('/frames/'):
             f=int(chosen['path'].split('/')[2]);prepared_selection['frame_products']=previous['payload']['frames'][f]['products'];prepared_selection['frame_products_path']=f'/frames/{f}/products'
+    studio_view = view.get('studio') if getattr(service, 'studio_bridge', None) else None
+    if studio_view:
+        # This view is constructed by Studio's ownership boundary, never copied from a public URL.
+        service.studio_bridge.access(owner, studio_view['document_id'])
+        for identifier in studio_view.get('frozen_evidence_ids', [])[:6]:
+            results.append({'id': identifier, **service.store.get_artifact(owner, identifier, 'evidence')['body']})
     if preset:
         progress(preset)
         results.append(service.science.call(owner,preset,context,{'first_year':2006} if preset=='archive_search' else {},cancel,deadline))
@@ -264,8 +363,6 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
     ambiguous_place_ids=set()
     resolved_places=[]
     annotated_figures=[]
-    used_models=[]
-    call_costs=[]
     instructions=Path(__file__).with_name("system.md").read_text()
     class BudgetModel(WrapperModel):
         async def request(self,messages,model_settings,model_request_parameters):
@@ -371,9 +468,53 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
             result={'id':result_id,**service.store.get_artifact(owner,result_id,'evidence')['body']}
         except (PermissionError,ValueError):
             raise ModelRetry('Use the exact evidence id supplied by the current selection, earlier findings, or an investigation tool. This evidence is unavailable to this workspace.') from None
-        if result['release_id']!=service.science.release()['id']:
+        if result['release_id']!=service.science.release()['id'] and result_id not in (studio_view or {}).get('frozen_evidence_ids', []):
             raise ModelRetry('The evidence belongs to an older data release. Recalculate it before inspecting, comparing, or annotating.')
         return result
+    if studio_view:
+        @agent.tool_plain
+        def studio_board() -> dict:
+            """Read bounded current Studio card references, geometry and checked facts before drafting changes."""
+            if cancel.is_set() or time.monotonic() > deadline:
+                raise InterruptedError('Investigation stopped.')
+            return service.studio_bridge.board(owner, studio_view['document_id'])
+
+        from ..studio.errors import StudioError as StudioActionError
+
+        @agent.tool_plain
+        def draft_studio_action(action: Literal['build_investigation', 'arrange_cards', 'create_story_draft', 'create_workflow_draft'], arguments: dict, base_revision: int) -> dict:
+            """Draft a typed, reversible presentation action for explicit user application. Use existing card IDs and the current board revision. Never invent numeric chart data or execute code. Story drafts choose selected_cards, title and audience."""
+            if cancel.is_set() or time.monotonic() > deadline:
+                raise InterruptedError('Investigation stopped.')
+            try:
+                result = service.studio_bridge.propose(owner, studio_view['document_id'], action, arguments, base_revision)
+                completed_effects.append({'tool': 'draft_studio_action', 'result': result})
+                return result
+            except (ValueError, PermissionError, StudioActionError) as error:
+                raise ModelRetry(str(error)) from None
+
+    if (studio_view and studio_view.get('captured_context')) or (view.get('jarvis_attachment_id') and getattr(service,'studio_bridge',None)):
+        from ..studio.errors import StudioError as StudioActionError
+        @agent.tool_plain
+        def run_studio_recipe(recipe: Literal['visualization_to_investigation', 'selection_to_chart_set', 'findings_to_workflow', 'board_to_portable_exports', 'continue_investigation'], arguments: dict) -> dict:
+            """Execute the user's requested deterministic Canvas recipe using the attached frozen instance selection. Use only when the user requests packaging, charts, a workflow, a local export or a selected-object follow-up. For package + charts + workflow + entire-whiteboard export, call visualization_to_investigation once with arguments.export_formats=['native','excalidraw']; the runner prepares exports without rerunning science. Never send externally. Return the saved command ID; saving and actual browser display are separate. Repeating the same intent resumes its saved outputs."""
+            if cancel.is_set() or time.monotonic() > deadline: raise InterruptedError('Investigation stopped.')
+            try:
+                if studio_view:
+                    captured=studio_view['captured_context']
+                    result=service.studio_bridge.command(owner,studio_view['document_id'],recipe,arguments,captured,
+                        'jarvis:'+studio_view['run_nonce']+':'+digest({'recipe':recipe,'arguments':arguments}))
+                else:
+                    result=service.studio_bridge.surface_command(owner,view['jarvis_attachment_id'],context,recipe,arguments,
+                        'jarvis:'+view['jarvis_run_nonce']+':'+digest({'recipe':recipe,'arguments':arguments}))
+                if cancel.is_set():
+                    service.studio_bridge.cancel_commands(owner,view.get('jarvis_run_nonce') or studio_view['run_nonce'])
+                    raise InterruptedError('Investigation stopped.')
+                saved = {k:result[k] for k in ('id','status','phase','outputs','message')}
+                completed_effects.append({'tool': 'run_studio_recipe', 'result': saved})
+                return saved
+            except (ValueError, PermissionError, StudioActionError) as error: raise ModelRetry(str(error)) from None
+
     @agent.tool_plain
     def resolve_study_place(place: str) -> dict:
         """Find geographic places or saved fires. Use returned place_id in a focus_place action to move the camera. Ambiguous results require a choice; geography never supplies fire measurements."""
@@ -425,6 +566,8 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
             if draft.claims or draft.visualizations:
                 raise ModelRetry("A clarification must have no measurement claims. Ask one clear location/date question.")
             return draft
+        if not results and not completed_effects and not draft.actions and not annotated_figures:
+            raise ModelRetry('No tool has been used yet. Choose the registered tool that performs the requested task: investigate for calculations, resolve_study_place for geography, run_studio_recipe for attached Canvas work, or draft_studio_action for an owned board draft. Use the actual returned IDs. If the needed view or tool is unavailable, return one specific clarification without measurement claims.')
         by_id={r["id"]:r for r in results}
         for claim in draft.claims:
             if claim.result_id not in by_id:
@@ -445,8 +588,8 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
         return draft
 
     @agent.tool_plain
-    def investigate(operation: str, context_overrides: dict | None = None, arguments: dict | None = None) -> dict:
-        """Query stored evidence. Supported operations: archive_search, availability, observations, replay, research, calendar, harmonized, persistence, missingness, compare, sensitivity, exposure, validation, method, sources. Values in claims use JSON pointers into returned payload. Context overrides must describe the scientist's requested study; do not silently narrow it."""
+    def investigate(operation: Literal['archive_search', 'availability', 'observations', 'replay', 'research', 'calendar', 'harmonized', 'persistence', 'missingness', 'compare', 'sensitivity', 'exposure', 'validation', 'method', 'sources'], context_overrides: dict | None = None, arguments: dict | None = None) -> dict:
+        """Choose the operation that answers the user's request: replay=heatmap/timeline/daily sensor readings (31 days/10000 rows); harmonized=exact supported regional activity/median/gap scaling; research=monthly sensor overlap/candidate groups; observations=original row pagination; missingness=export gaps by date; persistence=distinct observed dates; compare=two dated cell sets; sensitivity=bounded grouping variants; availability=source inventory; archive_search=historical month windows with first_year/last_year; validation=Park/Grove gates; method=definitions; sources=curated references. calendar is the generic union, not harmonized. Use study_month for explicit monthly research intersections. Context overrides must follow the user's requested study; never silently narrow it. Claim paths refer to payload and the returned ID."""
         if cancel.is_set() or time.monotonic()>deadline:
             raise InterruptedError("Investigation stopped.")
         overrides=context_overrides or {}
@@ -545,7 +688,7 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
             if cancel.is_set():raise InterruptedError('Investigation stopped.')
             return call(connector,tool,arguments)
     history=[{"question":a["body"].get("question"),"title":a["body"].get("title"),"context":a["body"].get("context"),"evidence_ids":a["body"].get("evidence_ids")} for a in reversed(service.store.artifacts(owner,"answer")[:6])]
-    prompt=json.dumps({"question":message,"attached_figures":[{"id":r["id"],"caption":r["body"]["caption"],"regions":r["body"].get("regions",[])} for r in service.store.artifacts(owner,"image")[:2] if r["body"]["revision"]==context["revision"]] if images else [],"prepared_selection":prepared_selection,"prepared_evidence":[evidence_preview(r,context) for r in results],"recent_investigations":history,"context":context,"view":view,"selected_evidence":view.get("selection"),"destinations":list(DESTINATIONS),"visual_targets":__import__("fireatlas.assistant.presentation",fromlist=["TARGETS"]).TARGETS,"curated_connectors":[{"id":c["id"],"tools":c["tools"],"scope":c["scope"]} for c in approved]},allow_nan=False)
+    prompt=json.dumps({"question":message,"available_operations": __import__("fireatlas.assistant.science",fromlist=["OPERATIONS"]).OPERATIONS,"attached_figures":[{"id":r["id"],"caption":r["body"]["caption"],"regions":r["body"].get("regions",[])} for r in service.store.artifacts(owner,"image")[:2] if r["body"]["revision"]==context["revision"]] if images else [],"prepared_selection":prepared_selection,"prepared_evidence":[evidence_preview(r,context) for r in results],"recent_investigations":history,"context":context,"view":view,"selected_evidence":view.get("selection"),"studio":studio_view,"destinations":list(DESTINATIONS),"visual_targets":__import__("fireatlas.assistant.presentation",fromlist=["TARGETS"]).TARGETS,"curated_connectors":[{"id":c["id"],"tools":c["tools"],"scope":c["scope"]} for c in approved]},allow_nan=False)
     inputs=[prompt]
     if images:
         from pydantic_ai import BinaryContent
@@ -561,12 +704,20 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
     elif config['provider']=='aiand':settings.update({'openai_reasoning_effort':config['reasoning_effort'],'openai_store':False,'parallel_tool_calls':False})
     elif config["provider"]=="google": settings["google_thinking_config"]={"thinking_level":"LOW"}
     else:settings.update({"openai_reasoning_effort":"low","openai_store":False})
-    from pydantic_ai.exceptions import UnexpectedModelBehavior, UsageLimitExceeded
+    from pydantic_ai.exceptions import UnexpectedModelBehavior, UsageLimitExceeded, ModelAPIError
     try:
         # A checked figure accompanies successive tool calls. Its billed image
         # tokens need a separate bounded allowance, without changing USD caps.
         response=agent.run_sync(inputs,usage_limits=UsageLimits(request_limit=4 if free_only else 8,input_tokens_limit=30000 if images and not free_only else 20000,output_tokens_limit=6000,tool_calls_limit=12), model_settings=settings)
-    except (UnexpectedModelBehavior,UsageLimitExceeded) as error:
+    except (UnexpectedModelBehavior,UsageLimitExceeded,ModelAPIError) as error:
+        if cancel.is_set() or time.monotonic() > deadline:
+            raise InterruptedError('Investigation stopped or timed out.') from None
+        # Persisted effects remain real even if the model cannot describe them.
+        # In particular a command ID is not a scientific scalar receipt.
+        effected = effect_answer()
+        if effected:
+            effected['ai_wording_unavailable'] = True
+            return effected
         if prepared_selection and not cancel.is_set():
             chosen=prepared_selection;cards=[]
             for key in ('source_id','platform','acquisition_utc','modis_detections','viirs_detections','modis_frp_max_mw','viirs_frp_max_mw','frp_mw','confidence','longitude','latitude'):
@@ -576,7 +727,8 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
                 if chosen.get('frame_products_path'):cards.append(fact(results[0],chosen['frame_products_path']+'/'+source+'/label'))
             text='Recorded satellite sample. Inspect the linked sensor readings and source export status; this sample does not establish a fire perimeter or continuous coverage.'
             existing=any(r['body'].get('result_id')==chosen['result_id'] and r['body'].get('path')==chosen['path'] for r in service.store.artifacts(owner,'annotation'))
-            if not existing:annotate_evidence(chosen['result_id'],chosen['path'],text)
+            if not existing and re.search(r'\b(?:annotate|label|mark|pin)\b',message,re.I):
+                annotate_evidence(chosen['result_id'],chosen['path'],text)
             return {'title':'Selected observation evidence','summary':text,'kind':'Checked selected-sample workflow','claims':cards[:12],'evidence_ids':[chosen['result_id']],'actions':[],'limitations':[LIMITATION],'spoken_summary':text,'ai_wording_unavailable':True,'provider':config['provider'],'model':used_models[-1] if used_models else config['model'],'estimated_cost_usd':sum(call_costs)/1e6 if call_costs and all(c is not None for c in call_costs) else None}
         if unresolved_places and resolved_places and not cancel.is_set():
             text='Several geographic places matched. Choose the place below to move the camera; your study dates and observation boundary stay unchanged.'
@@ -598,14 +750,45 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
                 answer['summary']=('Both source export requests are complete throughout this study. Dates without imported records are listed separately below. ' if complete else 'Incomplete source exports and dates without imported records are listed separately below. ')+'Neither state establishes no fire or clear satellite coverage. The daily status table is the authoritative record.'
             answer.update({'kind':'Checked archive workflow','provider':config['provider'],'model':used_models[-1] if used_models else config['model'],'analysis_depth':config.get('analysis_depth'),'ai_wording_unavailable':True,'estimated_cost_usd':sum(call_costs)/1e6 if call_costs and all(c is not None for c in call_costs) else None})
             return answer
-        if isinstance(error,UsageLimitExceeded):raise ValueError('The question exceeded its bounded analysis allowance. Retrieved evidence is saved; no unsupported answer was published.') from None
-        raise ValueError("The AI could not verify its answer against the retrieved records. No unchecked answer was published. Try a narrower question or use a stored-data task.") from None
+        # Malformed model drafts and framework validation errors take the
+        # same safe path once a checked result exists.
+        # The user receives the exact scalar cards and can continue inspecting
+        # evidence instead of being forced into a narrower retry.
+        fallback = checked_fallback(error)
+        if fallback and not unresolved_places:
+            return fallback
+        if isinstance(error,ModelAPIError):
+            # Never repeat an uncertain provider call or mask an unavailable
+            # provider as a successful command.
+            raise
+        if not results and plan and not unresolved_places:
+            try:
+                progress(plan['operation'])
+                results.append(service.science.call(owner,plan['operation'],context,plan['arguments'],cancel,deadline))
+            except ValueError as scope_error:
+                text = str(scope_error)
+                return {'title':'Choose a supported analysis scope','summary':text,'kind':'Study clarification',
+                        'claims':[],'evidence_ids':[],'actions':[],'limitations':[], 'spoken_summary':text}
+            return checked_fallback(error)
+        # No factual answer or mutation occurred. Explain the missing input;
+        # don't repeat a generic source-verification error for editor commands.
+        text = ('Attach the calculated view using “Attach this view to JARVIS”, or open its saved Canvas board, then ask for the Canvas operation again.'
+                if re.search(r'\b(canvas|whiteboard|package|workflow|export)\b',message,re.I) and not studio_view and not view.get('jarvis_attachment_id')
+                else 'Which displayed study, selected record or saved board should I use? Select it and name the calculation or view change you want.')
+        return {'title':'Select the command source','summary':text,'kind':'Command clarification',
+                'claims':[],'evidence_ids':[],'actions':[],'limitations':[], 'spoken_summary':text}
     if cancel.is_set() or time.monotonic()>deadline:
         raise InterruptedError("Investigation stopped.")
     draft=response.output
     inference_metadata={"analysis_depth":config.get('analysis_depth'),
         "estimated_cost_usd":sum(call_costs)/1e6 if call_costs and all(c is not None for c in call_costs) else None,
         "price_basis":config.get('price_basis'),"inference_calls":len(used_models)}
+    if completed_effects:
+        answer = effect_answer()
+        answer.update(inference_metadata)
+        # Return actual typed outputs, not model assertions that a board has
+        # already opened. Browser handoff continues using command identity.
+        return answer
     if draft.clarification:
         return {"title":"Clarify the study", "summary":draft.clarification,"kind":"AI clarification","places":resolved_places,"claims":[],"evidence_ids":[],"actions":[service.action(owner,a.destination,context,view,a.result_id,a.options) for a in draft.actions],"limitations":[],"spoken_summary":draft.clarification,"provider":config['provider'],"model":used_models[-1] if used_models else config['model'],"free_only":free_only,**inference_metadata}
     if not results and (draft.actions or annotated_figures):

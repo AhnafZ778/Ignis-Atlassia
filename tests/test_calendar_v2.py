@@ -61,7 +61,9 @@ class CriticalDateTests(unittest.TestCase):
             "documented_gap_estimate_days": 0,
         })
         self.assertEqual(verdict,
-                         "Punjab–Haryana, July 2024: comparison not usable. Only 9 comparable years.")
+                         "Punjab–Haryana, July 2024: 120 harmonized cell-days. "
+                         "Median unavailable: 9 comparable years; three are required. "
+                         "Percentile unavailable: ten comparable years are required.")
 
     def test_percentile_values_are_withheld_below_ten_comparable_years(self):
         self.assertEqual(_percentile_rank(8.0, list(range(9))), (None, None))

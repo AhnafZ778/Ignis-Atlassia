@@ -36,7 +36,7 @@ FIXTURE = """<!doctype html><html><head>
 <span id="harm-history-range"></span><div id="harm-history-grid"></div><p id="harm-history-note"></p>
 <span id="harm-bridge-state"></span><p id="harm-bridge-method"></p><section><span id="harm-bridge-modis"></span><small id="harm-bridge-modis-note"></small><i id="harm-bridge-modis-bar"></i><span id="harm-bridge-viirs"></span><small id="harm-bridge-viirs-note"></small><i id="harm-bridge-viirs-bar"></i><span id="harm-bridge-result"></span><small id="harm-bridge-result-note"></small><i id="harm-bridge-result-bar"></i><span id="harm-bridge-days"></span><i id="harm-mismatch-modis-bar"></i><i id="harm-mismatch-both-bar"></i><i id="harm-mismatch-viirs-bar"></i><i id="harm-mismatch-gap-bar"></i><span id="harm-mismatch-modis"></span><span id="harm-mismatch-both"></span><span id="harm-mismatch-viirs"></span><span id="harm-mismatch-gap"></span><p id="harm-bridge-note"></p><strong id="harm-frp-value"></strong><p id="harm-frp-note"></p><small id="harm-corroboration-state"></small><p id="harm-corroboration-note"></p></section>
 <section id="harm-share-card" hidden><span id="harm-share-card-case"></span><strong id="harm-share-card-title"></strong><small id="harm-share-card-subtitle"></small><dd id="harm-share-card-value"></dd><dd id="harm-share-card-state"></dd><dd id="harm-share-card-quality"></dd><dd id="harm-share-card-inputs"></dd><dd id="harm-share-card-limit"></dd><a id="harm-share-card-url"></a></section>
-</main><script src="/harmonized.js"></script></body></html>"""
+</main><script>history.replaceState(null,'','?year=2024&month=7')</script><script src="/workspace-context.js"></script><script src="/workspace.js"></script><script src="/harmonized.js"></script></body></html>"""
 
 
 class CalendarFixtureHandler(SimpleHTTPRequestHandler):
@@ -191,7 +191,7 @@ def main() -> None:
               shareLimit: document.querySelector('#harm-share-card-limit').textContent,
               shareUrl: document.querySelector('#harm-share-card-url').href
             })""")
-            if ("Northern California" not in norcal["verdict"] or not norcal["download"].startswith("http")
+            if ("Northern California" not in norcal["verdict"] or norcal["download"] != "#"
                     or not norcal["bridge"] or not norcal["frp"] or not norcal["build"]
                     or "SHA-256" not in norcal["build"] or norcal["corroboration"] != "MCD64A1 LAGGED"
                     or norcal["verdict"] != july_verdicts["norcal"]):
@@ -269,7 +269,7 @@ def main() -> None:
             share_url = page.locator("#harm-share-card-url").get_attribute("href") or ""
             if (not share_title or "2024" not in share_title or "SHA-256" not in share_inputs
                     or not share_quality or "MCD64A1 lagged context" not in share_limit
-                    or "harm_region=norcal" not in share_url or "harm_month=7" not in share_url):
+                    or "region=norcal" not in share_url or "month=7" not in share_url):
                 raise SystemExit(f"static evidence share card did not render its trace fields: {share_title!r}; {share_inputs!r}; {share_quality!r}; {share_limit!r}; {share_url!r}")
             if "EASE-Grid" not in bridge_method:
                 raise SystemExit(f"static bridge method label is missing its grid transform: {bridge_method!r}")

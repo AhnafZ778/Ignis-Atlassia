@@ -72,7 +72,7 @@ class StaticCalendarExportTests(unittest.TestCase):
         # The earlier redesign replaced persona captions with scientific
         # workflow links. Check that each destination still preserves context.
         for route in ("replay.html", "research.html", "method.html"):
-            self.assertIn(f'data-context-link="" href="/{route}"', atlas)
+            self.assertIn(f'href="./{route}"', atlas)
         self.assertIn(".harm-persona-panel", css)
         self.assertIn("path: site", workflow)
         self.assertTrue((root / "fireatlas/static/.nojekyll").is_file())

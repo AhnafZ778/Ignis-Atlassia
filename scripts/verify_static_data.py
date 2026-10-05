@@ -35,7 +35,7 @@ def main() -> None:
                                if shutil.which(name)), None)
             browser = playwright.chromium.launch(headless=True, executable_path=executable)
             page = browser.new_page(viewport={"width": 1440, "height": 1000})
-            page.on("request", lambda request: requests.append(request.url) if "/api/" in request.url else None)
+            page.on("request", lambda request: requests.append(request.url) if "/api/" in request.url and not request.url.endswith("/api/assistant/capabilities") else None)
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(f"http://127.0.0.1:{server.server_port}/data.html", wait_until="domcontentloaded")
             page.wait_for_function("document.querySelector('#archive-coverage-status').textContent.includes('complete region-product-month')")
@@ -52,8 +52,8 @@ def main() -> None:
         server.shutdown()
         server.server_close()
     if requests or errors:
-        raise SystemExit(f"static data page requests/errors: {requests}; {errors}")
-    print(f"Static data page verified: {status}; badge={badge}; no API calls or browser errors.")
+        raise SystemExit(f"static data scientific requests/errors: {requests}; {errors}")
+    print(f"Static data page verified: {status}; badge={badge}; no scientific API calls (assistant capability availability may be probed) or browser errors.")
 
 
 if __name__ == "__main__":

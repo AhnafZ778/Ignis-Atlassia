@@ -28,7 +28,7 @@ def _include(row: dict) -> bool:
     return calendar_row_included(row["raw_json"])
 
 
-def daily_aggregates(db, region: str, start: str | date, end: str | date) -> dict:
+def daily_aggregates(db, region: str, start: str | date, end: str | date, *, notice_path=None) -> dict:
     if region not in REGIONS:
         raise ValueError(f"region must be one of {', '.join(REGIONS)}")
     first = date.fromisoformat(start) if isinstance(start, str) else start
@@ -50,7 +50,7 @@ def daily_aggregates(db, region: str, start: str | date, end: str | date) -> dic
           AND b.demo=0
         ORDER BY o.acquisition_utc,o.source_id,o.grid_y,o.grid_x
     """, (*SOURCES, first.isoformat(), (last + timedelta(days=1)).isoformat(),
-          bbox[0], bbox[2], bbox[1], bbox[3])).fetchall()
+          bbox[0], bbox[2], bbox[1], bbox[3]))
     month_meta = defaultdict(lambda: {"versions": set(), "hashes": set(), "parents": set(), "requests": set(), "coverage_bases": set()})
     for row in db.execute("""
         SELECT e.source_id,e.month,e.coverage_basis,e.product_versions_json,
@@ -136,7 +136,8 @@ def daily_aggregates(db, region: str, start: str | date, end: str | date) -> dic
             }
             records["availability"] = source_status(
                 current, source, complete_export=complete,
-                detection_count=records["raw_pixel_count"])
+                detection_count=records["raw_pixel_count"],
+                **({"path": notice_path} if notice_path is not None else {}))
             # A documented product outage is not a zero-FRP observation. Keep
             # the context value unknown for that UTC day even when the export
             # contains no rows.

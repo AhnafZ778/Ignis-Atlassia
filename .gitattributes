@@ -1,0 +1,6 @@
+# Keep generated SDK bytes identical to their checksummed release manifests.
+# Whitespace embedded in upstream templates is not authored source formatting.
+fireatlas/static/studio-assets/** -whitespace
+site/studio-assets/** -whitespace
+docs/implementation/**/*.log -whitespace
+docs/implementation/**/*.csv -whitespace

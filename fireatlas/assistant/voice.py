@@ -60,3 +60,41 @@ def speech(service,owner,operation,body):
         service.store.artifact(owner,"voice_receipt",{"operation":operation,"characters":len(text),"created":time.time(),"answer_id":body["answer_id"]})
         return {"data":base64.b64encode(data).decode(),"mime":"audio/mpeg","text":text,"disclosure":"AI-generated narration of checked evidence; not an eyewitness account."}
     raise ValueError("Unsupported speech operation.")
+
+
+def synthesize_checked(service, owner, text, reference, *, model=None, voice="coral", transport=None):
+    """Narrate one server-resolved Studio segment through the existing speech ledger.
+
+    Only internal callers may provide text here. They must first resolve checked fields
+    against owned receipts. Uncertain failures leave the reservation held, exactly as
+    ordinary assistant speech does; there is no automatic paid retry.
+    """
+    from .agent import provider_config
+    if provider_config().get('free_only'):
+        raise ValueError("Paid speech is disabled in free-only mode.")
+    if not isinstance(text, str) or not 1 <= len(text) <= 800:
+        raise ValueError("Checked speech segments contain 1–800 characters.")
+    rate = float(os.getenv("FIREATLAS_TTS_MAX_REQUEST_USD", "0"))
+    if not math.isfinite(rate) or rate <= 0:
+        raise ValueError("A verified maximum narration request cost is required.")
+    if transport is None and not os.getenv("OPENAI_API_KEY"):
+        raise ValueError("Speech provider is not configured.")
+    prior = service.store.artifacts(owner, "voice_receipt")
+    characters = sum(v["body"].get("characters", 0) for v in prior
+                     if v["body"].get("created", 0) > time.time() - 86400 and v["body"].get("operation") == "synthesize")
+    if characters + len(text) > 4000:
+        raise ValueError("This workspace's narration allowance has been reached.")
+    reservation = service.store.reserve(owner, math.ceil(rate * 1e6))
+    if transport:
+        data = transport(text)
+    else:
+        from openai import OpenAI
+        client = OpenAI(timeout=30, max_retries=0)
+        data = client.audio.speech.create(model=model or os.getenv("FIREATLAS_TTS_MODEL", "gpt-4o-mini-tts"),
+                                          voice=voice, input=text, response_format="mp3").read()
+    if not data or len(data) > 8_000_000:
+        raise ValueError("The speech response was empty or exceeded 8 MB.")
+    service.store.reconcile(owner, reservation, math.ceil(rate * 1e6))
+    service.store.artifact(owner, "voice_receipt", {"operation": "synthesize", "characters": len(text), "created": time.time(),
+                                                   "studio_reference": reference, "reservation": reservation})
+    return data

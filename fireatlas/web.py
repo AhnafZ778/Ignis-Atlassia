@@ -27,6 +27,7 @@ from .core import SERIES, _complete_month, calendar, connect, ingest, validate_b
 from .fetch import FIRMS_SOURCES
 from .research import report as research_report
 from .study import build_bundle
+from .regional_study import build_bundle as build_regional_bundle, BUILD_LOCK as REGIONAL_BUILD_LOCK, StaleResult
 from .pilots import PilotSync, PILOTS
 from .bootstrap import populate_showcase
 from .archive import BBOX as NASA_ARCHIVE_BBOX, SAMPLE as NASA_ARCHIVE_SAMPLE, import_bundle as import_nasa_archive
@@ -35,7 +36,8 @@ from .globe import snapshot as globe_snapshot, detail as globe_detail
 from .briefing import responder_briefing
 from .harmonization import month_audit
 from .validity import CASES as VALIDITY_CASES, report as validity_report, build_evidence as build_validity_evidence
-from .calendar_v2 import calendar_v2, prepare_calendar_v2, region_status
+from .calendar_v2 import calendar_v2, prepare_calendar_v2, region_status, MCD64_REPORT
+from .availability import NOTICE_FILE
 from .regions import REGIONS
 from .provenance import public_source_reference, sanitize_public_payload
 from .replay import CASES as REPLAY_CASES, build_case as build_replay_case, build_catalog as build_replay_catalog
@@ -51,6 +53,18 @@ DOC_ASSETS = {
     "/docs/AI_USE.md": (PROJECT_ROOT / "docs" / "AI_USE.md", "text/markdown; charset=utf-8"),
 }
 ASSETS = {
+    "/combined-static.js": ("combined-static.js", "text/javascript; charset=utf-8"),
+    "/investigate.html": ("investigate.html", "text/html; charset=utf-8"),
+    "/evidence.html": ("evidence.html", "text/html; charset=utf-8"),
+    "/workspace-context.js": ("workspace-context.js", "text/javascript; charset=utf-8"),
+    "/workspace-shell.js": ("workspace-shell.js", "text/javascript; charset=utf-8"),
+    "/analytical-panels.js": ("analytical-panels.js", "text/javascript; charset=utf-8"),
+    "/compatibility-route.js": ("compatibility-route.js", "text/javascript; charset=utf-8"),
+    "/research-sensitivity.js": ("research-sensitivity.js", "text/javascript; charset=utf-8"),
+    "/investigation-terrain.js": ("investigation-terrain.js", "text/javascript; charset=utf-8"),
+    "/analytical.css": ("analytical.css", "text/css; charset=utf-8"),
+
+
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/styles.css": ("styles.css", "text/css; charset=utf-8"),
@@ -129,6 +143,14 @@ ASSETS = {
     "/assistant-visuals.js": ("assistant-visuals.js", "text/javascript; charset=utf-8"),
     "/assistant-map.js": ("assistant-map.js", "text/javascript; charset=utf-8"),
     "/assistant-workspace.js": ("assistant-workspace.js", "text/javascript; charset=utf-8"),
+    "/studio-excalidraw.html": ("studio-excalidraw.html", "text/html; charset=utf-8"),
+    "/jarvis-orchestration.js": ("jarvis-orchestration.js", "text/javascript; charset=utf-8"),
+    "/jarvis-orchestration.css": ("jarvis-orchestration.css", "text/css; charset=utf-8"),
+    "/studio.html": ("studio.html", "text/html; charset=utf-8"),
+    "/studio-reader.html": ("studio-reader.html", "text/html; charset=utf-8"),
+    "/studio-reader.js": ("studio-reader.js", "text/javascript; charset=utf-8"),
+    "/studio-reader.css": ("studio-reader.css", "text/css; charset=utf-8"),
+    "/studio-entry.css": ("studio-entry.css", "text/css; charset=utf-8"),
     "/replay-context/manifest.json": ("replay-context/manifest.json", "application/json; charset=utf-8"),
     "/replay-context/park-2024/terrain.png": ("replay-context/park-2024/terrain.png", "image/png"),
     "/replay-context/park-2024/ndvi.png": ("replay-context/park-2024/ndvi.png", "image/png"),
@@ -185,7 +207,41 @@ def handler_factory(database: Path):
     database = Path(database)
     from .assistant import AssistantService
     from .assistant.http import handle as assistant_request
+    from .studio.assets import StudioAssets, PREFIX as STUDIO_ASSET_PREFIX
+    from .studio.http import handle as studio_handle, PREFIX as STUDIO_API_PREFIX
     assistant = AssistantService(database)
+    studio_assets = StudioAssets(STATIC)
+    try:
+        from .studio.service import StudioService
+        studio = StudioService(database, assistant=assistant)
+    except Exception:  # noqa: BLE001 - Studio failing to start must never take the scientific pages down
+        studio = None
+
+    def studio_request(handler):
+        if not urlsplit(handler.path).path.startswith(STUDIO_API_PREFIX):
+            return False
+        if studio is None:
+            handler._json({"error": "Studio storage is unavailable. The scientific pages remain usable.", "code": "studio-unavailable"}, HTTPStatus.SERVICE_UNAVAILABLE)
+            return True
+        return studio_handle(handler, studio)
+
+    def studio_asset(handler, path):
+        found = studio_assets.resolve(path)
+        if not found:
+            return False
+        file, kind, immutable = found
+        content = file.read_bytes()
+        handler.send_response(HTTPStatus.OK)
+        handler.send_header("Content-Type", kind)
+        handler.send_header("Content-Length", str(len(content)))
+        handler.send_header("Cache-Control", "public, max-age=31536000, immutable" if immutable else "no-store")
+        handler.send_header("X-Content-Type-Options", "nosniff")
+        handler.end_headers()
+        try:
+            handler.wfile.write(content)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+        return True
     globe_lock = threading.Lock()
     globe_cache = {}
     calendar_cache_lock = threading.Lock()
@@ -207,6 +263,39 @@ def handler_factory(database: Path):
                                            "version": item.get("version", ""), "role": item.get("role", ""),
                                            "sha256": item.get("sha256", "")}
     class Handler(BaseHTTPRequestHandler):
+        def _regional_download(self, db, params):
+            if not REGIONAL_BUILD_LOCK.acquire(blocking=False):
+                self._json({"error": "Another regional export is being prepared. Try again shortly."}, HTTPStatus.SERVICE_UNAVAILABLE)
+                return
+            try:
+                region = params.get("region", [""])[0]
+                year = int(params.get("year", ["2026"])[0])
+                month = int(params.get("month", ["6"])[0])
+                db.execute("PRAGMA query_only=ON")
+                db.execute("BEGIN")
+                with tempfile.TemporaryDirectory(prefix="fireatlas-regional-export-") as directory:
+                    path = Path(directory) / "result.zip"
+                    build_regional_bundle(db, path, region=region, year=year, month=month,
+                        day=params.get("day", [None])[0],
+                        expected_result_sha256=params.get("expected_result_sha256", [None])[0])
+                    self.send_response(HTTPStatus.OK)
+                    self.send_header("Content-Type", "application/zip")
+                    self.send_header("Content-Length", str(path.stat().st_size))
+                    self.send_header("Content-Disposition", f'attachment; filename="harmonized_{region}_{year}_{month:02d}.zip"')
+                    self.send_header("X-Content-Type-Options", "nosniff")
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    try:
+                        with path.open("rb") as source:
+                            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                                self.wfile.write(chunk)
+                    except (BrokenPipeError, ConnectionResetError):
+                        pass
+            except StaleResult as error:
+                self._json({"error": str(error), "code": "stale-result"}, HTTPStatus.CONFLICT)
+            finally:
+                REGIONAL_BUILD_LOCK.release()
+
         def _local_data_action(self, content_type):
             host = self.headers.get("Host", "")
             hostname = urlsplit("//" + host).hostname
@@ -233,8 +322,13 @@ def handler_factory(database: Path):
             self._respond(json.dumps(sanitize_public_payload(value)).encode(),
                           "application/json; charset=utf-8", status)
 
+        def do_PATCH(self):
+            if studio_request(self) or assistant_request(self, assistant):
+                return
+            self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
+
         def do_POST(self):
-            if assistant_request(self, assistant):
+            if studio_request(self) or assistant_request(self, assistant):
                 return
             path = urlsplit(self.path).path
             if path == "/api/data/sync":
@@ -308,7 +402,11 @@ def handler_factory(database: Path):
                 self._json({"error": "database unavailable"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
         def do_GET(self):
-            if assistant_request(self, assistant):
+            if studio_request(self) or assistant_request(self, assistant):
+                return
+            if urlsplit(self.path).path.startswith(STUDIO_ASSET_PREFIX):
+                if not studio_asset(self, urlsplit(self.path).path):
+                    self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
                 return
             nonlocal replay_cache_stamp
             url = urlsplit(self.path)
@@ -431,15 +529,20 @@ def handler_factory(database: Path):
                     self._json(pilot_sync.status())
                     return
                 with connect(database) as db:
-                    if url.path == "/api/v2/regions":
+                    if url.path == "/api/v2/study":
+                        self._regional_download(db, params)
+                    elif url.path == "/api/v2/regions":
                         self._json(region_status(db))
                     elif url.path == "/api/v2/calendar":
                         region = params.get("region", [""])[0]
                         year = int(params.get("year", ["2024"])[0])
                         month = int(params.get("month", ["7"])[0])
                         history = params.get("history", ["0"])[0] == "1"
+                        db.execute("PRAGMA query_only=ON")
+                        db.execute("BEGIN")
+                        db.execute("SELECT name FROM sqlite_master LIMIT 1").fetchone()
                         stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
-                                       for p in (database, Path(str(database) + "-wal")))
+                                       for p in (database, Path(str(database) + "-wal"), NOTICE_FILE, MCD64_REPORT))
                         key = (region, year, month, history, stamps)
                         with calendar_cache_lock:
                             cached = calendar_cache.get(key)
@@ -535,6 +638,7 @@ def handler_factory(database: Path):
                                                series=series, bbox=bbox))
                     elif url.path == "/api/study":
                         year, month, series, bbox = _request_context(params)
+                        db.execute("PRAGMA query_only=ON")
                         db.execute("BEGIN")
                         bundle = build_bundle(db, year=year, month=month, series=series, bbox=bbox,
                                               day=params.get("day", [None])[0], layer=params.get("layer", ["none"])[0])
@@ -666,10 +770,11 @@ def handler_factory(database: Path):
                 self._json({"error": "database unavailable"}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
         def do_DELETE(self):
-            if not assistant_request(self, assistant):
+            if not (studio_request(self) or assistant_request(self, assistant)):
                 self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
 
     Handler.assistant = assistant
+    Handler.studio = studio
     return Handler
 
 
@@ -702,6 +807,8 @@ def main():
     finally:
         server.server_close()
         server.RequestHandlerClass.assistant.close()
+        if server.RequestHandlerClass.studio is not None:
+            server.RequestHandlerClass.studio.close()
 
 
 if __name__ == "__main__":

@@ -52,14 +52,16 @@ def main() -> None:
             browser = playwright.chromium.launch(headless=True, executable_path=executable)
             page = browser.new_page(viewport={"width": 1440, "height": 1200})
             page.on("request", lambda request: api_requests.append(request.url)
-                    if "/api/" in request.url else None)
-            page.goto(f"{base}/method.html?case={args.case}", wait_until="domcontentloaded")
+                    if "/api/" in request.url and not request.url.endswith("/api/assistant/capabilities") else None)
+            page.goto(f"{base}/evidence.html?tab=validity&case={args.case}", wait_until="domcontentloaded")
             page.wait_for_function("document.querySelector('#validity-status') && "
                                    "!document.querySelector('#validity-status').textContent.includes('Checking')")
             page.wait_for_function("document.querySelectorAll('#validity-day-buttons button').length > 0")
             if page.locator("#validity-day-buttons button").count() == 0:
                 raise SystemExit("historical case did not render any UTC day controls")
+            page.locator("#validity-inspect").evaluate("node => { for(let p=node.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true; }")
             page.locator("#validity-inspect summary").click()
+            page.locator("#source-records").evaluate("node => { for(let p=node;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true; }")
             gate_text = page.locator("#validity-validation").inner_text().replace(",", "")
             expected_gates = {
                 "park-2024": ("114 / 114", "3137 / 3137", "0 / 30", "0 / 1"),
@@ -78,6 +80,7 @@ def main() -> None:
                 page.wait_for_function("document.querySelector('#validity-incident-context').textContent.includes('GROVE FIRE')")
                 if page.locator("#validity-evidence-media img").count():
                     raise SystemExit("Grove case substituted an unrelated incident image")
+            page.locator("#run-recount").evaluate("node => { for(let p=node;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true; }")
             page.locator("#run-recount").click()
             page.wait_for_function("document.querySelector('#proof-state').textContent.includes('Recomputed')")
             state = page.locator("#proof-state").inner_text()
@@ -101,7 +104,7 @@ def main() -> None:
 
     if api_requests:
         raise SystemExit(f"static method issued API requests: {api_requests}")
-    print(f"Static method verified: {args.case}; {evidence_check}; recount passed; no API calls.")
+    print(f"Static method verified: {args.case}; {evidence_check}; recount passed; no scientific API calls (assistant capability availability may be probed).")
 
 
 if __name__ == "__main__":

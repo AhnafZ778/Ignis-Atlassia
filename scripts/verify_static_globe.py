@@ -64,9 +64,9 @@ def main() -> None:
                 page = browser.new_page(viewport={"width": 1440, "height": 1000})
                 page.on("request", lambda request: requests.append(request.url))
                 page.on("request", lambda request: api_requests.append(request.url)
-                        if "/api/" in request.url else None)
+                        if "/api/" in request.url and not request.url.endswith("/api/assistant/capabilities") else None)
                 page.on("response", lambda response: http_errors.append(
-                    f"{response.status} {response.url}") if response.status >= 400 else None)
+                    f"{response.status} {response.url}") if response.status >= 400 and not response.url.endswith("/api/assistant/capabilities") else None)
                 page.on("pageerror", lambda error: errors.append(str(error)))
                 base = f"http://127.0.0.1:{server.server_port}{prefix}"
                 page.goto(f"{base}?lite=1", wait_until="domcontentloaded")

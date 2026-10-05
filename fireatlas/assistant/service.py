@@ -40,6 +40,12 @@ class AssistantService:
         context=normalize_context(request.get("context"))
         view=request.get("view") or {}
         if not isinstance(view,dict): raise ValueError("Invalid view state.")
+        if view.get('jarvis_attachment_id'):
+            bridge=getattr(self,'studio_bridge',None)
+            if not bridge: raise ValueError('Canvas orchestration is unavailable.')
+            attached=bridge.surface(owner,view['jarvis_attachment_id'],context)
+            if attached['context']['origin_instance_id']!=view.get('jarvis_instance_id'):
+                raise ValueError('The attached source belongs to another submitting view.')
         current=self.store.session(owner)
         if current["context"]["revision"]!=context["revision"]:
             raise ValueError("Study settings changed. Register the current view before investigating.")
@@ -53,6 +59,7 @@ class AssistantService:
             raise ValueError(self.capabilities()["reason"])
         nonce=request.get("nonce") or secrets.token_urlsafe(16)
         if not isinstance(nonce,str) or len(nonce)>100: raise ValueError("Invalid request ID.")
+        view={**view,'jarvis_run_nonce':nonce}
         run,fresh=self.store.create_run(owner,nonce,{"context":context,"view":view,"message":message,"operation":operation})
         if fresh:
             cancel=threading.Event()
@@ -104,10 +111,14 @@ class AssistantService:
             with self.lock: self.cancellations.pop(run,None)
 
     def cancel(self,owner,run):
+        self.store.run(owner,run)
+        with self.store.connection() as db:
+            nonce=db.execute('SELECT nonce FROM runs WHERE id=? AND session=?',(run,owner)).fetchone()['nonce']
         self.store.cancel(owner,run)
         with self.lock:
             flag=self.cancellations.get(run)
             if flag: flag.set()
+        if getattr(self,'studio_bridge',None):self.studio_bridge.cancel_commands(owner,nonce)
 
     def action(self,owner,destination,context,view,result_id=None,options=None):
         if destination not in DESTINATIONS: raise ValueError("Unknown semantic destination.")

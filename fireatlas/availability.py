@@ -11,7 +11,7 @@ NOTICE_FILE = Path(__file__).with_name("samples") / "sensor_notices.json"
 
 
 @lru_cache(maxsize=8)
-def _notice_cache(path: str) -> tuple[dict, ...]:
+def _notice_cache(path: str, stamp=None) -> tuple[dict, ...]:
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     if data.get("schema") != "fireatlas-sensor-notices-v1" or not isinstance(data.get("notices"), list):
         raise ValueError("unsupported sensor notice ledger")
@@ -30,7 +30,8 @@ def _notice_cache(path: str) -> tuple[dict, ...]:
 
 
 def notices(path: str | Path = NOTICE_FILE) -> list[dict]:
-    return list(_notice_cache(str(Path(path).resolve())))
+    file=Path(path).resolve();info=file.stat()
+    return list(_notice_cache(str(file),(info.st_mtime_ns,info.st_size)))
 
 
 def notices_for_day(day: str | date, source_id: str, *, path: str | Path = NOTICE_FILE) -> list[dict]:

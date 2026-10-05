@@ -1,0 +1,45 @@
+{
+  "schema": "fireatlas-audience-prose-v1",
+  "profiles": {
+    "researcher": {
+      "orientation": "The map shows recorded observations inside the selected geographic and UTC window. Nearby detections are not a validated assignment to an incident.",
+      "activity": "The timeline compares recorded activity within the study. An occupied cell-day counts one detected common cell on one UTC date.",
+      "states": "These source states distinguish collected records from unknown evidence and processing gaps. An empty record does not establish a fire-free day.",
+      "finding": "The cited result comes from frozen evidence. Its interpretation remains editable and does not change the source measurements.",
+      "rows": "Original satellite observations retain native source fields and acquisition time. Those rows and common-cell counts answer different questions.",
+      "closing": "The study supports inspection of dated thermal observations. It does not establish ignition, continuous spread, a perimeter, or a forecast."
+    },
+    "public": {
+      "orientation": "This map shows satellite heat signals within the chosen area and dates. A signal is an observation, not a confirmed fire boundary.",
+      "activity": "The chart shows how recorded or explicitly estimated activity varies over time. Repeated readings in the same common cell on the same date count together; this does not count separate fires.",
+      "states": "An empty date can mean that the collected record is incomplete. Source labels distinguish recorded observations, known processing interruptions and unknown evidence. They do not establish whether the area was fire-free.",
+      "finding": "The finding is tied to saved satellite evidence. Its explanation is an interpretation that you can inspect alongside the original record.",
+      "rows": "These are the original satellite readings. Readings and occupied common cells measure different things, so their totals can differ.",
+      "closing": "The study lets us inspect dated satellite heat observations. It does not establish ignition, a fire perimeter, continuous spread or a forecast."
+    },
+    "student": {
+      "orientation": "An area of interest defines the geographic study boundary. The map places imported satellite detection centers inside that boundary and the selected UTC window; proximity alone does not identify an incident.",
+      "activity": "A cell-day is a common analysis cell occupied on a UTC date. Several readings can occupy the same cell-day. Estimated activity must retain its transformation label, and a new date adds a new cell-day rather than a new incident.",
+      "states": "Export completeness describes the collected request, not a cloud-free satellite pass. Distinguish complete zero-record dates from unknown exports and documented processing gaps before interpreting a blank map.",
+      "finding": "A checked finding combines a saved result with separately editable interpretation. Compare the unit, scope and source state before combining findings from different cards.",
+      "rows": "Original source rows preserve acquisition time, native confidence and reported fire radiative power. Native readings, eligible unique records and occupied common cells are distinct counting units.",
+      "closing": "Review what the selected evidence supports and what remains unknown. Satellite thermal observations alone cannot establish cause, ignition, perimeters, continuous spread or operational safety."
+    },
+    "reviewer": {
+      "orientation": "Inspect the exact AOI, UTC selection, eligibility and alias rules in the cited receipt. The prepared centroid view is a schematic, not a footprint denominator or validated incident-assignment layer.",
+      "activity": "Inspect source-specific daily values, explicit nulls, estimated-state labels and the fixed comparison domain. Retain the calculation contract; observed cell counts and harmonized estimates are not interchangeable metrics.",
+      "states": "Inspect the source-export ledger, product versions and intersecting processing notices. Collected-export completeness cannot close cloud/pass opportunity or exposure-validation gates.",
+      "finding": "Trace the stated value to its authorized receipt pointer, unit, method and release identity. Narrative interpretation and source authentication require separate review; a checksum is not an independent scientific endorsement.",
+      "rows": "Inspect original fields, stored identifiers, filtering and any scope-specific deduplication. Reproduce the matching evidence contract rather than substituting a calendar, replay or research statistic with different rules.",
+      "closing": "Keep computational consistency, product reconciliation, independent human review and validated exposure as separate gates. No inferred ignition, physical perimeter, forecast skill or independent sign-off follows from this story."
+    },
+    "presenter": {
+      "orientation": "Begin with the selected area and UTC window. Show the recorded satellite observations and make clear that the map is a study view, not a fire perimeter.",
+      "activity": "Show the dated activity with its unit and fixed scale. Identify any estimated or unknown dates before drawing a comparison.",
+      "states": "Show why a blank record can remain unknown. Collected exports, documented processing gaps and actual observation opportunity are different questions.",
+      "finding": "Present the checked finding, then open its evidence. Keep the explanatory interpretation distinct from the saved measurement.",
+      "rows": "Show an original reading and its acquisition time. Explain why a source row and an occupied common cell are different units.",
+      "closing": "Close with the supported observation and the matching evidence download. Keep ignition, continuous spread, perimeter and forecast claims outside the conclusions."
+    }
+  }
+}

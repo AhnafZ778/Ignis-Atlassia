@@ -40,6 +40,22 @@ class AssistantTests(unittest.TestCase):
         self.assertEqual(fact(evidence,'/overlap/jaccard')['unit'],'ratio')
         with readonly(self.database) as db:
             with self.assertRaises(Exception):db.execute('DELETE FROM observations')
+
+    def test_harmonized_claims_use_exact_selected_month_and_withhold_missing_values(self):
+        from fireatlas.assistant.agent import guided_answer
+        evidence=self.service.science.call(self.owner,'research',self.cfg)
+        evidence={**evidence,'operation':'harmonized','context':{**evidence['context'],'year':2026,'month':6},
+                  'payload':{'months':[{'month':'2026-05','value':999},
+                     {'month':'2026-06','value':113,'observed_days':30,'estimated_days':0,'unknown_days':0,
+                      'baseline_median':109,'anomaly_cell_days':4,'n_years':3,'percentile_rank':None,
+                      'verdict':'Percentile unavailable: ten comparable years are required.'}]}}
+        claims=guided_answer(evidence)['claims'];facts={c['path']:c for c in claims}
+        self.assertEqual(facts['/months/1/value']['value'],113)
+        self.assertEqual(facts['/months/1/value']['unit'],'VIIRS-equivalent cell-days')
+        self.assertEqual(facts['/months/1/baseline_median']['value'],109)
+        self.assertEqual(facts['/months/1/anomaly_cell_days']['value'],4)
+        self.assertNotIn('/months/1/percentile_rank',facts);self.assertTrue(all('/months/1/' in c['path'] for c in claims))
+        evidence['context']['month']=7;self.assertEqual(guided_answer(evidence)['claims'],[])
     def test_agent_visual_explanation_uses_retrieved_evidence_only(self):
         from pydantic_ai.models.function import FunctionModel
         from pydantic_ai.messages import ModelResponse,ToolCallPart
@@ -304,6 +320,81 @@ class AssistantTests(unittest.TestCase):
         for claim in selected['claims']:self.assertEqual(claim['value'],fact(result,claim['path'])['value'])
         note=self.service.store.artifacts(self.owner,'annotation')[0]['body']
         self.assertEqual(note['path'],path);self.assertEqual(note['context']['day'],result['payload']['frames'][frame]['date_utc'])
+
+    def test_model_selects_tool_after_attempting_an_answer_without_evidence(self):
+        from pydantic_ai.models.function import FunctionModel
+        from pydantic_ai.messages import ModelResponse, ToolCallPart
+        calls=[]
+        def respond(messages, info):
+            calls.append(1)
+            if len(calls)==1:
+                tools={t.name:t for t in info.function_tools}
+                self.assertIn('research',tools['investigate'].parameters_json_schema['properties']['operation']['enum'])
+                return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name,{'title':'Comparison','interpretation':'I compared the satellite observations.'})])
+            if len(calls)==2:
+                self.assertTrue(any(getattr(p,'part_kind','')=='retry-prompt' for m in messages for p in m.parts))
+                return ModelResponse(parts=[ToolCallPart('investigate',{'operation':'research'})])
+            result=next(p.content for m in reversed(messages) for p in m.parts if getattr(p,'part_kind','')=='tool-return')
+            if isinstance(result,str):result=json.loads(result)
+            return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name,{'title':'Checked comparison','interpretation':'Each sensor retains its own evidence.','claims':[{'result_id':result['id'],'path':'/overlap/totals/union','label':'union'}]})])
+        env={'FIREATLAS_AI_PROVIDER':'openai','OPENAI_API_KEY':'not-real','FIREATLAS_AI_INPUT_USD_PER_MILLION':'0.1','FIREATLAS_AI_OUTPUT_USD_PER_MILLION':'0.2'}
+        with patch.dict('os.environ',env):
+            answer=run_agent(self.service,self.owner,'Compare sensors',self.cfg,{},threading.Event(),time.monotonic()+30,lambda _:None,model=FunctionModel(respond))
+        self.assertEqual(len(calls),3)
+        self.assertEqual(answer['claims'][0]['value'],4)
+
+    def test_arbitrary_question_keeps_checked_tool_results_after_invalid_final_claim(self):
+        from pydantic_ai.models.function import FunctionModel
+        from pydantic_ai.messages import ModelResponse, ToolCallPart
+        calls=[]
+        def respond(messages, info):
+            calls.append(1)
+            if len(calls)==1:return ModelResponse(parts=[ToolCallPart('investigate',{'operation':'research'})])
+            return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name,{'title':'Invented','interpretation':'There were 999 fires.','claims':[{'result_id':'invented-id','path':'/bad','label':'wrong'}]})])
+        env={'FIREATLAS_AI_PROVIDER':'openai','OPENAI_API_KEY':'not-real','FIREATLAS_AI_INPUT_USD_PER_MILLION':'0.1','FIREATLAS_AI_OUTPUT_USD_PER_MILLION':'0.2'}
+        with patch.dict('os.environ',env):
+            answer=run_agent(self.service,self.owner,'Compare these sources',self.cfg,{},threading.Event(),time.monotonic()+30,lambda _:None,model=FunctionModel(respond))
+        self.assertTrue(answer['ai_wording_unavailable'])
+        self.assertEqual(answer['tool_route']['operation'],'research')
+        self.assertNotIn('999',json.dumps(answer))
+        for card in answer['claims']:
+            evidence={'id':card['result_id'],**self.service.store.get_artifact(self.owner,card['result_id'],'evidence')['body']}
+            self.assertEqual(card['value'],fact(evidence,card['path'])['value'])
+
+    def test_selected_frame_fallback_keeps_day_instead_of_whole_study_total(self):
+        from pydantic_ai.models.function import FunctionModel
+        from pydantic_ai.messages import ModelResponse, ToolCallPart
+        result=self.service.science.call(self.owner,'replay',self.cfg)
+        day=result['payload']['frames'][10]['date_utc']
+        def invalid(messages, info):
+            return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name,{'title':'Invented','interpretation':'There were 999 fires.'})])
+        env={'FIREATLAS_AI_PROVIDER':'openai','OPENAI_API_KEY':'not-real','FIREATLAS_AI_INPUT_USD_PER_MILLION':'0.1','FIREATLAS_AI_OUTPUT_USD_PER_MILLION':'0.2'}
+        with patch.dict('os.environ',env):
+            answer=run_agent(self.service,self.owner,'Compare counts for the selected UTC day.',{**self.cfg,'day':day},{'result_id':result['id']},threading.Event(),time.monotonic()+30,lambda _:None,model=FunctionModel(invalid))
+        self.assertTrue(answer['claims'])
+        self.assertTrue(all(c['path'].startswith('/frames/10/') for c in answer['claims']))
+        self.assertIn(day,[c['value'] for c in answer['claims']])
+        self.assertNotIn('/summary/joint_cell_days',[c['path'] for c in answer['claims']])
+
+    def test_missing_canvas_attachment_yields_focused_clarification_without_fake_success(self):
+        from pydantic_ai.models.function import FunctionModel
+        from pydantic_ai.messages import ModelResponse, ToolCallPart
+        def invalid(messages, info):
+            return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name,{'title':'Canvas','interpretation':'I created 4 heatmaps on the canvas.'})])
+        env={'FIREATLAS_AI_PROVIDER':'openai','OPENAI_API_KEY':'not-real','FIREATLAS_AI_INPUT_USD_PER_MILLION':'0.1','FIREATLAS_AI_OUTPUT_USD_PER_MILLION':'0.2'}
+        with patch.dict('os.environ',env),patch.object(self.service.science,'call') as query:
+            answer=run_agent(self.service,self.owner,'Show the heatmaps on the canvas',self.cfg,{},threading.Event(),time.monotonic()+30,lambda _:None,model=FunctionModel(invalid))
+        query.assert_not_called()
+        self.assertEqual(answer['kind'],'Command clarification')
+        self.assertIn('Attach this view',answer['summary'])
+        self.assertEqual(answer['claims'],[])
+
+    def test_recovery_route_never_uses_old_selection_for_explicit_place_or_date(self):
+        from fireatlas.assistant.agent import infer_tool_plan
+        self.assertEqual(infer_tool_plan('How many detections in this study?',self.cfg)['operation'],'replay')
+        for question in ['Show detections near Bangladesh in this study','Explain this map of Bangladesh','Compare this study during June','Compare this study with July 2020','Move this map to my canvas','Inspect the selected cell']:
+            with self.subTest(question=question):
+                self.assertIsNone(infer_tool_plan(question,self.cfg,{'selection':{'path':'/frames/0/cells/0'}} if 'cell' in question else {}))
 
     def test_ambiguous_places_never_allow_the_model_to_choose_a_camera_target(self):
         from pydantic_ai.models.function import FunctionModel

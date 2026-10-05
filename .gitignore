@@ -1,20 +1,73 @@
+# Scientific/private stores and owner-supplied archives remain local.
+/data/
+/NASA_data/
+# Full large ZIPs are rebuilt exactly from tracked, checksummed transport parts.
+/site/data/analysis/bundles/punjab-haryana-*.zip
+
+# Keep the public static evidence release, including its data namespace.
+# Sensitive-file rules below also apply within the published site.
+
+# Python environments, caches and packaging intermediates.
 .venv/
+.venv-assistant/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
 *.egg-info/
 .pytest_cache/
-data/
-*.sqlite3
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+/build/
+/dist/
+
+# Credentials and database files, including journal/WAL companions.
 .env
 .env.*
 *.key
+*.pem
+*.p12
+*.pfx
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db-journal
+*.db-wal
+*.db-shm
 
-# The generated static evidence bundle is intentionally publishable.  Re-include
-# its data subtree after the repository-wide local `data/` rule above.
-!site/
-!site/**
+# Node dependencies and intermediate builds. The browser bundles under
+# fireatlas/static/ and site/ are intentional, versioned release assets.
+node_modules/
+.npm/
+.vite/
+!/fireatlas/static/studio-assets/.vite/
+!/fireatlas/static/studio-assets/.vite/**
+!/site/studio-assets/.vite/
+!/site/studio-assets/.vite/**
+/studio-app/dist/
+/studio-mcp-app/dist/
+/studio-render/build/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
 
-# User-downloaded NASA source files remain local; hashes are stored on import.
-NASA_data/
+# Runtime logs stay local; curated implementation-check logs are evidence.
+*.log
+!/docs/implementation/**/*.log
+*.pid
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
 
-.venv-assistant/
+# Browser test hosting copies and repeated reader archives can be regenerated.
+# Keep reports, screenshots and the intentional native/Excalidraw samples.
+/docs/implementation/studio-checks/**/subpath/
+/docs/implementation/studio-checks/**/*-reader/
+/docs/implementation/studio-checks/**/reader.zip
+/docs/implementation/studio-checks/**/*-reader.zip

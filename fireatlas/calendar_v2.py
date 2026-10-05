@@ -12,6 +12,8 @@ from statistics import median
 from .aggregates import daily_aggregates
 from .calibration import calibrate
 from .regions import REGIONS
+from .availability import NOTICE_FILE
+from .result_identity import digest
 
 MODIS_EARLIEST_SUPPORTED_HISTORY = date(2006, 7, 1)
 MODIS_ARCHIVE_START = MODIS_EARLIEST_SUPPORTED_HISTORY
@@ -21,7 +23,7 @@ MIN_PERCENTILE_BASELINE_YEARS = 10
 MCD64_REPORT = Path(__file__).resolve().parent / "samples" / "mcd64_corroboration.json"
 
 
-def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
+def _mcd64_corroboration(region: str, year: int, month: int, *, report_path=None) -> dict:
     """Return only a hash-bound check that exists for this region/month."""
     base = {
         "product": "MCD64A1 Collection 6.1 burned area",
@@ -30,7 +32,7 @@ def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
         "note": "No dated MCD64A1 check is bundled for this selection; active-fire detections remain the only displayed evidence.",
     }
     try:
-        report = json.loads(MCD64_REPORT.read_text(encoding="utf-8"))
+        report = json.loads(Path(report_path or MCD64_REPORT).read_text(encoding="utf-8"))
     except (FileNotFoundError, OSError, json.JSONDecodeError):
         return base
     if report.get("schema") not in {
@@ -86,9 +88,9 @@ def _mcd64_corroboration(region: str, year: int, month: int) -> dict:
     }
 
 
-def _mcd64_checks_for_year(region: str, year: int) -> dict:
+def _mcd64_checks_for_year(region: str, year: int, *, report_path=None) -> dict:
     """Keep dated checks available when a static annual export changes month."""
-    checks = (_mcd64_corroboration(region, year, month) for month in range(1, 13))
+    checks = (_mcd64_corroboration(region, year, month, report_path=report_path) for month in range(1, 13))
     return {check["month"]: check for check in checks if check["status"] == "loaded"}
 
 
@@ -135,7 +137,15 @@ def _verdict(region_name: str, year: int, item: dict) -> str:
         return (f"{region_name}, {label}: monthly activity is unknown because the imported "
                 "source exports are incomplete; missing dates are not zeros.")
     if item["n_years"] < MIN_PERCENTILE_BASELINE_YEARS:
-        return f"{region_name}, {label}: comparison not usable. Only {item['n_years']} comparable years."
+        if item.get("baseline_median") is not None:
+            difference = item["anomaly_cell_days"]
+            relation = "above" if difference >= 0 else "below"
+            return (f"{region_name}, {label}: {item['value']:,.6g} harmonized cell-days, "
+                    f"{abs(difference):,.6g} {relation} the median of {item['n_years']} comparable prior years. "
+                    "Percentile unavailable: ten comparable years are required.")
+        return (f"{region_name}, {label}: {item['value']:,.6g} harmonized cell-days. "
+                f"Median unavailable: {item['n_years']} comparable years; three are required. "
+                "Percentile unavailable: ten comparable years are required.")
     estimated_days = (item["outside_downloaded_snpp_period_days"]
                       + item["documented_gap_estimate_days"])
     pre = item["outside_downloaded_snpp_period_days"]
@@ -255,7 +265,7 @@ def _baseline_mismatch_reason(target: dict, prior: dict) -> str | None:
     return None
 
 
-def prepare_calendar_v2(db, *, region: str, fallback_year: int = 2024) -> dict:
+def prepare_calendar_v2(db, *, region: str, fallback_year: int = 2024, notice_path=None) -> dict:
     """Load and calibrate a region once so multiple year views reuse the same rows."""
     if region not in REGIONS:
         raise ValueError(f"region must be one of {', '.join(REGIONS)}")
@@ -269,7 +279,7 @@ def prepare_calendar_v2(db, *, region: str, fallback_year: int = 2024) -> dict:
     """, (bbox[0], bbox[2], bbox[1], bbox[3])).fetchone()[0]
     latest_date = date.fromisoformat(latest) if latest else date(fallback_year, 12, 31)
     history_end = max(date(fallback_year, 12, 31), latest_date)
-    raw = daily_aggregates(db, region, history_start, history_end)
+    raw = daily_aggregates(db, region, history_start, history_end, notice_path=notice_path)
     versions = {target_year: _selected_modis_version(raw["days"], target_year)
                 for target_year in range(history_start.year, history_end.year + 1)}
     fallback = {"schema": "fireatlas-calibration-v1", "status": "insufficient-version-matched-overlap",
@@ -280,12 +290,13 @@ def prepare_calendar_v2(db, *, region: str, fallback_year: int = 2024) -> dict:
             **fallback, "versions": {"MODIS_SP": version, "VIIRS_SNPP_SP": None}}
         calibrations[version] = calibration
     return {"region": region, "latest": latest, "history_end": history_end,
+            "notice_sha256": digest(json.loads(Path(notice_path or NOTICE_FILE).read_text())),
             "history_start": history_start,
             "raw": raw, "versions": versions, "calibrations": calibrations}
 
 
 def calendar_v2(db, *, region: str, year: int, month: int = 7,
-                include_history: bool = False, prepared: dict | None = None) -> dict:
+                include_history: bool = False, prepared: dict | None = None, corroboration_path=None) -> dict:
     if region not in REGIONS:
         raise ValueError(f"region must be one of {', '.join(REGIONS)}")
     if not MODIS_EARLIEST_SUPPORTED_HISTORY.year <= year <= 2026:
@@ -499,10 +510,10 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
             "native_detail": raw.get("native_detail", {}),
             "bridge_method_version": raw.get("bridge_method_version"),
             "frp_context": raw.get("frp_context"),
-            "corroboration": (_mcd64_corroboration(region, year, selected_month_number)
+            "corroboration": (_mcd64_corroboration(region, year, selected_month_number, report_path=corroboration_path)
                               if raw.get("inputs") else {"status": "not-loaded",
                               "note": "No authentic active-fire inputs are imported for this calendar."}),
-            "corroboration_by_month": (_mcd64_checks_for_year(region, year)
+            "corroboration_by_month": (_mcd64_checks_for_year(region, year, report_path=corroboration_path)
                                        if raw.get("inputs") else {}),
             "baseline": {"years_used": sorted(years_used), "excluded": excluded},
             "calibration_id": fitted.get("calibration_id"),
@@ -541,6 +552,14 @@ def calendar_v2(db, *, region: str, year: int, month: int = 7,
                       "partial_viirs_cell_days": item["partial_viirs_cell_days"]}
                      for item in harmonized],
         }
+    from .result_identity import identify_calendar
+    try:
+        corroboration_input = json.loads(Path(corroboration_path or MCD64_REPORT).read_text())
+    except (OSError, ValueError):
+        corroboration_input = {}
+    identify_calendar(result, history_end=history_end.isoformat(), dependencies={
+        "notices_sha256": prepared.get("notice_sha256"),
+        "corroboration_sha256": digest(corroboration_input)})
     return result
 
 

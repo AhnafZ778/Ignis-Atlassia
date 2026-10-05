@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Reassemble verified regional archives
+        run: python3 scripts/static_bundle_storage.py --site site
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5

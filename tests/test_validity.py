@@ -47,10 +47,10 @@ class HistoricalValidityTests(unittest.TestCase):
             _verdict("Northern California", 2024, month),
             "Northern California, July 2024: 10th percentile of 12 comparable years.",
         )
-        month.update(n_years=9, percentile_rank=None)
+        month.update(n_years=9, percentile_rank=None, baseline_median=110, anomaly_cell_days=10)
         self.assertEqual(
             _verdict("Punjab–Haryana", 2024, month),
-            "Punjab–Haryana, July 2024: comparison not usable. Only 9 comparable years.",
+            "Punjab–Haryana, July 2024: 120 harmonized cell-days, 10 above the median of 9 comparable prior years. Percentile unavailable: ten comparable years are required.",
         )
 
     def test_case_totals_trace_to_authentic_rows_and_keep_coverage_unknown(self):
@@ -268,10 +268,10 @@ class HistoricalValidityTests(unittest.TestCase):
             self.assertEqual(failure.exception.code, 400)
         with urlopen(base + "/") as response:
             landing = response.read()
-        self.assertIn(b'/method.html', landing)
+        self.assertIn(b'Evidence', landing)
         self.assertNotIn(b'id="challenge-fit"', landing)
         self.assertNotIn(b'id="evidence-section"', landing)
-        with urlopen(base + "/method.html") as response:
+        with urlopen(base + "/evidence.html?tab=validity") as response:
             method = response.read()
         self.assertIn(b'id="challenge-fit"', method)
         self.assertIn(b'id="calibration-validation"', method)

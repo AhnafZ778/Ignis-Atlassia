@@ -121,6 +121,10 @@ def _rebase_local_asset_urls(site: Path) -> None:
     quoted = re.compile(r"(?P<q>['\"`])(?P<url>/[^'\"`\s]*)(?P=q)")
     unquoted_css = re.compile(r"url\(\s*(?P<url>/[^)'\"\s]+)\s*\)")
     for path in site.rglob("*"):
+        if path.relative_to(site).parts[0] in ('studio-assets', 'studio-mcp'):
+            # SDK builds already use relative imports. Preserve their exact
+            # allowlisted bytes and content hashes when refreshing the site.
+            continue
         if not path.is_file() or path.suffix not in TEXT_SUFFIXES:
             continue
         text = path.read_text(encoding="utf-8")
@@ -555,6 +559,9 @@ def export_static(database: str | Path, output: str | Path, *,
                   reuse_validity_from: str | Path | None = None) -> dict:
     """Export to a fresh directory; existing output is never deleted or overwritten."""
     database, destination = Path(database), Path(output).resolve()
+    if Path(static_source).resolve() == STATIC.resolve() and (ROOT / 'docs/implementation/landing-baseline.json').exists():
+        from scripts.check_landing_preservation import check
+        check()
     if destination.exists():
         raise FileExistsError(f"Refusing to overwrite existing export directory: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)

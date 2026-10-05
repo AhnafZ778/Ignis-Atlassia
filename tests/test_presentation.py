@@ -119,8 +119,10 @@ class PresentationTests(unittest.TestCase):
                 home = response.read()
             self.assertNotIn(b"data-demo", home)
             self.assertNotIn(b"story.js", home)
-            self.assertIn(b'id="start-calendar-tour"', home)
-            self.assertIn(b'id="calendar-tour"', home)
+            with urlopen(f"http://127.0.0.1:{server.server_port}/atlas.html") as response:
+                explore = response.read()
+            self.assertIn(b'Follow an authentic guided study', explore)
+            self.assertIn(b'data-guide-step', explore)
             with urlopen(f"http://127.0.0.1:{server.server_port}/tour.js") as response:
                 tour_js = response.read()
             self.assertIn(b"/api/calendar", tour_js)
