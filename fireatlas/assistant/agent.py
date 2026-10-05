@@ -447,7 +447,8 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
             from pydantic_ai.providers.openai import OpenAIProvider
             from pydantic_ai.profiles.openai import OpenAIModelProfile
             from .aiand import BASE_URL
-            client=AsyncOpenAI(api_key=os.environ['AIAND_API_KEY'],base_url=BASE_URL,max_retries=0,default_headers={'User-Agent':'FireAtlas/1.0'})
+            from .aiand import authenticated_key
+            client=AsyncOpenAI(api_key=authenticated_key(),base_url=BASE_URL,max_retries=0,default_headers={'User-Agent':'FireAtlas/1.0'})
             model=OpenAIChatModel(config['model'],provider=OpenAIProvider(openai_client=client),
                 profile=OpenAIModelProfile(supports_image_input=config['vision'],openai_supports_reasoning=True,openai_chat_supports_max_completion_tokens=True))
         elif config['provider']=='openai':
@@ -483,7 +484,7 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
 
         @agent.tool_plain
         def draft_studio_action(action: Literal['build_investigation', 'arrange_cards', 'create_story_draft', 'create_workflow_draft'], arguments: dict, base_revision: int) -> dict:
-            """Draft a typed, reversible presentation action for explicit user application. Use existing card IDs and the current board revision. Never invent numeric chart data or execute code. Story drafts choose selected_cards, title and audience."""
+            """Draft a typed presentation action for explicit user application. Use existing card IDs and the current board revision. Never invent numeric chart data or execute code. For an infographic story or video use create_story_draft with selected_cards: applying it invokes the dedicated AI& film director and local renderer when configured. Do not write measured chapter content yourself."""
             if cancel.is_set() or time.monotonic() > deadline:
                 raise InterruptedError('Investigation stopped.')
             try:
@@ -497,7 +498,7 @@ def run_agent(service, owner, message, context, view, cancel, deadline, progress
         from ..studio.errors import StudioError as StudioActionError
         @agent.tool_plain
         def run_studio_recipe(recipe: Literal['visualization_to_investigation', 'selection_to_chart_set', 'findings_to_workflow', 'board_to_portable_exports', 'continue_investigation'], arguments: dict) -> dict:
-            """Execute the user's requested deterministic Canvas recipe using the attached frozen instance selection. Use only when the user requests packaging, charts, a workflow, a local export or a selected-object follow-up. For package + charts + workflow + entire-whiteboard export, call visualization_to_investigation once with arguments.export_formats=['native','excalidraw']; the runner prepares exports without rerunning science. Never send externally. Return the saved command ID; saving and actual browser display are separate. Repeating the same intent resumes its saved outputs."""
+            """Execute the user's requested deterministic Canvas recipe using the attached frozen instance selection. Use only when the user requests packaging, charts, a workflow, a local export or a selected-object follow-up. For a comprehensive presentation use visualization_to_investigation with arguments.layout='curated': it arranges paired sensor maps, charts, records, connected groups, checked findings, an editable story and a runnable workflow. For package + charts + workflow + entire-whiteboard export, call visualization_to_investigation once with arguments.export_formats=['native','excalidraw']; the runner prepares exports without rerunning science. Never send externally. Return the saved command ID; saving and actual browser display are separate. Repeating the same intent resumes its saved outputs."""
             if cancel.is_set() or time.monotonic() > deadline: raise InterruptedError('Investigation stopped.')
             try:
                 if studio_view:

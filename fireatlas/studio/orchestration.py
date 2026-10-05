@@ -26,7 +26,7 @@ RECIPES = {
     'continue_investigation': {'effect': 'selected-objects', 'retry': 'checkpoint'},
 }
 ARGUMENTS={
-    'visualization_to_investigation':{'export_formats'}, 'selection_to_chart_set':{'export_formats'}, 'findings_to_workflow':{'export_formats'},
+    'visualization_to_investigation':{'export_formats','layout'}, 'selection_to_chart_set':{'export_formats'}, 'findings_to_workflow':{'export_formats'},
     'board_to_portable_exports':{'format','revision','scope'},
     'continue_investigation':{'action','workflow_id','node_id','metric','source','story_id','story_revision','chapter_ids','study'},
 }
@@ -126,6 +126,7 @@ class Commands:
         context = normalize(body.get('context'))
         args = graph.small_json(body.get('arguments') or {}, 'Recipe arguments', 16000)
         if set(args)-ARGUMENTS[recipe]:raise StudioError('Unknown typed recipe argument.')
+        if 'layout' in args and args['layout'] != 'curated':raise StudioError('Choose the supported curated layout.')
         if 'export_formats' in args and (not isinstance(args['export_formats'],list) or not 1<=len(args['export_formats'])<=5 or len(set(args['export_formats']))!=len(args['export_formats']) or any(f not in {'native','excalidraw','svg','png','pdf'} for f in args['export_formats'])):
             raise StudioError('Choose up to five distinct supported local export formats.')
         if recipe=='continue_investigation' and args.get('action') not in FOLLOW_ACTIONS:raise StudioError('Choose a supported follow-up action.')
@@ -313,6 +314,9 @@ class Commands:
                 for sid in prepared['snapshots'][1:]: entries.append(('timeline','Collected-export availability',sid,'joint'))
                 entries.append(('finding','Checked findings',snapshot['id'],context['study_selection']['source']))
                 entries.append(('note-question','Question to investigate',None,'joint'))
+                if args.get('layout')=='curated':
+                    from .composition import presentation_entries
+                    entries=presentation_entries(prepared['primary_operation'],snapshot['id'],prepared['snapshots'],source_view.get('source') or context['study_selection']['source'])
                 ops=[]
                 preview=self.step(cid,'capture').get('preview'); aid=None
                 if preview:
@@ -331,14 +335,45 @@ class Commands:
                           'follow':'pinned','pinned_study':{'context':{**context['study_selection'],'source':source}},
                           'transform':{'x':40+(i%3)*410,'y':top+(i//3)*310,'w':380,'h':270}}
                     ops.append({'op':'add_card','card':card})
+                if args.get('layout')=='curated':
+                    from .composition import decorate
+                    receipt=self.service.snapshot_receipt(principal,did,snapshot['id'])['receipt']
+                    decorate(ops,entries,context,receipt['payload'],top,lambda role:stable(cid,role))
                 if not doc['state'].get('workflow_id'):ops.append({'op':'set_workflow','id':workflow['id']})
                 for i in range(1,len(entries)):
-                    ops.append({'op':'connect','connection':{'id':stable(cid,'link-'+str(i)),'source':stable(cid,'card-0'),'target':stable(cid,'card-'+str(i)),'kind':'context'}})
+                    parent=0
+                    if args.get('layout')=='curated':
+                        from .composition import parent_index
+                        parent=parent_index(entries,i)
+                    ops.append({'op':'connect','connection':{'id':stable(cid,'link-'+str(i)),'source':stable(cid,'card-'+str(parent)),'target':stable(cid,'card-'+str(i)),'kind':'context'}})
                 self.store.apply_transaction(principal,did,{'base_revision':base,'allow_merge':True,'ops':ops,'group_id':cid},cid,_command=cid)
                 insertion=self.step(cid,'insertion')
+            if args.get('layout')=='curated' and not self.step(cid,'presentation_story'):
+                from .story import default_story, clean_story, adapt_narration
+                doc=self.store.get_document(principal,did)
+                card_ids=[oid for oid in doc['state']['order'] if doc['state']['cards'][oid]['provenance'].get('command_id')==cid]
+                body=default_story(doc['state'],'Curated investigation · '+str(context['study_selection'].get('case') or context['study_selection'].get('region') or 'selected study'),card_ids)
+                body['audience']='presenter';body['target_duration_seconds']=90
+                body['chapters']=[{**adapt_narration(chapter,'presenter'),'duration_seconds':15} for chapter in body['chapters']]
+                maps=[oid for oid in card_ids if doc['state']['cards'][oid]['type']=='map']
+                if maps:
+                    body['chapters'][0]['visible_cards']=maps[:3]
+                    body['chapters'][0]['evidence_cards']=maps[:3]
+                body=clean_story(body);story_id=stable(cid,'story')
+                if flag.is_set():raise InterruptedError('Command cancelled.')
+                with self.store.connection(write=True) as db:
+                    self.store.require(db,principal,did,'editor');now=self.store.clock()
+                    if not db.execute('SELECT 1 FROM stories WHERE id=?',(story_id,)).fetchone() and db.execute('SELECT COUNT(*) FROM stories WHERE document_id=?',(did,)).fetchone()[0]>=10:
+                        raise StudioError('This Canvas already has ten stories. The saved cards remain available; choose another Canvas for another presentation.',code='story-limit')
+                    db.execute('INSERT OR IGNORE INTO stories VALUES(?,?,?,?,?,?,?)',(story_id,did,principal,body['title'],1,now,now))
+                    db.execute('INSERT OR IGNORE INTO story_revisions VALUES(?,?,?,?,NULL,NULL,?,?)',(story_id,1,doc['revision'],dumps(body),principal,now))
+                self.service.resolve_story(principal,story_id)
+                self.checkpoint(cid,'presentation_story',{'id':story_id,'revision':1})
+                self.update(cid,'saved',{'story_id':story_id})
             package={'schema':'fireatlas-investigation-package-v1','id':stable(cid,'package'),'command_id':cid,'source_context':context,
                      'source_view':context['active_view'],'evidence_refs':prepared['snapshots'],'cards':insertion['object_ids'],'workflow':workflow,
-                     'operation_trace':prepared['trace'],'omissions':prepared['omissions'],'document_id':did,'revision':insertion['revision']}
+                     'operation_trace':prepared['trace'],'omissions':prepared['omissions'],'document_id':did,'revision':insertion['revision'],
+                     **({'story':self.step(cid,'presentation_story')} if args.get('layout')=='curated' else {})}
             with self.store.connection(write=True) as db:
                 db.execute('INSERT OR IGNORE INTO investigation_packages VALUES(?,?,?,?,?,?)',(package['id'],cid,principal,did,dumps(package),self.store.clock()))
             if args.get('export_formats'):

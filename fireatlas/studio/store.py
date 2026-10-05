@@ -17,7 +17,7 @@ from pathlib import Path
 from . import graph
 from .errors import Conflict, Forbidden, LimitExceeded, NotFound, StoreVersionError, StudioError, Throttled, Unauthorized
 
-STORE_VERSION = 6
+STORE_VERSION = 7
 SESSION_SECONDS = 365 * 86400
 MAX_STATE_BYTES = 1_000_000
 ROLES = ("viewer", "editor", "owner")
@@ -99,6 +99,13 @@ MIGRATIONS = [
     """),
     (6, "imported-frozen-projects", """
     CREATE TABLE imported_projects(document_id TEXT NOT NULL, body TEXT NOT NULL);
+    """),
+    (7, "ai-story-generation", """
+    CREATE TABLE story_generations(id TEXT PRIMARY KEY, principal_id TEXT NOT NULL,
+        document_id TEXT NOT NULL REFERENCES documents(id), document_revision INTEGER NOT NULL,
+        status TEXT NOT NULL, phase TEXT NOT NULL, progress REAL NOT NULL, capture TEXT NOT NULL,
+        story_id TEXT, render_id TEXT, receipt TEXT, error TEXT, cancel INTEGER NOT NULL DEFAULT 0,
+        created REAL NOT NULL, updated REAL NOT NULL);
     """),
 ]
 
@@ -284,6 +291,22 @@ class StudioStore:
                 (SELECT 1 FROM rooms r JOIN room_members m ON m.room_id=r.id WHERE r.document_id=d.id AND m.principal_id=?)) ORDER BY d.updated DESC LIMIT 200""",
                               (principal, principal)).fetchall()
         return [{"id": r["id"], "title": r["title"], "revision": r["revision"], "updated": r["updated"], "owner": r["owner_id"] == principal} for r in rows]
+
+    def delete_document(self, principal, document_id, expected_revision, key=None):
+        with self.connection(write=True) as db:
+            replayed = self.replay(db, principal, 'delete-document:' + document_id, key)
+            if replayed:
+                return {**replayed, 'idempotent_replay': True}
+            self.require(db, principal, document_id, 'owner')
+            row = db.execute('SELECT revision FROM documents WHERE id=?', (document_id,)).fetchone()
+            if type(expected_revision) is not int or expected_revision != row['revision']:
+                raise Conflict('This investigation changed. Reload it before deleting.', code='revision-conflict')
+            db.execute('UPDATE documents SET deleted=1,updated=? WHERE id=?', (self.clock(), document_id))
+            db.execute("UPDATE workflow_runs SET cancel=1 WHERE workflow_id IN (SELECT id FROM workflows WHERE document_id=?) AND status IN ('queued','running')", (document_id,))
+            db.execute("UPDATE renders SET cancel=1 WHERE document_id=? AND status IN ('queued','running')", (document_id,))
+            response = {'id': document_id, 'deleted': True}
+            self.remember(db, principal, 'delete-document:' + document_id, key, response)
+            return response
 
     def revision_state(self, principal, document_id, revision):
         with self.connection() as db:

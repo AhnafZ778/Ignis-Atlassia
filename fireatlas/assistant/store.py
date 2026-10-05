@@ -134,8 +134,6 @@ class Store:
                 return existing["id"], False
             if db.execute("SELECT 1 FROM runs WHERE session=? AND status IN ('queued','running')", (owner,)).fetchone():
                 raise ValueError("An investigation is already running. Stop it first.")
-            if db.execute("SELECT COUNT(*) FROM runs WHERE created>? AND session=?", (time.time()-86400, owner)).fetchone()[0] >= 20:
-                raise ValueError("Temporary workspace turn limit reached. Existing results remain available.")
             if db.execute("SELECT COUNT(*) FROM runs WHERE status IN ('queued','running')").fetchone()[0] >= 2:
                 raise ValueError("Both analysis slots are busy. Retry after a current investigation finishes.")
             identifier = secrets.token_urlsafe(18)

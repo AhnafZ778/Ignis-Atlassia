@@ -47,6 +47,8 @@ class StudioService:
         self.commands = Commands(self)
         from .miro import Miro
         self.miro = Miro(self)
+        from .story_generation import StoryGeneration
+        self.story_generation = StoryGeneration(self)
 
     def assistant_owner(self, principal):
         """Reuse one private assistant session per Studio principal, with its ordinary expiry and budgets."""
@@ -86,6 +88,7 @@ class StudioService:
         result['orchestration'] = {'available': True, 'recipes': RECIPES, 'context_schema': 'fireatlas-jarvis-context-v1'}
         result['portability'] = self.portability.capabilities()
         result['miro'] = self.miro.capabilities()
+        result['story_generation'] = self.story_generation.capabilities()
         if self.assistant is None:
             result['narration'] = {'available': False, 'reason': 'The existing assistant speech runtime is unavailable. Captions and transcript remain available.'}
         return result
@@ -163,6 +166,10 @@ class StudioService:
             identifier = self.store.artifact(principal, 'workflow_draft', draft)
             return {'action': action, 'workflow_draft': {'id': identifier, **draft}}
         if action == "create_story_draft":
+            if self.story_generation.capabilities()['available']:
+                job = self.story_generation.submit(principal, document_id,
+                    {**(body.get('story') or {}), 'expected_revision': document['revision']}, key)
+                return {'action': action, 'story_generation': job}
             story = self.create_story(principal, document_id, body.get("story") or {}, key)
             return {"action": action, "story": story}
         if action == "arrange_cards":
@@ -245,8 +252,13 @@ class StudioService:
             raise StudioError("The stored receipt no longer matches this snapshot.", code="receipt-mismatch", details={"problems": verification["problems"]}, status=409)
         return {"snapshot_id": snapshot_id, "result_id": snapshot["result_id"], "receipt": {**receipt, "id": snapshot["result_id"]}}
 
+    def snapshot_landscape(self, principal, document_id, snapshot_id, background='auto'):
+        from .context_layers import landscape
+        snapshot = self.store.get_snapshot(principal, document_id, snapshot_id)
+        return landscape(snapshot['scope'], background)
+
     # -- stories ----------------------------------------------------------------------
-    def snapshot_preview(self, principal, document_id, snapshot_id, kind, day=None, source="joint", start=None, end=None, cell=None):
+    def snapshot_preview(self, principal, document_id, snapshot_id, kind, day=None, source="joint", start=None, end=None, cell=None, background='auto'):
         if kind not in ("map", "chart", "timeline", "observation", "finding", "calendar", "table"):
             raise StudioError("Choose a registered analytical preview.", code="invalid-preview")
         snapshot = self.store.get_snapshot(principal, document_id, snapshot_id)
@@ -262,6 +274,11 @@ class StudioService:
                  "figure_version": 2,
                  "fallback": stories.schematic(card, [snapshot]),
                  "visual": visuals.prepared(card, [snapshot], {snapshot_id: receipt}, {"selection": selection, "source_filter": source})}
+        if kind == 'map' and scene['visual'] and scene['visual'].get('kind') == 'map':
+            from .context_layers import landscape
+            context = landscape(snapshot['scope'], background)
+            scene['visual']['context_layers'] = context['layers']
+            scene['visual']['background'] = {k: v for k, v in context.items() if k != 'layers'}
         return {"svg": visuals.svg(scene), "visual": scene["visual"], "snapshot_sha256": snapshot["snapshot_sha256"]}
 
     def _story_row(self, db, principal, story_id, minimum="viewer"):
@@ -454,7 +471,8 @@ class StudioService:
             workflow = db.execute("SELECT id,revision,definition FROM workflows WHERE document_id=? ORDER BY CASE WHEN id=? THEN 0 ELSE 1 END,updated DESC", (document_id,json.loads(db.execute("SELECT state FROM documents WHERE id=?",(document_id,)).fetchone()[0]).get("workflow_id"))).fetchone()
             renders = [dict(row) for row in db.execute('SELECT id,story_id,story_revision,status,phase,created FROM renders WHERE document_id=? ORDER BY created DESC,id DESC LIMIT 30', (document_id,))]
             render_count = db.execute('SELECT COUNT(*) FROM renders WHERE document_id=?', (document_id,)).fetchone()[0]
-            return {"stories": stories, "workflow": {"id": workflow["id"], "revision": workflow["revision"],
+            generations = [dict(row) for row in db.execute('SELECT id,status,story_id,created FROM story_generations WHERE document_id=? ORDER BY created DESC LIMIT 10', (document_id,))]
+            return {"story_generations": generations, "stories": stories, "workflow": {"id": workflow["id"], "revision": workflow["revision"],
                     "definition": json.loads(workflow["definition"])} if workflow else None, 'renders': renders, 'renders_total': render_count, 'imported_annotations': [json.loads(r['body']) for r in db.execute('SELECT body FROM imported_annotations WHERE document_id=?', (document_id,))]}
 
     # -- workflows --------------------------------------------------------------------
@@ -666,6 +684,8 @@ class StudioService:
         return self.renders.submit(principal, view["document_id"], story_id, resolved, key, narration_requested=narration_requested)
 
     def close(self):
+        for flag in list(self.story_generation.flags.values()):
+            flag.set()
         for flag in list(self.run_flags.values()):
             flag.set()
         for flag in list(self.commands.active.values()):

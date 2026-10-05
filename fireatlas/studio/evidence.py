@@ -171,6 +171,15 @@ def allowed_numbers(snapshots):
         for item in snapshot.get("facts", []):
             if item["state"] == "observed":
                 allowed |= _forms(item["value"])
+                # Guided date lists are checked strings, not numeric measurements.
+                # Permit their genuine UTC components in readable narration.
+                if isinstance(item['value'], str):
+                    for token in re.findall(r'\b\d{4}-\d{2}-\d{2}\b', item['value']):
+                        try:
+                            date = datetime.date.fromisoformat(token)
+                        except ValueError:
+                            continue
+                        allowed |= {str(date.year), f'{date.month:02}', str(date.month), f'{date.day:02}', str(date.day)}
         scope = snapshot.get("scope", {})
         for key in ("start", "end", "day"):
             if scope.get(key):

@@ -125,7 +125,7 @@ class StudioAssistant:
                     'run_nonce': (self.assistant.store.session(owner).get('view') or {}).get('studio', {}).get('run_nonce'),
                     'summary': {'build_investigation': 'Create the seven-card study template. Evidence remains unfrozen until calculated.',
                                 'arrange_cards': 'Move or resize the listed existing cards.',
-                                'create_story_draft': 'Create an editable six-chapter story from selected board evidence.',
+                                'create_story_draft': 'Create an AI& infographic story and film from the selected frozen evidence when configured; otherwise save a manual draft.',
                                 'create_workflow_draft': 'Load an editable workflow draft. Saving and running remain separate explicit actions.'}[action]}
         identifier = self.assistant.store.artifact(owner, 'studio_proposal', proposal)
         return {'proposal_id': identifier, **proposal, 'requires_apply': True}

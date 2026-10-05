@@ -479,6 +479,45 @@ class AssistantTests(unittest.TestCase):
         self.service.store.artifact(self.owner,'answer',{'title':'<script>evil()</script>','kind':'test','summary':'<img onerror=evil()>','claims':[]})
         report=self.service.report_html(self.owner)
         self.assertNotIn('<script>evil()',report);self.assertIn('&lt;script&gt;',report)
+    def test_run_history_does_not_block_browsing_or_conversations(self):
+        # An existing workspace retains all its prior completed/failed/cancelled
+        # requests; neither stored-data nor conversational admission has a
+        # cumulative daily turn ceiling. No model calls are made by this test.
+        store=self.service.store
+        for index in range(30):
+            run,fresh=store.create_run(self.owner,'old-run-'+str(index),{'operation':'replay' if index%2 else None})
+            self.assertTrue(fresh)
+            store.finish(self.owner,run,['completed','failed','cancelled'][index%3],{'saved':True})
+        for operation in ('archive_search','replay','missingness',None):
+            request={'operation':operation}
+            run,fresh=store.create_run(self.owner,'new-'+str(operation),request)
+            self.assertTrue(fresh)
+            repeated,new=store.create_run(self.owner,'new-'+str(operation),request)
+            self.assertEqual(repeated,run);self.assertFalse(new)
+            with self.assertRaisesRegex(ValueError,'already running'):
+                store.create_run(self.owner,'concurrent-'+str(operation),request)
+            store.finish(self.owner,run,'completed',{'saved':True})
+        with store.connection() as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM runs WHERE session=?',(self.owner,)).fetchone()[0],34)
+
+    def test_archive_and_replay_complete_in_a_previously_saturated_workspace(self):
+        for index in range(21):
+            run,_=self.service.store.create_run(self.owner,'prior-'+str(index),{'operation':'replay'})
+            self.service.store.finish(self.owner,run,'completed',{'saved':True})
+        for operation,args in [('archive_search',{'first_year':2015,'last_year':2015}),('replay',{})]:
+            with patch('fireatlas.assistant.service.run_agent',side_effect=AssertionError('Stored data must not call inference')):
+                run=self.service.start(self.owner,{'nonce':'actual-'+operation,'context':self.cfg,'view':{'instance':'tab-one'},'operation':operation,'arguments':args})
+                deadline=time.monotonic()+15
+                while time.monotonic()<deadline:
+                    result=self.service.store.run(self.owner,run['id'])
+                    if result['status'] in {'completed','failed'}:break
+                    time.sleep(.01)
+            self.assertEqual(result['status'],'completed',result)
+            evidence=self.service.store.get_artifact(self.owner,result['body']['evidence_ids'][0],'evidence')['body']
+            self.assertEqual(evidence['operation'],operation)
+            if operation=='archive_search':self.assertTrue(evidence['payload']['windows'])
+            else:self.assertTrue(evidence['payload']['frames'])
+
     def test_strict_context_and_no_joint_frp(self):
         for cfg in ({'source':'joint','metric':'frp'},{'bbox':[1,2,float('nan'),4]},{'revision':True},{'start':'2024-08-01','end':'2024-07-01'},{'region':'made-up'}):
             with self.subTest(cfg=cfg),self.assertRaises(ValueError):normalize_context(cfg)

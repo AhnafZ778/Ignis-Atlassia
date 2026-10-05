@@ -206,7 +206,7 @@ def _dispatch(handler, service, url):
         return _send(handler, service.capabilities())
     if method != "GET":
         _check_origin(handler)
-    body = _body(handler) if method in ("POST", "PATCH") and route != 'imports' else {}
+    body = _body(handler) if method in ("POST", "PATCH", "DELETE") and route != 'imports' else {}
     key = handler.headers.get("Idempotency-Key")
     store = service.store
 
@@ -223,6 +223,22 @@ def _dispatch(handler, service, url):
         principal, token = store.recover(body.get("recovery"))
         return _send(handler, {"principal": principal[-6:], "recovered": True}, token=token)
     principal = store.principal(token)
+    if parts[:1] == ['story-generations'] and len(parts) in (2, 3):
+        if len(parts) == 2 and method == 'GET':
+            return _send(handler, service.story_generation.get(principal, parts[1]))
+        if len(parts) == 3 and parts[2] == 'cancel' and method == 'POST':
+            return _send(handler, service.story_generation.cancel(principal, parts[1]))
+        if len(parts) == 3 and parts[2] == 'resume' and method == 'POST':
+            return _send(handler, service.story_generation.resume(principal, parts[1]), HTTPStatus.ACCEPTED)
+    if route == 'prompt-presets' and method == 'GET':
+        from .prompts import catalog
+        return _send(handler, catalog())
+    if route == 'prompt-commands' and method == 'POST':
+        from .prompts import submit
+        from ..assistant.http import COOKIE as ASSISTANT_COOKIE
+        jar = SimpleCookie(); jar.load(handler.headers.get('Cookie', ''))
+        owner = jar[ASSISTANT_COOKIE].value if ASSISTANT_COOKIE in jar else None
+        return _send(handler, submit(service,principal,body,key,assistant_owner=owner))
     if route == 'contexts' and method == 'POST':
         return _send(handler, service.commands.context(principal, body))
     if route == 'commands' and method == 'POST':
@@ -292,6 +308,8 @@ def _dispatch(handler, service, url):
             return _send(handler, service.miro.submit(principal, document_id, body, key=key), HTTPStatus.ACCEPTED)
         if not tail and method == "GET":
             return _send(handler, service.get_document(principal, document_id))
+        if not tail and method == "DELETE":
+            return _send(handler, store.delete_document(principal, document_id, body.get('expected_revision'), key))
         if not tail and method == "PATCH":
             return _send(handler, service.patch_document(principal, document_id, body))
         if tail == ["actions"] and method == "POST":
@@ -307,9 +325,11 @@ def _dispatch(handler, service, url):
             return _send(handler, {"revision": int(tail[1]), "state": state, "state_sha256": digest})
         if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "receipt" and method == "GET":
             return _send(handler, service.snapshot_receipt(principal, document_id, tail[1]))
+        if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "landscape" and method == "GET":
+            return _send(handler, service.snapshot_landscape(principal, document_id, tail[1], params.get('background', ['auto'])[0]))
         if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "preview" and method == "GET":
             return _send(handler, service.snapshot_preview(principal, document_id, tail[1], params.get("type", ["table"])[0], params.get("day", [None])[0], params.get("source", ["joint"])[0],
-                params.get("start", [None])[0], params.get("end", [None])[0], params.get("cell", [None])[0]))
+                params.get("start", [None])[0], params.get("end", [None])[0], params.get("cell", [None])[0], params.get('background', ['auto'])[0]))
         if len(tail) == 2 and tail[0] == "snapshots" and method == "GET":
             return _send(handler, service.snapshot_report(principal, document_id, tail[1]))
         if tail == ["bindings", "resolve"] and method == "POST":
@@ -328,6 +348,8 @@ def _dispatch(handler, service, url):
                 return _send(handler, service.jarvis.apply(principal, document_id, tail[2]))
         if tail == ["stories"] and method == "POST":
             return _send(handler, service.create_story(principal, document_id, body, key), HTTPStatus.CREATED)
+        if tail == ['story-generations'] and method == 'POST':
+            return _send(handler, service.story_generation.submit(principal, document_id, body, key), HTTPStatus.ACCEPTED)
         if tail == ["projects"] and method == "GET":
             return _send(handler, service.document_projects(principal, document_id))
         if tail == ["assets"] and method == "POST":

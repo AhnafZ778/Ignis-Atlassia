@@ -79,6 +79,50 @@ class StudioHttpTests(unittest.TestCase):
         self.assertEqual(status, 201, document)
         return document
 
+    def test_delete_requires_owner_origin_and_current_revision(self):
+        document = self.board()
+        path = '/api/studio/documents/' + document['id']
+        body = {'expected_revision': document['revision']}
+        self.assertEqual(self.alice.call('DELETE', path, body, origin=False)[0], 403)
+        self.assertEqual(self.bob.call('DELETE', path, body)[0], 404)
+        self.assertEqual(self.alice.call('DELETE', path, {'expected_revision': 0})[0], 409)
+        headers = {'Idempotency-Key': 'delete-http-once'}
+        self.assertEqual(self.alice.call('DELETE', path, body, headers=headers)[0], 200)
+        self.assertTrue(self.alice.call('DELETE', path, body, headers=headers)[1]['idempotent_replay'])
+        self.assertEqual(self.alice.call('GET', path)[0], 404)
+        self.assertEqual(self.alice.call('GET', '/api/studio/documents')[1]['documents'], [])
+
+    def test_landscape_requires_document_access_and_exact_snapshot(self):
+        document = self.board()
+        status, frozen, _ = self.alice.call('POST', '/api/studio/documents/' + document['id'] + '/bindings/resolve', {'binding': {'operation': 'replay', 'context': {}, 'arguments': {}}})
+        self.assertEqual(status, 200)
+        path = '/api/studio/documents/' + document['id'] + '/snapshots/' + frozen['snapshot']['id'] + '/landscape'
+        self.assertEqual(self.bob.call('GET', path)[0], 404)
+        status, context, _ = self.alice.call('GET', path)
+        self.assertEqual(status, 200)
+        self.assertEqual(context['layers'], [])
+        self.assertEqual(self.alice.call('GET', path + '?background=invalid')[0], 400)
+
+    def test_prompt_catalog_and_canvas_choice_require_owned_same_origin_context(self):
+        self.assertEqual(Client(self.base).call("GET", "/api/studio/prompt-presets")[0], 401)
+        status, catalog, _ = self.alice.call("GET", "/api/studio/prompt-presets")
+        self.assertEqual(status, 200)
+        self.assertEqual(len(catalog["presets"]), 7)
+        mine, other = self.board(), self.board(self.bob)
+        body = {"message": catalog["presets"][1]["prompt"], "context": {
+            "schema": "fireatlas-jarvis-context-v1", "surface": "studio",
+            "origin_instance_id": "prompt-http", "origin_tab_id": "tab-http",
+            "context_revision": 1, "study_selection": {"case": "park-2024"},
+            "active_view": {"kind": "map", "operation": "replay"},
+            "destination": {"intent": "new-board"}}}
+        self.assertEqual(self.alice.call("POST", "/api/studio/prompt-commands", body, origin=False)[0], 403)
+        status, result, _ = self.alice.call("POST", "/api/studio/prompt-commands", body)
+        self.assertEqual(status, 200, result)
+        self.assertEqual(result["status"], "needs_destination")
+        self.assertEqual([b["id"] for b in result["choices"]], [mine["id"]])
+        self.assertNotIn(other["id"], str(result))
+        self.assertEqual(self.alice.call("GET", "/api/studio/documents/" + mine["id"])[1]["revision"], 1)
+
     def test_capabilities_need_no_identity_and_report_truthful_gates(self):
         status, caps, _ = Client(self.base).call("GET", "/api/studio/capabilities")
         self.assertEqual(status, 200)
@@ -269,17 +313,13 @@ class StudioStaticTests(unittest.TestCase):
             self.assertEqual(status, 200)
             self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
 
-    def test_studio_pages_are_served_and_linked_only_from_investigate_and_research(self):
+    def test_studio_pages_are_served_and_linked_from_primary_navigation(self):
         for path, marker in (("/studio.html", b"studio"), ("/studio-reader.html", b"reader")):
             status, body, _ = self.client.call("GET", path, raw=True)
             self.assertEqual(status, 200, path)
             self.assertIn(marker, body.lower())
-        for path in ("/investigate.html", "/research.html"):
+        for path in ("/", "/investigate.html", "/research.html", "/atlas.html", "/evidence.html"):
             self.assertIn(b"studio.html", self.client.call("GET", path, raw=True)[1], path)
-        landing = self.client.call("GET", "/", raw=True)[1]
-        self.assertNotIn(b"studio", landing.lower())
-        for path in ("/atlas.html", "/evidence.html", "/replay.html", "/assistant.html"):
-            self.assertNotIn(b"studio.html", self.client.call("GET", path, raw=True)[1], path)
 
 
 if __name__ == "__main__":

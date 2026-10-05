@@ -69,6 +69,26 @@ class StoreMigrationTests(unittest.TestCase):
 
 
 class DocumentTests(StudioCase):
+    def test_delete_investigation_is_owned_revision_checked_and_idempotent(self):
+        document = self.add_card(self.board(), 'kept-evidence')
+        other = self.board(title='Keep this investigation')
+        # A shared editor can edit cards but cannot delete the owner's board.
+        with self.service.store.connection(write=True) as db:
+            db.execute('INSERT INTO rooms VALUES(?,?,?,?,?)', ('room-delete-test', document['id'], self.owner, 'mock', 1))
+            db.execute('INSERT INTO room_members VALUES(?,?,?,?)', ('room-delete-test', self.other, 'editor', 1))
+        with self.assertRaises(Forbidden):
+            self.service.store.delete_document(self.other, document['id'], document['revision'])
+        with self.assertRaises(Conflict):
+            self.service.store.delete_document(self.owner, document['id'], 1)
+        result = self.service.store.delete_document(self.owner, document['id'], document['revision'], 'delete-once-key')
+        self.assertTrue(result['deleted'])
+        self.assertTrue(self.service.store.delete_document(self.owner, document['id'], document['revision'], 'delete-once-key')['idempotent_replay'])
+        self.assertEqual([d['id'] for d in self.service.store.list_documents(self.owner)], [other['id']])
+        with self.assertRaises(NotFound):
+            self.service.get_document(self.owner, document['id'])
+        with self.assertRaises(NotFound):
+            self.service.transact(self.owner, document['id'], {'base_revision': document['revision'], 'ops': [{'op': 'set_title', 'title': 'Revive'}]})
+
     def test_group_moves_are_atomic_and_reversible_without_changing_bindings(self):
         document = self.add_card(self.add_card(self.board(), "a"), "b")
         def apply(ops):

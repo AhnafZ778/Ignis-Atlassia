@@ -23,4 +23,4 @@ build-backend = "setuptools.build_meta"
 include = ["fireatlas*"]
 
 [tool.setuptools.package-data]
-fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "static/incident-media/*", "static/studio-assets/*", "static/studio-assets/assets/*", "static/studio-assets/.vite/*", "static/studio-mcp/*", "samples/*", "assistant/system.md", "studio/*.json"]
+fireatlas = ["static/*", "static/vendor/*", "static/fonts/*", "static/incident-media/*", "static/studio-assets/*", "static/studio-assets/assets/*", "static/studio-assets/.vite/*", "static/studio-mcp/*", "samples/*", "assistant/system.md", "studio/*.json", "studio/*.md"]
