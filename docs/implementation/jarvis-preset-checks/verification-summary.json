@@ -1,0 +1,41 @@
+{
+  "backend": {
+    "focused_tests_passed": 69,
+    "final_curated_tests_passed": 6,
+    "modules": [
+      "tests.test_studio_prompts",
+      "tests.test_studio_assistant",
+      "tests.test_studio_portability",
+      "tests.test_studio_http",
+      "tests.test_studio_workflow_rooms"
+    ]
+  },
+  "frontend": {
+    "test_files": 14,
+    "tests_passed": 60,
+    "production_build_and_typescript": "passed"
+  },
+  "named_study_context": "passed",
+  "browser": {
+    "checks": [
+      "Studio prompt asks for destination before any board change.",
+      "Named Grove presentation appends to the chosen Canvas without changing its existing note or board study.",
+      "Grove retains seven authentic eligible detections and four joint cell-days.",
+      "Composed cards, four groups, six resolved story chapters and registered workflow persist and acknowledge the actual destination.",
+      "Investigate prompt captures the selected Park frame and creates a comprehensive new Canvas with 6,224 detections and 2,228 joint cell-days.",
+      "Prepared paired heat maps share their study domain; pointer zoom and keyboard card movement work after packaging."
+    ],
+    "page_errors": [],
+    "inference_requests": []
+  },
+  "landing": {
+    "asset_hashes_matched": 75,
+    "outside_header_boundaries_matched": 2
+  },
+  "release": {
+    "manifest_files": 382,
+    "javascript_syntax_files": 177,
+    "source_static_parity": "passed"
+  },
+  "external_provider_calls": "none; configured provider integrations were not reverified"
+}

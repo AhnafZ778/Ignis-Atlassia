@@ -1,0 +1,83 @@
+{
+  "checks": [
+    "local: native gates, distinct exposure boundary, exact scope, case switch, recount and 360/390/768 layout",
+    "local: Studio handoff visibility, compact controls, fixed map scale, keyboard disclosure, 360/390/768 layout",
+    "static: native gates, distinct exposure boundary, exact scope, case switch, recount and 360/390/768 layout",
+    "static: Studio handoff visibility, compact controls, fixed map scale, keyboard disclosure, 360/390/768 layout"
+  ],
+  "errors": [],
+  "sizes": [
+    {
+      "mode": "local",
+      "page": "validity",
+      "width": 360,
+      "scroll_width": 360
+    },
+    {
+      "mode": "local",
+      "page": "validity",
+      "width": 390,
+      "scroll_width": 390
+    },
+    {
+      "mode": "local",
+      "page": "validity",
+      "width": 768,
+      "scroll_width": 768
+    },
+    {
+      "mode": "local",
+      "page": "investigate",
+      "width": 360,
+      "scroll_width": 360
+    },
+    {
+      "mode": "local",
+      "page": "investigate",
+      "width": 390,
+      "scroll_width": 390
+    },
+    {
+      "mode": "local",
+      "page": "investigate",
+      "width": 768,
+      "scroll_width": 768
+    },
+    {
+      "mode": "static",
+      "page": "validity",
+      "width": 360,
+      "scroll_width": 360
+    },
+    {
+      "mode": "static",
+      "page": "validity",
+      "width": 390,
+      "scroll_width": 390
+    },
+    {
+      "mode": "static",
+      "page": "validity",
+      "width": 768,
+      "scroll_width": 768
+    },
+    {
+      "mode": "static",
+      "page": "investigate",
+      "width": 360,
+      "scroll_width": 360
+    },
+    {
+      "mode": "static",
+      "page": "investigate",
+      "width": 390,
+      "scroll_width": 390
+    },
+    {
+      "mode": "static",
+      "page": "investigate",
+      "width": 768,
+      "scroll_width": 768
+    }
+  ]
+}

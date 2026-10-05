@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Park preset uses authentic supplied NDVI and terrain under both heatmaps, with the dated composite label.",
+    "Changing to heat-only and back changes pixels while preserving date, sensor and the shared full-study scale; PNG includes vegetation.",
+    "The text-free dot toggles with click or Space, has a screen-reader switch label, and saves its state through refresh.",
+    "Interactive Canvas map uses the same supplied vegetation background."
+  ],
+  "page_errors": [],
+  "scale_maximum": "6.240770107354527",
+  "selected_utc_day": "2024-07-30"
+}

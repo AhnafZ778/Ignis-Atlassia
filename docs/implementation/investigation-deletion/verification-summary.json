@@ -1,0 +1,14 @@
+{
+  "fireatlas/static": {
+    "manifest_files": 382,
+    "errors": []
+  },
+  "site": {
+    "manifest_files": 382,
+    "errors": []
+  },
+  "source_static_parity": true,
+  "javascript_syntax": "passed",
+  "python_tests": 42,
+  "frontend_tests": 69
+}

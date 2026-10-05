@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "An empty workspace creates no unwanted board; all curated presets remain selectable.",
+    "Keep and Escape preserve the investigation and return keyboard focus.",
+    "Confirmed deletion removes only the selected investigation, opens the remaining board and survives refresh.",
+    "Deleting the last investigation stays empty after refresh and a stale board link; no replacement is created."
+  ],
+  "page_errors": [],
+  "layouts": [
+    360,
+    390,
+    768
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "errors": [],
+  "checks": [
+    "Default on-screen narration captions load successfully from the owned VTT artifact.",
+    "Real AI& request over authentic Park evidence produced a recovered six-chapter, checked story and 95-second H.264 MP4 with subtitles.",
+    "The completed film and lean creation UI load from owned persisted artifacts; advanced editing is collapsed.",
+    "Film downloads successfully through the actual UI.",
+    "Refresh restores the completed film without another provider request.",
+    "360, 390 and 768 pixel layouts have no horizontal overflow."
+  ],
+  "provider_receipt": {
+    "estimated_cost_usd": 0.001162,
+    "model": "zai-org/GLM-5.3-Flash",
+    "operation": "infographic-story",
+    "price_basis": "authenticated AI& model catalog; uncached upper bound",
+    "provider": "aiand",
+    "usage": {
+      "completion_tokens": 1226,
+      "completion_tokens_details": {
+        "reasoning_tokens": 17
+      },
+      "prompt_tokens": 3658,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": 2304,
+        "multimodal_tokens": null
+      },
+      "total_tokens": 4884
+    }
+  },
+  "duration_seconds": 95.0,
+  "chapters": [
+    {
+      "title": "Where was heat detected?",
+      "checked": true
+    },
+    {
+      "title": "From raw records to cells occupied",
+      "checked": true
+    },
+    {
+      "title": "Two eyes, uneven coverage",
+      "checked": true
+    },
+    {
+      "title": "Same night, two instruments",
+      "checked": true
+    },
+    {
+      "title": "What the joint union establishes",
+      "checked": true
+    },
+    {
+      "title": "Established, and still open",
+      "checked": true
+    }
+  ],
+  "film_bytes": 1889589
+}

@@ -20,6 +20,8 @@ The page opens a real observation map automatically. Select Park, Camp or Grove 
 
 Use **Earlier readings** to search authentic imported records inside the current boundary, from 2006 onward. Results are monthly detection windows, not confirmed incidents. Large windows open their peak UTC day to respect the replay record limit. **Evidence → Browse this day’s exact records** provides a keyboard-accessible alternative to clicking the map. Sample details include acquisition time, native confidence, source-specific FRP, product version and file hashes.
 
+Run admission has no daily turn-count ceiling. The former shared 20-run cap was removed on 6 October 2026: automatic map loads, historical searches, failed requests and conversations no longer exhaust that counter. Existing workspaces keep their saved history and require no reset. Paid inference accounting, concurrent-run handling and short-window HTTP throttles remain separate from browsing history.
+
 **Place note** creates a geographic annotation. **Select area → Finish area** retrieves original detections whose centers fall inside a drawn polygon. A selected cell or record can be annotated with its actual geometry and acquisition date; annotations are redrawn only in their matching study and date. The **Sources** tab traces imported records, calculation evidence, selected samples and annotations.
 
 **Refine question** is a local rule-based editor: it shows an editable suggestion with scope, selected evidence and scientific interpretation rules. It does not send an AI request or silently change studies. Conversation uses the configured tool-capable provider; map, archive and prompt tools do not consume inference quota. Figure attachments are schematics of the selected display metric; streamed terrain imagery is omitted and the caption states the limitation.
@@ -235,3 +237,13 @@ Visuals use the full saved calculation, never model-invented measurements or exe
 The Earth camera now fits geographic bounds using the current viewport. Zoom during an ongoing location move continues toward that location instead of cloning the previous camera position. The existing globe and satellite remain in place.
 
 This upgrade passed 41 focused Python tests plus JavaScript evidence-unit checks. Browser checks verified conversation restoration, source-linked charts, SVG export, real overlap diagrams, 390 px layouts, region fitting, concurrent focus/zoom and the existing globe controls. A live AI visual request exercised validated rendering and the checked explanation fallback; another attempt encountered a provider error and was reported as unavailable.
+
+## AI& infographic stories in Studio
+
+Open a prepared investigation, choose **Story**, and press **Create story**. JARVIS authors a structured storyboard through AI&, resolves its cited numerical fields against the board's frozen evidence and automatically prepares a locally rendered infographic MP4. The main view shows progress, cancellation, playback and downloads; detailed editing is under **Edit story & export settings**.
+
+Keep `AIAND_API_KEY` and optional ordered `AIAND_API_KEYS` in the ignored `.env.assistant`; never put them in frontend files. Set `FIREATLAS_AI_PROVIDER=aiand` for conversational JARVIS. Key fallback occurs only after rejected catalog authentication, before inference. Paid calls with uncertain usage are not repeated. Existing accounting applies to story requests.
+
+For the existing Chromium/ffmpeg renderer, set `FIREATLAS_STUDIO_LOCAL_RENDER=1` and install Node.js, Chromium and ffmpeg. This generates a captioned film without a voice-provider dependency. Voice is an optional existing speech capability. AI& supplies storyboard text; this integration does not claim an AI& native video endpoint. If rendering fails, the saved interactive story stays available. **Finish saved storyboard** reuses a retained response rather than making another paid request.
+
+See [the implementation report](implementation/aiand-story/REPORT.md) and [director instructions](../fireatlas/studio/story_system.md).

@@ -1,0 +1,37 @@
+{
+  "python_regression": {
+    "tests": 154,
+    "passed": true
+  },
+  "focused_story_generation": {
+    "tests": 10,
+    "passed": true
+  },
+  "frontend": {
+    "tests": 76,
+    "files": 17,
+    "passed": true
+  },
+  "renderer": {
+    "tests": 8,
+    "passed": true
+  },
+  "typecheck": true,
+  "production_build": true,
+  "landing_guard": {
+    "assets": 75,
+    "html_boundaries": 2,
+    "passed": true
+  },
+  "credential_catalog_authentication": {
+    "credentials": 3,
+    "all_authenticated": true
+  },
+  "real_provider": "aiand",
+  "film_duration_seconds": 95,
+  "film_resolution": [
+    1920,
+    1080
+  ],
+  "browser_page_errors": []
+}

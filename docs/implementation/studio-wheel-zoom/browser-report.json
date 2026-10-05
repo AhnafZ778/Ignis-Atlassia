@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "Wheel zooms both directions over card content without scrolling the board, card or page.",
+    "Wheel zooms both directions over card control without scrolling the board, card or page.",
+    "Wheel zooms both directions over card heading without scrolling the board, card or page.",
+    "Pointer anchor includes manually scrolled canvas offsets; manual scrolling remains available.",
+    "Native non-passive capture prevents nested handlers from scrolling or applying a second zoom.",
+    "Outside-canvas wheel leaves canvas zoom unchanged; zoom does not mutate card positions."
+  ],
+  "page_errors": [],
+  "wheel_warnings": []
+}

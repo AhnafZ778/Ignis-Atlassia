@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "Send to Canvas asks for the destination, then opens the persisted board after capture.",
+    "The new board retains the Grove case and fixed submitted date.",
+    "Refresh restores the captured cards; no browser exceptions occurred."
+  ],
+  "errors": []
+}

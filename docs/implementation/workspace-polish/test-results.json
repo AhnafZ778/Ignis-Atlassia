@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-06",
+  "focused_python": {
+    "tests": 169,
+    "status": "passed"
+  },
+  "story_discovery": {
+    "tests": 10,
+    "status": "passed"
+  },
+  "static_export": {
+    "tests": 6,
+    "status": "passed"
+  },
+  "frontend": {
+    "tests": 76,
+    "files": 17,
+    "status": "passed"
+  },
+  "typecheck": "passed",
+  "renderer": {
+    "tests": 8,
+    "status": "passed"
+  },
+  "map_visual_lifecycle_context": {
+    "files": 4,
+    "status": "passed"
+  },
+  "javascript_syntax": {
+    "files": 49,
+    "status": "passed"
+  },
+  "landing": {
+    "protected_assets": 75,
+    "html_boundaries": 2,
+    "status": "passed"
+  },
+  "keys": {
+    "configured": 3,
+    "authenticated_http_status": [
+      200,
+      200,
+      200
+    ],
+    "models_per_key": [
+      13,
+      13,
+      13
+    ],
+    "public_credential_leaks": 0
+  },
+  "browser": {
+    "workspace_polish": "passed",
+    "canvas_handoff": "passed",
+    "static_native_method_cases": [
+      "park-2024",
+      "grove-2025"
+    ]
+  },
+  "full_python_discovery": {
+    "tests": 370,
+    "seconds": 324.206,
+    "status": "passed"
+  }
+}

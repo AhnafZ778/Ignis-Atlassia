@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "An existing browser workspace completes more than twenty requests and retains its saved answers.",
+    "The real Search historical readings button returns authentic stored monthly windows after the former daily threshold.",
+    "Refreshing the same workspace loads the selected Park frame (159 MODIS / 558 VIIRS) without resetting history or replacing its selection."
+  ],
+  "page_errors": [],
+  "inference_requests": [],
+  "archive_summary": "218 monthly windows \u00b7 46,344 imported rows before replay filtering."
+}

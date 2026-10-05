@@ -1,0 +1,19 @@
+{
+  "fireatlas/static": {
+    "files": 382,
+    "errors": []
+  },
+  "site": {
+    "files": 382,
+    "errors": []
+  },
+  "python_tests": 49,
+  "frontend_tests": 73,
+  "source_static_parity": true,
+  "javascript_files_checked": 137,
+  "online_wms_png": {
+    "bytes": 249951,
+    "cors": "*",
+    "valid_png": true
+  }
+}

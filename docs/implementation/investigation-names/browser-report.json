@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Named creation and explicit rename persist through refresh, retaining cards and scientific selection.",
+    "Renaming uses the existing revisioned transaction and supports Undo/Redo.",
+    "Cancel leaves the investigation unchanged and restores focus.",
+    "Renamed investigations remain correctly labeled after switching away, returning and refreshing."
+  ],
+  "page_errors": [],
+  "layouts": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ]
+}

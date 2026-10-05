@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "Dragging empty canvas pans immediately without selecting Pan canvas or changing cards.",
+    "Space-drag over a card pans the view while preserving its position.",
+    "Middle-button drag pans over cards and prevents browser auto-scroll.",
+    "Pan canvas works over frozen card content; controls still respond.",
+    "Card dragging persists its position; details and pointer-anchored wheel zoom remain usable.",
+    "Studio appears in all six canonical navigation headers; Investigate entry remains visible at 360, 390 and 768 pixels."
+  ],
+  "page_errors": [],
+  "layouts": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ]
+}

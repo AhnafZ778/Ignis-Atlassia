@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "01 SENSOR COMPARISON: real seven-node diagram, accessible table and backend validation pass.",
+    "Park workflow edit persists and its saved revision completes seven real node receipts without inference.",
+    "Interrupted lazy download keeps Studio navigation and Canvas usable; refresh opens the same board and saved workflow.",
+    "02 HISTORICAL EVIDENCE: real seven-node diagram, accessible table and backend validation pass.",
+    "03 QUICK WALKTHROUGH: real seven-node diagram, accessible table and backend validation pass."
+  ],
+  "page_errors": [],
+  "expected_download_failures": [
+    "/studio-assets/assets/WorkflowPanel-DY8COBIY.js"
+  ],
+  "layouts": [
+    {
+      "width": 360,
+      "scroll": 360
+    },
+    {
+      "width": 390,
+      "scroll": 390
+    },
+    {
+      "width": 768,
+      "scroll": 768
+    }
+  ]
+}
