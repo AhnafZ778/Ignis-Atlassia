@@ -43,15 +43,15 @@ function viewUrl() {
   // route stable while retaining the root hash compatibility shim for older
   // links that still open the overview page.
   const path = document.body?.dataset.page === "atlas" ? "/atlas.html" : "./";
-  const url = new URL(path, location.origin);
-  url.search = new URLSearchParams(viewConfig()); url.hash = "calendar-section";
+  const url = new URL(FireAtlasContext.url(path));
+  url.search = FireAtlasContext.write({...viewConfig(),calendar_metric:"combined",start:`${state.year}-${String(state.month).padStart(2,"0")}-01`,end:FireAtlasContext.monthEnd(state.year,state.month)}); url.hash = "calendar-section";
   if (initialLiteEarth) url.searchParams.set("lite", "1");
   return url.href;
 }
 
 function methodUrl() {
-  const url = new URL("/method.html", location.origin);
-  url.search = new URLSearchParams({...viewConfig(), context: "calendar"});
+  const url = new URL(FireAtlasContext.url("evidence.html?tab=method"));
+  url.search = FireAtlasContext.write({...viewConfig(), tab:"method"});
   if (initialLiteEarth) url.searchParams.set("lite", "1");
   url.hash = "source-records";
   return url.href;
@@ -107,7 +107,7 @@ function initStudyTools() {
     const button = $("#download-study"); button.disabled = true; button.textContent = "Preparing study…";
     const config = viewConfig();
     try {
-      const response = await fetch(`/api/study?${new URLSearchParams(config)}`);
+      const response = await fetch(FireAtlasContext.url(`api/study?${new URLSearchParams(config)}`));
       if (!response.ok) throw new Error((await response.json()).error || "Study download failed.");
       const url = URL.createObjectURL(await response.blob()), link = document.createElement("a");
       link.href = url; link.download = `fireatlas_study_${config.series}_${config.year}.zip`; link.click();

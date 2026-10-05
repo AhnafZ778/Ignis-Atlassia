@@ -1,3 +1,5 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('calibration-validation', ({document,window,fetch,setTimeout,clearTimeout}) => {
 (() => {
   const $ = (selector) => document.querySelector(selector);
   const regionSelect = $("#calibration-region");
@@ -185,17 +187,16 @@
   async function load() {
     const token = ++request;
     const region = regionSelect.value;
-    const artifactUrl = new URL(`samples/calibration/${encodeURIComponent(region)}.json`, document.baseURI);
-    $("#calibration-status").textContent = "Loading the source-attributed calibration artifact…";
+    const context=FireAtlasContext.read(),staticRoot=document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+    const calendarUrl=staticRoot?new URL(`calibration/${encodeURIComponent(region)}.json`,new URL(staticRoot,document.baseURI)):FireAtlasContext.url(`api/v2/calendar?${new URLSearchParams({region,year:context.year,month:context.month})}`);
+    $("#calibration-status").textContent="Loading the calibration actually used by the selected calendar…";
     $("#calibration-models").replaceChildren();
-    $("#calibration-download").href = artifactUrl.href;
     try {
-      const response = await fetch(artifactUrl);
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
-      if (data.schema !== "fireatlas-calibration-artifact-v1" || data.region?.id !== region) {
-        throw new Error("Calibration artifact does not match the selected region.");
-      }
+      const response=await fetch(calendarUrl),result=await response.json();
+      if(!response.ok)throw Error(result.error||'Selected calibration unavailable.');
+      if(result.calibration?.schema!=='fireatlas-calibration-v1'||result.meta.region.id!==region)throw Error('Calibration does not match the selected region.');
+      const data={calibration:result.calibration,region:result.calibration.region,provenance:{parent_files:result.meta.inputs,paired_complete_months:result.calibration.overlap_months,input_manifest_sha256:result.meta.release_id||result.meta.calibration_id}};
+      const blob=new Blob([JSON.stringify({schema:'fireatlas-calendar-calibration-evidence-v1',...data,calibration_id:result.meta.calibration_id},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);$("#calibration-download").href=url;$("#calibration-download").download=`${region}-applied-calibration.json`;
       if (token === request) render(data);
     } catch (error) {
       if (token !== request) return;
@@ -213,5 +214,8 @@
     }
   }
   regionSelect.addEventListener("change", load);
+  regionSelect.value=FireAtlasContext.read().region;
   load();
 })();
+
+});

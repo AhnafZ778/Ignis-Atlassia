@@ -1,3 +1,5 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('validity', ({document,window,fetch,setTimeout,clearTimeout}) => {
 /* Visual account of two authentic historical FIRMS cases. No inferred coverage. */
 document.addEventListener('DOMContentLoaded',()=>{
   const svg=document.querySelector('#validity-graphic');
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   let caseId=['park-2024','grove-2025'].includes(viewParams.get('case'))?viewParams.get('case'):'park-2024',scene=captureFrame?'timeline':'sensors',selectedDate=null,report=null,request=0,maskSource='all';
   const cache=new Map();
   const mobile=()=>matchMedia('(max-width: 760px)').matches;
-  const staticDataRoot=document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+  const staticDataRoot=(document.querySelector('meta[name="fireatlas-static-evidence"]')||document.querySelector('meta[name="fireatlas-static-data"]'))?.content;
 
   function el(tag,attrs={},parent=svg,content){
     const item=document.createElementNS(NS,tag);
@@ -472,4 +474,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   window.addEventListener('resize',()=>{if(report)render();},{passive:true});
   load(caseId,viewParams.get('case_date'));
+});
+
 });

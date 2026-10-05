@@ -41,7 +41,7 @@
         }
         staticCache.set(target.href, payload);
       }
-      const payload = staticCache.get(target.href);
+      const payload = structuredClone(staticCache.get(target.href));
       if (file === "regions.json") return payload;
       if (file.startsWith("observations/")) {
         return payload.days[request.searchParams.get("date")] || {
@@ -57,9 +57,16 @@
         }
         payload.history = staticCache.get(historyUrl.href);
       }
+      if(file.startsWith('calendar/')) {
+        const key=`${request.searchParams.get('region')}/${request.searchParams.get('year')}/${request.searchParams.get('month')}`;
+        const manifestUrl=new URL('manifest.json',root);
+        if(!staticCache.has(manifestUrl.href)){const response=await fetch(manifestUrl);if(!response.ok)throw Error('Analytical release manifest unavailable.');staticCache.set(manifestUrl.href,await response.json());}
+        const release=staticCache.get(manifestUrl.href),identity=release.results?.[key];
+        if(identity){Object.assign(payload.meta,identity);payload.meta.period.selected_month=identity.selected_month;payload.meta.bundle=release.bundles?.[key]||{status:'unavailable'};}
+      }
       return payload;
     }
-    const response = await fetch(url);
+    const response = await fetch(FireAtlasContext.url(url));
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
     return data;
@@ -253,13 +260,8 @@
   }
 
   function syncCanonicalContext() {
-    const year = Number(yearSelect.value), month = Number(monthSelect.value);
-    const context = {...(window.FireAtlasContext?.read() || {}), region: regionSelect.value, year, month,
-      as_of: new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10), day: ""};
-    const url = new URL(location.href);
-    url.search = window.FireAtlasContext?.write(context) || new URLSearchParams(context).toString();
-    history.replaceState(null, "", url);
-    window.FireAtlasContext?.apply(document, context);
+    const year=Number(yearSelect.value),month=Number(monthSelect.value),end=FireAtlasContext.monthEnd(year,month),region=regions.find(r=>r.id===regionSelect.value);
+    FireAtlasContext.update({region:regionSelect.value,bbox:region.bbox.join(','),year,month,start:`${year}-${String(month).padStart(2,'0')}-01`,end,as_of:end,day:'',case:'',calendar_metric:'harmonized'},{history:'push'});
   }
 
   async function shareEvidence() {
@@ -485,7 +487,7 @@
         button.style.setProperty("--harm-heat", heat.color);
         button.style.setProperty("--harm-ink", heat.dark ? "#000000" : "#FFFFFF");
       }
-      button.addEventListener("click", () => { selectedDate = stamp; renderCalendar(); loadEvidence(stamp); });
+      button.addEventListener("click", () => { selectedDate = stamp; FireAtlasContext.update({day:stamp},{history:"replace",reason:"day"}); renderCalendar(); loadEvidence(stamp); });
       button.addEventListener("keydown", (event) => {
         const delta = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7}[event.key];
         if (!delta) return;
@@ -497,10 +499,20 @@
     });
     $("#harm-days-title").textContent = `${monthNames[month - 1]} ${year} · select a UTC day`;
     const download = $("#harm-download");
-    download.href = staticDataRoot
-      ? new URL(`calendar/${regionSelect.value}/${year}.json`, new URL(staticDataRoot, document.baseURI)).href
-      : `/api/v2/calendar?${new URLSearchParams({region: regionSelect.value, year, month})}`;
-    download.download = `fireatlas_${regionSelect.value}_${year}_calendar.json`;
+    const matching=current.meta.bundle;
+    download.textContent='Download this harmonized result';
+    if(staticDataRoot){
+      const available=matching?.status==='verified'&&matching.result_sha256===current.meta.result_sha256;
+      download.href=available?new URL(matching.path,new URL(staticDataRoot,document.baseURI)).href:'#';
+      download.setAttribute('aria-disabled',String(!available));
+      download.title=available?`Exact frozen result · ${(matching.bytes/1024/1024).toFixed(1)} MiB`:'Exact regional bundle unavailable for this static selection';
+      download.onclick=event=>{if(!available){event.preventDefault();setStatus('Exact regional bundle unavailable for this static selection. Start the local service for a current export.');}};
+    }else{
+      download.href=FireAtlasContext.url(`api/v2/study?${new URLSearchParams({region:regionSelect.value,year,month,expected_result_sha256:current.meta.result_sha256,...(selectedDate?{day:selectedDate}:{})})}`);
+      download.removeAttribute('aria-disabled');
+    }
+    download.download=`ignis-${regionSelect.value}-${year}-${String(month).padStart(2,'0')}-harmonized.zip`;
+    window.dispatchEvent(new CustomEvent('fireatlas:harmonized-result',{detail:{result:current,month:current.months.find(m=>m.month===monthKey)}}));
     if (!selectedDate || !selectedDate.startsWith(monthKey)) {
       selectedDate = null;
       $("#harm-day-title").textContent = "Choose a day to inspect its evidence.";
@@ -529,7 +541,7 @@
     if (Number(yearSelect.value) !== year) {
       yearSelect.value = String(year);
       monthSelect.value = String(month);
-      loadCalendar({includeHistory: true, selectDate: stamp});
+      loadCalendar({includeHistory: Boolean($("#harm-history-details")?.open), selectDate: stamp});
       return;
     }
     monthSelect.value = String(month);
@@ -755,6 +767,7 @@
   async function init() {
     if (!regionSelect) return;
     fillMonths();
+    monthSelect.value=String(FireAtlasContext.read().month);
     renderOfficialLinks();
     try {
       const status = await getJson("/api/v2/regions");
@@ -763,19 +776,24 @@
       const sharedRegion = params.get("region") || params.get("harm_region");
       if (regions.some((item) => item.id === sharedRegion)) regionSelect.value = sharedRegion;
       fillYears();
-      const sharedYear = Number(params.get("year") || params.get("harm_year"));
-      const sharedMonth = Number(params.get("month") || params.get("harm_month"));
+      const sharedYear = Number(params.get("year") || params.get("harm_year") || FireAtlasContext.read().year);
+      const sharedMonth = Number(params.get("month") || params.get("harm_month") || FireAtlasContext.read().month);
       if (sharedYear >= 2006 && sharedYear <= 2026 && [...yearSelect.options].some((option) => Number(option.value) === sharedYear)) yearSelect.value = String(sharedYear);
       if (sharedMonth >= 1 && sharedMonth <= 12) monthSelect.value = String(sharedMonth);
       renderOfficialLinks();
       displaySourceStatus();
-      await loadCalendar({includeHistory: true});
+      const incoming=FireAtlasContext.read(),requested=regions.find(r=>r.id===incoming.region);
+      if(incoming.errors.length||!requested||incoming.geometry||(params.has('bbox')&&incoming.bbox!==requested.bbox.join(','))||sharedYear<2006||sharedYear>2026)throw Error('The incoming selection is retained in the URL. Harmonized activity requires an exact supported regional box, no polygon subset, and a supported year. Choose a region/month explicitly or use Combined detections.');
+      await loadCalendar({includeHistory: Boolean($("#harm-history-details")?.open),selectDate:incoming.day||null});
     } catch (error) { setStatus(`Archive status unavailable: ${error.message}`); }
-    regionSelect.addEventListener("change", () => { fillYears(); renderOfficialLinks(); displaySourceStatus(); syncCanonicalContext(); loadCalendar({includeHistory: true}); });
-    yearSelect.addEventListener("change", () => { syncCanonicalContext(); loadCalendar({includeHistory: true}); });
-    monthSelect.addEventListener("change", () => { selectedDate = null; syncCanonicalContext(); renderSeasonContext(); renderCalendar(); });
+    regionSelect.addEventListener("change", () => { fillYears(); renderOfficialLinks(); displaySourceStatus(); syncCanonicalContext(); loadCalendar({includeHistory: Boolean($("#harm-history-details")?.open)}); });
+    yearSelect.addEventListener("change", () => { syncCanonicalContext(); loadCalendar({includeHistory: Boolean($("#harm-history-details")?.open)}); });
+    monthSelect.addEventListener("change", () => { selectedDate = null; syncCanonicalContext(); loadCalendar({includeHistory:Boolean($("#harm-history-details")?.open)}); });
     $("#harm-share")?.addEventListener("click", shareEvidence);
   }
 
+  addEventListener('fireatlas:context-restore',()=>{const c=FireAtlasContext.read();regionSelect.value=c.region;fillYears();yearSelect.value=c.year;monthSelect.value=c.month;selectedDate=c.day||null;loadCalendar({includeHistory:Boolean($("#harm-history-details")?.open)});});
+  $("#harm-history-details")?.addEventListener('toggle',()=>{if($("#harm-history-details").open)loadCalendar({includeHistory:true});});
+  window.FireAtlasAtlasCapture=()=>{if(!current)throw Error('Wait for the selected calendar.');const c=FireAtlasContext.read();return {study:FireAtlasContext.toAssistantContext(c),view:{kind:'calendar',operation:'harmonized',calculation_contract:'harmonized',day:selectedDate||c.start,metric:'harmonized',arguments:{expected_result_sha256:current.meta.result_sha256},caption:'Harmonized activity · '+c.region+' · '+c.year+'-'+String(c.month).padStart(2,'0')+' UTC; source visibility does not change the headline.'},result_sha256:current.meta.result_sha256};};
   init();
 })();

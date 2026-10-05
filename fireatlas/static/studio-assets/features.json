@@ -1,0 +1,6 @@
+{
+  "schema": "fireatlas-studio-features-v1",
+  "tldraw": true,
+  "reactflow": true,
+  "liveblocks": true
+}

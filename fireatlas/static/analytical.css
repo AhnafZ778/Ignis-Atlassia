@@ -1,0 +1,30 @@
+/* All new presentation is scoped to analytical pages. */
+body.analytical-workspace {background:#f5f7fb;color:#15263c}
+.analytical-workspace .workspace-heading {max-width:1440px;margin:34px auto 24px;padding:0 28px}
+.analytical-workspace .workspace-heading h1 {font-size:clamp(28px,4vw,48px);margin:8px 0}
+.analytical-workspace .workspace-heading p {max-width:80ch;line-height:1.6}
+.analytical-workspace .workspace-tabs {display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid #cdd7e4;padding:0 0 12px;margin-bottom:24px}
+.analytical-workspace .workspace-tabs button {background:transparent;border:1px solid transparent;border-radius:5px;padding:12px 18px;color:#30445e;cursor:pointer}
+.analytical-workspace .workspace-tabs [aria-selected=true] {background:#e6edff;border-color:#9eb5ee;color:#183cab;font-weight:700}
+.analytical-workspace button:focus-visible,.analytical-workspace a:focus-visible,.analytical-workspace input:focus-visible,.analytical-workspace select:focus-visible {outline:3px solid #315ddb;outline-offset:3px}
+.analytical-workspace #workspace-panel {min-height:50vh}
+.analytical-workspace .analytical-panel > .lab-intro,.analytical-workspace .analytical-panel > .page-intro,.analytical-workspace .analytical-panel > .deep-nav {display:none}
+.analytical-workspace .workspace-actions {display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:16px 0}
+.analytical-workspace .workspace-actions a {color:#204cba;text-decoration:underline;text-underline-offset:3px}
+.analytical-workspace .workspace-guide {margin:18px 0;max-width:1000px;line-height:1.65}
+.analytical-workspace .workspace-guide a {display:block;margin:8px 0;color:#204cba}
+.analytical-workspace #workspace-selection {overflow-wrap:anywhere;font-size:14px;color:#52637c}
+.analytical-workspace .mission-grid {grid-template-columns:minmax(0,1fr)}
+.analytical-workspace .mission-intelligence {display:none}
+.analytical-workspace.jarvis-open .mission-intelligence {display:flex}
+.analytical-workspace.jarvis-open .mission-grid {grid-template-columns:minmax(0,1fr) minmax(330px,420px)}
+.analytical-workspace.notebook-expanded .mission-grid {grid-template-columns:minmax(0,1fr) minmax(400px,1fr)}
+.analytical-workspace .mission-heading {gap:20px}
+.analytical-workspace .mission-map-stage.split .mission-map-pane {min-width:0}
+.analytical-workspace .mission-map-key p {max-width:100%;overflow-wrap:anywhere}
+.analytical-workspace .table-scroll {overflow-x:auto;max-width:100%}
+.analytical-workspace #investigation-terrain {height:560px;background:#e8eef4}
+.analytical-workspace #workspace-narrowing {padding:16px;border:1px solid #a9bad0;background:#edf3fa;margin:16px 0}
+@media(max-width:900px){.analytical-workspace.jarvis-open .mission-grid,.analytical-workspace.notebook-expanded .mission-grid{grid-template-columns:1fr}.analytical-workspace .mission-intelligence{max-height:none}.analytical-workspace .mission-map-stage.split {grid-template-columns:1fr 1fr}.analytical-workspace .mission-map{min-height:340px}.analytical-workspace .workspace-heading{padding:0 16px}.analytical-workspace .mission-map-toolbar {flex-wrap:wrap;gap:8px}}
+@media(max-width:500px){.analytical-workspace .workspace-tabs button{padding:10px 8px}.analytical-workspace .mission-map-stage.split{grid-template-columns:1fr}.analytical-workspace .mission-map{min-height:280px}.analytical-workspace .mission-map-source{font-size:10px}.analytical-workspace .mission-readouts{grid-template-columns:1fr}.analytical-workspace .mission-heading-actions{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.analytical-workspace *, .analytical-workspace *::before,.analytical-workspace *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

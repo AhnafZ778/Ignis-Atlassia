@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Research Studio — Ignis-Atlassia</title>
+  <meta name="description" content="Arrange checked FireAtlas evidence into a reproducible board and story.">
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./design.css">
+  <link rel="stylesheet" href="./analytical.css">
+  <link rel="stylesheet" href="./studio-entry.css">
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+</head>
+<body class="analytical-workspace studio-page">
+  <a class="skip-link" href="#studio-root">Skip to Research Studio</a>
+  <header class="topbar">
+    <a aria-label="Ignis-Atlassia home" class="brand" href="./"><span aria-hidden="true" class="brand-symbol"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"></circle><ellipse cx="16" cy="16" rx="15" ry="5" transform="rotate(-35 16 16)"></ellipse><circle class="logo-dot" cx="25" cy="8" r="2"></circle></svg></span><span class="brand-word">Ignis-<span>Atlassia</span></span></a>
+    <button aria-controls="site-navigation" aria-expanded="false" class="nav-toggle" type="button"><span></span><span></span><span class="menu-label">Menu</span></button>
+    <nav aria-label="Project navigation" id="site-navigation"><a data-destination="explore" href="./atlas.html">Explore</a><a data-destination="investigate" href="./investigate.html">Investigate</a><a data-destination="research" href="./research.html">Research Lab</a><a data-destination="evidence" href="./evidence.html">Evidence</a></nav>
+  </header>
+  <main id="studio-root"><p class="noscript">Opening the local Research Studio…</p></main>
+  <noscript><p class="noscript">Research Studio needs JavaScript. Use Explore or Investigate to inspect the evidence without authoring.</p></noscript>
+  <script defer src="./ui.js"></script>
+  <script defer src="./vendor/leaflet.js"></script>
+  <script defer src="./assistant-map.js"></script>
+  <script type="module" src="./studio-assets/studio-entry.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('data', ({document,window,fetch,setTimeout,clearTimeout}) => {
 (() => {
   const $ = id => document.getElementById(id);
-  const staticDataRoot = document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+  const staticDataRoot = (document.querySelector('meta[name="fireatlas-static-evidence"]')||document.querySelector('meta[name="fireatlas-static-data"]'))?.content;
   const staticSnapshot = document.querySelector('meta[name="fireatlas-static-snapshot"]')?.content || 'static snapshot';
   const staticCache = new Map();
   let timer, busy = false;
@@ -151,6 +153,9 @@
     $("archive-coverage-status").textContent = `${(payload.regions || []).length} study areas · ${complete.toLocaleString()} complete region-product-month exports recorded. Reconstructed archive rows are labeled partial; missing dates remain unknown. Export completeness is not a pass or cloud mask.`;
   }
   async function getJson(path) {
+    const analyticalRoot=document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+    if(staticDataRoot&&path==='/api/v2/regions'&&analyticalRoot){const response=await fetch(new URL('regions.json',new URL(analyticalRoot,document.baseURI)));if(!response.ok)throw Error('Regional ledger unavailable.');return response.json();}
+
     if (!staticDataRoot) {
       const response = await fetch(path, {signal:AbortSignal.timeout(30000)}); const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not load data");
@@ -341,3 +346,5 @@
   loadNativeMaskDownloads();
   refresh();
 })();
+
+});

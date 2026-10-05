@@ -1,10 +1,13 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('review', ({document,window,fetch,setTimeout,clearTimeout}) => {
 /* Hash-bound native-mask review form. It records human observations; it never
  * derives them from the processor's expected values. */
 document.addEventListener('DOMContentLoaded', () => {
   const $ = selector => document.querySelector(selector);
   const params = new URLSearchParams(location.search);
-  const staticRoot = document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+  const staticRoot = (document.querySelector('meta[name="fireatlas-static-evidence"]')||document.querySelector('meta[name="fireatlas-static-data"]'))?.content;
   const cases = new Map();
+  (async()=>{const c=window.FireAtlasContext.read(),a=$('#regional-download'),status=$('#regional-download-status');if(!a)return;try{if(staticRoot){const root=document.querySelector('meta[name="fireatlas-static-data"]').content,r=await fetch(new URL('manifest.json',new URL(root,document.baseURI))),m=await r.json(),b=m.bundles?.[`${c.region}/${c.year}/${c.month}`];if(!b||b.status!=='verified'){status.textContent='Exact regional bundle unavailable for this static selection.';return;}a.href=new URL(b.path,new URL(root,document.baseURI));status.textContent=`Frozen ${c.region} ${c.year}-${String(c.month).padStart(2,'0')} harmonized result · ${(b.bytes/1048576).toFixed(1)} MiB · ${b.result_sha256}`;}else{const r=await fetch(window.FireAtlasContext.url('api/v2/calendar?'+new URLSearchParams({region:c.region,year:c.year,month:c.month}))),m=await r.json();if(!r.ok)throw Error(m.error);a.href=window.FireAtlasContext.url('api/v2/study?'+new URLSearchParams({region:c.region,year:c.year,month:c.month,expected_result_sha256:m.meta.result_sha256}));status.textContent=`Current ${c.region} harmonized result · ${m.meta.result_sha256}`;}a.hidden=false;a.download='regional-result.zip';}catch(e){status.textContent='Exact download unavailable: '+e.message;}})();
   let nativeAssets=[];
   let caseId = params.get('case') === 'park-2024' ? 'park-2024' : 'grove-2025';
   let template = null;
@@ -226,4 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pagehide',saveDraft);
   if(!staticRoot)fetch('/api/native-masks',{signal:AbortSignal.timeout(15000)}).then(r=>r.ok?r.json():Promise.reject()).then(data=>{nativeAssets=data.assets||[];renderSourceLinks();}).catch(()=>{});
   selectCase(caseId);
+});
+
 });

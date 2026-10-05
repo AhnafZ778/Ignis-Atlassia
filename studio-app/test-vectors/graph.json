@@ -1,0 +1,44 @@
+{
+  "schema": "fireatlas-studio-graph-vectors-v1",
+  "topological_order": [
+    { "name": "chain", "cards": { "a": {}, "b": {}, "c": {} }, "connections": { "1": { "source": "a", "target": "b" }, "2": { "source": "b", "target": "c" } }, "expect": ["a", "b", "c"] },
+    { "name": "alphabetical ties", "cards": { "z": {}, "m": {}, "a": {} }, "connections": {}, "expect": ["a", "m", "z"] },
+    { "name": "diamond", "cards": { "a": {}, "b": {}, "c": {}, "d": {} }, "connections": { "1": { "source": "a", "target": "c" }, "2": { "source": "a", "target": "b" }, "3": { "source": "b", "target": "d" }, "4": { "source": "c", "target": "d" } }, "expect": ["a", "b", "c", "d"] },
+    { "name": "cycle", "cards": { "a": {}, "b": {} }, "connections": { "1": { "source": "a", "target": "b" }, "2": { "source": "b", "target": "a" } }, "expect": "cycle" },
+    { "name": "self loop", "cards": { "a": {} }, "connections": { "1": { "source": "a", "target": "a" } }, "expect": "cycle" }
+  ],
+  "compatibility": [
+    {
+      "name": "same study and operation is compatible",
+      "state": { "study": { "context": { "region": "norcal", "bbox": [-122, 39, -120, 41], "start": "2015-07-01", "end": "2015-07-31" } } },
+      "source": { "binding": { "operation": "replay" } }, "target": { "binding": { "operation": "persistence" } }, "kind": "context", "snapshots": {}, "expect": []
+    },
+    {
+      "name": "different regions and boxes",
+      "state": { "study": {} },
+      "source": { "follow": "pinned", "pinned_study": { "context": { "region": "norcal", "bbox": [-122, 39, -120, 41], "start": "2015-07-01", "end": "2015-07-31" } } },
+      "target": { "follow": "pinned", "pinned_study": { "context": { "region": "punjab-haryana", "bbox": [73, 29, 77, 32], "start": "2015-07-01", "end": "2015-07-31" } } },
+      "kind": "context", "snapshots": {}, "expect": ["Regions differ.", "Study bounding boxes differ."]
+    },
+    {
+      "name": "disjoint dates",
+      "state": { "study": {} },
+      "source": { "follow": "pinned", "pinned_study": { "context": { "start": "2015-06-01", "end": "2015-06-30" } } },
+      "target": { "follow": "pinned", "pinned_study": { "context": { "start": "2015-07-01", "end": "2015-07-31" } } },
+      "kind": "context", "snapshots": {}, "expect": ["UTC date ranges do not overlap."]
+    },
+    {
+      "name": "scale link needs one operation and one unit",
+      "state": { "study": {} },
+      "source": { "snapshot_id": "s1", "binding": { "operation": "replay" } }, "target": { "snapshot_id": "s2", "binding": { "operation": "persistence" } }, "kind": "scale",
+      "snapshots": { "s1": { "release_id": "r1", "unit": "records" }, "s2": { "release_id": "r2", "unit": "ratio" } },
+      "expect": ["Evidence comes from different releases.", "A shared scale needs the same operation.", "Units differ: records and ratio."]
+    },
+    {
+      "name": "families must match",
+      "state": { "study": {} },
+      "source": { "binding": { "operation": "replay" } }, "target": { "binding": { "operation": "research" } }, "kind": "context", "snapshots": {},
+      "expect": ["Operations belong to incompatible scientific families."]
+    }
+  ]
+}
