@@ -63,6 +63,7 @@ ASSETS = {
     "/research-sensitivity.js": ("research-sensitivity.js", "text/javascript; charset=utf-8"),
     "/investigation-terrain.js": ("investigation-terrain.js", "text/javascript; charset=utf-8"),
     "/analytical.css": ("analytical.css", "text/css; charset=utf-8"),
+    "/workspace-polish.css": ("workspace-polish.css", "text/css; charset=utf-8"),
 
 
     "/": ("index.html", "text/html; charset=utf-8"),

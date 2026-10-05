@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function renderValidation(){
     const target=$('#validity-validation');if(!target)return;target.replaceChildren();
-    const heading=document.createElement('h4');heading.textContent='From downloads to a checked result';target.append(heading);
+    const heading=document.createElement('h4');heading.textContent='Four checks, recorded separately';target.append(heading);
     const path=document.createElement('ol');path.className='validity-validation-path';
     for(const gate of report.validation_gates||[]){
       const step=document.createElement('li');step.className=gate.status;
@@ -250,7 +250,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       const name=document.createElement('strong');name.textContent=gate.label;
       const count=document.createElement('b');count.textContent=`${format(gate.actual)} / ${format(gate.required)}`;
       const state=document.createElement('small');state.textContent=`${gate.unit} · ${gate.status}${gate.target_fraction?' · target ≥98% of available rows':''}`;
-      step.append(mark,name,count,state);path.append(step);
+      step.append(mark,name,count,state);
+      const explanations={inventory:'Required mask and geolocation inputs were processed.',reconciliation:'Available FIRMS rows are matched to native fire samples. This does not measure source completeness.',samples:'A reviewer must check native classes, coordinates and grid assignments.',review:'An independent reviewer must record a signed interpretation.'};
+      const explanation=document.createElement('p');explanation.textContent=explanations[gate.id]||'Recorded check for this evidence scope.';step.append(explanation);path.append(step);
     }
     target.append(path);
     const masks=report.native_masks;
@@ -266,6 +268,24 @@ document.addEventListener('DOMContentLoaded',()=>{
       const item=document.createElement('span'),icon=document.createElement('i');icon.className=kind;icon.setAttribute('aria-hidden','true');item.append(icon,document.createTextNode(text));legend.append(item);
     }
     target.append(legend);
+    const title=$('#validity-overview-title');
+    if(title){
+      const checked=(report.validation_gates||[]).filter(g=>g.status==='passed').length;
+      const allChecked=checked===(report.validation_gates||[]).length && checked>0;
+      title.textContent=report.title;
+      $('#validity-overview-state').textContent=allChecked?'Recorded checks passed':'Independent review pending';
+      $('#validity-overview-state').dataset.state=allChecked?'passed':'pending';
+      $('#validity-overview-summary').textContent=masks?.processed_fire_granules
+        ? allChecked ? 'All recorded native checks passed. Whole-area observation opportunity remains a separate requirement.' : `${checked} of ${(report.validation_gates||[]).length} recorded checks passed. Native inputs and reconciliation can be checked here; human review and whole-area observation opportunity remain separate requirements.`
+        :'Native inputs are unavailable for this case. Source counts remain inspectable; the native review gates cannot be assumed passed.';
+      $('#validity-overview-scope').textContent=`${report.start_utc} → ${report.end_utc} UTC · Bounds [${report.bbox.join(', ')}] · ${report.grid}`;
+      const facts=$('#validity-audit-facts');facts.replaceChildren();
+      const values=[['Native centroid samples',masks?.clipped_native_pixels],['Descriptive paired samples',masks?.paired_observations?.sample_size],['Confidence disagreements',masks?.reconciliation?.confidence_disagreements]];
+      for(const [label,value]of values){const item=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value===null||value===undefined?'Unavailable':format(value);item.append(dt,dd);facts.append(item);}
+      const note=document.createElement('p');note.className='validity-pair-note';note.textContent='Pairs use native centroid samples within 90 minutes. Their count is descriptive, not a sensor sensitivity or exposure result.';facts.after(note);const old=note.nextElementSibling;if(old?.classList.contains('validity-pair-note'))old.remove();
+      const review=$('#validity-overview-review');review.href=new URL(`evidence.html?tab=reproduce&case=${encodeURIComponent(caseId)}`,document.baseURI).href;
+      $('#validity-overview-download').href=$('#validity-download').href;
+    }
   }
   function renderSensitivity(){
     const target=$('#validity-sensitivity');target.replaceChildren();
@@ -452,7 +472,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       window.dispatchEvent(new CustomEvent('fireatlas:validity-report',{detail:next}));
       if(location.pathname==='./method.html'){const address=new URL(location.href);address.searchParams.set('case',id);address.searchParams.set('case_date',selectedDate);history.replaceState(null,'',address);}
       if(sync)window.dispatchEvent(new CustomEvent('fireatlas:validity-day',{detail:{date:selectedDate,bbox:next.bbox,year:Number(selectedDate.slice(0,4)),month:Number(selectedDate.slice(5,7))}}));
-    }catch(error){if(current!==request)return;report=null;svg.replaceChildren();$('#validity-status').textContent=`Authentic case unavailable: ${error.message}. Select a case to retry.`;$('#validity-graphic-date').textContent='SOURCE DATA UNAVAILABLE';$('#validity-readout-value').textContent='—';$('#validity-day-buttons').replaceChildren();
+    }catch(error){if(current!==request)return;report=null;svg.replaceChildren();
+      if($('#validity-overview-title')){ $('#validity-overview-title').textContent='Case evidence unavailable';$('#validity-overview-summary').textContent='Select a case to retry. No validation status is inferred.';$('#validity-overview-state').textContent='Unavailable';$('#validity-overview-scope').textContent='';$('#validity-audit-facts').replaceChildren();$('#validity-overview-download').removeAttribute('href');$('#validity-overview-review').removeAttribute('href');}$('#validity-status').textContent=`Authentic case unavailable: ${error.message}. Select a case to retry.`;$('#validity-graphic-date').textContent='SOURCE DATA UNAVAILABLE';$('#validity-readout-value').textContent='—';$('#validity-day-buttons').replaceChildren();
       for(const id of ['validity-detail-summary','validity-record-detail','validity-sensitivity','validity-cmr','validity-incidents','validity-validation','validity-evidence-media','validity-incident-context'])$('#'+id)?.replaceChildren();
       $('#validity-source-notice').hidden=true;$('#validity-notice-link').hidden=true;$('#validity-selected-day').textContent='—';$('#validity-official-link').removeAttribute('href');$('#validity-download').removeAttribute('href');$('#validity-review-template').removeAttribute('href');$('#validity-review-ui').removeAttribute('href');
       window.dispatchEvent(new CustomEvent('fireatlas:validity-error',{detail:{message:error.message}}));

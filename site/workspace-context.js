@@ -2,6 +2,11 @@
 (() => {
   'use strict';
   const DEFAULTS=Object.freeze({year:2026,month:6,bbox:'-122.2,38.8,-120,41',as_of:'2026-06-30',series:'joint',day:'',distance_km:2,gap_days:1,region:'norcal',layer:'none',calendar_metric:'harmonized',metric:'density',scope:'daily',view:'2d',scale:'study'});
+  const NAMED_STUDIES=Object.freeze({
+    'park-2024':{bbox:'-122,39.5,-121.3,40.5',start:'2024-07-24',end:'2024-08-14'},
+    'camp-2018':{bbox:'-121.85,39.6,-121.3,40',start:'2018-11-08',end:'2018-11-21'},
+    'grove-2025':{bbox:'-121.55,39.25,-121.28,39.48',start:'2025-07-04',end:'2025-07-06'}
+  });
   const KEYS=['year','month','bbox','start','end','as_of','day','case','region','series','source','distance_km','gap_days','layer','calendar_metric','metric','scope','view','split','scale','tab','section','analysis_month','guide','guide_step','method_id','unit','release_id','result_sha256','origin_region','origin_year','origin_month','origin_start','origin_end','origin_metric','origin_method_id','origin_unit','origin_result_sha256','origin_route','geometry'];
   const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'')&&Number.isFinite(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s;
   const monthEnd=(year,month)=>new Date(Date.UTC(year,month,0)).toISOString().slice(0,10);
@@ -26,7 +31,7 @@
     if(c.geometry){try{const g=typeof c.geometry==='string'?JSON.parse(c.geometry):c.geometry;const ring=g.coordinates?.[0],box=c.bbox.split(',').map(Number);if(g.type!=='Polygon'||g.coordinates?.length!==1||!Array.isArray(ring)||ring.length<4||ring.length>100||JSON.stringify(ring[0])!==JSON.stringify(ring.at(-1))||ring.some(p=>!Array.isArray(p)||p.length!==2||!p.every(Number.isFinite)||p[0]<box[0]||p[0]>box[2]||p[1]<box[1]||p[1]>box[3]))throw Error();c.geometry=JSON.stringify(g);}catch{errors.push('Invalid polygon selection');}}
     c.errors=errors;return c;
   }
-  function read(search=location.search){const p=new URLSearchParams(search),v={};for(const k of KEYS)if(p.has(k))v[k]=p.get(k);if(v.start&&!v.year)v.year=v.start.slice(0,4);if(v.start&&!v.month)v.month=v.start.slice(5,7);if(!v.bbox&&v.region==='punjab-haryana')v.bbox='73.8,29.5,77.6,32.6';if(!v.as_of&&v.year&&v.month&&Number(v.month)>=1&&Number(v.month)<=12)v.as_of=monthEnd(Number(v.year),Number(v.month));return normalize(v);}
+  function read(search=location.search){const p=new URLSearchParams(search),v={};for(const k of KEYS)if(p.has(k))v[k]=p.get(k);const named=NAMED_STUDIES[v.case];if(named){for(const k of ['bbox','start','end'])if(!p.has(k))v[k]=named[k];if(!p.has('as_of'))v.as_of=v.end;}if(v.start&&!v.year)v.year=v.start.slice(0,4);if(v.start&&!v.month)v.month=v.start.slice(5,7);if(!v.bbox&&v.region==='punjab-haryana')v.bbox='73.8,29.5,77.6,32.6';if(!v.as_of&&v.year&&v.month&&Number(v.month)>=1&&Number(v.month)<=12)v.as_of=monthEnd(Number(v.year),Number(v.month));return normalize(v);}
   function write(context,options={}){const merged={...read(),...context};const p=new URLSearchParams();for(const k of KEYS)if(merged[k]!=null&&merged[k]!=='')p.set(k,k==='geometry'&&typeof merged[k]!=='string'?JSON.stringify(merged[k]):String(merged[k]));p.set('context_version','2');return options.path?`${options.path}?${p}${options.hash||''}`:'?'+p;}
   function api(context,keys=['year','month','bbox','as_of','series','day','distance_km','gap_days']){const p=new URLSearchParams();for(const k of keys)if(context[k]!=null&&context[k]!=='')p.set(k,Array.isArray(context[k])?context[k].join(','):context[k]);return p;}
   const base=()=>new URL('./',document.baseURI);

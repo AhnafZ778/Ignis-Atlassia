@@ -1,0 +1,113 @@
+/* Analytical page polish only. Landing assets and scientific controllers are independent. */
+body.analytical-workspace:has(.mission),body.analytical-workspace[data-workspace=evidence]{background:#fbfcfe}
+.analytical-workspace .assistant-shell.mission{width:auto;max-width:1480px;padding:36px clamp(16px,3vw,48px) 64px}
+.analytical-workspace .mission-heading{align-items:flex-start;gap:24px;padding:0 0 24px}
+.analytical-workspace .mission-heading h1{font-size:clamp(28px,3.2vw,44px);letter-spacing:-.045em;line-height:1.13;margin:10px 0 12px;font-weight:650}
+.analytical-workspace .mission-heading p{max-width:62ch;font-size:14px;line-height:1.65}
+.analytical-workspace .mission-heading-actions{justify-content:flex-end;max-width:520px;gap:8px;padding-top:12px}
+.analytical-workspace .mission-live{flex-basis:100%;justify-content:flex-end;color:#546579}
+.analytical-workspace .mission-live::before{background:#31836d}
+.analytical-workspace .mission-heading-actions button,.analytical-workspace #investigate-studio-link{min-height:40px;padding:9px 13px;font-size:13px;border-radius:7px;box-shadow:none}
+.analytical-workspace .mission-archive-drawer{margin:0 0 24px;border:0;border-top:1px solid #dce3eb;border-bottom:1px solid #dce3eb;border-radius:0;background:transparent;box-shadow:none}
+.analytical-workspace .mission-archive-drawer>summary{min-height:64px;padding:14px 0;gap:12px;color:#173656}
+.analytical-workspace .mission-archive-drawer>summary strong{font-size:15px;font-weight:650}
+.analytical-workspace .mission-archive-drawer>summary small{font-size:12px;margin-top:3px}
+.analytical-workspace .archive-task-icon{width:32px;height:32px;border-radius:50%;background:#eaf0fa;color:#315ddb!important;font-size:20px;display:grid;place-items:center}
+.analytical-workspace .mission-archive{background:transparent;border:0;padding:24px 0}
+.analytical-workspace .mission-grid{border:0;border-radius:0;background:transparent;gap:24px;overflow:visible}
+.analytical-workspace .mission-observatory{background:transparent}
+.analytical-workspace .mission-study-bar{background:transparent;padding:0 0 16px;border-bottom:0;gap:20px}
+.analytical-workspace .mission-study-bar h2{font-size:24px;line-height:1.3}
+.analytical-workspace .mission-study-bar p{font-size:13px;line-height:1.6}
+.analytical-workspace .mission-frame-state{background:transparent;border:0;border-left:2px solid #d7bd82;padding:6px 10px;max-width:240px;text-align:left}
+.analytical-workspace .mission-map-toolbar{padding:12px 0 16px;background:transparent;border:0;gap:12px}
+.analytical-workspace .mission-display-fields{flex-wrap:wrap;gap:12px}
+.analytical-workspace .mission-display-fields label{color:#516477;font-size:12px;display:flex;align-items:center;gap:8px}
+.analytical-workspace .mission-map-stage{border:1px solid #d5dfe9;border-radius:10px;overflow:hidden}
+.analytical-workspace .mission-map-key{background:transparent;padding:16px 0 10px;border:0}
+.analytical-workspace .mission-landscape{background:transparent;padding:8px 0 18px;border:0;gap:16px}
+.analytical-workspace .mission-readouts-heading{background:transparent;padding:18px 0 0;border-top:1px solid #e0e6ed}
+.analytical-workspace .mission-readouts-heading span{display:inline;margin-left:10px}
+.analytical-workspace .mission-readouts{grid-template-columns:repeat(3,minmax(0,1fr));background:transparent;gap:24px;padding:20px 0 24px;border:0}
+.analytical-workspace .mission-readout{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0 0 0 14px;border-left:2px solid #b9c8d9}
+.analytical-workspace .mission-readout.modis{border-left-color:#bc7923}.analytical-workspace .mission-readout.viirs{border-left-color:#16839b}
+.analytical-workspace .mission-readout strong{font-size:32px;font-weight:650;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.analytical-workspace .mission-readout span,.analytical-workspace .mission-readout small{font-size:12px;line-height:1.55}
+.analytical-workspace .mission-timeline{background:transparent;border:0;border-top:1px solid #e0e6ed;border-bottom:1px solid #e0e6ed;border-radius:0;padding:24px 0}
+.analytical-workspace .mission-timeline-head{gap:16px}.analytical-workspace .mission-replay-controls{gap:16px;padding-top:8px}
+.analytical-workspace .mission-context-actions{background:transparent;border:0;gap:10px;padding:24px 0 16px}
+.analytical-workspace .mission-feedback{padding:8px 0;font-size:12px}
+.analytical-workspace .mission-intelligence{background:#fff;border:1px solid #dce3eb;border-radius:10px;overflow:hidden}
+.analytical-workspace .jarvis-transfer-compact{background:transparent;box-shadow:none;border:0;border-top:1px solid #e0e6ed;border-radius:0;gap:12px;padding:20px 0;margin:8px 0}
+.analytical-workspace .jarvis-transfer-compact>strong{font-size:15px;flex-basis:auto;margin-right:auto}
+.analytical-workspace .jarvis-transfer-compact .jarvis-context-strip{order:4;flex-basis:100%;font-size:12px;color:#5c6d7f}
+.analytical-workspace .jarvis-transfer-compact>button{min-height:40px}.analytical-workspace .jarvis-transfer-compact>button:first-of-type{background:#315ddb;color:white;border-color:#315ddb}
+.analytical-workspace .jarvis-transfer-compact>[role=status]{order:5;flex-basis:100%;font-size:12px;color:#5c6d7f}
+.analytical-workspace .jarvis-transfer-details{order:6;flex-basis:100%;border:0;padding:0}
+.analytical-workspace .jarvis-transfer-details>summary{color:#315ddb;cursor:pointer;font-size:13px;padding:10px 0;min-height:40px}
+.analytical-workspace .jarvis-transfer-details[open]{display:flex;flex-wrap:wrap;gap:10px}.analytical-workspace .jarvis-transfer-details[open]>summary{margin-bottom:12px}
+.analytical-workspace .jarvis-transfer-details>button,.analytical-workspace .jarvis-transfer-details>select,.analytical-workspace .jarvis-transfer-details>label{margin:4px 8px 4px 0}
+.analytical-workspace .jarvis-transfer-details .jarvis-prompt-presets{margin-top:12px;gap:8px}
+/* Evidence reads as a scientific notebook, with one clear native-audit summary. */
+.analytical-workspace[data-workspace=evidence] .lab-shell{width:auto;max-width:1320px;margin:auto;padding:32px clamp(16px,3vw,44px) 64px}
+.analytical-workspace[data-workspace=evidence] .workspace-heading{padding:0;margin:0 0 24px}
+.analytical-workspace[data-workspace=evidence] .workspace-heading h1{font-size:32px;letter-spacing:-.035em}
+.analytical-workspace[data-workspace=evidence] .workspace-heading p{font-size:14px;margin:8px 0;max-width:78ch}
+.analytical-workspace[data-workspace=evidence] .workspace-tabs{gap:6px;margin-bottom:32px;padding-bottom:8px;flex-wrap:nowrap;overflow:auto}
+.analytical-workspace[data-workspace=evidence] .workspace-tabs button{flex-shrink:0;min-height:44px;padding:10px 14px;font-size:13px;border:0;border-radius:6px}
+.analytical-workspace .validity-overview-heading{margin:0 0 28px;max-width:72ch}
+.analytical-workspace .validity-overview-heading h2{font-size:clamp(26px,3vw,38px);letter-spacing:-.04em;margin:10px 0 12px;line-height:1.15}
+.analytical-workspace .validity-overview-heading p{font-size:14px;line-height:1.7;color:#516477}
+.analytical-workspace .method-case-control{padding:0 0 24px;margin:0;border:0}
+.analytical-workspace .validity-casebar{gap:12px;flex-wrap:wrap}.analytical-workspace .validity-casebar>span{font-size:10px;letter-spacing:.12em}.analytical-workspace .validity-casebar button{min-height:48px}
+.analytical-workspace .validity-verdict{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 0;border-top:1px solid #dce3eb}
+.analytical-workspace .validity-verdict h3{font-size:25px;letter-spacing:-.03em;margin:8px 0 12px}
+.analytical-workspace .validity-verdict p{max-width:80ch;font-size:14px;line-height:1.7;color:#516477}
+.analytical-workspace .validity-verdict .validity-scope{font-size:12px;color:#66788b;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.analytical-workspace .validity-status-pill{flex-shrink:0;display:inline-flex;align-items:center;gap:8px;border-radius:20px;padding:9px 13px;background:#fff2dd;color:#865514;font-size:12px;font-weight:650;white-space:nowrap}
+.analytical-workspace .validity-status-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.analytical-workspace .validity-status-pill[data-state=passed]{background:#e8f4ed;color:#207548}
+.analytical-workspace #validity-validation>h4{font-size:13px;font-weight:650;color:#516477;margin:0 0 16px}
+.analytical-workspace .validity-validation-path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;padding:0;margin:0 0 24px;gap:0;background:transparent;border:1px solid #dce3eb;border-radius:9px;overflow:hidden}
+.analytical-workspace .validity-validation-path li{display:flex;flex-direction:column;align-items:flex-start;position:relative;gap:8px;min-width:0;padding:20px;background:transparent;border:0;border-right:1px solid #dce3eb;border-radius:0;box-shadow:none}
+.analytical-workspace .validity-validation-path li:last-child{border-right:0}
+.analytical-workspace .validity-validation-path .validation-step-mark{display:grid;place-items:center;position:static;width:26px;height:26px;background:#fff3df;border-radius:50%;color:#946315;font-size:16px;margin-bottom:4px}
+.analytical-workspace .validity-validation-path .passed .validation-step-mark{background:#e5f4eb;color:#23774a}
+.analytical-workspace .validity-validation-path strong{font-size:14px;color:#18324b;line-height:1.4}
+.analytical-workspace .validity-validation-path b{font-size:24px;font-weight:650;letter-spacing:-.035em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.analytical-workspace .validity-validation-path small{font-size:11px;color:#65788b;line-height:1.5}
+.analytical-workspace .validity-validation-path p{font-size:12px;line-height:1.6;color:#65788b;margin:4px 0 0}
+.analytical-workspace #validity-validation>p{font-size:13px;line-height:1.7;color:#516477;max-width:90ch}
+.analytical-workspace .validity-exposure{display:flex;align-items:flex-start;gap:14px;border-top:1px solid #e0e6ed;border-bottom:1px solid #e0e6ed;padding:20px 0;margin:24px 0}
+.analytical-workspace .validity-exposure-mark{width:30px;height:30px;display:grid;place-items:center;background:repeating-linear-gradient(45deg,#f0f3f8,#f0f3f8 3px,#e5eaf1 3px,#e5eaf1 5px);border-radius:50%;flex-shrink:0}
+.analytical-workspace .validity-exposure h4{font-size:14px;margin:0 0 8px}.analytical-workspace .validity-exposure p{font-size:13px;line-height:1.7;max-width:80ch;margin:0;color:#516477}
+.analytical-workspace .validity-exposure>span:last-child{margin-left:auto;flex-shrink:0;color:#65788b;font-size:11px}
+.analytical-workspace .validity-audit-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin:24px 0 12px}
+.analytical-workspace .validity-audit-facts dt{font-size:12px;color:#65788b;margin-bottom:8px}.analytical-workspace .validity-audit-facts dd{margin:0;font-size:24px;font-weight:650;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.analytical-workspace .validity-pair-note,.analytical-workspace .validity-audit-boundary{font-size:12px;line-height:1.7;color:#65788b;max-width:95ch;margin:12px 0}
+.analytical-workspace .validity-next{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:24px 0}
+.analytical-workspace .validity-next a{font-size:13px;min-height:44px;display:inline-flex;align-items:center;color:#315ddb;text-decoration:none}
+.analytical-workspace .validity-next a.validity-primary{padding:11px 16px;background:#315ddb;color:white;border-radius:7px;font-weight:600}
+.analytical-workspace .validity-counting-details{margin:24px 0;border-bottom:1px solid #dce3eb}
+.analytical-workspace .validity-counting-details>summary{padding:18px 0;cursor:pointer;color:#315ddb;font-size:14px;min-height:44px}
+.analytical-workspace .validity-walkthrough{background:transparent;border:0;border-bottom:1px solid #dce3eb;border-radius:0;padding:0;margin:24px 0}
+.analytical-workspace .validity-walkthrough>summary{padding:18px 0;color:#315ddb;font-size:14px;min-height:44px}
+.analytical-workspace .validity-story{margin:8px 0 28px}.analytical-workspace .validity-intro{padding:12px 0 24px}.analytical-workspace .validity-intro h2{font-size:28px}
+.analytical-workspace .method-flow,.analytical-workspace .trace-section,.analytical-workspace .reproduce-section,.analytical-workspace .method-records{margin:28px 0;padding:24px 0;background:transparent;border:0;border-top:1px solid #dce3eb;border-radius:0}
+.analytical-workspace .method-section-head h2{font-size:25px;line-height:1.25}.analytical-workspace .method-section-head{flex-wrap:wrap;gap:16px}
+.analytical-workspace .section-jump-nav{margin:24px 0;padding:14px 0;gap:24px;flex-wrap:wrap}
+@media(max-width:1100px){.analytical-workspace .mission-heading{flex-direction:column;gap:0}.analytical-workspace .mission-heading-actions{justify-content:flex-start;max-width:none}.analytical-workspace .mission-live{flex-basis:auto;justify-content:flex-start}.analytical-workspace .validity-verdict{flex-direction:column;gap:12px}.analytical-workspace .validity-validation-path{grid-template-columns:repeat(2,minmax(0,1fr))}.analytical-workspace .validity-validation-path li:nth-child(-n+2){border-bottom:1px solid #dce3eb}.analytical-workspace .validity-validation-path li:nth-child(2){border-right:0}.analytical-workspace .validity-exposure>span:last-child{display:none}}
+@media(max-width:760px){.analytical-workspace .assistant-shell.mission{padding:24px 16px 40px;margin:0;width:100%}.analytical-workspace .mission-heading-actions{gap:8px;margin-top:4px}.analytical-workspace .mission-live{flex-basis:100%;justify-content:flex-start}.analytical-workspace .mission-archive-drawer>summary{grid-template-columns:32px minmax(0,1fr) 16px;padding:14px 0}.analytical-workspace .mission-map-toolbar{flex-wrap:wrap}.analytical-workspace .mission-display-settings{flex-basis:100%}.analytical-workspace .mission-display-settings>summary{display:block;cursor:pointer;padding:10px 0;color:#315ddb;min-height:44px}.analytical-workspace .mission-display-settings>.mission-display-fields{flex-wrap:wrap;gap:12px;padding:12px 0}.analytical-workspace .mission-display-fields label{flex-wrap:wrap}.analytical-workspace .mission-readouts-heading span{display:block;margin:4px 0 0}.analytical-workspace .mission-readouts{gap:12px}.analytical-workspace .mission-readout{padding-left:8px}.analytical-workspace .mission-readout strong{font-size:26px}.analytical-workspace .mission-grid{display:grid;gap:16px}.analytical-workspace .validity-overview-heading{margin-bottom:20px}.analytical-workspace .validity-verdict{padding:24px 0}.analytical-workspace .validity-status-pill{white-space:normal}.analytical-workspace .validity-validation-path li{padding:16px}.analytical-workspace .validity-validation-path b{font-size:22px}.analytical-workspace .validity-audit-facts{grid-template-columns:1fr;gap:16px}.analytical-workspace .validity-audit-facts>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.analytical-workspace .validity-audit-facts dd{font-size:22px}.analytical-workspace .validity-casebar>div{display:flex;flex-wrap:wrap}.analytical-workspace .validity-next{gap:12px}.analytical-workspace .section-jump-nav{gap:16px}.analytical-workspace .jarvis-transfer-compact>strong{flex-basis:100%}.analytical-workspace .jarvis-transfer-details .jarvis-prompt-presets button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.analytical-workspace *, .analytical-workspace *::before,.analytical-workspace *::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* Keep case switching and map geography light rather than nesting more panels. */
+.analytical-workspace .method-case-control{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.analytical-workspace .validity-casebar{display:flex;align-items:center;gap:14px}
+.analytical-workspace .validity-casebar>div{display:flex;gap:4px}
+.analytical-workspace .validity-casebar>a{font-size:12px;color:#65788b;margin-left:12px}
+.analytical-workspace .assistant-location-context{background:transparent;border:0;border-radius:0;box-shadow:none;margin:0;padding:12px 0;gap:12px}
+.analytical-workspace .assistant-location-context>div{min-width:0}
+.analytical-workspace .assistant-location-context strong{font-size:12px;color:#516477}
+.analytical-workspace .assistant-place-search{background:transparent;border:0;padding:0 0 12px;gap:12px}
+.analytical-workspace .validity-validation-path li p{max-width:34ch}
+@media(max-width:760px){.analytical-workspace .method-case-control{gap:12px}.analytical-workspace .validity-casebar{gap:8px}.analytical-workspace .validity-casebar>span{flex-basis:100%}.analytical-workspace .validity-casebar>a{margin:0}.analytical-workspace .assistant-location-context{padding:12px 0}.analytical-workspace .assistant-place-search{flex-wrap:wrap}}

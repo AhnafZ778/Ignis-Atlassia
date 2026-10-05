@@ -4,6 +4,7 @@ import gzip
 import hashlib
 import json
 import tempfile
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -76,7 +77,12 @@ class StaticCalendarExportTests(unittest.TestCase):
         self.assertIn(".harm-persona-panel", css)
         self.assertIn("path: site", workflow)
         self.assertTrue((root / "fireatlas/static/.nojekyll").is_file())
-        self.assertIn("!site/**", (root / ".gitignore").read_text(encoding="utf-8"))
+        # Public evidence remains tracked while secret patterns still apply
+        # inside the publication tree. An unconditional unignore is unsafe.
+        for path in ('site/atlas.html', 'site/data/v2/manifest.json'):
+            self.assertEqual(subprocess.run(['git', 'check-ignore', '--no-index', '-q', path], cwd=root).returncode, 1)
+        for path in ('.env.assistant', 'site/.env.assistant', 'site/private.sqlite3', 'site/provider.key'):
+            self.assertEqual(subprocess.run(['git', 'check-ignore', '--no-index', '-q', path], cwd=root).returncode, 0)
 
     def test_prepared_region_data_reuses_the_same_calendar_result(self):
         with tempfile.TemporaryDirectory() as temporary:

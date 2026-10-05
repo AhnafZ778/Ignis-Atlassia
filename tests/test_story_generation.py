@@ -5,7 +5,10 @@ import threading
 import unittest
 from unittest.mock import Mock, patch
 
-from .studio_support import StudioCase
+try:
+    from studio_support import StudioCase
+except ImportError:  # both unittest discovery and package-based focused runs
+    from .studio_support import StudioCase
 from fireatlas.studio.story_generation import StoryGeneration
 from fireatlas.studio.errors import Conflict, StudioError
 
