@@ -1,3 +1,5 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('method', ({document,window,fetch,setTimeout,clearTimeout}) => {
 /* Actual records and calculations from the existing local NASA archive. */
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s), NS = 'http://www.w3.org/2000/svg';
@@ -8,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let report = null, recordRequest = 0, checkRequest = 0, auditUrl = null, selectedCell = null;
   let context = explicitContext ? {year:params.get('year'),month:params.get('month'),series:params.get('series')||'joint',bbox:params.get('bbox'),day:params.get('day')||''} : null;
   const archiveCache = new Map();
-  const staticDataRoot = document.querySelector('meta[name="fireatlas-static-data"]')?.content;
+  const staticDataRoot = (document.querySelector('meta[name="fireatlas-static-evidence"]')||document.querySelector('meta[name="fireatlas-static-data"]'))?.content;
   const staticCache = new Map();
   function node(tag, attrs, parent, text) { const n=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(attrs||{})) n.setAttribute(k,v); if(text!==undefined)n.textContent=text; parent.append(n); return n; }
   function svgText(parent,x,y,text,size=12,color='#4D6575') {return node('text',{x,y,fill:color,'font-family':'DM Sans, sans-serif','font-size':size,'text-anchor':'middle'},parent,text);}
@@ -154,6 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   window.addEventListener('fireatlas:validity-report',event=>{
     const next=event.detail,changed=report?.case_id!==next.case_id;report=next;
+    window.FireAtlasViews.register('method',{
+      context:()=>({case:report.case_id,bbox:report.bbox,start:report.start_utc,end:report.end_utc,as_of:report.end_utc,day:report.selected_date_utc,year:Number(report.start_utc.slice(0,4)),month:Number(report.start_utc.slice(5,7)),source:'joint',series:'joint'}),
+      describeView:()=>({kind:'source-evidence',operation:'validation',metric:'native validity audit and original rows',day:report.selected_date_utc,source:'joint',calculation_contract:report.schema,display_scope:'Bounded selected-day text guide; complete audit retained in the checked result.',caption:report.title+' · raw validity audit; independent review and complete exposure validation remain separate gates.'}),
+      capture:()=>window.FireAtlasViews.captureGuide('replay-records'),state:()=>({ready:Boolean(report)}),capabilities:['frozen validity evidence','original source rows']
+    });
     const day=report.days.find(d=>d.date_utc===report.selected_date_utc);drawFlow(day);if(changed)resetProof();
     if(!context||!explicitContext)context={year:day.date_utc.slice(0,4),month:Number(day.date_utc.slice(5,7)),series:'joint',bbox:report.bbox.join(','),day:day.date_utc};
     $('#method-calendar').href=calendarUrl(context);
@@ -200,4 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('#load-records').addEventListener('click',loadRecords);
   if(explicitContext){$('#record-day').value=context.day||`${context.year}-${String(context.month).padStart(2,'0')}-01`;$('#method-calendar').href=calendarUrl(context);loadRecords();}
+});
+
 });

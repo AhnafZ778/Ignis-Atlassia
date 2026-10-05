@@ -1,0 +1,49 @@
+{
+  "schema": "fireatlas-static-archive-storage-v1",
+  "archives": [
+    {
+      "path": "bundles/punjab-haryana-2024-07.zip",
+      "bytes": 164508016,
+      "sha256": "8df85baabe84494b808dce659005c9e934a22214c086e08d790a11467cf3bfd8",
+      "parts": [
+        {
+          "path": "bundles/punjab-haryana-2024-07.zip.part000",
+          "bytes": 67108864,
+          "sha256": "09deab4d922fc5dbc155492b22e58b18bdb24923751c2e0541294bf3d858abf5"
+        },
+        {
+          "path": "bundles/punjab-haryana-2024-07.zip.part001",
+          "bytes": 67108864,
+          "sha256": "539ced9fe06a2c7e33115ba68ce9322d44f7e0e476e5d6eadabc9e68e8bdfc18"
+        },
+        {
+          "path": "bundles/punjab-haryana-2024-07.zip.part002",
+          "bytes": 30290288,
+          "sha256": "325947e5c571d95526cfa8d9d91056b279005a37fffcf78ac93f16fef14b8ff3"
+        }
+      ]
+    },
+    {
+      "path": "bundles/punjab-haryana-2026-06.zip",
+      "bytes": 164490795,
+      "sha256": "f0411f55387634c51bdaad251cd1c9c433e621f3d0001d9add530e68061e3d35",
+      "parts": [
+        {
+          "path": "bundles/punjab-haryana-2026-06.zip.part000",
+          "bytes": 67108864,
+          "sha256": "c7e25731929830035806f728e1b7e66a912929e0194648737dc7e652cd7215bc"
+        },
+        {
+          "path": "bundles/punjab-haryana-2026-06.zip.part001",
+          "bytes": 67108864,
+          "sha256": "e8ef6fbc26184f7f144c62b995d3531e784ee846325b5154ca3e7db0b772c286"
+        },
+        {
+          "path": "bundles/punjab-haryana-2026-06.zip.part002",
+          "bytes": 30273067,
+          "sha256": "5ff89cb4f30d0a12b6cc04da573b30ff16116c3cc414e2275891046eb8973687"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,11 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('research-overview', ({document,window,fetch,setTimeout,clearTimeout}) => {
 (() => {
   const C = window.FireAtlasContext;
   const $ = id => document.getElementById(id);
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const n = value => value == null ? "—" : Number(value).toLocaleString();
-  let report = null, requestVersion=0,scopeStart=new URLSearchParams(location.search).get("start")||null;
+  let report = null, requestVersion=0,scopeStart=C.researchSelection().start_date||null;
   function monthEnd(year, month) { return new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10); }
   function setCutoff() { $("overview-as-of").value = monthEnd(Number($("overview-year").value), Number($("overview-month").value)); }
   function context() {
@@ -11,9 +13,9 @@
   }
   function syncContext() {
     let selected; try { selected = context(); $("overview-bbox").removeAttribute("aria-invalid"); } catch (_) { $("overview-bbox").setAttribute("aria-invalid","true"); return; }
-    const url = new URL(location.href);
-    url.search = C.write(selected);if(selected.start_date)url.searchParams.set("start",selected.start_date);
-    history.replaceState(null, "", url);
+    const origin=C.read(), analysis_month=`${selected.year}-${String(selected.month).padStart(2,'0')}`;
+    const bbox=Array.isArray(selected.bbox)?selected.bbox.join(','):selected.bbox, outside=analysis_month<origin.start.slice(0,7)||analysis_month>origin.end.slice(0,7);
+    C.update({bbox,distance_km:selected.distance_km,gap_days:selected.gap_days,analysis_month,...(bbox!==origin.bbox?{case:'',region:''}:{}),...(outside?{year:selected.year,month:selected.month,start:selected.start_date||analysis_month+'-01',end:selected.as_of,as_of:selected.as_of,day:'',case:''}:{})},{history:'push',reason:'research-result'});
     C.apply(document, selected);
   }
   function showError(message) {
@@ -94,10 +96,10 @@
   }
   async function init() {
     months.forEach((name, index) => { const option = new Option(name, index + 1); $("overview-month").add(option); });
-    const selected = C.read(); $("overview-month").value = String(selected.month); $("overview-distance").value = String(selected.distance_km); $("overview-gap").value = String(selected.gap_days);
+    const selected = C.researchSelection(); $("overview-month").value = String(selected.month); $("overview-distance").value = String(selected.distance_km); $("overview-gap").value = String(selected.gap_days);
     $("overview-year").replaceChildren(new Option(selected.year,selected.year));
     $("overview-bbox").value = selected.bbox; $("overview-as-of").value = selected.as_of;
-    $("overview-month").addEventListener("change", () => { setCutoff(); syncContext(); }); $("overview-year").addEventListener("change", () => { setCutoff(); syncContext(); }); $("overview-controls").addEventListener("input", syncContext); $("overview-controls").addEventListener("submit", run);
+    $("overview-month").addEventListener("change", () => { setCutoff(); }); $("overview-year").addEventListener("change", () => { setCutoff(); }); $("overview-controls").addEventListener("input", ()=>{if($("overview-status"))$("overview-status").textContent="Draft settings changed. Run analysis to apply them.";}); $("overview-controls").addEventListener("submit", run);
     if (document.querySelector('meta[name="fireatlas-static-data"]')) {
       $("overview-year").replaceChildren(new Option(selected.year,selected.year));
       C.apply(document,selected);
@@ -117,7 +119,8 @@
 
   document.addEventListener('DOMContentLoaded', () => window.FireAtlasViews?.register('research', {
     capabilities:['study controls','sensor overlap','exact daily table'],
-    context: () => { try{const {start_date,...c}=context();return {...c,start:start_date||`${c.year}-${String(c.month).padStart(2,'0')}-01`,end:c.as_of};}catch{return {};} },
+    describeView:()=>{if(!report)throw Error('Run comparison before packaging.');return {kind:'chart',operation:'research',metric:'daily source occupied cells',calculation_contract:report.method_version,caption:'Research comparison uses all selected standard rows; eligibility differs from the calendar.'};},
+    context: () => { try{const {start_date,...c}=report?.config||context();return {...c,start:start_date||`${c.year}-${String(c.month).padStart(2,'0')}-01`,end:c.as_of};}catch{return {};} },
     state: () => ({ready:Boolean(report),report_id:report?.report_id,method:report?.method_version}),
     apply: async cfg => { if(cfg.start?.slice(0,7)!==cfg.end?.slice(0,7))throw Error('Choose a single UTC month for sensor overlap.');scopeStart=cfg.start; const values={year:cfg.year,month:cfg.month,bbox:cfg.bbox.join(','),'as-of':cfg.end,distance:cfg.distance_km,gap:cfg.gap_days};for(const [key,value]of Object.entries(values)){const n=$('overview-'+key);if(n){if(key==='year'&&![...n.options].some(o=>o.value==value))n.add(new Option(value,value));n.value=value;}}await run();if(!report||report.config.as_of!==cfg.end)throw Error('The requested analysis was not loaded.'); },
     capture: async () => { const svg=$('overview-chart').querySelector('svg');if(!svg)throw Error('Run sensor comparison first.');const image=new Image(),serialized=new XMLSerializer().serializeToString(svg);image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(serialized)));await image.decode();const c=document.createElement('canvas');c.width=1080;c.height=320;c.getContext('2d').drawImage(image,0,0);return {data:c.toDataURL('image/png').split(',')[1],mime:'image/png',caption:'Source-specific overlap chart · '+report.report_id+' · observed cell-days'}; }
@@ -125,3 +128,5 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
+});

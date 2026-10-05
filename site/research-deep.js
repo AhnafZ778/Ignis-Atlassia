@@ -1,9 +1,11 @@
+/* Mounted by analytical-panels.js; original scientific controller retained. */
+FireAtlasPanels.define('research-deep', ({document,window,fetch,setTimeout,clearTimeout}) => {
 (() => {
   const C = window.FireAtlasContext;
   const view = document.body.dataset.researchView;
   const $ = id => document.getElementById(id);
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  let report = null, mask = null, map = null, mapLayer = null, contextLayer = null, selectedId = null,requestVersion=0,scopeStart=new URLSearchParams(location.search).get("start")||null;
+  let report = null, mask = null, map = null, mapLayer = null, contextLayer = null, selectedId = null,requestVersion=0,scopeStart=C.researchSelection().start_date||null;
   let contextDate = null, contextErrors = 0;
   function contextStatus() {
     const target = $("candidate-context-status");
@@ -22,17 +24,17 @@
     return new Date(first + Math.floor(elapsed / 16) * 16 * 86400000).toISOString().slice(0, 10);
   }
   function fields() {
-    const context = C.read();
+    const context = C.researchSelection();
     const year = Number($("deep-year")?.value || context.year), month = Number($("deep-month")?.value || context.month);
     const output = {year, month, bbox: C.validBBox($("deep-bbox") ? $("deep-bbox").value : context.bbox, true).split(",").map(Number), as_of: $("deep-as-of")?.value || endDate(year, month), distance_km: Number($("deep-distance")?.value || context.distance_km), gap_days: Number($("deep-gap")?.value || context.gap_days)};
     if(scopeStart&&scopeStart.startsWith(`${year}-${String(month).padStart(2,"0")}`))output.start_date=scopeStart;return output;
   }
   function syncContext() {
     let config; try { config = fields(); $("deep-bbox")?.removeAttribute("aria-invalid"); } catch (_) { $("deep-bbox")?.setAttribute("aria-invalid","true"); return; }
-    const url = new URL(location.href);
-    url.search = C.write({...C.read(), ...config});if(config.start_date)url.searchParams.set("start",config.start_date);
-    history.replaceState(null, "", url);
-    C.apply(document, {...C.read(), ...config});
+    const origin=C.read(), analysis_month=`${config.year}-${String(config.month).padStart(2,'0')}`;
+    const bbox=Array.isArray(config.bbox)?config.bbox.join(','):config.bbox, outside=analysis_month<origin.start.slice(0,7)||analysis_month>origin.end.slice(0,7);
+    C.update({bbox,distance_km:config.distance_km,gap_days:config.gap_days,analysis_month,...(bbox!==origin.bbox?{case:'',region:''}:{}),...(outside?{year:config.year,month:config.month,start:config.start_date||analysis_month+'-01',end:config.as_of,as_of:config.as_of,day:'',case:''}:{})},{history:'push',reason:'research-result'});
+    C.apply(document, config);
   }
   function showError(message) { const target = $("deep-error"); if (!target) return; target.hidden = false; target.textContent = message; }
   function setState(label, kind = "unknown") { C.status($("deep-state"), label, kind); }
@@ -182,20 +184,21 @@
     finally { if (request===requestVersion && $("deep-run")) { $("deep-run").disabled = false; $("deep-run").textContent = view === "exposure" ? "Match study context ↗" : view === "validation" ? "Check study gates" : "Run candidate analysis ↗"; } }
   }
   async function init() {
-    const context = C.read();
+    const context = C.researchSelection();
     if ($("deep-month")) months.forEach((name, index) => $("deep-month").add(new Option(name, index + 1)));
     if ($("deep-year")) {
       $("deep-year").replaceChildren(new Option(context.year,context.year));
       if(!document.querySelector('meta[name="fireatlas-static-data"]'))fetch("/api/meta",{signal:AbortSignal.timeout(12000)}).then(r=>r.ok?r.json():Promise.reject()).then(meta=>{const current=Number($("deep-year").value)||context.year,years=[...new Set([...(meta.years||[]),current])].sort((a,b)=>a-b);$("deep-year").replaceChildren(...years.map(year=>new Option(year,year)));$("deep-year").value=String(current);}).catch(()=>{});
     }
     C.apply(document, context); if ($("deep-as-of") && !$("deep-as-of").value) $("deep-as-of").value = endDate(context.year, context.month); if ($("deep-month")) $("deep-month").addEventListener("change", () => { $("deep-as-of").value = endDate(Number($("deep-year").value), Number($("deep-month").value)); });
-    $("deep-form")?.addEventListener("submit", event => run(event)); $("deep-form")?.addEventListener("input", syncContext); $("deep-form")?.addEventListener("change", syncContext); $("candidate-sort")?.addEventListener("change", () => drawGroups(false)); $("candidate-fit")?.addEventListener("click", fitGroups); $("coverage-file")?.addEventListener("change", async event => { const file = event.target.files?.[0]; if (!file) return; try { if (file.size > 2_900_000) throw new Error("Mask files must be smaller than 2.9 MB."); const accepted = await run(null, JSON.parse(await file.text())); if (accepted && $("coverage-download")) $("coverage-download").disabled = false; } catch (error) { showError(error instanceof SyntaxError ? "This file is not valid JSON." : error.message); } }); $("coverage-example")?.addEventListener("click", () => download(schemaTemplate(), "fireatlas-coverage-mask-template.json")); $("coverage-download")?.addEventListener("click", () => { if (mask) download(mask, "fireatlas-coverage-mask.json"); }); $("validation-refresh")?.addEventListener("click", () => run()); $("validation-case")?.addEventListener("change", () => run());
+    $("deep-form")?.addEventListener("submit", event => run(event)); $("deep-form")?.addEventListener("input", ()=>{if($("deep-status"))$("deep-status").textContent="Draft settings changed. Run analysis to apply them.";});  $("candidate-sort")?.addEventListener("change", () => drawGroups(false)); $("candidate-fit")?.addEventListener("click", fitGroups); $("coverage-file")?.addEventListener("change", async event => { const file = event.target.files?.[0]; if (!file) return; try { if (file.size > 2_900_000) throw new Error("Mask files must be smaller than 2.9 MB."); const accepted = await run(null, JSON.parse(await file.text())); if (accepted && $("coverage-download")) $("coverage-download").disabled = false; } catch (error) { showError(error instanceof SyntaxError ? "This file is not valid JSON." : error.message); } }); $("coverage-example")?.addEventListener("click", () => download(schemaTemplate(), "fireatlas-coverage-mask-template.json")); $("coverage-download")?.addEventListener("click", () => { if (mask) download(mask, "fireatlas-coverage-mask.json"); }); $("validation-refresh")?.addEventListener("click", () => run()); $("validation-case")?.addEventListener("change", () => run());
     if (view === "candidates") initMap(); await run();
   }
 
   document.addEventListener('DOMContentLoaded', () => window.FireAtlasViews?.register(document.body.dataset.page, {
     capabilities:['study controls','candidate evidence','coverage status','scientific gates'],
-    context:()=>{try{const {start_date,...c}=fields();return {...c,start:start_date||`${c.year}-${String(c.month).padStart(2,'0')}-01`,end:c.as_of,day:''};}catch{return {};}},
+    describeView:()=>{if(!report)throw Error('Run the selected analysis first.');if(view==='exposure')throw Error('Package the uploaded mask through its checked assistant evidence receipt; mask exposure cannot be reconstructed from a chart.');return {kind:'chart',operation:'research',metric:'candidate groups',calculation_contract:report.method_version,caption:'Candidate grouping from all selected standard rows, not validated incidents.'};},
+    context:()=>{try{const {start_date,...c}=report?.config||fields();return {...c,start:start_date||`${c.year}-${String(c.month).padStart(2,'0')}-01`,end:c.as_of,day:''};}catch{return {};}},
     state:()=>({ready:Boolean(report),report_id:report?.report_id,method:report?.method_version,coverage_mask:mask?'user-supplied; see validation status':'unavailable'}),
     selection:()=>selectedId?{candidate_id:selectedId,report_id:report?.report_id}:null,
     apply:async (cfg,action)=>{if(cfg.start?.slice(0,7)!==cfg.end?.slice(0,7))throw Error('Choose a single UTC month for this analysis.');scopeStart=cfg.start;if($('validation-case')&&cfg.case)$('validation-case').value=cfg.case;C.apply(document,{...cfg,bbox:cfg.bbox.join(','),as_of:cfg.end});if(!await run())throw Error('Study analysis could not be loaded.');if(action?.options?.candidate_id){const group=report.candidates.groups.find(g=>g.id===action.options.candidate_id);if(!group)throw Error('Candidate does not belong to this report.');selectedId=group.id;drawGroups();renderDetail();if(map&&group.points.length)map.fitBounds(group.points.map(p=>[p.coordinates[1],p.coordinates[0]]),{maxZoom:13});}}
@@ -203,3 +206,5 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
+
+});

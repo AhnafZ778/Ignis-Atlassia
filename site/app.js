@@ -12,7 +12,7 @@ function toast(message) {
 }
 
 async function getJson(path) {
-  const response = await fetch(path, {signal: AbortSignal.timeout(45000)});
+  const response = await fetch(FireAtlasContext.url(path), {signal: AbortSignal.timeout(45000)});
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Could not load data");
   return data;
@@ -754,7 +754,7 @@ function render() {
   document.querySelectorAll('a[href^="./research.html"]:not(#open-research-study)').forEach(link => { link.href = researchUrl; });
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+FireAtlasOnReady(async () => {
   // A static release contains a complete, prebuilt harmonized calendar, but
   // not the live AOI/map APIs used by this older study workspace. Keep the
   // static path honest and quiet: Regional history retains the calendar, while
@@ -883,7 +883,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.dispatchEvent(new CustomEvent("fireatlas:study-ready"));
 });
 
-document.addEventListener('DOMContentLoaded',()=>window.FireAtlasViews?.register('atlas',{
+FireAtlasOnReady(()=>window.FireAtlasViews?.register('atlas',{
   capabilities:['study bounds','daily observations','NASA context','calendar'],
   context:()=>({year:state.year,month:state.month+1,bbox:state.bbox,series:state.series,day:state.day||'',layer:contextChoice}),
   state:()=>({ready:Boolean(state.data),visible_points:replayFeatures.length,totals_basis:'calendar calculation; displayed points are sampled'}),

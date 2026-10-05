@@ -1,0 +1,1 @@
+{"checks":"hashes, grid, completeness, frozen calibration, daily/monthly states, baselines, season","release_id":"984f7f597cd84307bfcd8c3d084c4423239d713cf9824337fa29b8a41bb852c6","result_sha256":"00d2d772681c55abba4c7cb7080aef94b69bb1b678070e8fed20b8bb4eba78a3","rows":229501,"schema":"fireatlas-regional-study-v1","status":"verified"}
