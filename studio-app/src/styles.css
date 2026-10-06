@@ -267,7 +267,12 @@
 .studio-app .story-edit > summary { cursor:pointer; font-weight:600; padding:10px 0; }
 .studio-app .story-film video { width:100%; max-height:70vh; background:#112a32; border-radius:16px; }
 .studio-app .story-film .row { margin-top:14px; }
-.studio-app .story-panel .player-stage { border-radius:18px; background:linear-gradient(145deg,#eff3fd,#fffdf8); }
+.studio-app .story-panel .player-stage { border-radius:18px; background:#f5f4ee; color:#182e38; }
+.studio-app .story-panel .player-stage h3 { color:#182e38; }
+.studio-app .story-panel .player-stage table.facts th,
+.studio-app .story-panel .player-stage table.facts td { border-color:#d9dfdf; color:#182e38; }
+.studio-app .story-panel .player-stage table.facts thead,
+.studio-app .story-panel .player-stage table.facts th { background:#e9eeed; }
 .studio-app .story-panel .scene-schematic-wrap { animation:story-scene-in .55s ease both; }
 @keyframes story-shimmer { to { background-position:-200% 0; } }
 @keyframes story-scene-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }

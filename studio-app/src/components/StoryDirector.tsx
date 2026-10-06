@@ -17,7 +17,7 @@ export function StoryDirector() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('Opening saved stories…');
   const [selected, setSelected] = useState(0);
-  const [narrate, setNarrate] = useState(false);
+  const [narrate, setNarrate] = useState(true);
   const [render, setRender] = useState<RenderJob | null>(null);
   const [savedRenders, setSavedRenders] = useState<RenderSummary[]>([]);
   const renderEpoch = useRef(0), activeStory = useRef<string | null>(null);
@@ -40,13 +40,13 @@ export function StoryDirector() {
   };
   useEffect(() => {
     let live = true; const request = ++storyRequest.current;
-    setStory(null); setDraft(null); setRender(null); setSavedRenders([]); activeStory.current = null; setStatus('Opening saved stories…');
+    setStory(null); setDraft(null); setRender(null); setGeneration(null); setSavedRenders([]); activeStory.current = null; setStatus('Opening saved stories…');
     api.projects(boardId).then(async (projects) => {
       if (!live || request !== storyRequest.current) return;
       setSavedStories(projects.stories);
       setSavedRenders(projects.renders || []);
       const pending = projects.story_generations?.[0];
-      if (pending && (!pending.story_id || pending.story_id === projects.stories[0]?.id)) {
+      if (pending && (!pending.story_id || pending.story_id === projects.stories[0]?.id) && !(projects.renders || []).some(job => job.story_id === pending.story_id)) {
         setBusy(true); void watchGeneration(pending.id, ++generationEpoch.current);
       }
       if (!projects.stories.length) { setStatus('Choose evidence cards on the board, then create your story.'); return; }
@@ -72,8 +72,13 @@ export function StoryDirector() {
 
   const watchGeneration = async (id: string, epoch: number) => {
     try {
-      const job = await api.storyGeneration(id);
+      let job = await api.storyGeneration(id);
       if (active.current !== boardId || epoch !== generationEpoch.current) return;
+      // Older servers briefly published storyboard completion before admitting
+      // the film. Keep polling that checkpoint rather than stranding it at 65%.
+      if (job.status === 'completed' && job.progress < 1 && job.story_id && !job.error && job.render_requested !== false) {
+        job = { ...job, status: 'running', phase: job.render?.phase || 'preparing-video' };
+      }
       setGeneration(job);
       if (job.story_id && activeStory.current !== job.story_id) {
         const next = await api.getStory(job.story_id);
@@ -81,7 +86,7 @@ export function StoryDirector() {
         accept(next);
       }
       if (job.render) setRender(job.render);
-      setStatus(job.error || (job.status === 'completed' ? 'Your infographic story is ready.' : 'JARVIS is preparing your infographic story…'));
+      setStatus(job.error || (job.status === 'completed' ? (job.render?.status === 'completed' ? 'Your infographic film is ready.' : 'Your infographic story is ready.') : job.story_id ? 'Your storyboard is saved. Preparing the infographic film…' : 'JARVIS is preparing your infographic story…'));
       if (['queued', 'running'].includes(job.status)) generationTimer.current = window.setTimeout(() => void watchGeneration(id, epoch), 900);
       else setBusy(false);
     } catch (error) {
@@ -117,6 +122,10 @@ export function StoryDirector() {
       const current = await api.getRender(id);
       if (active.current !== boardId || epoch !== renderEpoch.current || current.story_id !== activeStory.current) return;
       setRender(current);
+      setGeneration((job) => job && job.story_id === current.story_id && job.render_id === current.id && !['cancelled', 'failed'].includes(job.status) ? {
+        ...job, render: current, status: current.status === 'completed' ? 'completed' : ['failed', 'canceled'].includes(current.status) ? 'partial' : 'running',
+        phase: current.phase || current.status, progress: .65 + .35 * current.progress, error: current.error,
+      } : job);
       setSavedRenders((all) => all.map((job) => job.id === current.id ? { ...job, status: current.status } : job));
       if (['queued', 'running'].includes(current.status)) timer.current = window.setTimeout(() => void poll(id, epoch), 800);
       else setStatus(current.error || `Video ${current.status}.`);
@@ -157,13 +166,20 @@ export function StoryDirector() {
     setDraft({ ...draft, chapters: [...draft.chapters, next] }); setSelected(draft.chapters.length);
   };
   const chapter = draft?.chapters[selected];
-  const running = generation && ['queued', 'running'].includes(generation.status);
-  const labels: Record<string, string> = { capturing: 'Capturing your evidence', 'writing-story': 'AI& is writing the story', 'checking-evidence': 'Checking citations and composing scenes', 'preparing-assets': 'Preparing infographic visuals', rendering: 'Animating the film', encoding: 'Encoding your video', finalizing: 'Preparing downloads', completed: 'Your film is ready', saved: 'Your story is ready', 'story-ready': 'Your story is ready', failed: 'Story preparation stopped', cancelled: 'Cancelled', interrupted: 'Preparation interrupted' };
+  const renderActive = Boolean(render && ['queued', 'running'].includes(render.status));
+  const running = Boolean(generation && ['queued', 'running'].includes(generation.status)) || renderActive;
+  const progressJob = render && (!generation || generation.story_id === render.story_id) && !['cancelled', 'failed'].includes(generation?.status || '') ? { ...generation, id: generation?.id || render.id, phase: render.phase || render.status, progress: .65 + .35 * render.progress } : generation;
+  const labels: Record<string, string> = { capturing: 'Capturing your evidence', 'writing-story': 'AI& is writing the story', 'checking-evidence': 'Checking citations and composing scenes', 'preparing-video': 'Storyboard saved · preparing your film', 'preparing-assets': 'Preparing infographic visuals', narrating: 'Recording the voice narration', rendering: 'Animating the film', encoding: 'Encoding your video', finalizing: 'Preparing downloads', completed: 'Your film is ready', saved: 'Your story is ready', 'story-ready': 'Your story is ready', failed: 'Story preparation stopped', canceled: 'Film rendering cancelled', cancelled: 'Cancelled', interrupted: 'Preparation interrupted' };
   return <section className="panel story-panel" aria-label="Story Director">
-    <header className="story-hero"><div className="story-spark" aria-hidden="true">✦</div><div><span className="st-eyebrow">JARVIS · Infographic stories</span><h2>Turn evidence into a story.</h2><p>Maps, checked charts and a clear narrative, composed from this investigation.</p></div><button className="btn primary story-create" disabled={busy || !canEdit || dirty || !chosenCards.length || !caps?.story_generation?.available} onClick={() => void create()}>{running ? 'Creating your story…' : '✦ Create story'}</button></header>
+    <header className="story-hero"><div className="story-spark" aria-hidden="true">✦</div><div><span className="st-eyebrow">JARVIS · Infographic stories</span><h2>Turn evidence into a story.</h2><p>Maps, checked charts and a clear narrative, composed from this investigation.</p></div><button className="btn primary story-create" disabled={busy || running || !canEdit || dirty || !chosenCards.length || !caps?.story_generation?.available} onClick={() => void create()}>{running ? 'Creating your story…' : '✦ Create story'}</button></header>
+    {caps?.video?.engine === 'aiand-native-video' ? <p className="muted">AI&amp; video generation · {caps.video.model} · Generated motion and sound with exact evidence overlays.</p> : null}
+    {render?.provider_progress ? <p role="status" className="muted">AI&amp; · Chapter {render.provider_progress.chapter} of {render.provider_progress.chapters} · {render.provider_progress.status.replaceAll('_', ' ')} · Provider generation can take several minutes.</p> : null}
+    {render?.manifest?.provider ? <p className="muted">Generated by AI&amp; {render.manifest.provider.model} · ${render.manifest.provider.quoted_cost_usd.toFixed(2)} video generation{render.manifest.provider.reused_clips ? ` · ${render.manifest.provider.reused_clips} cached clips reused · $${(render.manifest.provider.new_submission_cost_usd || 0).toFixed(2)} new submissions` : ''}</p> : null}
     {!caps?.story_generation?.available ? <p className="muted">{caps?.story_generation?.reason || 'AI& story creation requires the local service.'}</p> : null}
-    {generation ? <div className={`story-progress ${running ? 'active' : ''}`} aria-label="Story preparation"><div className="row"><strong>{labels[generation.phase] || generation.phase.replaceAll('-', ' ')}</strong><span>{Math.round(generation.progress * 100)}%</span>{running ? <button className="btn small" onClick={async () => { const id = generation.id, epoch = generationEpoch.current; try { const job = await api.cancelStoryGeneration(id); if (epoch === generationEpoch.current) { ++generationEpoch.current; window.clearTimeout(generationTimer.current); setGeneration(job); setBusy(false); setStatus('Cancelled. Saved story material remains available.'); } } catch (error) { setStatus(errorText(error)); } }}>Cancel</button> : null}</div><div className="story-progress-track" role="progressbar" aria-label="Story creation progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(generation.progress * 100)}><div style={{ width: `${generation.progress * 100}%` }} /></div><ol className="story-steps"><li>Evidence</li><li>Narrative</li><li>Infographics</li><li>Film</li></ol></div> : null}
+    {progressJob ? <div className={`story-progress ${running ? 'active' : ''}`} aria-label="Story preparation"><div className="row"><strong>{labels[progressJob.phase] || progressJob.phase.replaceAll('-', ' ')}</strong><span>{Math.round(progressJob.progress * 100)}%</span>{running ? <button className="btn small" onClick={async () => { if (renderActive) { await cancelSelectedRender(); return; } if (!generation) return; const id = generation.id, epoch = generationEpoch.current; try { const job = await api.cancelStoryGeneration(id); if (epoch === generationEpoch.current) { ++generationEpoch.current; window.clearTimeout(generationTimer.current); setGeneration(job); setBusy(false); setStatus('Cancelled. Saved story material remains available.'); } } catch (error) { setStatus(errorText(error)); } }}>Cancel</button> : null}</div><div className="story-progress-track" role="progressbar" aria-label="Story creation progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressJob.progress * 100)}><div style={{ width: `${progressJob.progress * 100}%` }} /></div><ol className="story-steps"><li>Evidence</li><li>Narrative</li><li>Infographics</li><li>Film</li></ol></div> : null}
     <p role="status" className="muted">{status}</p>
+    {story?.resolved && !dirty && !running ? <div className="row"><button className="btn" disabled={busy || !canEdit || !caps?.video.available} onClick={() => void startRender()}>Refresh film &amp; voice</button><span className="muted">Uses the saved story · no new AI writing request</span></div> : null}
+    {render?.manifest ? <p className="muted" role="status">{render.manifest.narration.status === 'narrated' ? 'Voice narration is included in this film.' : `Captions only: ${render.manifest.narration.reason || 'Narration was not available for this export.'}`}</p> : null}
     {generation?.can_resume ? <button className="btn" disabled={busy || !canEdit} onClick={async () => { setBusy(true); const epoch = ++generationEpoch.current; try { const job = await api.resumeStoryGeneration(generation.id); if (active.current === boardId && epoch === generationEpoch.current) { setGeneration(job); void watchGeneration(job.id, epoch); } } catch (error) { if (epoch === generationEpoch.current) { setBusy(false); setStatus(errorText(error)); } } }}>Finish saved storyboard</button> : null}
     {render?.status === 'completed' && render.artifacts.video ? <div className="story-film"><video controls preload="metadata" aria-label="Generated infographic film" src={api.artifactUrl(render.id, 'video')}><track default kind="captions" srcLang="en" label="Checked story narration" src={api.artifactUrl(render.id, 'captions')} /></video><div className="row"><a className="btn primary" download="ignis-infographic.mp4" href={api.artifactUrl(render.id, 'video')}>Download film</a>{story?.resolved ? <a className="btn" href={api.exportUrl(story.id)}>Download interactive story</a> : null}</div></div> : story?.resolved && !dirty ? <StoryPlayer key={story.resolved.sha256} story={story.resolved} identity={{ story_id: story.id, story_revision: story.revision }} /> : !story ? <div className="story-empty" aria-hidden="true"><span>◉</span><span>▥</span><span>✦</span><p>Your investigation, beautifully connected.</p></div> : null}
     <details className="story-edit"><summary>Edit story &amp; export settings{dirty ? ' · unsaved changes' : ''}</summary>
@@ -173,7 +189,7 @@ export function StoryDirector() {
       <div className="grid2"><label className="field">Story title<input maxLength={120} value={draft.title} disabled={!canEdit || busy} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></label><label className="field">Audience<select value={draft.audience || 'researcher'} disabled={!canEdit || busy} onChange={(e) => setDraft(adaptAudience(draft, e.target.value as NonNullable<StoryBody['audience']>))}>{['public', 'student', 'researcher', 'reviewer', 'presenter'].map((v) => <option key={v}>{v}</option>)}</select></label><label className="field">Target reading duration (seconds)<input type="number" min={10} max={600} value={draft.target_duration_seconds || 120} disabled={!canEdit || busy} onChange={(e) => setDraft({ ...draft, target_duration_seconds: Number(e.target.value) })} /></label></div>
       <p className="muted">Audience changes adapt marked starter prose and explanatory detail. Your manual text and checked fields stay unchanged; values, methods and evidence scope stay fixed.</p><div className="row"><button className="btn primary" disabled={busy || !dirty || !canEdit} onClick={async () => { setBusy(true); try { await save(); } catch (error) { setStatus(errorText(error)); } finally { setBusy(false); } }}>Save revision</button><button className="btn" disabled={busy || !canEdit} onClick={() => void resolve()}>Resolve checked scenes</button><button className="btn" disabled={!canEdit || busy || draft.chapters.length >= 24} onClick={() => add()}>Add chapter</button><a className="btn" aria-disabled={dirty || !story.resolved} href={!dirty && story.resolved ? api.exportUrl(story.id) : undefined}>Export reader ZIP</a><button className="btn" disabled={busy || dirty || !story.resolved || !canEdit || !caps?.video.available} onClick={() => void startRender()}>Render documentary</button></div>
       <p className="muted">{String((caps?.video.available ? caps.video.disclosure : caps?.video.reason) || '')}</p>{story.resolved?.warnings?.length ? <details><summary>Scene checks and limitations ({story.resolved.warnings.length})</summary>{story.resolved.warnings.map((warning, i) => <p key={i}>{warning.chapter ? `${warning.chapter}: ` : ""}{warning.message || warning.problem}</p>)}</details> : null}
-      <label><input type="checkbox" checked={narrate} disabled={!caps?.narration.available || busy} onChange={(e) => setNarrate(e.target.checked)} /> AI narration through the existing assistant speech budget</label><p className="muted">{caps?.narration.available ? "Narration uses the saved text and its checked fields; explanatory prose remains authored interpretation. Provider failure keeps captions and transcript." : caps?.narration.reason}</p>
+      <label><input type="checkbox" checked={narrate} disabled={!caps?.narration.available || busy} onChange={(e) => setNarrate(e.target.checked)} /> Include voice narration</label><p className="muted">{caps?.narration.available ? String(caps.narration.disclosure || 'Narration reads the saved story and its checked fields.') : caps?.narration.reason}</p>
       {render ? <div className="row"><span>Video {(render.phase || render.status).replaceAll('-', ' ')} · {Math.round(render.progress * 100)}%</span>{['queued', 'running'].includes(render.status) ? <button className="btn" onClick={() => void cancelSelectedRender()}>Cancel render</button> : null}{Object.keys(render.artifacts || {}).map((name) => <a className="btn" key={name} href={api.artifactUrl(render.id, name)}>Download {name}</a>)}</div> : null}
       {savedRenders.some((job) => job.story_id === story.id) ? <label className="field">Recent video exports<select value={render?.id || ''} onChange={(e) => { const epoch = ++renderEpoch.current; window.clearTimeout(timer.current); setRender(null); if (e.target.value) void poll(e.target.value, epoch); }}><option value="">Choose a saved export</option>{savedRenders.filter((job) => job.story_id === story.id).map((job) => <option value={job.id} key={job.id}>Revision {job.story_revision} · {job.status} · {new Date(job.created * 1000).toISOString().slice(0, 19).replace('T', ' ')} UTC</option>)}</select></label> : null}
       {render ? <p className="muted">This export uses saved story revision {render.story_revision}.{render.story_revision !== story.revision ? ` The editor is on revision ${story.revision}; exporting again is an explicit action.` : ''}</p> : null}

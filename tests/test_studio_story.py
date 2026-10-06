@@ -687,6 +687,7 @@ class RenderTests(StudioCase):
 import { join } from 'node:path';
 console.log('PHASE preparing-assets');
 console.log('PHASE rendering');
+console.log('PHASE finalizing');
 writeFileSync(join(process.argv[2], 'oversized.tmp'), Buffer.alloc(1024));
 setInterval(() => {}, 1000);
 """)
@@ -696,7 +697,7 @@ setInterval(() => {}, 1000);
                 with self.assertRaises(StudioError) as refused:
                     node_runner(job_dir, progress, threading.Event())
             self.assertEqual(refused.exception.code, 'render-limit')
-            self.assertEqual(phases, ['preparing-assets', 'rendering'])
+            self.assertEqual(phases, ['preparing-assets', 'rendering', 'finalizing'])
 
     def manager(self, **kwargs):
         defaults = dict(runner=fake_video, capability=AVAILABLE, narration_capability=NARRATION_OFF, background=False)
@@ -734,6 +735,32 @@ setInterval(() => {}, 1000);
             self.assertTrue(path.is_file())
         with self.assertRaises(StudioError):
             manager.get(self.other, job["id"])
+
+    def test_native_engine_calls_actual_adapter_and_records_provider_identity(self):
+        manager = self.manager(capability=lambda: {'available': True, 'engine': 'aiand-native-video'})
+        story = self.ready_story()
+        def native(directory, progress, cancel, cache):
+            (directory/'provider-receipts.json').write_text(json.dumps({'model':'minimaxai/minimax-h3','disclosure':'Generated motion with exact frozen evidence.','clips':[]}))
+            return fake_video(directory, progress, cancel)
+        with patch('fireatlas.studio.aiand_video.verify_access'), patch('fireatlas.studio.aiand_video.run', side_effect=native) as adapter:
+            job = self.service.start_render(self.owner, story['id'])
+            manager.execute(job['id'],self.owner)
+        result = manager.get(self.owner,job['id'])
+        self.assertEqual(result['status'],'completed',result)
+        self.assertEqual(result['manifest']['engine'],'aiand-native-video')
+        self.assertEqual(result['manifest']['provider']['model'],'minimaxai/minimax-h3')
+        adapter.assert_called_once()
+
+    def test_native_failure_never_invokes_local_renderer(self):
+        from unittest.mock import Mock
+        local = Mock(side_effect=AssertionError('Local fallback must not run.'))
+        manager = self.manager(runner=local,capability=lambda:{'available':True,'engine':'aiand-native-video'})
+        story = self.ready_story()
+        with patch('fireatlas.studio.aiand_video.verify_access'), patch('fireatlas.studio.aiand_video.run',side_effect=StudioError('AI& unavailable')):
+            job=self.service.start_render(self.owner,story['id'])
+            manager.execute(job['id'],self.owner)
+        self.assertEqual(manager.get(self.owner,job['id'])['status'],'failed')
+        local.assert_not_called()
 
     def test_narration_is_attempted_and_provider_failure_falls_back_silently(self):
         from fireatlas.studio.story import resolve_story  # noqa: F401 - ensure the module imports

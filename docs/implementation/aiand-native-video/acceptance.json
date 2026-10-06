@@ -1,0 +1,45 @@
+{
+  "checks": [
+    "Completed native provider jobs and source clip hashes recorded.",
+    "Final MP4 has video, audio and subtitles; actual native film restores at 100%.",
+    "Reload retains the native film instead of the older local render.",
+    "Actual video plays with sound enabled, without another generation request.",
+    "360/390/768 layouts have no horizontal page overflow."
+  ],
+  "page_errors": [],
+  "generation_posts": 0,
+  "provider": {
+    "model": "minimaxai/minimax-h3",
+    "completed_clips": 5,
+    "native_resolution": "768p",
+    "quoted_cost_usd": 6.0,
+    "reused_clips": 5,
+    "new_submission_cost_usd": 0
+  },
+  "media": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1"
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "r_frame_rate": "0/0"
+      },
+      {
+        "codec_name": "mov_text",
+        "codec_type": "subtitle",
+        "r_frame_rate": "0/0"
+      }
+    ],
+    "format": {
+      "duration": "87.187696",
+      "size": "3904780"
+    }
+  }
+}

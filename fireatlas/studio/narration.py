@@ -17,6 +17,43 @@ AUDIO_TOTAL_LIMIT = 64 * 1024 * 1024
 DISCLOSURE = "AI-generated voice of the saved story. Checked fields cite frozen evidence; explanatory prose remains authored interpretation. Not an eyewitness account."
 
 
+def fit_local_timing(public, audio, cache_dir, probe=None):
+    """Extend presentation holds to fit offline voice, retaining every checked word.
+
+    This affects video timing only. Saved stories, receipts and measurements are
+    unchanged, and all adjusted chapter timings are recorded in the manifest.
+    """
+    if audio.get('status') != 'narrated' or not audio.get('segments'):
+        return public, []
+    probe = probe or audio_duration
+    try:
+        durations = {}
+        for segment in audio['segments']:
+            seconds = probe(Path(cache_dir) / segment['file'])
+            if not math.isfinite(seconds) or seconds <= 0:
+                return public, []
+            durations[segment['chapter_id']] = durations.get(segment['chapter_id'], 0) + seconds
+        import copy
+        prepared = copy.deepcopy(public)
+        changes, cursor = [], 0
+        for scene in prepared['scenes']:
+            original = scene['duration_seconds']
+            duration = max(original, math.ceil((durations.get(scene['chapter_id'], 0) + 1.2) * 30) / 30)
+            if duration > 300:
+                return public, []
+            if duration != original:
+                changes.append({'chapter_id': scene['chapter_id'], 'saved_seconds': original, 'video_seconds': duration,
+                                'reason': 'Complete neural narration and a closing pause.'})
+            scene['duration_seconds'], scene['start_seconds'] = duration, cursor
+            cursor += duration
+        if cursor > 600:
+            return public, []
+        prepared['profile']['duration_seconds'] = cursor
+        return prepared, changes
+    except (KeyError, ValueError, OSError, subprocess.SubprocessError):
+        return public, []
+
+
 def audio_duration(path):
     """Probe a controlled local file only; no network resources or shell interpolation."""
     result = subprocess.run(['ffprobe', '-v', 'error', '-protocol_whitelist', 'file,pipe', '-f', 'mp3', '-select_streams', 'a:0',
@@ -122,7 +159,8 @@ def cache_key(text, model, voice, revision_key=""):
 
 def preflight(scenes, capability, used_today=0, model=None, voice="coral", revision_key=""):
     """Decide what would be sent before any provider call. Unchecked narration is never voiced."""
-    model = model or os.getenv("FIREATLAS_TTS_MODEL", "gpt-4o-mini-tts")
+    model = model or capability.get('model') or os.getenv("FIREATLAS_TTS_MODEL", "gpt-4o-mini-tts")
+    voice = capability.get('voice', voice)
     segments, skipped = [], []
     for scene in scenes:
         if not scene["narration_text"]:
@@ -134,10 +172,10 @@ def preflight(scenes, capability, used_today=0, model=None, voice="coral", revis
             segments.append({"chapter_id": scene["chapter_id"], "index": index, "text": text, "key": cache_key(text, model, voice, revision_key)})
     characters = sum(len(s["text"]) for s in segments)
     report = {"segments": segments, "skipped": skipped, "characters": characters, "model": model, "voice": voice, "available": bool(capability.get("available")),
-              "reason": capability.get("reason")}
+              "reason": capability.get("reason"), 'provider': capability.get('provider', 'openai')}
     if not segments:
         report.update(available=False, reason="No checked narration text to voice.")
-    elif report["available"] and used_today + characters > DAILY_LIMIT:
+    elif report["available"] and capability.get('provider') != 'piper' and used_today + characters > DAILY_LIMIT:
         report.update(available=False, reason=f"Narration would exceed the {DAILY_LIMIT}-character daily allowance; captions and transcript are used instead.")
     elif report["available"]:
         rate, budget = capability.get("per_request_usd", 0), capability.get("story_budget_usd", 0)
@@ -147,7 +185,7 @@ def preflight(scenes, capability, used_today=0, model=None, voice="coral", revis
     return report
 
 
-def narrate(report, cache_dir, synthesize, record=lambda characters: None, cancelled=lambda: False):
+def narrate(report, cache_dir, synthesize, record=lambda characters: None, cancelled=lambda: False, progress=lambda fraction: None):
     """Synthesize uncached segments. The first provider failure stops the run with no retry; cached audio is kept."""
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -171,4 +209,5 @@ def narrate(report, cache_dir, synthesize, record=lambda characters: None, cance
             record(len(segment["text"]))
         done.append({"chapter_id": segment["chapter_id"], "index": segment["index"], "file": target.name, "cached": cached,
                      "sha256": hashlib.sha256(target.read_bytes()).hexdigest()})
+        progress(len(done) / len(report['segments']))
     return {"status": status, "reason": reason, "segments": done, "disclosure": DISCLOSURE, "generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import datetime
 import re
 import secrets
@@ -131,7 +132,8 @@ class StoryGeneration:
         available = self.service.assistant is not None and bool(configured_keys())
         return {'available': available, 'provider': 'aiand', 'reason': None if available else
                 'AI& story creation needs the existing assistant runtime and a server-side AIAND_API_KEY.',
-                'disclosure': 'AI& authors the evidence-grounded storyboard; local rendering produces the infographic video.'}
+                'model': os.getenv('FIREATLAS_AIAND_STORY_MODEL', 'zai-org/glm-5.3'),
+                'disclosure': 'AI& authors the evidence-grounded storyboard; the configured video engine generates the film.'}
 
     def submit(self, principal, document_id, body, key=None):
         with self.lock:
@@ -160,7 +162,7 @@ class StoryGeneration:
                 self.store.require(db, principal, document_id, 'editor')
                 if db.execute('SELECT revision FROM documents WHERE id=?', (document_id,)).fetchone()[0] != document['revision']:
                     raise Conflict('The investigation changed during capture. Create again from its current revision.')
-                if db.execute("SELECT 1 FROM story_generations WHERE status IN ('queued','running')").fetchone():
+                if db.execute("SELECT 1 FROM story_generations WHERE status IN ('queued','running') AND render_id IS NULL").fetchone():
                     raise Conflict('A story is already being prepared. Open its progress to continue.', code='story-busy')
                 identifier, now = 'sgn_'+secrets.token_urlsafe(12), self.store.clock()
                 db.execute('INSERT INTO story_generations(id,principal_id,document_id,document_revision,status,phase,progress,capture,created,updated) VALUES(?,?,?,?,?,?,?,?,?,?)',
@@ -182,12 +184,21 @@ class StoryGeneration:
             self.store.require(db, principal, row['document_id'])
             view = {k: row[k] for k in ('id', 'document_id', 'document_revision', 'status', 'phase', 'progress', 'story_id', 'render_id', 'error', 'created')}
             view['receipt'] = json.loads(row['receipt']) if row['receipt'] else None
+            view['render_requested'] = json.loads(row['capture'])['render']
         if view['render_id']:
             render = self.service.renders.get(principal, view['render_id'])
             view['render'] = render
             if view['status'] not in {'cancelled', 'failed'}:
                 view.update(status='completed' if render['status'] == 'completed' else 'partial' if render['status'] in {'failed', 'canceled'} else 'running',
                             phase=render.get('phase', render['status']), progress=.65 + .35*render['progress'], error=render['error'])
+                # Reconcile older records and renders that finish before their ID
+                # is linked. Publication and progress reflect the saved film.
+                if any(view[k] != row[k] for k in ('status', 'phase', 'progress', 'error')):
+                    with self.store.connection(write=True) as db:
+                        db.execute('UPDATE story_generations SET status=?,phase=?,progress=?,error=?,updated=? '
+                                   'WHERE id=? AND updated=? AND cancel=0',
+                                   (view['status'], view['phase'], view['progress'], view['error'],
+                                    self.store.clock(), identifier, row['updated']))
         view['can_resume'] = view['status'] == 'failed' and not view['story_id'] and self.saved_draft(row['principal_id'], identifier) is not None
         return view
 
@@ -218,7 +229,7 @@ class StoryGeneration:
             self.store.require(db, principal, row['document_id'], 'editor')
             if row['status'] != 'failed' or row['story_id'] or self.saved_draft(principal, identifier) is None:
                 raise Conflict('No unfinished saved storyboard is available. Saved films remain accessible; a new AI request requires Create story.')
-            if db.execute("SELECT 1 FROM story_generations WHERE status IN ('queued','running')").fetchone():
+            if db.execute("SELECT 1 FROM story_generations WHERE status IN ('queued','running') AND render_id IS NULL").fetchone():
                 raise Conflict('A story is already being prepared.')
             db.execute("UPDATE story_generations SET status='queued',phase='checking-evidence',cancel=0,error=NULL WHERE id=?", (identifier,))
         flag = threading.Event()
@@ -301,16 +312,20 @@ class StoryGeneration:
                 now = self.store.clock()
                 db.execute('INSERT INTO stories VALUES(?,?,?,?,?,?,?)', (sid, row['document_id'], principal, body['title'], 1, now, now))
                 db.execute('INSERT INTO story_revisions VALUES(?,?,?,?,?,?,?,?)', (sid, 1, row['document_revision'], dumps(body), dumps(resolved), resolved['sha256'], principal, now))
-                db.execute("UPDATE story_generations SET story_id=?,status='completed',phase='saved',progress=.65,updated=? WHERE id=?", (sid, now, identifier))
+                # Storyboard persistence is a checkpoint, not completion of a
+                # requested film. Pollers must stay connected through admission.
+                db.execute("UPDATE story_generations SET story_id=?,status=?,phase=?,progress=?,updated=? WHERE id=?",
+                           (sid, 'running' if capture['render'] else 'completed',
+                            'preparing-video' if capture['render'] else 'story-ready',
+                            .65 if capture['render'] else 1.0, now, identifier))
             if flag.is_set() or not capture['render']:
-                self.update(identifier, progress=1.0)
                 return
             try:
                 with self.lock:
                     if flag.is_set():
                         return
-                    render = self.service.start_render(principal, sid, key='ai-story:'+identifier)
-                    self.update(identifier, render_id=render['id'], phase='rendering')
+                    render = self.service.start_render(principal, sid, key='ai-story:'+identifier, narration_requested=True)
+                    self.update(identifier, render_id=render['id'], status='running', phase='rendering')
             except StudioError as error:
                 self.update(identifier, status='partial', phase='story-ready', error=str(error))
         except Exception as error:

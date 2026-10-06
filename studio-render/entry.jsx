@@ -6,11 +6,11 @@ function Scene({ scene, index, total, audio }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const duration = Math.round(scene.duration_seconds * fps);
-  const opacity = scene.transition === 'cut' ? 1 : interpolate(frame, [0, 8, duration - 8, duration], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const opacity = 1;
   const camera = scene.visual?.camera_transition;
   const cameraProgress = camera ? Math.max(0, Math.min(1, frame / Math.max(1, duration - 1))) : 0;
-  const sceneSvg = filmFrame(scene, index, total, cameraProgress);
-  return <AbsoluteFill style={{ backgroundColor: '#edf2ff' }}>
+  const sceneSvg = filmFrame(scene, index, total, cameraProgress, frame / fps);
+  return <AbsoluteFill style={{ backgroundColor: '#f5f4ee' }}>
     <div style={{ opacity, position: 'absolute', inset: 0, transform: scene.transition === 'slide' ? `translateY(${interpolate(frame, [0, 14], [12, 0], { extrapolateRight: 'clamp' })}px)` : undefined }}>
       <Img src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(sceneSvg)}`} style={{ width: 1920, height: 1080, display: 'block' }} />
     </div>

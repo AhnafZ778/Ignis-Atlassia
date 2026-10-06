@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "Narrated film plays with sound enabled; saved-story refresh action is visible.",
+    "Real saved film restores after simulated legacy 65% checkpoint; valid video metadata and download visible.",
+    "Refresh restores completed progress and film without another AI request.",
+    "360, 390 and 768 pixel layouts have no horizontal page overflow."
+  ],
+  "page_errors": [],
+  "generation_posts": 0
+}

@@ -22,7 +22,7 @@ from .errors import Conflict, NotFound, StudioError, Unavailable
 from .store import dumps
 
 STATES = ("queued", "running", "completed", "failed", "canceled")
-PHASES = ("queued", "preparing-assets", "rendering", "encoding", "finalizing", "completed", "failed", "canceled")
+PHASES = ("queued", "preparing-assets", "narrating", "generating-video", "rendering", "encoding", "finalizing", "completed", "failed", "canceled")
 WORKING_LIMIT = 1024 * 1024 * 1024
 INPUT_LIMIT = 32_000_000
 RECOVERY_ERROR = 'An interrupted worker could not be safely recovered. Existing stories and downloads remain available.'
@@ -32,9 +32,9 @@ MIME = {"briefing.mp4": "video/mp4", "manifest.json": "application/json", "trans
         "captions.vtt": "text/vtt; charset=utf-8", "evidence-hashes.json": "application/json"}
 
 
-def node_runner(job_dir, progress, cancel):
+def node_runner(job_dir, progress, cancel, *, script=None):
     """Run the configured local renderer. Output lines ``PROGRESS <0..1>`` update the job; cancel terminates it."""
-    script = "render-local.mjs" if os.getenv("FIREATLAS_STUDIO_LOCAL_RENDER", "").lower() in {"1", "true", "yes", "on"} else "render.mjs"
+    script = script or ("render-local.mjs" if os.getenv("FIREATLAS_STUDIO_LOCAL_RENDER", "").lower() in {"1", "true", "yes", "on"} else "render.mjs")
     if not resources.monitor_available():
         raise Unavailable('Local video requires the Linux process-resource monitor. Reader exports remain available.', code='render-monitor-unavailable')
     process = subprocess.Popen(["node", "--max-old-space-size=768", script, str(Path(job_dir).resolve())], cwd=str(capabilities.RENDER_DIR), stdout=subprocess.PIPE,
@@ -106,7 +106,7 @@ def node_runner(job_dir, progress, cancel):
                 elif line.startswith('PHASE '):
                     phase = line.strip().split(' ', 1)[1]
                     callback = getattr(progress, 'phase', None)
-                    if phase in PHASES[1:5] and callback:
+                    if phase in ('preparing-assets', 'rendering', 'encoding', 'finalizing') and callback:
                         callback(phase)
         code = process.wait()
     finally:
@@ -174,6 +174,10 @@ class RenderManager:
         state = self.capability()
         if not state["available"]:
             raise Unavailable("Video rendering is unavailable: " + state["reason"] + " Story editing and static export remain available.", code="video-unavailable")
+        engine = state.get('engine', 'local')
+        if engine == 'aiand-native-video':
+            from .aiand_video import verify_access
+            verify_access()
         blocking = [w for w in resolved["warnings"] if w["problem"] in ("evidence-unfrozen", "card-missing", "checked-field-unavailable", "scene-context")]
         if blocking:
             raise StudioError("Resolve the story's evidence before rendering: " + blocking[0]["message"], code="story-not-ready", details={"warnings": blocking})
@@ -199,7 +203,7 @@ class RenderManager:
                 job_dir.mkdir()
                 created_dir = True
                 (job_dir / "resolved.json").write_text(frozen, encoding='utf-8')
-                (job_dir / "options.json").write_text(dumps({"narration_requested": narration_requested}), encoding='utf-8')
+                (job_dir / "options.json").write_text(dumps({"narration_requested": narration_requested, "engine": engine}), encoding='utf-8')
                 job = self._view(db, identifier)
                 self.store.remember(db, principal, "render", key, job)
         except Exception as error:
@@ -216,7 +220,9 @@ class RenderManager:
 
     def _view(self, db, identifier):
         row = db.execute("SELECT * FROM renders WHERE id=?", (identifier,)).fetchone()
-        return {"id": row["id"], "status": row["status"], "progress": row["progress"], "story_id": row["story_id"],
+        provider = self.root / identifier / 'provider-progress.json'
+        detail = json.loads(provider.read_text()) if provider.is_file() else None
+        return {"id": row["id"], "status": row["status"], "progress": row["progress"], "story_id": row["story_id"], 'provider_progress': detail,
                 'phase': row['phase'],
                 "story_revision": row["story_revision"], "profile": json.loads(row["profile"]), "error": row["error"],
                 "manifest": json.loads(row["manifest"]) if row["manifest"] else None, "created": row["created"], "updated": row["updated"],
@@ -268,6 +274,14 @@ class RenderManager:
                 fields['phase'] = fields['status']
             sets = ",".join(f"{k}=?" for k in fields) + ",updated=?"
             db.execute(f"UPDATE renders SET {sets} WHERE id=?", (*fields.values(), self.store.clock(), identifier))
+            # Keep the parent operation durable even when no browser is polling.
+            # A canceled/failed generation must never be revived by late frames.
+            current = db.execute('SELECT status,phase,progress,error FROM renders WHERE id=?', (identifier,)).fetchone()
+            db.execute("UPDATE story_generations SET status=?,phase=?,progress=?,error=?,updated=? "
+                       "WHERE render_id=? AND cancel=0 AND status NOT IN ('failed','cancelled')",
+                       ('completed' if current['status'] == 'completed' else
+                        'partial' if current['status'] in ('failed', 'canceled') else 'running',
+                        current['phase'], .65 + .35*current['progress'], current['error'], self.store.clock(), identifier))
             return True
 
     def _clean_working(self, job_dir, discard=False):
@@ -311,17 +325,27 @@ class RenderManager:
                     raise StudioError('Prepared scene inputs exceed 32 MB. Reduce visible imagery or chapters.', code='render-limit')
                 options = json.loads((job_dir / "options.json").read_text())
                 capability = self.narration_capability() if options.get("narration_requested") else {"available": False, "reason": "The author chose a captioned video without AI narration."}
-                if self.synthesize is None and self.synthesize_factory is None:
+                if capability.get('provider') != 'piper' and self.synthesize is None and self.synthesize_factory is None:
                     capability = {"available": False, "reason": "The existing assistant speech runtime is unavailable. Captions remain complete."}
                 plan = narration.preflight(resolved["scenes"], capability, self._spoken_today(principal), revision_key=resolved["sha256"])
                 audio = {"status": "captions-only", "reason": plan["reason"], "segments": []}
                 synth = self.synthesize
-                if plan["available"] and self.synthesize_factory:
+                if plan['available'] and capability.get('provider') == 'piper':
+                    from .local_voice import synthesize
+                    synth = lambda text: synthesize(text, cancel.is_set)
+                elif plan["available"] and self.synthesize_factory:
                     synth = self.synthesize_factory(principal, resolved["sha256"], plan["model"], plan["voice"])
                 if plan["available"] and synth:
-                    audio = narration.narrate(plan, self.store.root / "narration", synth, lambda n: self.store.artifact(principal, "voice_receipt", {"characters": n, "created": time.time(), "sha256": ""}), cancelled=cancel.is_set)
-                audio = narration.check_audio(audio, resolved['scenes'], self.store.root / 'narration', probe=self.audio_probe, cancelled=cancel.is_set)
+                    self._update(identifier, phase='narrating')
+                    audio = narration.narrate(plan, self.store.root / "narration", synth, lambda n: self.store.artifact(principal, "voice_receipt", {"characters": n, "created": time.time(), "sha256": ""}), cancelled=cancel.is_set,
+                                               progress=lambda fraction: self._update(identifier, progress=round(.15*fraction, 4)))
+                timing_changes = []
+                if capability.get('provider') == 'piper':
+                    public, timing_changes = narration.fit_local_timing(public, audio, self.store.root / 'narration', probe=self.audio_probe)
+                audio = narration.check_audio(audio, public['scenes'], self.store.root / 'narration', probe=self.audio_probe, cancelled=cancel.is_set)
                 audio['skipped_chapters'] = plan['skipped']
+                audio['provider'] = capability.get('provider', 'openai')
+                audio['model'] = plan['model']
                 if cancel.is_set() or audio['status'] == 'canceled':
                     self._update(identifier, status='canceled', error='Canceled before rendering; cached narration was retained.')
                     return
@@ -334,12 +358,17 @@ class RenderManager:
                 (job_dir / ARTIFACTS["transcript"]).write_text(story.transcript(public))
                 def progress(value):
                     if isinstance(value, (int, float)) and 0 <= value <= 1:
-                        self._update(identifier, progress=round(value, 4))
-                progress.phase = lambda phase: self._update(identifier, phase=phase) if phase in PHASES[1:5] else False
+                        self._update(identifier, progress=round(.15 + .8 * value, 4))
+                progress.phase = lambda phase: self._update(identifier, phase=phase) if phase in ('preparing-assets', 'generating-video', 'rendering', 'encoding', 'finalizing') else False
                 measured_resources = {}
                 progress.resources = measured_resources.update
                 progress.storage = self.storage.check
-                video = self.runner(job_dir, progress, cancel)
+                native = options.get('engine') == 'aiand-native-video'
+                if native:
+                    from .aiand_video import run
+                    video = run(job_dir, progress, cancel, self.store.root/'aiand-video-cache')
+                else:
+                    video = self.runner(job_dir, progress, cancel)
                 if cancel.is_set() or video is None:
                     self._update(identifier, status="canceled", error="Canceled before the video finished; partial output was discarded.")
                     return
@@ -353,7 +382,7 @@ class RenderManager:
                 files = {name: self._file_identity(job_dir / name)
                          for name in (ARTIFACTS["video"], ARTIFACTS["transcript"], ARTIFACTS["captions"], ARTIFACTS["evidence"])}
                 manifest = {"schema": "fireatlas-studio-render-manifest-v1", "render_id": identifier, "story_sha256": public["sha256"],
-                            "profile": public["profile"], "engine": "local-svg-ffmpeg" if os.getenv("FIREATLAS_STUDIO_LOCAL_RENDER", "").lower() in {"1", "true", "yes", "on"} else "remotion", "narration": {k: audio.get(k) for k in ("status", "attempted_status", "reason", "disclosure", "segments", "cached_segments", "timing", "skipped_chapters")},
+                            "profile": public["profile"], "engine": "local-svg-ffmpeg" if os.getenv("FIREATLAS_STUDIO_LOCAL_RENDER", "").lower() in {"1", "true", "yes", "on"} else "remotion", "narration": {k: audio.get(k) for k in ("status", "provider", "model", "attempted_status", "reason", "disclosure", "segments", "cached_segments", "timing", "skipped_chapters")},
                             "files": files, "evidence": evidence,
                             "rasterizer": "chromium" if os.getenv("FIREATLAS_STUDIO_LOCAL_RENDER", "").lower() in {"1", "true", "yes", "on"} else "remotion-chromium",
                             "captions_fallback": audio["status"] != "narrated",
@@ -368,12 +397,22 @@ class RenderManager:
                                                 'retained_storage_bytes': self.storage.limit, 'retained_file_limit': resources.STORAGE_FILES,
                                                 'free_disk_headroom_bytes': resources.FREE_HEADROOM, 'sampling_seconds': .2}
                 manifest['resource_observation'] = measured_resources or {'verified': False, 'reason': 'The selected runner did not supply process counters.'}
-                manifest['renderer_configuration'] = {'adapter_version': 2, 'remotion_version': '4.0.532' if manifest['engine'] == 'remotion' else None,
+                manifest['presentation_timing'] = {'saved_story_duration_seconds': resolved['profile']['duration_seconds'],
+                                                   'video_duration_seconds': public['profile']['duration_seconds'], 'adjustments': timing_changes}
+                manifest['renderer_configuration'] = {'adapter_version': 3, 'frame_design': 'editorial-field-notes-v1',
+                                                      'motion_fps': 30, 'remotion_version': '4.0.532' if manifest['engine'] == 'remotion' else None,
                                                       'phase_protocol': 1, 'caption_version': public.get('caption_version', 1)}
+                if native:
+                    manifest['engine'] = 'aiand-native-video'
+                    manifest['provider'] = json.loads((job_dir/'provider-receipts.json').read_text())
+                    manifest['limitations'] = [*manifest['limitations'], manifest['provider']['disclosure']]
+                    manifest['renderer_configuration']['video_generation_adapter_version'] = 1
+                    manifest['execution_limits']['provider_poll_seconds'] = 10
+                    manifest['execution_limits']['provider_wait_seconds_per_clip'] = 3600
                 (job_dir / ARTIFACTS["manifest"]).write_text(json.dumps(manifest, indent=2, sort_keys=True))
                 self._update(identifier, status="completed", progress=1.0, manifest=dumps(manifest))
             except Exception as error:  # noqa: BLE001 - every failure becomes a visible job state
-                self._update(identifier, status="failed", error=(str(error) if isinstance(error, StudioError) else "The render failed: " + type(error).__name__)[:400])
+                self._update(identifier, status="canceled" if cancel.is_set() else "failed", error=(str(error) if isinstance(error, StudioError) else "The render failed: " + type(error).__name__)[:400])
             finally:
                 with self.store.connection() as db:
                     terminal = db.execute('SELECT status FROM renders WHERE id=?', (identifier,)).fetchone()['status']

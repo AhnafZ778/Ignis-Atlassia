@@ -11,6 +11,7 @@ EFFICIENT_MODEL = 'zai-org/glm-5.3-flash'
 EFFICIENT_VISION_MODEL = 'deepseek-ai/deepseek-v4.1-flash'
 DEEP_MODEL = 'deepseek-ai/deepseek-v4-pro'
 DEEP_VISION_MODEL = 'deepseek-ai/deepseek-v4.1-flash'
+STORY_MODEL = 'zai-org/glm-5.3'
 _lock = threading.Lock()
 _cache = None
 _stamp = None
@@ -40,7 +41,7 @@ def routes():
             'deep_vision': os.getenv('FIREATLAS_AIAND_DEEP_VISION_MODEL', DEEP_VISION_MODEL)}
 
 
-def verified_model(depth='efficient', vision=False):
+def verified_model(depth='efficient', vision=False, *, model=None, reasoning_effort=None):
     global _cache, _stamp, _updated, _authenticated_key
     if depth not in {'efficient', 'deep'}:
         raise ValueError('Choose efficient or deep analysis.')
@@ -69,7 +70,7 @@ def verified_model(depth='efficient', vision=False):
             except Exception:
                 raise ValueError('AI& model access and prices could not be verified. No inference was sent; archive tools remain available.') from None
             _stamp, _updated = stamp, time.monotonic()
-    name = routes()[depth+'_vision' if vision else depth]
+    name = model or routes()[depth+'_vision' if vision else depth]
     entry = _cache.get(name, {})
     capabilities = entry.get('capabilities', [])
     if 'tool_calling' not in capabilities or vision and 'vision' not in capabilities:
@@ -81,7 +82,7 @@ def verified_model(depth='efficient', vision=False):
             raise ValueError()
     except (KeyError,ValueError,TypeError):
         raise ValueError('AI& prices exceed configured USD limits or cannot be verified. No paid request was sent.') from None
-    effort = 'high' if depth=='deep' else 'none' if name.startswith('deepseek-ai/') else 'low'
+    effort = reasoning_effort or ('high' if depth=='deep' else 'none' if name.startswith('deepseek-ai/') else 'low')
     if effort not in entry.get('reasoning_efforts', []):
         raise ValueError('The selected AI& model does not support the requested reasoning setting.')
     return {'model':name, 'input_price':ip, 'output_price':op, 'reasoning_effort':effort,
@@ -95,7 +96,8 @@ def structured_story(store, owner, instructions, material, cancel):
     import httpx
     if cancel.is_set():
         raise ValueError('Story generation cancelled.')
-    model = {**verified_model('efficient'), 'max_tokens': 4096}
+    model = {**verified_model('deep', model=os.getenv('FIREATLAS_AIAND_STORY_MODEL', STORY_MODEL),
+                             reasoning_effort=os.getenv('FIREATLAS_AIAND_STORY_EFFORT', 'high')), 'max_tokens': 8192}
     messages = [{'role': 'system', 'content': instructions},
                 {'role': 'user', 'content': json.dumps(material, ensure_ascii=False, allow_nan=False)}]
     size = len(json.dumps(messages).encode())
@@ -106,7 +108,7 @@ def structured_story(store, owner, instructions, material, cancel):
         response = httpx.post(BASE_URL+'/chat/completions', headers={
             'Authorization': 'Bearer '+_authenticated_key, 'User-Agent': 'FireAtlas/1.0'},
             json={'model': model['model'], 'messages': messages, 'max_tokens': model['max_tokens'],
-                  'reasoning_effort': model['reasoning_effort'], 'response_format': {'type': 'json_object'}}, timeout=100)
+                  'reasoning_effort': model['reasoning_effort'], 'response_format': {'type': 'json_object'}}, timeout=180)
         response.raise_for_status()
         payload = response.json()
     except Exception:

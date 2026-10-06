@@ -34,6 +34,8 @@ class GenerationTests(StudioCase):
         manager, author = self.manager()
         job = manager.submit(self.owner, doc['id'], {'expected_revision': doc['revision'], 'render': False}, 'story-once-key')
         self.assertEqual(job['status'], 'completed', job)
+        self.assertEqual(job['progress'], 1)
+        self.assertEqual(job['phase'], 'story-ready')
         saved = self.service.get_story(self.owner, job['story_id'])
         self.assertEqual(saved['document_revision'], doc['revision'])
         self.assertEqual(len(saved['resolved']['scenes']), 4)
@@ -93,6 +95,62 @@ class GenerationTests(StudioCase):
         self.assertIsNotNone(self.service.get_story(self.owner, job['story_id'])['resolved'])
         self.assertIn('test renderer offline', job['error'])
 
+    def test_saved_story_checkpoint_stays_running_until_video_admission_and_completion(self):
+        doc, _ = self.bound_board()
+        manager, author = self.manager()
+        entered, release = threading.Event(), threading.Event()
+        video = {'id': 'test-video', 'status': 'queued', 'phase': 'queued', 'progress': 0, 'error': None}
+        outcome = []
+        def start(*args, **kwargs):
+            self.assertTrue(kwargs['narration_requested'])
+            entered.set()
+            if not release.wait(5):
+                raise AssertionError('test admission timed out')
+            return video
+        with patch.object(self.service, 'start_render', side_effect=start), patch.object(self.service.renders, 'get', side_effect=lambda *args: dict(video)):
+            worker = threading.Thread(target=lambda: outcome.append(manager.submit(self.owner, doc['id'], {'expected_revision': doc['revision']}, 'checkpoint-test')))
+            worker.start()
+            try:
+                self.assertTrue(entered.wait(5))
+                with self.service.store.connection() as db:
+                    identifier = db.execute('SELECT id FROM story_generations').fetchone()[0]
+                checkpoint = manager.get(self.owner, identifier)
+                self.assertEqual((checkpoint['status'], checkpoint['phase'], checkpoint['progress']), ('running', 'preparing-video', .65))
+                self.assertIsNotNone(self.service.get_story(self.owner, checkpoint['story_id'])['resolved'])
+            finally:
+                release.set()
+                worker.join(5)
+            self.assertFalse(worker.is_alive())
+            self.assertEqual(outcome[0]['status'], 'running')
+            video.update(status='completed', phase='completed', progress=1)
+            finished = manager.get(self.owner, identifier)
+            self.assertEqual((finished['status'], finished['progress']), ('completed', 1))
+            with self.service.store.connection() as db:
+                row = db.execute('SELECT status,progress FROM story_generations WHERE id=?', (identifier,)).fetchone()
+                self.assertEqual(tuple(row), ('completed', 1))
+            # A retry restores the finished job, without requesting another draft.
+            again = manager.submit(self.owner, doc['id'], {'expected_revision': doc['revision']}, 'checkpoint-test')
+            self.assertEqual(again['id'], identifier)
+            author.assert_called_once()
+
+    def test_render_completion_updates_parent_without_browser_and_does_not_revive_cancel(self):
+        doc, _ = self.bound_board()
+        manager, _ = self.manager()
+        self.service.renders.background = False
+        with patch.object(self.service.renders, 'capability', return_value={'available': True}):
+            job = manager.submit(self.owner, doc['id'], {'expected_revision': doc['revision']})
+        renderer = self.service.renders
+        renderer._update(job['render_id'], status='completed', progress=1)
+        with self.service.store.connection() as db:
+            row = db.execute('SELECT status,phase,progress FROM story_generations WHERE id=?', (job['id'],)).fetchone()
+            self.assertEqual(tuple(row), ('completed', 'completed', 1))
+        # A canceled generation remains canceled when a renderer later stops.
+        with patch.object(renderer, 'capability', return_value={'available': True}):
+            second = manager.submit(self.owner, doc['id'], {'expected_revision': doc['revision']})
+        manager.cancel(self.owner, second['id'])
+        renderer._update(second['render_id'], status='completed', progress=1)
+        self.assertEqual(manager.get(self.owner, second['id'])['status'], 'cancelled')
+
     def test_missing_bindings_are_frozen_without_replacing_the_board(self):
         doc = self.add_card(self.board(), binding={'operation': 'research', 'context': {}, 'arguments': {}})
         manager, _ = self.manager()
@@ -128,8 +186,8 @@ class CredentialTests(unittest.TestCase):
     def test_catalog_authentication_fallback_never_retries_inference(self):
         import httpx
         from fireatlas.assistant import aiand
-        entry = {'id': aiand.EFFICIENT_MODEL, 'capabilities': ['tool_calling'], 'currency': 'usd',
-                 'input_per_1m': .1, 'output_per_1m': .5, 'reasoning_efforts': ['low']}
+        entry = {'id': aiand.STORY_MODEL, 'capabilities': ['tool_calling'], 'currency': 'usd',
+                 'input_per_1m': 1, 'output_per_1m': 4, 'reasoning_efforts': ['high']}
         responses = [httpx.Response(401, request=httpx.Request('GET', aiand.BASE_URL)),
                      httpx.Response(200, json={'data': [entry]}, request=httpx.Request('GET', aiand.BASE_URL))]
         store = Mock(); store.reserve.return_value = 'reservation'
@@ -141,6 +199,8 @@ class CredentialTests(unittest.TestCase):
             self.assertEqual(catalog.call_count, 2)
             self.assertEqual(post.call_count, 1)
             self.assertEqual(post.call_args.kwargs['headers']['Authorization'], 'Bearer second-private')
+            self.assertEqual(post.call_args.kwargs['json']['model'], aiand.STORY_MODEL)
+            self.assertEqual(post.call_args.kwargs['json']['reasoning_effort'], 'high')
             store.reconcile.assert_not_called()
 
     def test_success_records_usage_without_private_key(self):

@@ -3,7 +3,7 @@
   "generated_by": "studio-app",
   "files": {
     ".vite/manifest.json": {
-      "sha256": "1a30316bbc35a74e7ea5236e5a3697d8d1248bfc9d2ea34013e07375f173eff3",
+      "sha256": "cfe3b0b46f9e3be010a20fc103eb49c161558160994ed6cd6f526d5fb22fa6fb",
       "bytes": 61478
     },
     "assets/Assistant-Bold-gm-uSS1B.woff2": {
@@ -30,16 +30,16 @@
       "sha256": "47a7d283ef670bc7d6fd9d65425feaf83e0ffacd04a2966c28202739017bbc4f",
       "bytes": 78828
     },
-    "assets/TldrawBoard-Cgfh0ns-.js": {
-      "sha256": "056e95be82302f389e65abb48777c365c8f201d2b51f3e03957ddbf5597b1e09",
+    "assets/TldrawBoard-Djp96jAg.js": {
+      "sha256": "fcf43a5ec0d217699458df235d7b38542f7cf114fdf31b51903fc86833f14af2",
       "bytes": 1679024
     },
     "assets/WorkflowPanel-BnuhLJ6X.css": {
       "sha256": "1243b61a71923367ce620fb944427c80c9b03e863e18374fcf4f74d6d06f63fc",
       "bytes": 15869
     },
-    "assets/WorkflowPanel-D0PtdwCs.js": {
-      "sha256": "0bb9fe2e5fd3f3b40113a59c4c262dca8a6cce9c9ab126437af54d4470f13aa6",
+    "assets/WorkflowPanel-DY-pbW99.js": {
+      "sha256": "4dd442273fed29842ad7b4eefae26f250fabefb2d069f63eb1f90e3348906d01",
       "bytes": 152779
     },
     "assets/abnfDiagram-VCTEODGH-CVODaem9.js": {
@@ -490,13 +490,13 @@
       "sha256": "80a2a000624455a413dbd3ab1f3782339a87c137845b40aa1fdc7ee802a9ed66",
       "bytes": 453
     },
-    "assets/studio-DCyJsWcp.css": {
-      "sha256": "41e4af1fe5d26302371e3d5ced3e33b01541f04599f89a4398ecceb1f6e17e1f",
-      "bytes": 23233
+    "assets/studio-D1kUzUvd.css": {
+      "sha256": "f4ba735867b3a5fb4f1a55edfde517a72d3b602f25c4cdc5511e61a6bba179fa",
+      "bytes": 23544
     },
-    "assets/studio-DRe0gJNo.js": {
-      "sha256": "0358b12485e60873534b731dd5561b29229693b55df4dd0cbe19db6cc312b99c",
-      "bytes": 157877
+    "assets/studio-DoYE5cdj.js": {
+      "sha256": "bc45ba74ca33b17b420a60806ffe0c7f28ee654d2f6b4d12744958295c3b2279",
+      "bytes": 160212
     },
     "assets/subset-shared.chunk-BX7IX67e.js": {
       "sha256": "b328c999fac299dc892a0b25861c9165c5ac2e129c10c178ec168b721157358e",
@@ -1519,7 +1519,7 @@
       "bytes": 47276
     },
     "studio-entry.js": {
-      "sha256": "52fe2e0667223d9daae25686dafdac9ede00fb0ad8a030fb3c0ec8dc114d4794",
+      "sha256": "44412383435b03995a836f645d7d9c58897fe527bb53d4ce36a9ed9356db926d",
       "bytes": 215
     },
     "excalidraw-entry.js": {

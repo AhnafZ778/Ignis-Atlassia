@@ -34,3 +34,7 @@ Scientific counts, filtering, alias rules, grid, release identities, missingness
 - Credentials: zero supplied keys found in tracked files. Private configuration remains Git-ignored.
 
 The browser's successful final export was recovered from its earlier actual AI& response and rerendered after framing corrections. No paid retries occurred during recovery. The representative MP4 is retained privately at `/tmp/ignis-infographic-film.mp4`; source scientific data and private stores are not published with the report.
+
+The subsequent [65% progress fix](../story-progress-fix/REPORT.md) keeps storyboard persistence nonterminal when a film is requested, records renderer progress durably and reconnects legacy checkpoints. Completed films restore at 100% without another AI request.
+
+The later [editorial film and narration update](../editorial-film/REPORT.md) replaces the initial visual framing, uses the dedicated GLM-5.3 authoring route and includes installed offline neural voice by default. The silent-film description and earlier test counts above describe this initial delivery, rather than the current audio-enabled implementation.

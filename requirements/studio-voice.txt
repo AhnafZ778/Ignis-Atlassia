@@ -1,0 +1,4 @@
+# Optional offline narration, separate from the Apache-2.0 project code.
+# Piper runtime is GPL-3.0; voice weights retain their published model license.
+piper-tts==1.4.1
+onnxruntime==1.30.0

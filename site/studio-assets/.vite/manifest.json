@@ -1504,7 +1504,7 @@
     "isDynamicEntry": true
   },
   "src/components/TldrawBoard.tsx": {
-    "file": "assets/TldrawBoard-Cgfh0ns-.js",
+    "file": "assets/TldrawBoard-Djp96jAg.js",
     "name": "TldrawBoard",
     "src": "src/components/TldrawBoard.tsx",
     "isDynamicEntry": true,
@@ -1522,7 +1522,7 @@
     ]
   },
   "src/components/WorkflowPanel.tsx": {
-    "file": "assets/WorkflowPanel-D0PtdwCs.js",
+    "file": "assets/WorkflowPanel-DY-pbW99.js",
     "name": "WorkflowPanel",
     "src": "src/components/WorkflowPanel.tsx",
     "isDynamicEntry": true,
@@ -1632,7 +1632,7 @@
     "isDynamicEntry": true
   },
   "src/main.tsx": {
-    "file": "assets/studio-DRe0gJNo.js",
+    "file": "assets/studio-DoYE5cdj.js",
     "name": "studio",
     "src": "src/main.tsx",
     "isEntry": true,
@@ -1645,7 +1645,7 @@
       "src/components/TldrawBoard.tsx"
     ],
     "css": [
-      "assets/studio-DCyJsWcp.css"
+      "assets/studio-D1kUzUvd.css"
     ]
   }
 }
