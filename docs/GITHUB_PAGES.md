@@ -1,6 +1,6 @@
 # GitHub Pages publication
 
-The static demo's URL is https://AhnafZ778.github.io/NASA-Spaceapps/.
+The static demo's URL is https://AhnafZ778.github.io/Ignis-Atlassia/.
 In repository **Settings → Pages**, select **GitHub Actions** as the publishing source.
 GitHub must allow Pages for the repository's visibility and account plan.
 
@@ -19,7 +19,8 @@ bundle is about 949 MB, leaving about 51 MB before that conservative limit.
 Chromium then exercises the analytical pages under a project subpath, desktop and
 mobile navigation, supported calendar selections, downloads, legacy redirects and
 the static limitations. Both historical evidence cases must recount successfully,
-and the landing globe is checked under `/NASA-Spaceapps/`. Only then does the workflow
+and the landing globe is checked under the repository's actual URL prefix
+(`/Ignis-Atlassia/`). Only then does the workflow
 upload `site/` and deploy it to the `github-pages` environment.
 
 After deployment, open the homepage and its Explore, Investigate and Evidence links.

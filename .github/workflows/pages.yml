@@ -56,7 +56,9 @@ jobs:
           uv run --with playwright python scripts/verify_static_method.py --site site --case park-2024
           uv run --with playwright python scripts/verify_static_method.py --site site --case grove-2025
       - name: Verify the landing globe under the repository URL
-        run: uv run --with playwright python scripts/verify_static_globe.py --site site --prefix /NASA-Spaceapps/
+        env:
+          PAGES_PREFIX: /${{ github.event.repository.name }}/
+        run: uv run --with playwright python scripts/verify_static_globe.py --site site --prefix "$PAGES_PREFIX"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload the static bundle

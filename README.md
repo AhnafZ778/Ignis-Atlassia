@@ -4,8 +4,8 @@
 
 Ignis-Atlassia is a research prototype for inspecting dated NASA FIRMS active-fire detections and counting distinct 1 km equal-area grid cell-days in UTC. The calendar variant includes FIRMS type 0 or missing, across confidence levels; other rows remain inspectable but are excluded from totals. The home page retains its existing globe. Four analytical destinations share the applied study: **Explore** (`atlas.html`), **Investigate** (`investigate.html`), **Research Lab** (`research.html?tab=…`) and **Evidence** (`evidence.html?tab=…`). Explore opens the regional harmonized calendar; Investigate opens synchronized 2D MODIS/VIIRS panes, with optional 3D. Legacy page URLs forward with their queries and fragments. A hotspot is a satellite thermal observation, not a fire perimeter, burned area, or proof that no fire occurred.
 
-**GitHub Pages demo:** https://AhnafZ778.github.io/NASA-Spaceapps/ — bundled, read-only scientific evidence. JARVIS commands and private Studio authoring require the Python service. [Deployment setup and checks](docs/GITHUB_PAGES.md). Run the full app locally at http://127.0.0.1:8000/.
-**Repository:** https://github.com/AhnafZ778/NASA-Spaceapps
+**GitHub Pages demo:** https://AhnafZ778.github.io/Ignis-Atlassia/ — bundled, read-only scientific evidence. JARVIS commands and private Studio authoring require the Python service. [Deployment setup and checks](docs/GITHUB_PAGES.md). Run the full app locally at http://127.0.0.1:8000/.
+**Repository:** https://github.com/AhnafZ778/Ignis-Atlassia
 **Project handoff:** [FireAtlas Project Brief](docs/FireAtlas_Project_Brief.pdf) · [HTML source](docs/FireAtlas_Project_Brief.html)
 
 ## Run

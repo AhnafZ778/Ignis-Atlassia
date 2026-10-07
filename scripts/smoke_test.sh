@@ -90,10 +90,12 @@ with urllib.request.urlopen(base + path, timeout=20) as response:
     assert calendar["demo_data"] is False
     july = next(month for month in calendar["monthly"] if month["month"] == "2024-07")
     assert july["export_window_complete"] is True, july
-    assert july["detected_cell_days"] == 1668, july
+    # Independently recounted from the bundled July CSVs: type 0 or missing
+    # occupies 1,665 cell-days. Including excluded types 2/3 would give 1,668.
+    assert july["detected_cell_days"] == 1665, july
     provenance = {row["source_id"] for row in calendar["provenance"]}
     assert {"MODIS_SP", "VIIRS_SNPP_SP"}.issubset(provenance), provenance
-print("PASS calendar: July 2024 = 1,668 joint detected cell-days (authentic bundled export)")
+print("PASS calendar: July 2024 = 1,665 eligible joint detected cell-days (authentic bundled export)")
 PY
 
 echo "Smoke test passed."
