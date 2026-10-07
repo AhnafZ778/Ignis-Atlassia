@@ -58,7 +58,7 @@ def main() -> None:
         try:
             with sync_playwright() as playwright:
                 executable = next((shutil.which(name) for name in
-                                   ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable")
+                                   ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
                                    if shutil.which(name)), None)
                 browser = playwright.chromium.launch(headless=True, executable_path=executable)
                 page = browser.new_page(viewport={"width": 1440, "height": 1000})

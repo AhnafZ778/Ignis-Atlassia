@@ -32,7 +32,9 @@ FORMATS={'native','excalidraw','svg','png','pdf'}
 
 
 def browser_path():
-    return next((shutil.which(n) for n in ('chromium','chromium-browser','google-chrome') if shutil.which(n)),None)
+    # Ubuntu's Chromium command can be a Snap launcher that cannot start on
+    # hosted runners. Prefer the installed Chrome binary when available.
+    return next((shutil.which(n) for n in ('google-chrome','google-chrome-stable','chromium','chromium-browser') if shutil.which(n)),None)
 
 def image(data,mime):
     return {'sha256':hashlib.sha256(data).hexdigest(),'mime':mime,'data_url':'data:'+mime+';base64,'+base64.b64encode(data).decode()}

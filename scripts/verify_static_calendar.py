@@ -155,7 +155,7 @@ def main() -> None:
             return
         with sync_playwright() as playwright:
             system_browser = next((shutil.which(name) for name in
-                                   ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable")
+                                   ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
                                    if shutil.which(name)), None)
             browser = playwright.chromium.launch(headless=True, executable_path=system_browser)
             page = browser.new_page()
