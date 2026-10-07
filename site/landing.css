@@ -662,3 +662,7 @@
 .static-calendar-note p{margin:0;color:#c2d0d7;font-size:12px;line-height:1.6}
 @media(max-width:760px){.plan-safety-footer{grid-template-columns:1fr;margin:20px 12px 0;padding:16px}.plan-safety-footer a{white-space:normal}}
 @media(max-width:650px){.static-calendar-note{grid-template-columns:1fr;gap:5px;margin:18px 0 26px;padding:14px 16px}.static-calendar-note p{font-size:11px}}
+
+/* Keep the landing page scrollable while hiding scrollbar chrome and preventing sideways page drift. */
+html:has(body.landing-overhaul){overflow-x:clip;scrollbar-width:none;-ms-overflow-style:none}
+html:has(body.landing-overhaul)::-webkit-scrollbar{display:none;width:0;height:0}
