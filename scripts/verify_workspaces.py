@@ -29,7 +29,9 @@ def main():
                 except Exception:pass
             page.on('response',response);page.goto(base+'/demo/'+path,wait_until='domcontentloaded');return context,page,errors,responses
         c,page,errors,responses=visit('atlas.html');page.wait_for_function("document.querySelector('#harm-verdict').textContent.includes('113 harmonized')");page.wait_for_timeout(800)
-        assert '4 above the median of 3' in page.locator('#harm-verdict').inner_text();assert page.locator('#site-navigation a[data-destination]').count()==4
+        assert '4 above the median of 3' in page.locator('#harm-verdict').inner_text()
+        destinations=page.locator('#site-navigation a[data-destination]').evaluate_all('(links)=>links.map(link=>link.dataset.destination)')
+        assert sorted(destinations)==['evidence','explore','investigate','research','studio'],destinations
         assert not any('bundles/' in r['url'] or 'history/' in r['url'] or '/observations/' in r['url'] for r in responses);assert not errors,errors
         records['calendar']=responses.copy();page.screenshot(path=str(args.output/'after-calendar.png'),full_page=True);page.locator('#harm-bridge-method').scroll_into_view_if_needed();page.screenshot(path=str(args.output/'after-sensor-bridge.png'))
         page.locator('#harm-month').select_option('7');page.wait_for_function("document.querySelector('#harm-verdict').textContent.includes('July 2026')");page.go_back();page.wait_for_function("document.querySelector('#harm-verdict').textContent.includes('June 2026')")
