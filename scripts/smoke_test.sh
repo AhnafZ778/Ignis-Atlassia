@@ -72,7 +72,8 @@ base = sys.argv[1]
 with urllib.request.urlopen(base + "/", timeout=10) as response:
     page = response.read().decode("utf-8")
     assert response.status == 200
-    assert "FireAtlas" in page
+    assert "Ignis-Atlassia" in page
+    assert 'id="earth-frame-host"' in page
 print("PASS homepage: HTTP 200")
 
 with urllib.request.urlopen(base + "/api/meta", timeout=10) as response:
