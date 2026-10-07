@@ -26,6 +26,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - name: Check out the reviewed bundle
         uses: actions/checkout@v4
@@ -41,7 +42,7 @@ jobs:
           Path('site/deployment.json').write_text(json.dumps({'commit': os.environ['PUBLISHED_SHA']}) + '\n')
           PY
       - name: Verify publication size and frozen evidence
-        run: python3 scripts/check_pages_release.py --site site
+        run: python3 scripts/run_ci_check.py scripts/check_pages_release.py --site site
       - name: Install browser verification tools
         uses: astral-sh/setup-uv@v5
         with:
@@ -49,16 +50,20 @@ jobs:
           python-version: '3.12'
       - name: Install Chromium
         run: uv run --with playwright python -m playwright install --with-deps chromium
+      - name: Fetch the recorded landing comparison
+        env:
+          ORIGINAL_LANDING_SHA: 9e9f682307be01a340d80b98d05b1ed78fe638c8
+        run: curl --fail --silent --show-error --location --retry 3 "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$ORIGINAL_LANDING_SHA/site/index.html" --output "$RUNNER_TEMP/original-landing.html"
       - name: Verify the website under a project URL
-        run: uv run --with playwright python scripts/verify_workspaces.py --output "$RUNNER_TEMP/pages-checks"
+        run: uv run --with playwright python scripts/run_ci_check.py scripts/verify_workspaces.py --original-landing "$RUNNER_TEMP/original-landing.html" --output "$RUNNER_TEMP/pages-checks"
       - name: Verify bundled historical evidence
         run: |
-          uv run --with playwright python scripts/verify_static_method.py --site site --case park-2024
-          uv run --with playwright python scripts/verify_static_method.py --site site --case grove-2025
+          uv run --with playwright python scripts/run_ci_check.py scripts/verify_static_method.py --site site --case park-2024
+          uv run --with playwright python scripts/run_ci_check.py scripts/verify_static_method.py --site site --case grove-2025
       - name: Verify the landing globe under the repository URL
         env:
           PAGES_PREFIX: /${{ github.event.repository.name }}/
-        run: uv run --with playwright python scripts/verify_static_globe.py --site site --prefix "$PAGES_PREFIX"
+        run: uv run --with playwright python scripts/run_ci_check.py scripts/verify_static_globe.py --site site --prefix "$PAGES_PREFIX"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload the static bundle

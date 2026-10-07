@@ -20,7 +20,10 @@ bundle is about 949 MB, leaving about 51 MB before that conservative limit.
 
 Chromium then exercises the analytical pages under a project subpath, desktop and
 mobile navigation, supported calendar selections, downloads, legacy redirects and
-the static limitations. Both historical evidence cases must recount successfully,
+the static limitations. The original landing HTML is fetched from its recorded commit
+for visual comparison, so a shallow checkout needs no historical Git objects.
+Check failures include their Python tracebacks in the workflow annotations.
+Both historical evidence cases must recount successfully,
 and the landing globe is checked under the repository's actual URL prefix
 (`/Ignis-Atlassia/`). Only then does the workflow
 upload `site/` and deploy it to the `github-pages` environment.

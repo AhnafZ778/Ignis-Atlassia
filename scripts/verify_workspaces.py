@@ -6,18 +6,22 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 class Handler(SimpleHTTPRequestHandler):
-    def __init__(self,*args,**kwargs):super().__init__(*args,directory=str(ROOT/'site'),**kwargs)
+    site=ROOT/'site'
+    original_landing=b''
+    def __init__(self,*args,**kwargs):super().__init__(*args,directory=str(self.site),**kwargs)
     def do_GET(self):
         if self.path.startswith('/demo/'):self.path=self.path[5:]
         if self.path.split('?')[0]=='/__original_landing__':
-            body=subprocess.check_output(['git','show','9e9f682:site/index.html'],cwd=ROOT)
+            body=self.original_landing
             self.send_response(200);self.send_header('Content-Type','text/html');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body);return
         try:super().do_GET()
         except (BrokenPipeError,ConnectionResetError):pass
     def log_message(self,*args):pass
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,default=ROOT/'docs/implementation/artifacts');args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,default=ROOT/'docs/implementation/artifacts');parser.add_argument('--site',type=Path,default=ROOT/'site');parser.add_argument('--original-landing',type=Path,help='Original landing HTML for checkouts without historical commits');args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
+    Handler.site=args.site.resolve()
+    Handler.original_landing=args.original_landing.read_bytes() if args.original_landing else subprocess.check_output(['git','show','9e9f682:site/index.html'],cwd=ROOT)
     server=ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start();base=f'http://127.0.0.1:{server.server_port}';records={};checks=[]
     with sync_playwright() as p:
         browser=p.chromium.launch(headless=True)
