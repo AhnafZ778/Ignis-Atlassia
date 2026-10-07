@@ -17,6 +17,16 @@ jobs:
       - name: Reassemble verified regional archives
         run: python3 scripts/static_bundle_storage.py --site site
 
+      - name: Install the Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: studio-app/package-lock.json
+
+      - name: Install the locked Studio export helpers
+        run: npm ci --prefix studio-app
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -27,6 +37,9 @@ jobs:
 
       - name: Install locked dependencies
         run: uv sync --frozen --all-extras
+
+      - name: Install the locked assistant test runtime
+        run: uv pip install --python .venv/bin/python -r requirements/assistant.lock
 
       - name: Run Python tests
         run: uv run --no-sync python -m unittest discover -s tests

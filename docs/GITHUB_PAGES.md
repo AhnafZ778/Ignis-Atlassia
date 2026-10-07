@@ -6,7 +6,9 @@ GitHub must allow Pages for the repository's visibility and account plan.
 
 Push to `main` to publish, or manually run **Publish the verified static FireAtlas bundle**
 from the repository's Actions tab. The workflow first calls CI: it installs the locked
-core, mask and assistant dependencies, runs Python tests, checks JavaScript syntax and
+core, mask and assistant dependencies (including the assistant runtime lockfile)
+and the pinned Node export helpers,
+runs Python tests, checks JavaScript syntax and
 smoke-tests a clean clone. Publication requires that job to succeed.
 
 The deployment job reconstructs the two large regional ZIPs from their checksummed
