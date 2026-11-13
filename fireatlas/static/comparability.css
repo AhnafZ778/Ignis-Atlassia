@@ -1,0 +1,60 @@
+/* Reusable scientific components within the existing light workspace. */
+.comparability-workbench{color:var(--ws-text);min-width:0}
+html:has(meta[name="fireatlas-static-data"]) .scientific-workspace:has(.comparability-workbench) :is([aria-label="Capture investigation"],.workspace-heading-actions){display:none}
+.scientific-workspace:has(.comparability-workbench) .workspace-heading{padding:18px 0 10px}
+.scientific-workspace:has(.comparability-workbench) .workspace-heading h1{font-size:30px;margin:6px 0}
+.scientific-workspace:has(.comparability-workbench) .workspace-heading p{font-size:14px;margin:6px 0}
+.scientific-workspace:has(.comparability-workbench) .workspace-heading .eyebrow{font-size:12px}
+.custom-comparison>[data-research-intersection]{display:grid;gap:6px;margin:18px 0;font-size:13px}
+.comparability-workbench .compare-panel{padding:24px;margin:20px 0;background:var(--ws-surface);border:1px solid var(--ws-line);border-radius:12px;scroll-margin-top:110px}
+.comparability-workbench .compare-panel h2{font-size:26px;margin:4px 0 12px}
+.comparability-workbench .compare-panel h3{margin-top:24px}
+.comparability-workbench .section-heading{align-items:center;gap:16px;margin:0}
+.comparability-workbench .scope-note{color:var(--ws-muted);font-size:13px;line-height:1.6}
+.compare-badge{color:var(--ws-viirs);font-size:13px;white-space:nowrap}
+.compare-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:20px 0}
+.compare-controls label,.comparability-workbench .compare-panel>label{display:grid;gap:6px;font-size:13px;color:var(--ws-muted);min-width:0}
+.comparability-workbench select{width:100%;max-width:100%;min-width:0;padding:10px;border:1px solid var(--ws-control);border-radius:7px;background:var(--ws-surface);color:var(--ws-text);font:inherit}
+.compare-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin:20px 0}
+.compare-metrics article{padding:16px;border:1px solid var(--ws-line);border-radius:9px;background:var(--ws-raised)}
+.compare-metrics article>span{font-size:13px;color:var(--ws-muted)}
+.compare-metrics strong{display:block;font-size:28px;line-height:1.3;margin:8px 0;font-variant-numeric:tabular-nums}
+.compare-metrics small{display:block;font-size:12px;color:var(--ws-muted);line-height:1.5}
+.comparability-workbench .compare-warning{border-left:3px solid #a87524;padding:10px 14px;background:#fff6e7;color:#6e4c17;font-size:13px}
+.compare-toggle{display:flex;gap:8px;flex-wrap:wrap}
+.scientific-workspace .comparability-workbench button{font:inherit;font-size:13px;min-height:42px;padding:9px 14px;border:1px solid var(--ws-control);border-radius:7px;background:var(--ws-surface);color:var(--ws-text)}
+#comparison .compare-toggle button[aria-pressed=true]{background:var(--ws-selected);color:var(--ws-action);border-color:var(--ws-action)}
+.comparability-workbench button:disabled{opacity:.55;cursor:default}
+.compare-chart-wrap{width:100%;overflow:hidden;border:1px solid var(--ws-line);border-radius:8px;margin:12px 0;background:#fff}
+.compare-chart-wrap svg{display:block;width:100%;height:auto;min-height:170px}
+.compare-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px}
+.compare-legend .reference{color:#2457d6}.compare-legend .adjusted,.compare-legend .both{color:#287446}.compare-legend .viirs{color:#006e86}.compare-legend .modis{color:#a75500}
+.compare-table{overflow:auto;max-height:560px;margin:16px 0}
+.compare-table table{border-collapse:collapse;width:100%;font-size:13px}
+.compare-table th,.compare-table td{padding:10px;text-align:left;border-bottom:1px solid var(--ws-line);white-space:nowrap}
+.compare-table th{color:var(--ws-text);background:var(--ws-raised);position:sticky;top:0}
+.compare-table caption{text-align:left;padding:12px 0;color:var(--ws-muted);white-space:normal}
+.comparability-workbench details{padding:14px 0}
+.comparability-workbench details.compare-panel{padding:20px 24px}
+.comparability-workbench summary{cursor:pointer;color:var(--ws-action);font-size:15px;font-weight:600}
+.compare-months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin:18px 0}
+.compare-month{padding:8px 3px;text-align:center;border:1px solid var(--ws-control);font-size:11px;border-radius:5px;min-width:0}
+.compare-month.eligible{background:#e0f0e5;border-color:#79a98a;color:#204d31}
+.compare-month.excluded{background:repeating-linear-gradient(45deg,#fff6e7,#fff6e7 4px,#eadabe 4px,#eadabe 8px)}
+.compare-month.other{border-style:dashed;color:var(--ws-muted)}
+.coverage-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin:18px 0}
+#coverage-days button{font-size:12px;min-height:60px;padding:6px;line-height:1.5}
+#coverage-days .complete{background:#e0f0e5;color:#204d31}
+#coverage-days .gap{background:repeating-linear-gradient(45deg,#fff6e7,#fff6e7 5px,#eadabe 5px,#eadabe 10px);color:#6e4c17}
+#coverage-days .unknown{background:#fff;border-style:dashed}
+#coverage-days button[aria-pressed=true]{outline:3px solid var(--ws-action);outline-offset:1px}
+.compare-two{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:start}.compare-two>*{min-width:0}
+#native-map,#acquisition-map{display:block;width:100%;height:auto;background:#f3f6f7;border:1px solid var(--ws-line);border-radius:9px}
+#acquisition-map{max-width:700px;margin:16px 0}
+.comparability-workbench .compare-hash,.comparability-workbench pre,#native-granule-detail{overflow-wrap:anywhere;font-size:12px}
+.comparability-workbench pre{white-space:pre-wrap;padding:16px;background:var(--ws-raised);border-radius:7px}
+.custom-comparison>summary{font-weight:600;color:var(--ws-action);cursor:pointer}
+@media(max-width:850px){.compare-controls{grid-template-columns:1fr 1fr}.compare-two{grid-template-columns:1fr}.compare-months{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:540px){.comparability-workbench .compare-panel{padding:16px}.comparability-workbench details.compare-panel{padding:16px}.comparability-workbench .compare-panel h2{font-size:22px}.compare-metrics{grid-template-columns:1fr 1fr;gap:8px}.compare-metrics article{padding:12px}.compare-metrics strong{font-size:23px}.compare-controls{gap:12px}#coverage-days button{font-size:10px;padding:3px}.compare-badge{white-space:normal}.comparability-workbench .section-heading{align-items:start;flex-direction:column}}
+
+#native-rematching-status,#native-acquisition-detail{overflow-wrap:anywhere}.comparability-workbench .compare-metrics{min-width:0}

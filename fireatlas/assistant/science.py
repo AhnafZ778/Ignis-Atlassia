@@ -19,7 +19,7 @@ from .contracts import METHODS, LIMITATION, digest, normalize_context
 
 ROOT = Path(__file__).resolve().parents[2]
 HEAVY = threading.Semaphore(1)
-OPERATIONS = ("archive_search", "availability", "observations", "replay", "research", "calendar", "harmonized", "persistence", "missingness", "compare", "sensitivity", "exposure", "validation", "method", "sources")
+OPERATIONS = ("similar_patterns", "environment_context", "park_platforms", "archive_search", "availability", "observations", "replay", "research", "calendar", "comparability", "finding_comparison", "environment_analogues", "harmonized", "persistence", "missingness", "compare", "sensitivity", "exposure", "validation", "method", "sources")
 
 
 def readonly(path):
@@ -88,7 +88,7 @@ class Science:
         cancel = cancel or threading.Event()
         deadline = deadline or time.monotonic()+120
         release = self.release()
-        heavy = operation in {"research", "sensitivity", "validation", "harmonized", "calendar", "exposure"}
+        heavy = operation in {"similar_patterns", "research", "sensitivity", "validation", "harmonized", "comparability", "calendar", "exposure"}
         with contextlib.ExitStack() as stack:
             if heavy:
                 while not HEAVY.acquire(timeout=.2):
@@ -141,15 +141,57 @@ class Science:
             return {"sources": rows, "export_inventory": windows, "cases": [{"id": k, **{n: v[n] for n in ("title", "start", "end", "bbox")}} for k, v in CASES.items()], "context_layers": json.loads((ROOT/"fireatlas/static/replay-context/manifest.json").read_text()), "note": "Historical rows do not establish complete monthly coverage. NRT and other imported streams remain separate."}, "availability"
         if op == "observations":
             return self.observations(db, cfg, args), "observations"
+        if op == 'park_platforms':
+            from ..studio.park_chart import published_timeline, BBOX, DAYS
+            if cfg.get('case')!='park-2024' or cfg['bbox']!=BBOX or cfg['start']<DAYS[0] or cfg['end']>DAYS[-1]:
+                raise ValueError('The published four-platform comparison covers the Park boundary on July 25–28, 2024.')
+            rows=[row for row in published_timeline() if cfg['start']<=row['date']<=cfg['end']]
+            return {'rows':rows,'sources':['MODIS_SP','VIIRS_SNPP_SP','VIIRS_NOAA20_SP','VIIRS_NOAA21_SP'],
+                    'unit':'recorded detections','note':'Source-specific published detection counts. Product gaps stay unavailable; counts are not harmonized or summed.'}, 'park_platforms'
         if op == "calendar":
             return calendar(db, year=cfg["year"], series=cfg["series"], bbox=tuple(cfg["bbox"])), "calendar"
-        if op == "harmonized":
-            from ..calendar_v2 import calendar_v2
+        if op == 'similar_patterns':
+            from ..historical_similarity import match_imported_profiles
+            if set(args)-{'first_year','last_year','regions'}:raise ValueError('Unknown historical profile matching setting.')
+            return match_imported_profiles(db,cfg,args,cancel), 'similar_patterns'
+        if op == 'environment_context':
+            from ..environment_analogues import context_publication
+            if cfg.get('case')!='park-2024' or cfg['bbox']!=[-122.0,39.5,-121.3,40.5] or cfg['start']!='2024-07-25' or cfg['end']!='2024-07-28':
+                raise ValueError('Environmental context is available for the fixed Park July 25–28 pilot only.')
+            if args:raise ValueError('Environmental context uses the verified published grid without extra filters.')
+            return context_publication(ROOT/'site/data/environment-analogues/v1'), 'environment_context'
+        if op == 'environment_analogues':
+            from ..environment_analogues import resolve_publication
+            if cfg.get('case')!='park-2024' or cfg['bbox']!=[-122.0,39.5,-121.3,40.5] or cfg['start']!='2024-07-25' or cfg['end']!='2024-07-28' or cfg['source']!='MODIS_SP':
+                raise ValueError('The environmental pilot uses the fixed Park study boundary.')
+            if set(args)-{'cell_id','expected_environment_sha256'}:
+                raise ValueError('Unknown environmental selection.')
+            return resolve_publication(ROOT/'site/data/environment-analogues/v1',args.get('cell_id'),args.get('expected_environment_sha256')), 'environment_analogues'
+        if op == 'finding_comparison':
+            from ..finding_comparison import published_pair
             from ..regions import REGIONS
-            region = cfg["region"]
-            if region not in REGIONS or list(REGIONS[region]["bbox"]) != cfg["bbox"]:
-                raise ValueError("Harmonization requires the exact calibrated regional bounds. Custom areas have no local calibration; raw observation analysis remains available.")
-            return calendar_v2(db, region=region, year=cfg["year"], month=cfg["month"]), "harmonized"
+            region=cfg.get('region')
+            if region not in REGIONS or list(cfg['bbox']) != list(REGIONS[region]['bbox']):
+                raise ValueError('Choose the exact fixed comparison region.')
+            allowed={'finding_month','finding_first_year','finding_second_year','expected_finding_sha256','finding_series'}
+            if set(args)-allowed:
+                raise ValueError('Unknown finding comparison setting.')
+            payload=published_pair(ROOT/'site/data/finding-comparisons/v1',region,
+                args.get('finding_month'),args.get('finding_first_year'),args.get('finding_second_year'),
+                args.get('expected_finding_sha256'),args.get('finding_series','modis'))
+            return payload, 'finding_comparison'
+        if op in {"comparability", "harmonized"}:
+            from ..comparability import build
+            region = cfg.get("region")
+            from ..regions import REGIONS
+            if region not in REGIONS or list(cfg["bbox"]) != list(REGIONS[region]["bbox"]):
+                raise ValueError("Monthly comparability requires the exact fixed regional bounds. A custom area has no evaluated mapping.")
+            payload = build(db, region)
+            payload["note"] = ("Monthly overlap comparison across available complete, collection-matched source months. "
+                               "This does not provide a value for the selected day, daily substitution, climate anomaly, "
+                               "historical transfer or operational continuity. Independent review is pending.")
+            return payload, "comparability"
+
         if op in {"research", "exposure"}:
             mask = None
             if op == "exposure" and cfg.get("mask_id"):

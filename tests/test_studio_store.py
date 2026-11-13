@@ -69,6 +69,22 @@ class StoreMigrationTests(unittest.TestCase):
 
 
 class DocumentTests(StudioCase):
+    def test_board_creation_survives_an_unavailable_scientific_archive(self):
+        from fireatlas.assistant.service import AssistantService
+        from fireatlas.studio.service import StudioService
+        missing=self.root / 'missing' / 'science.sqlite3'
+        assistant=AssistantService(missing)
+        studio=StudioService(missing, assistant=assistant)
+        self.addCleanup(studio.close)
+        owner,_=studio.store.create_principal()
+        document=studio.create_document(owner,{'title':'Independent notes'})
+        self.assertEqual(document['title'],'Independent notes')
+        self.assertIsNone(document['release'])
+        self.assertEqual(studio.get_document(owner,document['id'])['title'],'Independent notes')
+        capabilities=assistant.capabilities()
+        self.assertIsNone(capabilities['release'])
+        self.assertEqual(next(c for c in capabilities['connectors'] if c['id']=='fireatlas')['status'],'unavailable')
+
     def test_delete_investigation_is_owned_revision_checked_and_idempotent(self):
         document = self.add_card(self.board(), 'kept-evidence')
         other = self.board(title='Keep this investigation')

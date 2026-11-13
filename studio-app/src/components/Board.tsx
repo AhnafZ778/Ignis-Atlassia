@@ -174,7 +174,7 @@ export function Board() {
                 <span className="card-title">{card.title || 'Untitled'}</span>
               </header>
               <div className="card-body"><CardBody card={card} snapshot={snapshot} documentId={doc!.id} /></div>
-              {snapshot ? <footer className="card-foot"><span className="chip ok">frozen</span><span className="muted">{snapshot.unit} · {snapshot.scope.start} → {snapshot.scope.end}</span></footer> : null}
+              {snapshot ? <footer className="card-foot"><span className="chip ok">frozen</span><span className="muted">{snapshot.unit} · {snapshot.scope.periods?.length ? snapshot.scope.periods.map((p) => p.start.slice(0, 7)).join(' / ') : `${snapshot.scope.start} → ${snapshot.scope.end}`}</span></footer> : null}
               {canEdit && !card.locked ? <div className="resize" aria-hidden="true" onPointerDown={(e) => { e.stopPropagation(); start(e, card, 'resize'); }} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} /> : null}
             </article>
           );

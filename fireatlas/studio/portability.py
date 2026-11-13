@@ -15,6 +15,7 @@ import subprocess
 import threading
 import zipfile
 from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
 
 from ..provenance import sanitize_public_payload
 from . import graph, evidence, visuals, story, heat
@@ -29,6 +30,85 @@ ENTRIES=4096
 JSON_LIMIT=32*1024**2
 ROOT=Path(__file__).resolve().parents[2]
 FORMATS={'native','excalidraw','svg','png','pdf'}
+
+RESEARCH_FIELDS={'web_sources','web_search','public_research_receipts','research_team','research_answer','public_readings','nasa_discoveries'}
+
+
+def clean_research_fields(turn):
+    """Portable authored research, bounded and safe to render after restoration."""
+    def sources(value):
+        if not isinstance(value,list) or len(value)>12:raise StudioError('Invalid research sources.')
+        for source in value:
+            if not isinstance(source,dict) or not isinstance(source.get('title'),str) or len(source['title'])>500:raise StudioError('Invalid research source.')
+            url=source.get('url','')
+            if not isinstance(url,str) or len(url)>3000:raise StudioError('Invalid research source URL.')
+            try:
+                parsed=urlsplit(url)
+                if parsed.scheme!='https' or not parsed.netloc or parsed.username or parsed.password:raise ValueError()
+            except ValueError:raise StudioError('Invalid research source URL.') from None
+            for key in ('id','snippet','provider'):
+                if key in source and (not isinstance(source[key],str) or len(source[key])>2000):raise StudioError('Invalid research source text.')
+    if 'web_sources' in turn:sources(turn['web_sources'])
+    result={}
+    for key in RESEARCH_FIELDS & turn.keys():
+        value=turn[key]
+        try:encoded=json.dumps(value,allow_nan=False).encode()
+        except (TypeError,ValueError,RecursionError):raise StudioError('Invalid research conversation.') from None
+        if len(encoded)>60000:raise StudioError('Research conversation is too large.')
+        if key=='web_sources':sources(value)
+        elif key=='public_readings':
+            from ..assistant.public_reading import validate_reports
+            try:validate_reports(value,turn.get('web_sources',[]))
+            except (ValueError,TypeError,KeyError,OverflowError):raise StudioError('Invalid original public reading.') from None
+        elif key=='nasa_discoveries':
+            from ..assistant.nasa_discovery import validate_reports
+            try:validate_reports(value,turn.get('web_sources',[]))
+            except (ValueError,TypeError,KeyError,OverflowError,AttributeError):raise StudioError('Invalid NASA catalog discovery.') from None
+        elif key=='research_answer':
+            if not isinstance(value,dict) or set(value)!={'synthesis','hypothesis','proposed_test','source_ids'}:raise StudioError('Invalid research answer.')
+            for field,limit in (('synthesis',600),('hypothesis',400),('proposed_test',1000)):
+                if not isinstance(value[field],str) or not value[field].strip() or not 1<=len(value[field])<=limit:raise StudioError('Invalid research answer text.')
+            known={source.get('id') for source in turn.get('web_sources',[]) if isinstance(source,dict)}
+            identifiers=value['source_ids']
+            if not isinstance(identifiers,list) or not 1<=len(identifiers)<=8 or any(not isinstance(identifier,str) or identifier not in known for identifier in identifiers):raise StudioError('Invalid research answer references.')
+        elif key=='research_team':
+            if not isinstance(value,dict) or value.get('status') not in ('completed','partial','unavailable') or not isinstance(value.get('specialists'),list) or len(value['specialists'])>3:raise StudioError('Invalid research team.')
+            for item in value['specialists']:
+                if not isinstance(item,dict) or item.get('status') not in ('completed','withheld','cancelled'):raise StudioError('Invalid research specialist.')
+                for field in ('role','label','insight','next_test','reason'):
+                    if field in item and (not isinstance(item[field],str) or len(item[field])>600):raise StudioError('Invalid research specialist text.')
+                if not all(isinstance(item.get(field),str) for field in ('role','label')):raise StudioError('Invalid research specialist identity.')
+                if item['status']=='completed' and not all(isinstance(item.get(field),str) for field in ('insight','next_test')):raise StudioError('Invalid research specialist result.')
+                if 'sources' in item:sources(item['sources'])
+            if 'note' in value and (not isinstance(value['note'],str) or len(value['note'])>2000):raise StudioError('Invalid research note.')
+            for field in ('ceiling_usd','reserved_usd','estimated_cost_usd'):
+                amount=value.get(field)
+                if amount is not None and (type(amount) not in (int,float) or not math.isfinite(amount) or amount<0):raise StudioError('Invalid research usage.')
+        else:
+            receipts=value if key=='public_research_receipts' else [value]
+            if not isinstance(receipts,list) or len(receipts)>2:raise StudioError('Invalid public research receipts.')
+            for receipt in receipts:
+                if not isinstance(receipt,dict):raise StudioError('Invalid public research receipt.')
+                sources(receipt.get('sources',[]))
+        result[key]=value
+    return result
+
+
+def clean_conversation(value):
+    """Validate portable, bounded conversational text; it is not scientific evidence."""
+    if not isinstance(value,list) or len(value)>30:raise StudioError('Invalid investigation conversation.')
+    clean=[]
+    for turn in value:
+        if not isinstance(turn,dict) or set(turn)-({'question','title','summary','claims'} | RESEARCH_FIELDS):raise StudioError('Invalid conversation turn.')
+        if any(not isinstance(turn.get(k,''),str) or len(turn.get(k,''))>limit for k,limit in [('question',1000),('title',200),('summary',2400)]):raise StudioError('Invalid conversation text.')
+        claims=turn.get('claims',[])
+        if not isinstance(claims,list) or len(claims)>12:raise StudioError('Invalid conversation claims.')
+        for claim in claims:
+            if not isinstance(claim,dict) or set(claim)!={'label','value','unit'} or not isinstance(claim['label'],str) or len(claim['label'])>200 or not isinstance(claim['unit'],str) or len(claim['unit'])>100:raise StudioError('Invalid conversation claim.')
+            v=claim['value']
+            if isinstance(v,bool) or not isinstance(v,(str,int,float)) or (isinstance(v,str) and len(v)>400) or (isinstance(v,float) and not math.isfinite(v)):raise StudioError('Invalid conversation claim value.')
+        clean.append({'question':turn.get('question',''),'title':turn.get('title',''),'summary':turn.get('summary',''),'claims':claims,**clean_research_fields(turn)})
+    return clean
 
 
 def browser_path():
@@ -129,6 +209,22 @@ class Portability:
             comments += [json.loads(r['body']) for r in db.execute('SELECT body FROM imported_annotations WHERE document_id=?',(did,))]
             imported_projects=[json.loads(r['body']) for r in db.execute('SELECT body FROM imported_projects WHERE document_id=?',(did,))]
             packages=[json.loads(r['body']) for r in db.execute('SELECT body FROM investigation_packages WHERE document_id=?',(did,))]
+            drawing=[{'kind':r['kind'],'id':r['object_id'],'position':r['position'],'value':json.loads(r['body'])}
+                     for r in db.execute('SELECT kind,object_id,position,body FROM whiteboard_objects WHERE document_id=? ORDER BY position,object_id',(did,))]
+            datasets=[dict(r) for r in db.execute('SELECT id,name,sha256,content,row_count,columns_json FROM datasets WHERE document_id=?',(did,))]
+            source_documents=[dict(r) for r in db.execute('SELECT id,name,sha256,content FROM source_documents WHERE document_id=?',(did,))]
+            conversation=[{k:v for k,v in json.loads(r['body']).items() if k in {'question','title','summary','claims'} | RESEARCH_FIELDS}
+                          for r in db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=? ORDER BY created DESC,rowid DESC LIMIT 30",(principal,did))]
+            conversation=clean_conversation(list(reversed(conversation)))
+            dataset_index={d['id']:d['sha256'] for d in datasets}
+            source_index={d['id']:d['sha256'] for d in source_documents}
+            for obj in drawing:
+                custom=obj['value'].get('customData') if obj['kind']=='element' else None
+                meta=custom.get('fireatlas') if isinstance(custom,dict) else None
+                if isinstance(meta,dict) and meta.get('documentId')==did and meta.get('datasetId') and (meta['datasetId'] not in dataset_index or dataset_index[meta['datasetId']]!=meta.get('datasetHash')):
+                    raise StudioError('A whiteboard table references missing or changed data.',code='invalid-evidence')
+                if isinstance(meta,dict) and meta.get('documentId')==did and meta.get('sourceDocumentId') and (meta['sourceDocumentId'] not in source_index or source_index[meta['sourceDocumentId']]!=meta.get('sourceDocumentHash')):
+                    raise StudioError('A whiteboard document references missing or changed data.',code='invalid-evidence')
             for project in imported_projects:
                 histories.extend(project.get('workflow_runs',[]));packages.extend(project.get('packages',[]))
                 frozen_stories={s['id']:s for s in project.get('stories',[])}
@@ -139,6 +235,10 @@ class Portability:
             db.execute('COMMIT')
         state=copy.deepcopy(doc['state']);scope=scope or {'kind':'whole'}
         if scope.get('kind')!='whole':
+            drawing=[]  # Studio card selections do not imply a whiteboard selection.
+            datasets=[]
+            source_documents=[]
+            conversation=[]
             ids=scope.get('object_ids')
             if scope.get('kind')=='frame': ids=state['groups'].get(scope.get('frame_id'),{}).get('card_ids')
             if not isinstance(ids,list) or not ids or any(i not in state['cards'] for i in ids):raise StudioError('Select actual board objects for a scoped export.')
@@ -155,14 +255,33 @@ class Portability:
             workflows=[];histories=[];stories=[];packages=[]
             assets=[a for a in assets if a['id'] in {c.get('asset_id') for c in state['cards'].values()}]
         bundle={'schema':SCHEMA,'source_document':{'id':did,'revision':doc['revision']},'board':state,'snapshots':snapshots,'results':results,
-                'workflows':workflows,'workflow_runs':histories,'stories':stories,'comments':comments,'packages':packages,'assets':[],'scope':scope}
+                'workflows':workflows,'workflow_runs':histories,'stories':stories,'comments':comments,'packages':packages,'assets':[],'scope':scope,
+                'whiteboard':{'schema':'fireatlas-whiteboard-v1','objects':drawing},'datasets':[],'source_documents':[],'conversation':conversation}
+        bundle['source_document']['conversation_sha256']=sha256_text(dumps(conversation))
         binaries={}
+        for dataset in datasets:
+            data=bytes(dataset['content'])
+            if hashlib.sha256(data).hexdigest()!=dataset['sha256']:raise StudioError('A dataset changed during capture.',code='dataset-corrupt')
+            filename='datasets/'+dataset['sha256']+'.csv';binaries[filename]=data
+            bundle['datasets'].append({'id':dataset['id'],'name':dataset['name'],'sha256':dataset['sha256'],'bytes':len(data),'file':filename,
+                                       'row_count':dataset['row_count'],'columns':json.loads(dataset['columns_json'])})
+        bundle['source_document']['dataset_manifest_sha256']=sha256_text(dumps(sorted((d['id'],d['sha256']) for d in bundle['datasets'])))
+        for source in source_documents:
+            data=bytes(source['content'])
+            if hashlib.sha256(data).hexdigest()!=source['sha256']:raise StudioError('A document changed during capture.',code='document-corrupt')
+            filename='source-documents/'+source['sha256']+'.pdf';binaries[filename]=data
+            bundle['source_documents'].append({'id':source['id'],'name':source['name'],'sha256':source['sha256'],'bytes':len(data),'file':filename})
+        bundle['source_document']['source_documents_manifest_sha256']=sha256_text(dumps(sorted((d['id'],d['sha256']) for d in bundle['source_documents'])))
         for asset in assets:
             path=self.service.root/asset['path'];data=path.read_bytes()
             if len(data)!=asset['bytes'] or hashlib.sha256(data).hexdigest()!=asset['sha256']:raise StudioError('An image asset changed during capture.')
             portable='assets/'+asset['sha256']+path.suffix
             binaries[portable]=data;bundle['assets'].append({**{k:v for k,v in asset.items() if k!='path'},'file':portable})
-        return sanitize_public_payload(bundle),binaries
+        public_bundle=sanitize_public_payload(bundle)
+        # Authored drawing text and links are user content, not provider source paths.
+        public_bundle['whiteboard']=bundle['whiteboard']
+        public_bundle['conversation']=conversation
+        return public_bundle,binaries
 
     def intermediate(self,bundle,binaries):
         state=bundle['board'];objects=[];conversions=[];asset_index={a['id']:a for a in bundle['assets']}
@@ -245,11 +364,13 @@ class Portability:
             return saved
         if not self.capabilities()[fmt]['available']:raise Unavailable('Install the local export runtime for this format.')
         bundle,binaries=self.capture(principal,did,body.get('revision'),body.get('scope'))
+        if fmt!='native' and bundle['whiteboard']['objects']:
+            raise StudioError('This format does not yet include the saved whiteboard. Use the native investigation package or export the drawing from Investigation.',code='whiteboard-export-format')
         if not self.lock.acquire(blocking=False):raise Conflict('Another export is preparing. Retry after it finishes.',code='export-busy')
         try:
             StorageBudget(self.service.root).check(EXPANDED,ENTRIES)
             with self.store.connection(write=True) as db:
-                now=self.store.clock();db.execute('INSERT INTO export_jobs VALUES(?,?,?,?,?,?,?,NULL,NULL,?,?)',(jid,principal,did,bundle['source_document']['revision'],fmt,'queued',dumps({'scope':bundle['scope']}),now,now))
+                now=self.store.clock();db.execute('INSERT INTO export_jobs VALUES(?,?,?,?,?,?,?,NULL,NULL,?,?)',(jid,principal,did,bundle['source_document']['revision'],fmt,'queued',dumps({'scope':bundle['scope'],'dataset_manifest_sha256':bundle['source_document']['dataset_manifest_sha256'],'source_documents_manifest_sha256':bundle['source_document']['source_documents_manifest_sha256'],'conversation_sha256':bundle['source_document']['conversation_sha256']}),now,now))
             if background:threading.Thread(target=self.build,args=(principal,jid,bundle,binaries),daemon=True,name='studio-export').start()
             else:self.build(principal,jid,bundle,binaries)
         except BaseException:
@@ -263,9 +384,16 @@ class Portability:
             with self.store.connection(write=True) as db:db.execute("UPDATE export_jobs SET status='preparing' WHERE id=?",(jid,))
             job=self.get(principal,jid);fmt=job['format'];ir=self.intermediate(bundle,binaries)
             irpath=directory/'intermediate.json';irpath.write_text(dumps(ir))
-            svg=board_svg(ir);(directory/'board.svg').write_text(svg)
+            drawing=bundle['whiteboard']['objects']
+            drawing_only=fmt=='native' and bool(drawing) and not ir['objects']
+            svg='' if drawing_only else board_svg(ir)
+            if svg:(directory/'board.svg').write_text(svg)
             if fmt in {'native','excalidraw'}:
-                subprocess.run([shutil.which('node'),'--max-old-space-size=768',str(ROOT/'studio-app/scripts/export-scene.mjs'),str(irpath),str(directory/'board.excalidraw'),str(directory/'object-map.json')],check=True,timeout=120,capture_output=True)
+                if drawing_only:
+                    (directory/'board.excalidraw').write_text(dumps({'type':'excalidraw','version':2,'source':'FireAtlas','elements':[],'appState':{'viewBackgroundColor':'#fbf7ef'},'files':{}}))
+                    (directory/'object-map.json').write_text('{}')
+                else:
+                    subprocess.run([shutil.which('node'),'--max-old-space-size=768',str(ROOT/'studio-app/scripts/export-scene.mjs'),str(irpath),str(directory/'board.excalidraw'),str(directory/'object-map.json')],check=True,timeout=120,capture_output=True)
             if fmt=='native':
                 path=directory/'board.fireatlas.zip';inventory={};total=0
                 with zipfile.ZipFile(path,'w',zipfile.ZIP_DEFLATED) as archive:
@@ -289,16 +417,31 @@ class Portability:
                     index={}
                     for key in ('board','snapshots','workflows','workflow_runs','stories','comments','packages','source_document','scope','assets'):
                         write(key+'.json',dumps(bundle[key]).encode())
+                    write('whiteboard.json',dumps(bundle['whiteboard']).encode())
+                    write('datasets.json',dumps(bundle['datasets']).encode())
+                    write('source-documents.json',dumps(bundle['source_documents']).encode())
+                    write('conversation.json',dumps(bundle['conversation']).encode())
                     write('view-descriptors.json',dumps({c['id']:c['display'] for c in bundle['board']['cards'].values()}).encode())
                     for rid,result in bundle['results'].items():
                         entry='results/'+rid+'.json';index[rid]=write_json(entry,result)
                     write('results/index.json',dumps(index).encode())
+                    from .selected_rows import selection_rows, csv_bytes
+                    for sid,snapshot in bundle['snapshots'].items():
+                        selection=snapshot.get('selected_observations')
+                        if not selection:continue
+                        receipt=bundle['results'][snapshot['result_id']]
+                        _,rows=selection_rows(selection,receipt,selection['date'],selection['source'])
+                        write('observations/'+sid+'.csv',csv_bytes(rows))
                     for name,data in binaries.items():write(name,data)
                     write('interop/board.excalidraw',(directory/'board.excalidraw').read_bytes());write('interop/object-map.json',(directory/'object-map.json').read_bytes())
+                    if drawing:
+                        scene={'type':'excalidraw','version':2,'source':'FireAtlas','elements':[o['value'] for o in drawing if o['kind']=='element'],
+                               'appState':{'viewBackgroundColor':'#fbf7ef'},'files':{o['id']:o['value'] for o in drawing if o['kind']=='file'}}
+                        write('interop/whiteboard.excalidraw',dumps(scene).encode())
                     report={'schema':'fireatlas-export-report-v1','scope':bundle['scope'],'objects':len(ir['objects']),'conversions':ir['conversions'],
                             'editability':'Excalidraw text, shapes, frames and connectors are editable. Embedded scientific figures are visual objects. FireAtlas workflows run only in a compatible FireAtlas installation.',
                             'provenance':'User-supplied frozen archive on import; hashes check integrity, not source authenticity.'}
-                    write('export-report.json',dumps(report).encode());write('README.txt',b'Restore with Studio > Restore native board. Frozen results work without the original scientific database. Reruns require compatible methods and data. This archive contains board-scoped discussion, not private conversation or room credentials.\n')
+                    write('export-report.json',dumps(report).encode());write('README.txt',b"Restore with Studio > Restore native board. Frozen results work without the original scientific database. Reruns require compatible methods and data. Whole-board archives include the exporter's recent AI conversation and board discussion; share accordingly. Room credentials are not included.\n")
                     archive.writestr('manifest.json',dumps({'schema':SCHEMA,'files':inventory,'expanded_bytes':total}))
                 if path.stat().st_size>COMPRESSED:raise LimitExceeded('Archive exceeds compressed limit.')
             elif fmt=='svg':path=directory/'board.svg'
@@ -333,7 +476,7 @@ class Portability:
                 shutil.rmtree(profile,ignore_errors=True)
             if not path.exists() or path.stat().st_size>COMPRESSED:raise LimitExceeded('Export failed or exceeds output limits.')
             with self.store.connection(write=True) as db:
-                db.execute("UPDATE export_jobs SET status='completed',path=?,body=?,updated=? WHERE id=?",(str(path.relative_to(self.service.root.resolve())),dumps({'scope':bundle['scope'],'objects':len(ir['objects']),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}),self.store.clock(),jid))
+                db.execute("UPDATE export_jobs SET status='completed',path=?,body=?,updated=? WHERE id=?",(str(path.relative_to(self.service.root.resolve())),dumps({'scope':bundle['scope'],'dataset_manifest_sha256':bundle['source_document']['dataset_manifest_sha256'],'source_documents_manifest_sha256':bundle['source_document']['source_documents_manifest_sha256'],'conversation_sha256':bundle['source_document']['conversation_sha256'],'objects':len(ir['objects']),'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}),self.store.clock(),jid))
             # Intermediate inputs can contain duplicated embedded images; retain only final artifacts.
             irpath.unlink(missing_ok=True)
         except Exception as error:
@@ -346,6 +489,15 @@ class Portability:
         job=self.get(principal,jid)
         if job['status']!='failed':return job
         bundle,binaries=self.capture(principal,job['document_id'],job['revision'],job['body']['scope'])
+        expected=job['body'].get('dataset_manifest_sha256')
+        if (expected is None and bundle['datasets']) or (expected is not None and expected!=bundle['source_document']['dataset_manifest_sha256']):
+            raise Conflict('Saved tables changed since this export was prepared. Start a new export.',code='stale-export')
+        expected_sources=job['body'].get('source_documents_manifest_sha256')
+        if (expected_sources is None and bundle['source_documents']) or (expected_sources is not None and expected_sources!=bundle['source_document']['source_documents_manifest_sha256']):
+            raise Conflict('Saved documents changed since this export was prepared. Start a new export.',code='stale-export')
+        expected_conversation=job['body'].get('conversation_sha256')
+        if (expected_conversation is None and bundle['conversation']) or (expected_conversation is not None and expected_conversation!=bundle['source_document']['conversation_sha256']):
+            raise Conflict('The conversation changed since this export was prepared. Start a new export.',code='stale-export')
         if not self.lock.acquire(blocking=False):raise Conflict('Another export is preparing.',code='export-busy')
         try:
             StorageBudget(self.service.root).check(EXPANDED,ENTRIES)
@@ -383,7 +535,8 @@ class Portability:
             result=bundle['results'].get(snap['result_id'])
             if not result or not evidence.verify_snapshot(snap,result)['verified']:raise StudioError('Imported frozen evidence is inconsistent.',code='invalid-evidence')
         ids=set(state['cards'])|set(state['connections'])|set(state['groups'])|set(bundle['snapshots'])|set(bundle['results'])
-        ids|={w['id'] for w in bundle['workflows']}|{s['id'] for s in bundle['stories']}|{a['id'] for a in bundle['assets']}
+        ids|={w['id'] for w in bundle['workflows']}|{s['id'] for s in bundle['stories']}|{a['id'] for a in bundle['assets']}|{d['id'] for d in bundle['datasets']}
+        ids|={d['id'] for d in bundle['source_documents']}
         ids|={r['id'] for r in bundle['workflow_runs']}|{p['id'] for p in bundle['packages']}
         for saved in bundle['stories']:ids|={c['id'] for c in saved['body'].get('chapters',[])}
         mapping={i:'imp_'+secrets.token_hex(12) for i in ids}
@@ -398,6 +551,76 @@ class Portability:
         for sid,source in bundle['snapshots'].items():
             snap=copy.deepcopy(source);snap.update(id=mapping[sid],result_id=mapping[source['result_id']],imported_provenance={'schema':SCHEMA,'source_document':bundle['source_document'],'original_snapshot_id':sid,'original_snapshot_sha256':source['snapshot_sha256']})
             snap['snapshot_sha256']=sha256_text(dumps({k:v for k,v in snap.items() if k!='snapshot_sha256'}));restored_snaps[snap['id']]=snap
+        drawing=bundle['whiteboard']['objects']
+        dataset_index={d['id']:d['sha256'] for d in bundle['datasets']}
+        source_index={d['id']:d['sha256'] for d in bundle['source_documents']}
+        for obj in drawing:
+            value=obj.get('value') if isinstance(obj,dict) else None
+            custom=value.get('customData') if isinstance(value,dict) else None
+            meta=custom.get('fireatlas') if isinstance(custom,dict) else None
+            if isinstance(meta,dict) and meta.get('documentId')==bundle['source_document']['id'] and meta.get('datasetId') and (meta['datasetId'] not in dataset_index or dataset_index[meta['datasetId']]!=meta.get('datasetHash')):
+                raise StudioError('The imported whiteboard references missing or changed data.',code='invalid-evidence')
+            if isinstance(meta,dict) and meta.get('documentId')==bundle['source_document']['id'] and meta.get('sourceDocumentId') and (meta['sourceDocumentId'] not in source_index or source_index[meta['sourceDocumentId']]!=meta.get('sourceDocumentHash')):
+                raise StudioError('The imported whiteboard references a missing or changed document.',code='invalid-evidence')
+        if len(drawing)>10000:raise LimitExceeded('Imported whiteboard has too many objects.')
+        drawing_ids={}
+        for obj in drawing:
+            if not isinstance(obj,dict) or set(obj)!={'kind','id','position','value'} or obj['kind'] not in ('element','file'):
+                raise StudioError('Invalid imported whiteboard object.')
+            oid=graph.check_id(obj['id'],'whiteboard object ID')
+            if not isinstance(obj['value'],dict) or obj['value'].get('id')!=oid:
+                raise StudioError('Imported whiteboard identity does not match.')
+            if obj['kind']=='element' and not isinstance(obj['value'].get('groupIds',[]),list):
+                raise StudioError('Invalid imported whiteboard groups.')
+            if (obj['kind'],oid) in drawing_ids:raise StudioError('Duplicate imported whiteboard object.')
+            drawing_ids[obj['kind'],oid]='imp_'+secrets.token_hex(12)
+        drawing_map={old:new for (_,old),new in drawing_ids.items()}
+        if len(drawing_map)!=len(drawing_ids):raise StudioError('Ambiguous imported whiteboard identity.')
+        groups={g for obj in drawing if obj['kind']=='element' and isinstance(obj.get('value'),dict) for g in obj['value'].get('groupIds',[]) if isinstance(g,str)}
+        group_map={g:'imp_'+secrets.token_hex(12) for g in groups}
+        def drawing_refs(value,key=''):
+            if isinstance(value,list):return [drawing_refs(v,key) for v in value]
+            if isinstance(value,dict):return {k:drawing_refs(v,k) for k,v in value.items()}
+            if isinstance(value,str) and key in {'id','elementId','fileId','containerId','frameId'}:return drawing_map.get(value,value)
+            if isinstance(value,str) and key=='groupIds':return group_map.get(value,value)
+            return value
+        restored_drawing=[]
+        for obj in drawing:
+            value=drawing_refs(copy.deepcopy(obj['value']))
+            if isinstance(value,dict):
+                value['id']=drawing_ids[obj['kind'],obj['id']]
+                meta=(value.get('customData') or {}).get('fireatlas')
+                if isinstance(meta,dict) and meta.get('documentId')==bundle['source_document']['id']:
+                    meta['documentId']=did
+                    for field in ('cardId','snapshotId','datasetId','sourceDocumentId'):
+                        if meta.get(field) in mapping:meta[field]=mapping[meta[field]]
+                    if isinstance(meta.get('sourceCardIds'),list):meta['sourceCardIds']=[mapping.get(i,i) for i in meta['sourceCardIds']]
+                    if isinstance(meta.get('originalElementIds'),list):
+                        original_ids=meta['originalElementIds']
+                        meta['originalElementIds']=[drawing_map[i] for i in original_ids if i in drawing_map]
+                        if len(meta['originalElementIds'])!=len(original_ids):meta['reference_state']='unavailable-after-import'
+                    if meta.get('evidenceId'):
+                        if meta['evidenceId'] in mapping:meta['evidenceId']=mapping[meta['evidenceId']]
+                        else:meta['evidenceId']=None;meta['reference_state']='unavailable-after-import'
+                    if meta.get('snapshotId') in restored_snaps:meta['snapshotHash']=restored_snaps[meta['snapshotId']]['snapshot_sha256']
+                    if isinstance(meta.get('sourceBindings'),list):
+                        for binding in meta['sourceBindings']:
+                            if not isinstance(binding,dict):continue
+                            original=binding.get('snapshotId')
+                            saved=bundle['snapshots'].get(original)
+                            if binding.get('documentId')==bundle['source_document']['id'] and saved and binding.get('snapshotHash')==saved['snapshot_sha256']:
+                                binding['documentId']=did
+                                binding['snapshotId']=mapping[original]
+                                binding['snapshotHash']=restored_snaps[mapping[original]]['snapshot_sha256']
+                                if binding.get('cardId') in mapping:binding['cardId']=mapping[binding['cardId']]
+                            else:binding['reference_state']='unavailable-after-import'
+                    if isinstance(meta.get('claims'),list):
+                        for claim in meta['claims']:
+                            if isinstance(claim,dict) and claim.get('result_id'):
+                                if claim['result_id'] in mapping:claim['result_id']=mapping[claim['result_id']]
+                                else:claim['result_id']=None;claim['reference_state']='unavailable-after-import'
+                    if isinstance(value.get('link'),str) and 'studio.html?board=' in value['link']:value['link']='./studio.html?board='+did
+            restored_drawing.append({'kind':obj['kind'],'id':drawing_ids[obj['kind'],obj['id']],'position':obj['position'],'value':value})
         for cid,card in list(restored['cards'].items()):
             if card.get('type') not in graph.CARD_TYPES:
                 card['text']='Imported unsupported object: '+str(card.get('type'))+'\n'+str(card.get('text',''));card['type']='method-note'
@@ -415,6 +638,23 @@ class Portability:
                 if node['type']=='evidence_input' and node.get('params',{}).get('snapshot_id') not in bundle['snapshots']:
                     raise StudioError('Workflow references absent frozen evidence.')
         assets=[]
+        from .datasets import parse_csv, MAX_BOARD_BYTES
+        if sum(len(binaries[d['file']]) for d in bundle['datasets'])>MAX_BOARD_BYTES:raise LimitExceeded('Imported datasets exceed the board limit.')
+        for dataset in bundle['datasets']:
+            graph.check_id(dataset['id'],'dataset identity')
+            if not isinstance(dataset['name'],str) or not dataset['name'].strip() or len(dataset['name'])>200 or any(ord(c)<32 for c in dataset['name']) or dataset['file']!='datasets/'+dataset['sha256']+'.csv':
+                raise StudioError('Invalid imported dataset identity.')
+            data=binaries[dataset['file']];parsed=parse_csv(data)
+            if hashlib.sha256(data).hexdigest()!=dataset['sha256'] or len(data)!=dataset['bytes'] or parsed['columns']!=dataset['columns'] or parsed['row_count']!=dataset['row_count']:
+                raise StudioError('Imported dataset metadata does not match its bytes.',code='invalid-evidence')
+        from .source_documents import validate as validate_document, MAX_BOARD_BYTES as MAX_SOURCE_BYTES
+        if sum(len(binaries[d['file']]) for d in bundle['source_documents'])>MAX_SOURCE_BYTES:raise LimitExceeded('Imported documents exceed the board limit.')
+        for source in bundle['source_documents']:
+            graph.check_id(source['id'],'document identity')
+            data=binaries[source['file']]
+            validate_document(source['name'],data)
+            if source['file']!='source-documents/'+source['sha256']+'.pdf' or hashlib.sha256(data).hexdigest()!=source['sha256'] or len(data)!=source['bytes']:
+                raise StudioError('Imported document metadata does not match its bytes.',code='invalid-evidence')
         for a in bundle['assets']:
             data=binaries[a['file']]
             if len(data)>1_500_000:raise LimitExceeded('Imported asset exceeds existing image limits.')
@@ -424,9 +664,19 @@ class Portability:
             assets.append((a,data))
         with self.store.connection(write=True) as db:
             db.execute('INSERT INTO documents VALUES(?,?,?,?,?,?,?,?,?,0)',(did,principal,restored['title'],1,dumps({'study':1,'title':1}),dumps(restored),dumps({'board_id':did,'document_revision':1,'epoch':0,'card_id':None}),now,now))
+            for offset in range(0,len(restored_drawing),500):
+                self.store._patch_whiteboard(restored,{'op':'patch_whiteboard','changes':restored_drawing[offset:offset+500]},[],[],db,did)
+            db.execute('UPDATE documents SET state=? WHERE id=?',(dumps(restored),did))
             db.execute('INSERT INTO revisions VALUES(?,?,?,?,?,?,?)',(did,1,principal,None,sha256_text(dumps(restored)),dumps(restored),now))
             for rid,receipt in result_bodies.items():db.execute('INSERT INTO science_results VALUES(?,?,?,?,?,?)',(rid,principal,'evidence',receipt['sha256'],dumps(receipt),now))
             for sid,snap in restored_snaps.items():db.execute('INSERT INTO snapshots VALUES(?,?,?,?,?,?)',(sid,did,principal,snap['snapshot_sha256'],dumps(snap),now))
+            for dataset in bundle['datasets']:
+                db.execute('INSERT INTO datasets VALUES(?,?,?,?,?,?,?,?,?)',(mapping[dataset['id']],did,principal,dataset['name'],dataset['sha256'],binaries[dataset['file']],dataset['row_count'],dumps(dataset['columns']),now))
+            for source in bundle['source_documents']:
+                db.execute('INSERT INTO source_documents VALUES(?,?,?,?,?,?,?)',(mapping[source['id']],did,principal,source['name'],source['sha256'],binaries[source['file']],now))
+            for turn in bundle['conversation']:
+                body={**turn,'document_id':did,'run_id':'import_'+secrets.token_hex(12)}
+                db.execute('INSERT INTO science_results VALUES(?,?,?,?,?,?)',('res_'+secrets.token_hex(12),principal,'whiteboard_conversation','',dumps(body),now))
             for a,data in assets:
                 relative='assets/'+hashlib.sha256(data).hexdigest()+Path(a['file']).suffix
                 (self.service.root/'assets').mkdir(exist_ok=True);(self.service.root/relative).write_bytes(data)
@@ -458,9 +708,9 @@ def read_archive(path):
         for item in entries:
             p=PurePosixPath(item.filename)
             if p.is_absolute() or str(p)!=item.filename or '..' in p.parts or '\\' in item.filename or ':' in item.filename or item.is_dir() or stat.S_ISLNK(item.external_attr>>16):raise StudioError('Unsafe archive entry.')
-            allowed={'board.json','snapshots.json','workflows.json','workflow_runs.json','stories.json','comments.json','packages.json','source_document.json','scope.json','assets.json','view-descriptors.json','export-report.json','README.txt','manifest.json','interop/board.excalidraw','interop/object-map.json','results/index.json'}
+            allowed={'board.json','snapshots.json','workflows.json','workflow_runs.json','stories.json','comments.json','packages.json','source_document.json','scope.json','assets.json','datasets.json','source-documents.json','conversation.json','whiteboard.json','view-descriptors.json','export-report.json','README.txt','manifest.json','interop/board.excalidraw','interop/whiteboard.excalidraw','interop/object-map.json','results/index.json'}
             import re
-            if item.filename not in allowed and not re.fullmatch(r'(?:results/[A-Za-z0-9_-]{1,64}\.json(?:\.part-[0-9]{4})?|assets/[a-f0-9]{64}\.(?:png|jpg|webp))',item.filename):raise StudioError('Unsupported archive content.')
+            if item.filename not in allowed and not re.fullmatch(r'(?:results/[A-Za-z0-9_-]{1,64}\.json(?:\.part-[0-9]{4})?|assets/[a-f0-9]{64}\.(?:png|jpg|webp)|observations/[A-Za-z0-9_-]{1,64}\.csv|datasets/[a-f0-9]{64}\.csv|source-documents/[a-f0-9]{64}\.pdf)',item.filename):raise StudioError('Unsupported archive content.')
             total+=item.file_size
             if total>EXPANDED or item.file_size>JSON_LIMIT and item.filename.endswith('.json'):raise LimitExceeded('Archive expansion or metadata limit exceeded.')
         def read(name):
@@ -483,6 +733,26 @@ def read_archive(path):
             data[name]=blob
         if actual!=manifest['expanded_bytes']:raise StudioError('Incorrect expanded-size manifest.')
         bundle={key:json.loads(data[key+'.json']) for key in ('board','snapshots','workflows','workflow_runs','stories','comments','packages','source_document','scope','assets')}
+        bundle['whiteboard']=json.loads(data['whiteboard.json']) if 'whiteboard.json' in data else {'schema':'fireatlas-whiteboard-v1','objects':[]}
+        bundle['datasets']=json.loads(data['datasets.json']) if 'datasets.json' in data else []
+        bundle['source_documents']=json.loads(data['source-documents.json']) if 'source-documents.json' in data else []
+        bundle['conversation']=clean_conversation(json.loads(data['conversation.json'])) if 'conversation.json' in data else []
+        expected_conversation=bundle['source_document'].get('conversation_sha256')
+        if (expected_conversation is None and bundle['conversation']) or (expected_conversation is not None and expected_conversation!=sha256_text(dumps(bundle['conversation']))):
+            raise StudioError('Conversation manifest does not match the saved package.',code='invalid-evidence')
+        if not isinstance(bundle['source_documents'],list) or any(not isinstance(d,dict) or set(d)!={'id','name','sha256','bytes','file'} for d in bundle['source_documents']):raise StudioError('Invalid imported document metadata.')
+        if len({d['id'] for d in bundle['source_documents']})!=len(bundle['source_documents']) or len({d['sha256'] for d in bundle['source_documents']})!=len(bundle['source_documents']):raise StudioError('Duplicate imported document identities or content.')
+        source_manifest=bundle['source_document'].get('source_documents_manifest_sha256')
+        actual_sources=sha256_text(dumps(sorted((d['id'],d['sha256']) for d in bundle['source_documents'])))
+        if (source_manifest is None and bundle['source_documents']) or (source_manifest is not None and source_manifest!=actual_sources):
+            raise StudioError('Document manifest does not match the saved package.',code='invalid-evidence')
+        if not isinstance(bundle['datasets'],list) or any(not isinstance(d,dict) or set(d)!={'id','name','sha256','bytes','file','row_count','columns'} for d in bundle['datasets']):raise StudioError('Invalid imported dataset metadata.')
+        if len({d['id'] for d in bundle['datasets']})!=len(bundle['datasets']):raise StudioError('Duplicate imported dataset identities.')
+        if len({d['sha256'] for d in bundle['datasets']})!=len(bundle['datasets']):raise StudioError('Duplicate imported dataset content.')
+        expected=bundle['source_document'].get('dataset_manifest_sha256')
+        if expected is not None and expected!=sha256_text(dumps(sorted((d['id'],d['sha256']) for d in bundle['datasets']))):raise StudioError('Dataset manifest does not match the saved package.',code='invalid-evidence')
+        if not isinstance(bundle['whiteboard'],dict) or bundle['whiteboard'].get('schema')!='fireatlas-whiteboard-v1' or not isinstance(bundle['whiteboard'].get('objects'),list):
+            raise StudioError('Unsupported whiteboard archive data.')
         if bundle['board'].get('schema')!='fireatlas-studio-document-v1':raise StudioError('Unsupported board schema.')
         index=json.loads(data['results/index.json']);bundle['results']={}
         for rid,entry in index.items():
@@ -495,6 +765,8 @@ def read_archive(path):
             bundle['results'][rid]=json.loads(blob)
 
         binaries={a['file']:data[a['file']] for a in bundle['assets']}
+        binaries.update({d['file']:data[d['file']] for d in bundle['datasets']})
+        binaries.update({d['file']:data[d['file']] for d in bundle['source_documents']})
         if len(bundle['assets'])!=len({a['id'] for a in bundle['assets']}):raise StudioError('Duplicate imported asset identities.')
         if len(bundle['assets'])>40 or len(bundle['stories'])>10:raise LimitExceeded('Archive exceeds existing board asset/story limits.')
         return bundle,binaries

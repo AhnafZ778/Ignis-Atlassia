@@ -1,0 +1,98 @@
+{
+  "schema": "fireatlas-research-protocol-v1",
+  "id": "daily-v2.0.4",
+  "state": "frozen-proposal-awaiting-human-approval",
+  "target": "Expected observed S-NPP daily centroid cell-days; never synthetic detection locations",
+  "regions": {
+    "norcal": "primary qualification",
+    "punjab-haryana": "independent replication"
+  },
+  "cohort": "Explicit exact standard-product pair, verified complete UTC dates without processing gaps",
+  "candidates": [
+    "no_harmonization",
+    "annual_ratio",
+    "monthly_ratio",
+    "hurdle_poisson"
+  ],
+  "prediction_inputs": [
+    "MODIS daily occupied cells",
+    "Terra and Aqua occupied cells",
+    "sin and cos of UTC day of year"
+  ],
+  "partition": {
+    "outer": "chronological test year Y",
+    "calibration_years": "Y-2 and Y-1",
+    "training": "years before Y-2",
+    "minimum_training_years": 3,
+    "minimum_training_days": 730,
+    "minimum_calibration_days": 365,
+    "minimum_test_groups": 3,
+    "minimum_test_days": 180,
+    "required_test_quarters": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "minimum_zero_recovery_test_days": 30,
+    "required_calibration_quarters": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "interval": {
+    "nominal": 0.9,
+    "method": "absolute log1p calibration residuals, same as monthly; no guaranteed dependent coverage"
+  },
+  "gates": {
+    "minimum_log_error_improvement": 0.1,
+    "maximum_wape_ratio": 1.0,
+    "minimum_coverage": 0.85,
+    "maximum_interval_score_ratio": 1.0,
+    "minimum_zero_recovery_improvement": 0.1,
+    "maximum_seasonal_wape_degradation": 0.1,
+    "authority": "proposed project gates requiring human scientific approval before fitting"
+  },
+  "dependency": "statsmodels==0.15.0 optional research extra; missing dependency or failed fit leaves estimates unavailable",
+  "claims_excluded": [
+    "fire truth",
+    "continuous observation",
+    "synthetic locations",
+    "hourly interpolation",
+    "automatic monthly qualification transfer"
+  ],
+  "amendment": "New protocol ID and human approval required for any method or threshold amendment.",
+  "supersedes": "daily-v2.0.3 (unapproved proposal retained)",
+  "method_annex": {
+    "source_sha256": {
+      "fireatlas/comparability_v2.py": "943ac08934913540a8a06bcefb7bfb6c7302581b50dd5422bf73f96cfcbe798b",
+      "fireatlas/comparability.py": "a19238e045f9d3169ebc25af5ad87e0cc30ccf00c2be966134b894c3adf6c41a",
+      "fireatlas/calibration.py": "6548fc9525500d47fb9cbcf5a4a8c01f615de41e41864eab3db339dc8640ee96",
+      "fireatlas/daily_estimates.py": "8260f948a949c977390815eeb0e33b2614164b211706a4b947a5b5fdcbdafc6a",
+      "fireatlas/qualification.py": "15b335cbbd23e94dd94702fbdb234a54376a8c97529af0d0b073d911b1630e81"
+    },
+    "ratio_fit": "annual=sum(reference)/sum(MODIS); zero denominator unavailable. Month-specific ratio requires monthly MODIS denominator >=30; otherwise use annual ratio.",
+    "selection": "Fixed identity, annual/month-specific ratio and hurdle candidates evaluated on identical chronological dates; hurdle must beat all baselines under frozen gates; no selection using test outcomes.",
+    "metrics": "WAPE=sum(abs(error))/sum(reference); signed relative bias=sum(error)/sum(reference), undefined if denominatorzero. Interval score width+20*miss distance for nominal90%. Log error uses log((prediction+1)/(reference+1)).",
+    "intervals": "Sorted absolute log1p calibration residual, rankceil((n+1)*0.9); require rank<=n. expm1(log1p(point)\u00b1radius), lower clippedzero; zero radius preserves exact point; nonzero boundaries rounded outward by nextafter.",
+    "qualification": "All declared project gates apply to both monthly selection strategies; no post-test candidate choice. Synthetic input cannot enter authentic admission. Previously inspected periods are retrospective. Human conclusion/native/task-study gates remain separate.",
+    "features": [
+      "intercept1",
+      "log1p(MODIS daily occupied-cell union)",
+      "log1p(Terra daily occupied cells)",
+      "log1p(Aqua daily occupied cells)",
+      "sin(2\u03c0*(UTC dayofyear-1)/daysinyear)",
+      "cos(same UTC seasonal angle)"
+    ],
+    "hurdle": "statsmodels0.15.0 HurdleCountModel(dist=poisson,zerodist=poisson); intercept explicit; BFGS,maxiter200, library defaults otherwise. Both zero and positive training outcomes/full-rank design required. Convergence, Hessian and numerical warnings fail closed. predictmean and1-predictprobzero. Runtime numerical package versions recorded.",
+    "zero_subset": "At least30 MODIS-zero/VIIRS-positive testdates; >=10% log-error improvement over every baseline on that subset. At least3supported testyears; no season WAPE >10%worse than any baseline. This does not establish seasonal/zero-subset interval coverage.",
+    "opportunity": "No opportunity denominator inferred. Supported native observation-opportunity subset evaluation remains unavailable until qualified geometry evidence exists.",
+    "subgroup_interval_reporting": "Report exact covered_count and interval_count per test year and season; pooled85%floor is not proof of90%temporal/seasonal/conditional coverage. Calibration requires all four calendar quarters. Zero/small-count support remains explicit."
+  },
+  "execution_modes": {
+    "human_reviewed": "Signed independent protocol approval before authentic qualification evaluation.",
+    "ai_experimental": "Explicit user-authorized exploration under ai-exploration-v1; no human approval or scientific qualification. Synthetic inputs cannot enter this mode."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema": "fireatlas-ai-exploratory-policy-v1",
+  "id": "ai-daily-hybrid-v1.0.0",
+  "protocol_id": "daily-hybrid-v1.0.0",
+  "protocol_sha256": "3161b3cf497fd157d5a00d2298a4af413fc5a15a77d80c2d9ed2119525e52c0e",
+  "audit_sha256": {
+    "docs/qualification/AI_EXPLORATION.md": "77f46a6a2a972f2c455b3fa0030cc3c02a65e5014227d89f5494aef7d1e2ae8d"
+  },
+  "scope": "Owner-authorized retrospective exploratory computations only; no independent human review, scientific approval, blind-confirmation claim or admission."
+}

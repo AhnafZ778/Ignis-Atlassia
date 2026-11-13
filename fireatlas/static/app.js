@@ -86,12 +86,11 @@ async function loadMeta({preserveContext = false} = {}) {
   }
 
   const weatherButton = $('[data-layer="fwi"]');
-  weatherButton.setAttribute("aria-disabled", "true");
-  weatherButton.textContent = "Fire weather · unavailable";
-  weatherButton.dataset.tooltip = "Measured fire-weather data have not been imported.";
+  if (weatherButton) { weatherButton.setAttribute("aria-disabled", "true"); weatherButton.textContent = "Fire weather · unavailable"; weatherButton.dataset.tooltip = "Measured fire-weather data have not been imported."; }
 }
 
 async function loadCalendar(next = {}) {
+  window.FireAtlasAreaAvailability?.cancel(document.getElementById("area-availability"));
   const request = ++calendarRequest;
   const config = {...state, ...next};
   if (state.data && (config.year !== state.year || config.month !== state.month || config.series !== state.series || config.bbox !== state.bbox)) {
@@ -499,7 +498,7 @@ function initMap() {
     attribution: "&copy; OpenStreetMap contributors", maxZoom: 18, className: "atlas-basemap",
   }).addTo(map);
   markers = L.layerGroup().addTo(map);
-  map.on("moveend", () => { if (state.data) updateMap(); });
+  map.on("moveend", () => { window.FireAtlasAreaAvailability?.cancel(document.getElementById("area-availability")); if (state.data) updateMap(); });
   map.on("zoomend moveend", renderReplayAnnotations);
   drawAoi(false);
 }
@@ -805,6 +804,7 @@ FireAtlasOnReady(async () => {
       await loadCalendar(next); drawAoi(true);
     } catch (error) { toast(error.message); }
   });
+  $("#area-available-data").addEventListener("click", () => { if (map) window.FireAtlasAreaAvailability.show(document.getElementById('area-availability'), {bbox:mapViewport(),year:state.year,region:FireAtlasContext.read().region,staticMode:false}); });
   $("#use-map-aoi").addEventListener("click", () => {
     if (!map) return;
     $("#bbox").value = mapViewport();
@@ -885,7 +885,8 @@ FireAtlasOnReady(async () => {
 
 FireAtlasOnReady(()=>window.FireAtlasViews?.register('atlas',{
   capabilities:['study bounds','daily observations','NASA context','calendar'],
-  context:()=>({year:state.year,month:state.month+1,bbox:state.bbox,series:state.series,day:state.day||'',layer:contextChoice}),
+  context:()=>FireAtlasContext.toAssistantContext(FireAtlasContext.read()),
+  describeView:()=>{if(!state.data)throw Error('Wait for the selected calendar.');return {kind:'calendar',operation:'calendar',metric:'observed occupied 1 km cell-days',calculation_contract:'fireatlas-raw-calendar-v1',caption:'Observed daily activity · '+state.year+'-'+String(state.month+1).padStart(2,'0')+' UTC · '+state.series};},
   state:()=>({ready:Boolean(state.data),visible_points:replayFeatures.length,totals_basis:'calendar calculation; displayed points are sampled'}),
   apply:async cfg=>{stopMapPlayback();contextChoice=cfg.layer||'ndvi';await loadCalendar({year:cfg.year,month:cfg.month-1,bbox:cfg.bbox.join(','),series:cfg.series,day:cfg.day||''});drawAoi(true);updateContextLayer();if(cfg.day)await loadDay(cfg.day);}
 }));

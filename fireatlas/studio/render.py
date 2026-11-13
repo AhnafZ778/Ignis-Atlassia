@@ -176,8 +176,7 @@ class RenderManager:
             raise Unavailable("Video rendering is unavailable: " + state["reason"] + " Story editing and static export remain available.", code="video-unavailable")
         engine = state.get('engine', 'local')
         if engine == 'aiand-native-video':
-            from .aiand_video import verify_access
-            verify_access()
+            raise Unavailable('Generative footage is retired from scientific presentations. Use a deterministic renderer.', code='video-unavailable')
         blocking = [w for w in resolved["warnings"] if w["problem"] in ("evidence-unfrozen", "card-missing", "checked-field-unavailable", "scene-context")]
         if blocking:
             raise StudioError("Resolve the story's evidence before rendering: " + blocking[0]["message"], code="story-not-ready", details={"warnings": blocking})
@@ -324,6 +323,8 @@ class RenderManager:
                 if len(dumps(public).encode()) > INPUT_LIMIT:
                     raise StudioError('Prepared scene inputs exceed 32 MB. Reduce visible imagery or chapters.', code='render-limit')
                 options = json.loads((job_dir / "options.json").read_text())
+                if options.get("engine") == "aiand-native-video":
+                    raise StudioError("Generative footage is retired; choose a deterministic evidence renderer.", code="video-unavailable")
                 capability = self.narration_capability() if options.get("narration_requested") else {"available": False, "reason": "The author chose a captioned video without AI narration."}
                 if capability.get('provider') != 'piper' and self.synthesize is None and self.synthesize_factory is None:
                     capability = {"available": False, "reason": "The existing assistant speech runtime is unavailable. Captions remain complete."}
@@ -365,8 +366,7 @@ class RenderManager:
                 progress.storage = self.storage.check
                 native = options.get('engine') == 'aiand-native-video'
                 if native:
-                    from .aiand_video import run
-                    video = run(job_dir, progress, cancel, self.store.root/'aiand-video-cache')
+                    raise ValueError('Generative scientific footage has been retired. Re-export this story with a deterministic renderer.')
                 else:
                     video = self.runner(job_dir, progress, cancel)
                 if cancel.is_set() or video is None:

@@ -1,0 +1,32 @@
+{
+  "candidate": "Arithmetic mean of VIIRS counts in 64 nearest earlier training dates, ordered deterministically by squared Euclidean distance over log1p MODIS, one-quarter log1p Terra, one-quarter log1p Aqua, and annual sine/cosine; chronological date breaks ties. The fraction of positive training references is a descriptive occurrence probability.",
+  "gates": {
+    "maximum_seasonal_wape_degradation": 0.1,
+    "minimum_coverage": 0.85,
+    "minimum_log_error_improvement": 0.1,
+    "minimum_zero_recovery_improvement": 0.1
+  },
+  "gates_scope": "Apply prior daily proposed screening thresholds to the candidate against identity, annual/monthly ratio and hurdle baselines on the same supported test dates and calibration strata; WAPE and interval score no worse. Report hybrids separately. These gates require independent protocol approval for scientific qualification, and this retrospective proposal has no admission path.",
+  "id": "daily-neighbors-v1.0.0",
+  "inputs": "Prediction-time MODIS occupied cell count, Terra/Aqua counts and calendar day; reference VIIRS enters only training values, interval calibration or held-out scoring.",
+  "interval": "Per-model nominal 90% absolute log1p calibration residual intervals, separate MODIS zero and positive strata. Coverage is empirical under temporal dependence.",
+  "limitations": "Fixed region and exact cohorts only; no validated observation opportunity, fire truth, synthetic locations or unobserved hourly progression. Estimates remain unavailable as a released product.",
+  "minimum_calibration_per_stratum": 30,
+  "neighbors": 64,
+  "occurrence": "Report five held-out probability bins and the overall Brier score for observed positive VIIRS activity; empty bins are null. No occurrence-calibration threshold is asserted.",
+  "partition": "Identical to daily-hybrid-v1.0.0: training before Y-2, calibration Y-2 and Y-1, held-out test Y, with exact complete-export cohort support and quarter/stratum gates.",
+  "purpose": "Compare a fixed similar-day expected-count model against the existing daily identity, ratio, hurdle and hybrid experiments. Earlier results have been inspected: all available dates are retrospective development evidence, never blind confirmation.",
+  "schema": "fireatlas-research-protocol-v1",
+  "source_sha256": {
+    "fireatlas/calibration.py": "6548fc9525500d47fb9cbcf5a4a8c01f615de41e41864eab3db339dc8640ee96",
+    "fireatlas/comparability.py": "a19238e045f9d3169ebc25af5ad87e0cc30ccf00c2be966134b894c3adf6c41a",
+    "fireatlas/comparability_v2.py": "943ac08934913540a8a06bcefb7bfb6c7302581b50dd5422bf73f96cfcbe798b",
+    "fireatlas/daily_estimates.py": "6e90df67eb06a91412517556e7ac776a4453ffc54731bbed6484f0a8a164c90b",
+    "fireatlas/daily_hybrid_experiment.py": "cea7a1ede5eb70bf5f62a840f95c327a47e8f4dc9b8bef0073e785b803a80b21",
+    "fireatlas/daily_neighbors_experiment.py": "1fbe59ce68280973d7a124695f0890cef890301edf7540668c26835ce0bdc772",
+    "fireatlas/protocols/ai-daily-hybrid-v1.0.0.json": "60c1526d69ac86b8e6d4427cce72f95b37f4a85a8280e556a86c9496708a328c",
+    "fireatlas/protocols/daily-hybrid-v1.0.0.json": "e506070e59f84126cd11f16333c9f55f17740d0eaac7de2df131209e8adbf986",
+    "fireatlas/qualification.py": "70e3f328a5b3b92822d318187ed1cfb71ae5a1aa9eab0cafc111ee034cd3e824"
+  },
+  "state": "frozen-exploratory-proposal-not-human-approved"
+}

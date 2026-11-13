@@ -1,0 +1,140 @@
+/* Render frozen Python evidence; no fitted arithmetic is delegated to the browser. */
+FireAtlasPanels.define("comparability", ({document,window,fetch,setTimeout}) => {
+const $=id=>document.getElementById(id),NS="http://www.w3.org/2000/svg",staticMode=!!document.querySelector('meta[name="fireatlas-static-data"]'),params=new URLSearchParams(location.search),monthly=!!$("compare-region"),native=!!$("native-case-select");
+const query=k=>params.get(({region:"cmp_region",protocol:"cmp_protocol",year:"cmp_year",switch:"cmp_switch",mode:"cmp_mode",case:"native_case",threshold:"native_threshold"})[k]);
+let bundle,evidence,rematching,mode="adjusted",serial=0,caseSerial=0;
+const originalDocuments=new WeakMap();
+const n=(v,d=1)=>v===null||v===undefined?"—":Number(v).toLocaleString("en",{maximumFractionDigits:d});
+const pct=v=>v===null||v===undefined?"—":n(v*100)+"%";
+const mon=m=>new Intl.DateTimeFormat("en",{month:"short",timeZone:"UTC"}).format(new Date(Date.UTC(2025,m-1,1)));
+function text(id,v){$(id).textContent=v;}
+function table(id,caption,heads,rows){
+ const t=document.createElement("table"),c=document.createElement("caption");c.textContent=caption;t.append(c);
+ const h=document.createElement("thead"),tr=document.createElement("tr");heads.forEach(v=>{const x=document.createElement("th");x.scope="col";x.textContent=v;tr.append(x);});h.append(tr);t.append(h);
+ const b=document.createElement("tbody");rows.forEach(row=>{const r=document.createElement("tr");row.forEach(v=>{const td=document.createElement("td");td.textContent=v??"—";r.append(td);});b.append(r);});t.append(b);$(id).replaceChildren(t);
+}
+function cards(id,rows){$(id).replaceChildren(...rows.map(([label,value,note])=>{const a=document.createElement("article"),t=document.createElement("span"),v=document.createElement("strong"),s=document.createElement("small");t.textContent=label;v.textContent=value;s.textContent=note;a.append(t,v,s);return a;}));}
+function el(parent,tag,attrs,content){const x=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>x.setAttribute(k,String(v)));if(content!==undefined)x.textContent=content;parent.append(x);return x;}
+async function get(url){const r=await fetch(new URL(url,document.baseURI),{signal:AbortSignal.timeout(45000)}),raw=await r.text();let value;try{value=JSON.parse(raw);}catch(_){throw Error("Evidence response is not valid JSON ("+r.status+").");}if(!r.ok)throw Error(value?.error||"Evidence unavailable ("+r.status+").");if(value&&typeof value==='object')originalDocuments.set(value,raw);return value;}
+function save(value,name){const raw=originalDocuments.get(value);if(raw===undefined)throw Error("Original evidence bytes unavailable; reload this comparison before downloading.");const url=URL.createObjectURL(new Blob([raw],{type:"application/json"})),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function share(){const u=new URL(location.href);if(monthly){for(const [key,value]of Object.entries({cmp_region:$("compare-region").value,cmp_protocol:$("compare-protocol").value,cmp_year:$("compare-year").value,cmp_switch:$("compare-switch").value,cmp_mode:mode}))u.searchParams.set(key,value);}if(native){u.searchParams.set("native_case",$("native-case-select").value);u.searchParams.set("native_threshold",$("native-threshold").value);}history.replaceState(null,"",u);window.FireAtlasContext.apply();}
+
+function registerMonthlyCapture(){
+ const views=window.FireAtlasViews;if(!views)return;
+ views.register('research',{
+  capabilities:['monthly sensor comparison'],
+  state:()=>({ready:!!bundle&&!!experiment()}),
+  context:()=>{const c=window.FireAtlasContext.read(),r=bundle.result.region,year=Number(experiment().year);return {...c,region:r.id,bbox:r.bbox,case:'',year,month:1,start:`${year}-01-01`,end:`${year}-12-31`,as_of:`${year}-12-31`,day:''};},
+  describeView:()=>{const item=experiment();if(!bundle||!item)throw Error('Choose a loaded monthly comparison first.');return {kind:'chart',operation:'comparability',metric:'monthly occupied 1 km centroid cell-days',calculation_contract:bundle.result.method_version,caption:`${bundle.result.region.name} · ${item.year} · ${$('compare-protocol').value} · ${mode} handoff in ${mon(item.switch_month)} · monthly MODIS estimate and observed VIIRS; error metrics cover all test years · result ${bundle.result.result_sha256}`,arguments:{expected_result_sha256:bundle.result.result_sha256,comparison_protocol:$('compare-protocol').value,comparison_year:String(item.year),comparison_switch:String(item.switch_month),comparison_mode:mode}};},
+  capture:async()=>{const svg=$('compare-chart');if(!svg?.children.length)throw Error('The monthly chart is unavailable.');const image=new Image(),data=new XMLSerializer().serializeToString(svg);image.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(data)));await image.decode();const canvas=document.createElement('canvas');canvas.width=900;canvas.height=350;const context=canvas.getContext('2d');context.fillStyle='#fff';context.fillRect(0,0,900,350);context.drawImage(image,0,0);return {data:canvas.toDataURL('image/png').split(',')[1],mime:'image/png',caption:'Monthly sensor comparison · '+bundle.result.result_sha256};}
+ });
+}
+function experiment(){return bundle?.result.experiments[[$("compare-protocol").value,$("compare-year").value,$("compare-switch").value].join("/")];}
+function setSwitch(preferred){const prefix=[$("compare-protocol").value,$("compare-year").value].join("/")+"/",months=Object.keys(bundle.result.experiments).filter(k=>k.startsWith(prefix)).map(k=>Number(k.split("/")[2])).sort((a,b)=>a-b);$("compare-switch").replaceChildren(...months.map(m=>new Option(mon(m),String(m))));if(months.includes(Number(preferred)))$("compare-switch").value=String(preferred);}
+function setYears(preferred){const r=bundle.result,p=$("compare-protocol").value,years=[...new Set(Object.keys(r.experiments).filter(k=>k.startsWith(p+"/")).map(k=>k.split("/")[1]))].sort();$("compare-year").replaceChildren(...years.map(y=>new Option(y,y)));const want=String(preferred||r.default_experiment?.split("/")[1]||"");if(years.includes(want))$("compare-year").value=want;setSwitch(query("switch")||7);}
+function chart(item){
+ const svg=$("compare-chart");svg.replaceChildren();el(svg,"title",{id:"compare-svg-title"},"Held-out source switch, "+item.year);el(svg,"desc",{id:"compare-svg-desc"},"Observed VIIRS reference and selected raw or adjusted source handoff. Missing months break the line; exact values follow.");
+ const key=mode==="raw"?"raw_switch":"adjusted_switch",rows=item.rows,max=Math.max(1,...rows.flatMap(r=>[r.reference,r.raw_switch,r.adjusted_switch]))*1.12,x=m=>68+(m-1)*70,y=v=>292-v/max*250;
+ for(let i=0;i<=4;i++){const v=max*i/4;el(svg,"line",{x1:68,x2:852,y1:y(v),y2:y(v),stroke:"#d8e1e4"});el(svg,"text",{x:58,y:y(v)+4,fill:"#4d6575","font-size":12,"text-anchor":"end"},n(v,0));}
+ for(let m=1;m<=12;m++)el(svg,"text",{x:x(m),y:321,fill:"#4d6575","font-size":13,"text-anchor":"middle"},mon(m));
+ el(svg,"line",{x1:x(item.switch_month)-35,x2:x(item.switch_month)-35,y1:25,y2:292,stroke:"#a75500","stroke-dasharray":"5 5"});el(svg,"text",{x:x(item.switch_month)-30,y:18,fill:"#a75500","font-size":12},"VIIRS handoff");
+ [["reference","#2457d6","5 4"],[key,mode==="raw"?"#a75500":"#287446",null]].forEach(([field,color,dash])=>{let prev;rows.forEach(r=>{if(prev&&r.month===prev.month+1)el(svg,"line",{x1:x(prev.month),y1:y(prev[field]),x2:x(r.month),y2:y(r[field]),stroke:color,"stroke-width":2.5,...(dash?{"stroke-dasharray":dash}:{})});const c=el(svg,"circle",{cx:x(r.month),cy:y(r[field]),r:4,fill:color,tabindex:0});el(c,"title",{},r.date+" · "+field+" "+n(r[field],2));prev=r;});});
+}
+function mc(m){return[n(m.n_months,0),n(m.median_absolute_log_error,3),pct(m.median_absolute_percentage_error_nonzero),pct(m.weighted_absolute_percentage_error),pct(m.relative_bias)];}
+function renderComparison(){
+ if(!bundle)return;const r=bundle.result,ev=r.evaluation[$("compare-protocol").value],item=experiment();
+ if(!item){text("compare-status","No held-out source-switch experiment is available. Evidence gates remain closed.");$("compare-results").hidden=true;share();return;}
+ $("compare-results").hidden=false;const forward=ev.protocol==="forward",names={annual_ratio:"pooled annual ratio",monthly_ratio:"month-specific ratio",no_harmonization:"identity (no adjustment)"};
+ text("compare-status","Comparison loaded · adjusted MODIS estimates and observed VIIRS reference.");
+ text("compare-scope",r.region.name+" · fixed bounds "+r.region.bbox.join(", ")+" · MODIS "+r.versions[0]+" / S-NPP "+r.versions[1]+" · "+r.eligibility.complete_matched_months+" complete matched months · latest imported standard observation "+(r.period.latest_imported_standard_utc||"unknown"));
+ text("compare-admission",(r.admission.monthly_comparison?"Monthly comparison meets the retrospective screening checks.":"Some monthly screening checks remain open.")+(forward&&!r.admission.forward_evidence_sufficient?" Forward evidence is insufficient: "+ev.folds.length+" year groups; "+r.admission.policy.minimum_forward_test_years+" required.":"")+"");
+ cards("compare-metrics",[
+ ["Raw monthly log error",n(ev.raw.median_absolute_log_error,3),ev.raw.n_months+" held-out months · lower is better"],
+ ["Adjusted monthly log error",n(ev.adjusted.median_absolute_log_error,3),pct(ev.relative_log_error_improvement)+" relative reduction in median log error"],
+ ["Residual monthly error",pct(ev.adjusted.median_absolute_percentage_error_nonzero),"Median absolute percentage error on nonzero VIIRS months"],
+ ["Held-out year groups",n(ev.folds.length,0),forward?"Earlier-year training only; short forward record":"Nested year holdout; training may include later years"]]);
+ text("compare-chart-title",item.year+" · counterfactual "+mon(item.switch_month)+" source handoff · monthly centroid cell-days");chart(item);
+ $("compare-line-legend").style.color=mode==="raw"?"#a75500":"#287446";text("compare-line-legend",mode==="raw"?"● Raw MODIS → VIIRS handoff":"● Adjusted MODIS → VIIRS handoff");
+ text("compare-training","Test year "+item.year+" excluded. Training years: "+item.rows[0].training_years.join(", ")+". Selected in training only: "+names[item.rows[0].model]+". "+(forward?"No future-year values enter this test.":"Retrospective evaluation can include later training years."));
+ text("compare-seam","Handoff mismatch relative to the observed VIIRS change: raw "+n(item.raw_seam_error)+" → adjusted "+n(item.adjusted_seam_error)+" cell-days. "+(item.adjusted_seam_error>item.raw_seam_error?"Adjustment worsens this particular handoff.":"This handoff improves; other months can still disagree."));
+ table("compare-values","Monthly chart values and source handoff.",["Month","Raw MODIS","Observed VIIRS","Held-out MODIS estimate","Factor","Raw handoff","Adjusted handoff"],item.rows.map(p=>[p.date,n(p.modis),n(p.reference),n(p.prediction,2),n(p.factor,4),n(p.raw_switch,2),n(p.adjusted_switch,2)]));
+ table("compare-diagnostics","Fixed candidates are references, not post-test selections. Selection optimizes monthly log error, not annual error.",["Evaluation","Months","Median log error","Nonzero median APE","Weighted APE","Relative bias"],[["Selected pipeline",...mc(ev.adjusted)],...Object.entries(ev.fixed_models).map(([k,m])=>[names[k],...mc(m)]),...Object.entries(ev.seasonal).map(([k,m])=>["Selected · "+k,...mc(m)])]);
+ const p=document.createElement("p");p.textContent="Full-year errors require all 12 complete months: "+(ev.complete_year_results.map(v=>v.year+" "+pct(v.absolute_percentage_error)).join("; ")||"none")+". Partial 2024 and 2026 are excluded.";$("compare-diagnostics").append(p);share();const mapSelection={id:r.region.id,name:r.region.name,bbox:r.region.bbox,year:Number(item.year)};window.FireAtlasComparisonMapSelection=mapSelection;window.dispatchEvent(new CustomEvent("fireatlas:comparison-map-selection",{detail:mapSelection}));window.dispatchEvent(new Event("fireatlas:selection-changed"));
+}
+function renderDays(){
+ if(!bundle)return;const days=bundle.inputs.days.filter(d=>d.date.startsWith($("coverage-month").value));
+ $("coverage-days").replaceChildren(...days.map(d=>{const sources=Object.entries(d.sources),gap=sources.some(([,s])=>s.processing_gap),complete=sources.every(([,s])=>s.verified_export&&s.cells!==null),b=document.createElement("button");b.type="button";b.className=gap?"gap":complete?"complete":"unknown";b.textContent=d.date.slice(8)+" · "+(gap?"gap":complete?"export":"unknown");b.setAttribute("aria-label",d.date+" UTC: "+(gap?"processing gap":complete?"complete exports; usable coverage unknown":"incomplete or unknown export"));b.addEventListener("click",()=>{$("coverage-days").querySelectorAll("button").forEach(el=>el.setAttribute("aria-pressed",String(el===b)));text("coverage-detail",d.date+" UTC · "+sources.map(([id,s])=>(id==="MODIS_SP"?"MODIS":"S-NPP")+": "+(s.processing_gap?"processing gap":s.verified_export?"complete export":"unverified or incomplete export")+"; "+(s.cells===null?"count unknown":n(s.cells,0)+" occupied cells")+"; version "+s.versions.join("/")).join(" · ")+". Clear-sky, no-pass and no-fire status: unknown.");});return b;}));
+ text("coverage-detail",$("coverage-month").value+" · select a UTC date. No daily harmonized values are inferred.");
+}
+function renderCoverage(){
+ const r=bundle.result,days=bundle.inputs.days,excluded=new Map(r.eligibility.excluded_months.map(m=>[m.month,m.reasons])),selected=new Set(r.evaluation.nested.rows.map(r=>r.date)),months=[...new Set(days.map(d=>d.date.slice(0,7)))];
+ text("compare-epochs",r.eligibility.version_cohorts.map(c=>"MODIS "+c.versions[0]+" / S-NPP "+c.versions[1]+": "+c.complete_months+" complete months ("+c.years.join(", ")+"); "+(c.transfer_to_selected_pair==="same-pair"?"selected pair":"collection transfer not established")).join(". ")+".");
+ const z=r.zero_recovery_limit,p=document.createElement("p");p.className="compare-warning";p.textContent=n(z.modis_zero_viirs_positive_days||0,0)+" of "+n(z.viirs_positive_days||0,0)+" VIIRS-positive eligible dates had zero MODIS cells. A multiplier cannot recover activity on these dates.";$("compare-epochs").append(p);
+ $("compare-months").replaceChildren(...months.map(m=>{const e=document.createElement("span");e.className="compare-month "+(selected.has(m)?"eligible":excluded.has(m)?"excluded":"other");e.textContent=m;e.title=selected.has(m)?"Eligible complete month":excluded.get(m)?.join("; ")||"Different version cohort; not pooled";return e;}));
+ $("coverage-month").replaceChildren(...months.map(m=>new Option(m,m)));if(months.includes("2024-07"))$("coverage-month").value="2024-07";renderDays();
+}
+async function loadComparison(){
+ const token=++serial,region=$("compare-region").value;bundle=null;window.FireAtlasComparisonMapSelection=null;window.dispatchEvent(new Event("fireatlas:comparison-map-pending"));window.dispatchEvent(new Event("fireatlas:selection-changed"));$("compare-results").hidden=true;$("compare-download").disabled=true;$("compare-retry").hidden=true;
+ ["compare-year","compare-switch","coverage-month"].forEach(id=>{$(id).replaceChildren();$(id).disabled=true;});
+ text("coverage-detail","Source states are loading; no previous region values are displayed.");text("compare-method","Loading the selected region’s method and evidence…");text("compare-hash","");
+ ["compare-months","coverage-days","compare-epochs","compare-inventory","compare-limits"].forEach(id=>$(id).replaceChildren());text("compare-status","Loading complete months and held-out experiments…");
+ try{const v=await get(staticMode?"./data/comparability/"+region+".json":"./api/comparability?region="+region);if(token!==serial)return;if(v.schema!=="fireatlas-comparability-bundle-v1"||v.result?.region?.id!==region||v.result?.schema!=="fireatlas-monthly-comparability-v1")throw Error("Incompatible or wrong-region evidence; refusing to display it.");bundle=v;["compare-year","compare-switch","coverage-month"].forEach(id=>$(id).disabled=false);setYears(query("year")||window.FireAtlasContext.read().year);renderComparison();renderCoverage();text("compare-method",v.result.method_version+" · "+v.result.grid+". "+v.result.eligibility.rule);text("compare-hash","Result SHA-256: "+v.result.result_sha256+" · input SHA-256: "+v.result.input_sha256);$("compare-limits").replaceChildren(...v.result.limitations.map(l=>{const li=document.createElement("li");li.textContent=l;return li;}));table("compare-inventory",v.result.diagnostics.note,["Source","Platform","Day/night","Version","Imported rows"],v.result.diagnostics.platform_daynight_inventory.map(r=>[r.source_id,r.platform,r.daynight,r.product_version,n(r.imported_rows,0)]));$("compare-download").disabled=false;registerMonthlyCapture();}catch(e){if(token!==serial)return;$("compare-retry").hidden=false;text("coverage-detail","Source states unavailable for the selected region.");text("compare-status",e.message);text("compare-method","Comparison unavailable. No fitted values are substituted.");text("compare-hash","");}
+}
+function renderGranule(){const g=evidence?.granules[Number($("native-granule").value)];if(g)text("native-granule-detail",g.product+" · "+g.start_utc+" → "+g.end_utc+" UTC · "+g.status+". SHA-256 "+g.file_sha256+". Other intervals remain unknown.");}
+function renderAcquisition(){
+ const index=Number($("native-acquisition").value),g=evidence?.acquisitions[index];if(!g)return;
+ $("acquisition-prev").disabled=index===0;$("acquisition-next").disabled=index===evidence.acquisitions.length-1;
+ const next=evidence.acquisitions[index+1],gap=next?(Date.parse(next.acquisition_utc)-Date.parse(g.acquisition_utc))/3600000:null;
+ text("native-acquisition-detail",g.acquisition_utc+" · "+g.platform+" · version "+g.product_version+" · "+g.rows+" rows / "+g.occupied_cells+" occupied cells. Sampled FRP sum "+n(g.sampled_frp_sum_mw)+" MW in "+g.frp_rows+" valid rows ("+g.frp_missing_rows+" missing). "+(gap===null?"Last listed acquisition group.":n(gap,2)+" hours to the next listed acquisition group; this interval has no reconstructed activity.")+" FRP is not energy or hourly activity. Original records are in the parent ZIP.");
+ const svg=$("acquisition-map"),[w,s,e,north]=evidence.bbox;svg.replaceChildren();el(svg,"title",{},g.acquisition_utc+" · "+g.platform+" observed detection centroids");
+ el(svg,"rect",{x:35,y:20,width:490,height:300,fill:"#f3f6f7",stroke:"#9aaab2"});
+ for(let i=1;i<5;i++){el(svg,"line",{x1:35+i*98,x2:35+i*98,y1:20,y2:320,stroke:"#d8e1e4"});el(svg,"line",{x1:35,x2:525,y1:20+i*60,y2:20+i*60,stroke:"#d8e1e4"});}
+ g.points.forEach(p=>{const c=el(svg,"circle",{cx:35+(p.lon-w)/(e-w)*490,cy:20+(north-p.lat)/(north-s)*300,r:3,fill:g.source_id==="MODIS_SP"?"#a75500":"#006e86"});el(c,"title",{},p.lat+", "+p.lon+" · native confidence "+p.confidence_raw+" · FRP "+p.frp_raw+" MW · "+p.detection_id);});
+ el(svg,"text",{x:35,y:343,fill:"#4d6575","font-size":12},g.acquisition_utc+" · "+g.platform+" · observed centroids only");
+}
+function renderNative(){
+ if(!evidence)return;const limit=$("native-threshold").value,rematched=rematching?.thresholds?.[limit],m=rematched?.metrics||evidence.threshold_metrics[limit];
+ cards("native-metrics",[["Positive-pair overlap",pct(m.positive_jaccard),m.both_detected+" both / "+m.positive_union_pairs+" positive union pairs"],["Overall agreement",pct(m.overall_agreement),n(m.both_without_detection,0)+" pairs without a detection in either sensor"],["Usable sampled pairs",n(m.n_pairs,0),(rematched?"Recomputed ":"Legacy subset · ")+limit+" minute limit; dependent cell/pass samples"]]);
+ table("native-confusion","Descriptive cross-tabulation; neither sensor is ground truth.",["Sampled state","VIIRS detected","VIIRS without detection"],[["MODIS detected",m.both_detected,m.modis_only],["MODIS without detection",m.viirs_only,m.both_without_detection]]);
+ const review=evidence.review;text("native-review","Native review: "+review.reviewed+" / "+review.required+" samples reviewed. Same-product row reconciliation: "+evidence.reconciliation.matched+" / "+evidence.reconciliation.total_firms_pixels+".");
+ const pairs=rematched?.positive_pairs||evidence.positive_pairs.filter(p=>p.maximum_endpoint_gap_minutes<=Number(limit)),svg=$("native-map"),[w,s,e,north]=evidence.bbox;svg.replaceChildren();el(svg,"title",{},"Positive sampled pairs · "+evidence.title);el(svg,"rect",{x:35,y:20,width:490,height:300,fill:"#f3f6f7",stroke:"#9aaab2"});
+ for(let i=1;i<5;i++){el(svg,"line",{x1:35+i*98,x2:35+i*98,y1:20,y2:320,stroke:"#d8e1e4"});el(svg,"line",{x1:35,x2:525,y1:20+i*60,y2:20+i*60,stroke:"#d8e1e4"});}
+ pairs.forEach(p=>{const c=el(svg,"circle",{cx:35+(p.lon-w)/(e-w)*490,cy:20+(north-p.lat)/(north-s)*300,r:3,opacity:.7,fill:{both_detected:"#287446",modis_only:"#a75500",viirs_only:"#006e86"}[p.category]});el(c,"title",{},p.date_utc+" · "+p.category+" · cause undetermined · "+p.maximum_endpoint_gap_minutes+" minute separation");});
+ el(svg,"text",{x:35,y:343,fill:"#4d6575","font-size":12},w+"° to "+e+"° lon · "+s+"° to "+north+"° lat");
+ text("native-map-note",pairs.length+" positive cell/pass pairs over the case window. "+(rematched?"Independently rematched at this tolerance; "+rematched.group_uncertainty.independent_groups+" connected acquisition groups. ":"Legacy subset of the original 90-minute matching; new rematching unavailable. ")+"Symbols can overlap. These are not perimeters, extent or unique fires; unsampled cells are unknown.");
+ table("native-pairs","Positive pairs; causes are not inferred.",["UTC day","State","Grid X","Grid Y","Gap (min)","MODIS granule","VIIRS granule"],pairs.map(p=>[p.date_utc,p.category,p.grid_x,p.grid_y,n(p.maximum_endpoint_gap_minutes),p.modis_granule,p.viirs_granule]));share();
+}
+async function loadCase(){
+ const token=++caseSerial,id=$("native-case-select").value;evidence=null;rematching=null;for(const key of ["native-rematching-download","native-rematching-full","native-rematching-inputs"]){const link=$(key);link.hidden=true;link.removeAttribute("href");}text("native-rematching-status","");$("native-results").hidden=true;$("native-retry").hidden=true;text("native-status","Loading frozen native evidence…");
+ try{const v=await get(staticMode?"./data/comparability/cases/"+id+".json":"./api/comparability/case?case="+id);if(token!==caseSerial)return;if(v.schema!=="fireatlas-comparison-case-v1"||v.case_id!==id)throw Error("Incompatible native evidence.");evidence=v;
+ try{const a=await window.FireAtlasQualification.read('native-summary/'+id+'.json',fetch);if(token!==caseSerial)return;if(a.value.case_id!==id||a.value.schema!=='fireatlas-native-rematching-v2')throw Error('Wrong native rematching evidence.');rematching=a.value;const summary=$("native-rematching-download"),full=$("native-rematching-full"),inputs=$("native-rematching-inputs");summary.href=a.url;full.href=new URL("../native/"+id+".json.gz",a.url);inputs.href=new URL("../native-inputs/"+id+".json.gz",a.url);for(const link of [summary,full,inputs])link.hidden=false;text("native-rematching-status","Displayed matching: v2 independent rematching · release "+a.release_id+" · the summary, full pairs and input downloads belong to that release. The original v1 download is separate.");}catch(_){if(token!==caseSerial)return;rematching=null;text("native-rematching-status","Displayed matching: original v1 subsets; current v2 rematching is unavailable. Download the v1 diagnostics to reproduce these values.");}
+ if(token!==caseSerial)return;$("native-results").hidden=false;text("native-status",v.title+" · "+v.start_utc+" to "+v.end_utc+" UTC · bounds "+v.bbox.join(", "));$("native-granule").replaceChildren(...v.granules.map((g,i)=>new Option(g.start_utc+" · "+g.product+" · "+g.producer_id,String(i))));$("native-acquisition").replaceChildren(...v.acquisitions.map((g,i)=>new Option(g.acquisition_utc+" · "+g.platform+" · "+g.rows+" rows",String(i))));$("native-parent").href=staticMode?"./data/v2/validity/"+id+".zip":"./api/validity/export?case="+id;table("native-acquisitions","Exact groups. Intervals between acquisitions remain unobserved by the point record.",["UTC","Platform","Version","Rows","Occupied cells","FRP sum (MW)","FRP rows / total"],v.acquisitions.map(g=>[g.acquisition_utc,g.platform,g.product_version,n(g.rows,0),n(g.occupied_cells,0),n(g.sampled_frp_sum_mw),g.frp_rows+" / "+g.rows]));table("native-sensitivity","Grid/confidence sensitivity on the case observations. Counts change with cell size; these are not accuracy scores or interchangeable 1 km totals.",["Grid width (m)","Exclude native low confidence","Distinct cell-days on that grid","Retained raw rows"],v.grid_confidence_sensitivity.map(r=>[r.grid_metres,String(r.exclude_low_confidence),n(r.joint_detected_cell_days,0),n(r.retained_raw_pixels,0)]));if(rematching?.sampled_sensitivity)table("native-sensitivity","Native centroid class counts are reaggregated and independently rematched for each grid, confidence and tolerance setting; neither sensor supplies fire truth.",["Grid (m)","Exclude low confidence","Time limit (min)","Usable pairs","Positive Jaccard"],rematching.sampled_sensitivity.map(r=>[r.grid_metres,String(r.exclude_low_confidence),r.tolerance_minutes,n(r.metrics.n_pairs,0),pct(r.metrics.positive_jaccard)]));renderNative();renderGranule();renderAcquisition();}catch(e){if(token===caseSerial){text("native-status",e.message);$("native-retry").hidden=false;}}
+}
+if(monthly){
+ if(["raw","adjusted"].includes(query("mode")))mode=query("mode");
+ document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)));
+ const region=query("region")||window.FireAtlasContext.read().region;
+ if(["norcal","punjab-haryana"].includes(region))$("compare-region").value=region;
+ if(["nested","forward"].includes(query("protocol")))$("compare-protocol").value=query("protocol");
+ $("compare-retry").addEventListener("click",loadComparison);$("compare-region").addEventListener("change",loadComparison);
+ $("compare-protocol").addEventListener("change",()=>{if(bundle){setYears($("compare-year").value);renderComparison();}});
+ $("compare-year").addEventListener("change",()=>{if(bundle){setSwitch($("compare-switch").value);renderComparison();}});
+ $("compare-switch").addEventListener("change",renderComparison);
+ document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderComparison();}));
+ $("coverage-month").addEventListener("change",renderDays);
+ $("compare-download").addEventListener("click",()=>{if(bundle)save(bundle,"comparison.json");});
+ loadComparison();
+}
+if(native){
+ const id=query("case")||window.FireAtlasContext.read().case;
+ if(["park-2024","grove-2025"].includes(id))$("native-case-select").value=id;
+ if(["30","60","90"].includes(query("threshold")))$("native-threshold").value=query("threshold");
+ $("native-retry").addEventListener("click",loadCase);
+ $("native-case-select").addEventListener("change",()=>{loadCase();window.dispatchEvent(new CustomEvent('fireatlas:select-validity-case',{detail:{id:$("native-case-select").value}}));});
+ window.addEventListener('fireatlas:validity-report',e=>{const id=e.detail.case_id||e.detail.id;if(["park-2024","grove-2025"].includes(id)&&id!==$("native-case-select").value){$("native-case-select").value=id;loadCase();}});
+ $("native-threshold").addEventListener("change",renderNative);$("native-granule").addEventListener("change",renderGranule);$("native-acquisition").addEventListener("change",renderAcquisition);
+ $("acquisition-prev").addEventListener("click",()=>{$("native-acquisition").selectedIndex--;renderAcquisition();});
+ $("acquisition-next").addEventListener("click",()=>{$("native-acquisition").selectedIndex++;renderAcquisition();});
+ $("native-download").addEventListener("click",()=>{if(evidence)save(evidence,evidence.case_id+"-diagnostics.json");});loadCase();
+}
+});

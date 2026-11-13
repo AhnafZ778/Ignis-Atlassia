@@ -44,7 +44,7 @@ function viewUrl() {
   // links that still open the overview page.
   const path = document.body?.dataset.page === "atlas" ? "/atlas.html" : "./";
   const url = new URL(FireAtlasContext.url(path));
-  url.search = FireAtlasContext.write({...viewConfig(),calendar_metric:"combined",start:`${state.year}-${String(state.month).padStart(2,"0")}-01`,end:FireAtlasContext.monthEnd(state.year,state.month)}); url.hash = "calendar-section";
+  url.search = FireAtlasContext.write({...viewConfig(),calendar_metric:"combined",start:`${state.year}-${String(state.month + 1).padStart(2,"0")}-01`,end:FireAtlasContext.monthEnd(state.year,state.month + 1)}); url.hash = "calendar-section";
   if (initialLiteEarth) url.searchParams.set("lite", "1");
   return url.href;
 }

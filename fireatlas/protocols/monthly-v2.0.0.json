@@ -1,0 +1,16 @@
+{
+ "schema":"fireatlas-research-protocol-v1", "id":"monthly-v2.0.0", "state":"frozen-proposal-awaiting-human-approval",
+ "target":"Observed S-NPP VIIRS equivalent monthly common-grid centroid cell-days, not fire truth",
+ "units":"VIIRS-equivalent centroid cell-days per complete UTC calendar month", "grid":"EPSG:6933 1000 m",
+ "regions":{"norcal":"primary qualification","punjab-haryana":"independent replication"},
+ "sources":["MODIS_SP","VIIRS_SNPP_SP"], "cohort":"Explicit exact source/product-version pair per regional experiment; never pooled or relabelled",
+ "eligibility":"Every UTC date has both request-verified exports, known totals, one exact product-version pair and no documented processing gaps",
+ "candidates":["no_harmonization","annual_ratio","monthly_ratio"],
+ "training_inputs":["eligible monthly MODIS and S-NPP counts","calendar month"],
+ "partition":{"outer":"chronological test year Y","calibration_years":"Y-2 and Y-1","training":"years strictly earlier than Y-2","nested_selection":"inner leave-one-training-year-out","forward_selection":"inner earlier-training-years-only; at least two earlier years","minimum_training_years":3,"minimum_training_months":36,"minimum_calibration_months":18,"minimum_test_groups":3,"minimum_test_months":8,"required_test_quarters":[1,2,3,4]},
+ "interval":{"nominal":0.9,"method":"symmetric absolute log1p residuals; finite-sample upper order statistic ceil((n+1)*0.9); clip lower count at zero","warning":"Empirical calibration, not guaranteed coverage under temporal dependence; baseline separately calibrated on same dates"},
+ "gates":{"minimum_log_error_improvement":0.1,"maximum_wape_ratio":1.0,"minimum_coverage":0.85,"maximum_interval_score_ratio":1.0,"applies_to":["nested","forward"],"authority":"proposed project gates; not NASA standards; approval required before fitting"},
+ "report":["median absolute log error","WAPE","signed and seasonal bias","zero and small-count subsets","all twelve complete-month annual errors only","raw and adjusted source-switch error","interval coverage,width,score","support and exclusion reasons"],
+ "claims_excluded":["ground-truth fire accuracy","burned area","continuous observation","daily reconstruction","historical collection transfer","operational forecasting","blind confirmation from previously inspected periods"],
+ "amendment":"Any methodological or gate change requires a new immutable protocol ID, new human approval and reevaluation. Previously inspected inputs remain retrospective."
+}

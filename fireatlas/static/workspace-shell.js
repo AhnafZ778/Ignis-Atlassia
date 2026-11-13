@@ -2,6 +2,7 @@
 (() => {
   'use strict';
   const C=FireAtlasContext,V=FireAtlasViews;
+  if(document.body?.dataset.page==='atlas'&&/harmonized-calendar|regional/.test(location.hash)){const target=new URL('./research.html?tab=comparison',location.href),region=new URL(location.href).searchParams.get('region');if(['norcal','punjab-haryana'].includes(region))target.searchParams.set('cmp_region',region);target.search=location.search;target.searchParams.set('tab','comparison');if(['norcal','punjab-haryana'].includes(region))target.searchParams.set('cmp_region',region);location.replace(target);return;}
   const allowed=new Set(['year','month','bbox','as_of','series','day','distance_km','gap_days','region','layer','case','start','end','source','metric','view','revision','mask_id','scale']);
   const originalContext=V.context;
   V.context=()=>Object.fromEntries(Object.entries(originalContext()).filter(([k,v])=>allowed.has(k)&&v!==''));
@@ -10,20 +11,21 @@
   const apply=V.apply;
   V.apply=async action=>{const route=V.destinations[action.destination],target=new URL(route?.[0]||'./',location.href),tab=target.searchParams.get('tab');if(target.pathname===location.pathname&&tab&&window.FireAtlasPanels)await FireAtlasPanels.select(tab,{history:'push'});return apply(action);};
   window.FireAtlasOnReady=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn):queueMicrotask(fn);
-  if(document.body?.dataset.page==='atlas'&&!location.hash)history.replaceState(null,'',location.pathname+location.search+(C.read().calendar_metric==='combined'?'#atlas-section':'#harmonized-calendar'));
-  if(document.body?.dataset.page==='atlas'&&/atlas-section|calendar-section|study-workspace/.test(location.hash))C.update({calendar_metric:'combined'},{reason:'incoming-metric'});
+  if(document.body?.dataset.page==='atlas'&&!location.hash)history.replaceState(null,'',location.pathname+location.search+('#atlas-section'));
+  if(document.body?.dataset.page==='atlas')C.update({calendar_metric:'combined'},{reason:'incoming-metric'});
   let generic;
   function loadScript(name){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=C.url(name);s.onload=resolve;s.onerror=()=>reject(Error('Unable to load '+name));document.head.append(s);});}
-  async function combined(){if(!generic)generic=(async()=>{if(document.querySelector('meta[name="fireatlas-static-data"]')){await loadScript('combined-static.js');return;}await loadScript('study-ui.js');await loadScript('app.js');})();await generic;}
+  async function combined(){if(!generic)generic=(async()=>{if(document.querySelector('meta[name="fireatlas-static-data"]')){await loadScript('explore-static.js?v=20261101-maps4');return;}await loadScript('study-ui.js?v=20261101-simple');await loadScript('app.js?v=20261101-maps5');})();await generic;}
   function heading(){const c=C.read(),n=document.getElementById('workspace-selection');if(n)n.textContent=`${c.case||c.region||'Custom area'} · ${c.start} → ${c.end} UTC · ${c.bbox}`;}
   FireAtlasOnReady(()=>{
     heading();
+    if(document.body.dataset.page==='assistant' && location.hash==='#inspect-selection'){document.body.classList.add('inspection-mode');const back=document.getElementById('return-to-explore');if(back)back.hidden=false;const title=document.querySelector('.mission-heading h1');if(title)title.textContent='Inspect your selection.';}
     if(document.body.dataset.workspace==='research'&&!C.read().errors.length){
-      const c=C.read(),label=document.createElement('label');label.textContent='Research UTC month intersection ';const select=document.createElement('select');select.setAttribute('aria-label','Research UTC month intersection');const choice=document.createElement('option');choice.value='';choice.textContent='Choose a month';select.append(choice);const date=new Date(c.start+'T00:00:00Z');date.setUTCDate(1);while(date.toISOString().slice(0,7)<=c.end.slice(0,7)){const ym=date.toISOString().slice(0,7);select.add(new Option(ym,ym));date.setUTCMonth(date.getUTCMonth()+1);}select.value=c.analysis_month||(c.start.slice(0,7)===c.end.slice(0,7)?c.start.slice(0,7):'');select.addEventListener('change',()=>{if(!select.value)return;C.update({analysis_month:select.value},{history:'push'});FireAtlasPanels.select(new URLSearchParams(location.search).get('tab')||'comparison');});label.append(select);document.querySelector('.workspace-heading').append(label);
+      const c=C.read(),label=document.createElement('label');label.dataset.researchIntersection='';label.textContent='Research UTC month intersection ';const select=document.createElement('select');select.setAttribute('aria-label','Research UTC month intersection');const choice=document.createElement('option');choice.value='';choice.textContent='Choose a month';select.append(choice);const date=new Date(c.start+'T00:00:00Z');date.setUTCDate(1);while(date.toISOString().slice(0,7)<=c.end.slice(0,7)){const ym=date.toISOString().slice(0,7);select.add(new Option(ym,ym));date.setUTCMonth(date.getUTCMonth()+1);}select.value=c.analysis_month||(c.start.slice(0,7)===c.end.slice(0,7)?c.start.slice(0,7):'');select.addEventListener('change',()=>{if(!select.value)return;C.update({analysis_month:select.value},{history:'push'});FireAtlasPanels.select(new URLSearchParams(location.search).get('tab')||'comparison');});label.append(select);document.querySelector('.workspace-heading').append(label);
     }
 
     document.querySelectorAll('[data-atlas-scope]').forEach(b=>b.addEventListener('click',()=>{C.update({calendar_metric:b.dataset.atlasScope==='regional'?'harmonized':'combined'},{history:'push'});if(b.dataset.atlasScope==='study')combined();}));
-    if(document.body.dataset.page==='atlas'&&/atlas-section|calendar-section|study-workspace/.test(location.hash))combined();
+    if(document.body.dataset.page==='atlas')combined();
     document.querySelectorAll('[data-guide-step]').forEach(b=>b.href=C.link(b.getAttribute('href'),{guide:'authentic',...JSON.parse(b.dataset.guideStep)}));
     document.getElementById('workspace-open-jarvis')?.addEventListener('click',()=>{document.body.classList.toggle('jarvis-open');const n=document.getElementById('workspace-open-jarvis');n.setAttribute('aria-expanded',String(document.body.classList.contains('jarvis-open')));if(document.body.classList.contains('jarvis-open'))document.getElementById('assistant-question')?.focus();});
     document.getElementById('workspace-notebook')?.addEventListener('click',()=>{document.body.classList.toggle('notebook-expanded');document.body.classList.add('jarvis-open');document.getElementById('workspace-open-jarvis')?.setAttribute('aria-expanded','true');});

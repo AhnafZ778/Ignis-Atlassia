@@ -14,6 +14,7 @@ PRESETS = [
     {'id':'curated-current', 'title':'Present this study', 'prompt':'Create a comprehensive presentation on Canvas from this study, with paired sensor heat maps, daily charts, an availability timeline, checked findings, original records, connected groups, an editable story and a runnable workflow.', 'recipe':'visualization_to_investigation', 'arguments':{'layout':'curated'}},
     *[{'id':'curated-'+case, 'title':title+' presentation', 'prompt':f'Create a curated {title} presentation on Canvas with paired heat maps, charts, evidence, an editable story and a runnable workflow.', 'recipe':'visualization_to_investigation', 'arguments':{'layout':'curated'}, 'case':case}
       for case,title in [('park-2024','Park Fire 2024'),('camp-2018','Camp Fire 2018'),('grove-2025','Grove Fire 2025')]],
+    {'id':'save-current', 'title':'Save this view', 'prompt':'Save this study on Canvas.', 'recipe':'visualization_to_investigation', 'arguments':{'layout':'minimal'}},
     {'id':'checked-charts', 'title':'Add checked charts', 'prompt':'Add the supported daily activity charts and availability timeline from this study to Canvas.', 'recipe':'selection_to_chart_set', 'arguments':{}},
     {'id':'source-states', 'title':'Check observation gaps', 'prompt':'Check the source export states and processing gaps for this study.', 'operation':'missingness'},
     {'id':'source-rows', 'title':'Inspect original records', 'prompt':'Inspect the original satellite records for this study.', 'operation':'observations'},

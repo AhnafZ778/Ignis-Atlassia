@@ -11,11 +11,17 @@ from ..core import SERIES, validate_bbox
 from ..replay import CASES
 
 METHODS = {
+    "similar_patterns": {"id":"fireatlas-imported-profile-candidates-v1","unit":"imported thermal records; descriptive profile distance","filter":"Same-sensor equal-length positive-record date windows in the listed imported regions. Normalized daily shares rank descriptive candidates only; missing record dates excluded, not zero-filled. No physical or causal similarity admission."},
+    "environment_context": {"id":"fireatlas-environment-published-context-v1","unit":"measured NDVI and elevation (m)","filter":"Hash-verified published Park pre-window NDVI and elevation grid; four-day MODIS outcomes remain separate. Context, not causal attribution."},
+    "park_platforms": {"id":"fireatlas-park-published-platforms-v1","unit":"recorded detections","filter":"Published Park July 25–28 counts and source states with original replay and NOAA publication hashes. Source-specific, not harmonized."},
+    "environment_analogues": {"id":"fireatlas-environment-spatial-analogues-v1","unit":"reported units vary; see individual values","filter":"Same-date Park spatial matches using pre-window median NDVI and elevation; MODIS observations reported separately."},
+    "finding_comparison": {"id": "fireatlas-finding-comparison-v1", "unit": "occupied 1 km centroid cell-days", "filter": "Two same-calendar-month forward-evaluation results from the published comparison; observed and adjusted series stay distinct."},
     "archive_search": {"id": "assistant-historical-window-search-v1", "unit": "imported records", "filter": "Authentic standard MODIS and VIIRS S-NPP rows inside the requested bbox and explicit year range. Monthly windows are retrieval shortcuts, not confirmed incidents. Counts precede replay eligibility and alias deduplication."},
     "observations": {"id": "assistant-original-records-v1", "unit": "imported records", "filter": "Authentic batches; requested sources; UTC acquisition interval; inclusive bbox. No replay deduplication."},
     "replay": {"id": "fireatlas-observation-replay-v1", "unit": "observed cell-days", "filter": "Standard MODIS/S-NPP; vegetation type 0 or missing; alias-aware exact-repeat deduplication."},
     "research": {"id": "fireatlas-research-v1", "unit": "cell-days", "filter": "Existing research eligibility; source/cell/UTC-date union. Research filtering differs from replay."},
     "calendar": {"id": "fireatlas-raw-calendar-v1", "unit": "observed cell-days", "filter": "Existing calendar eligibility. Official incomplete totals withheld; partial imported values separate."},
+    "comparability": {"id": "complete-month-nested-and-past-only-v1", "unit": "monthly occupied 1 km centroid cell-days", "filter": "Complete request-verified source months, no processing-gap dates, one MODIS/S-NPP version pair. Retrospective and past-only held-out predictions; daily substitution and historical transfer withheld."},
     "harmonized": {"id": "fireatlas-calendar-v2", "unit": "VIIRS-equivalent cell-days", "filter": "Version-matched regional calibration; observed/scaled/mixed/unknown states preserved."},
     "availability": {"id": "assistant-source-inventory-v1", "unit": "imported records", "filter": "Authentic batches only; catalog counts do not establish complete export coverage."},
     "validation": {"id": "fireatlas-validity-v1", "unit": "evidence gates", "filter": "Existing native-mask and independent-reference requirements; no assistant signoff."},

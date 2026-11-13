@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'No packages required for the entry page'",
+  "buildCommand": "node scripts/build_vercel.mjs",
+  "outputDirectory": "deployment/vercel-dist",
+  "rewrites": [{"source": "/:path*", "destination": "/index.html"}],
+  "headers": [{"source": "/:path*", "headers": [{"key": "Cache-Control", "value": "no-store"}, {"key": "Referrer-Policy", "value": "no-referrer"}]}]
+}

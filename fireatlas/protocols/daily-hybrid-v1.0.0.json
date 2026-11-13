@@ -1,0 +1,64 @@
+{
+  "schema": "fireatlas-research-protocol-v1",
+  "id": "daily-hybrid-v1.0.0",
+  "state": "frozen-exploratory-proposal-not-human-approved",
+  "purpose": "Compare the previous hurdle and fixed ratio baselines against fixed hybrids which use hurdle expected counts only when MODIS is zero and use the annual or monthly ratio otherwise. This proposal follows inspection of the old daily results: all available dates are retrospective development evidence, never blind confirmation.",
+  "target": "Observed S-NPP daily occupied common-grid centroid cell-days for a fixed region and exact standard-product cohort; model values are estimates, not fires or detection locations.",
+  "inputs": "Same daily eligibility and prediction-time MODIS, Terra, Aqua and seasonal features as daily-v2.0.5; no target-date VIIRS values used in fitting or prediction.",
+  "baselines": [
+    "no_harmonization",
+    "annual_ratio",
+    "monthly_ratio",
+    "hurdle_poisson"
+  ],
+  "candidates": [
+    "zero_hurdle_annual",
+    "zero_hurdle_monthly"
+  ],
+  "models": "Fit the frozen v2 Poisson hurdle and annual/month ratios on training dates only. Fixed candidate switches to hurdle on zero MODIS days and otherwise uses the named ratio; no test-period selection. Baselines and candidates share dates and stratified calibration.",
+  "partition": {
+    "outer": "chronological test year Y",
+    "calibration_years": "Y-2 and Y-1",
+    "training": "years before Y-2",
+    "minimum_training_years": 3,
+    "minimum_training_days": 730,
+    "minimum_calibration_days": 365,
+    "minimum_test_groups": 3,
+    "minimum_test_days": 180,
+    "required_test_quarters": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "minimum_zero_recovery_test_days": 30,
+    "required_calibration_quarters": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "minimum_calibration_per_stratum": 30
+  },
+  "interval": "Nominal 90% symmetric absolute log1p calibration errors stratified by prediction-time MODIS zero versus positive, separately for each model, using only the two calibration years. A stratum requires 30 dates or the whole fold is unavailable. Temporal dependence means coverage is empirical and not guaranteed.",
+  "gates": {
+    "minimum_log_error_improvement": 0.1,
+    "maximum_wape_ratio": 1.0,
+    "minimum_coverage": 0.85,
+    "maximum_interval_score_ratio": 1.0,
+    "minimum_zero_recovery_improvement": 0.1,
+    "maximum_seasonal_wape_degradation": 0.1,
+    "authority": "proposed project gates requiring human scientific approval before fitting"
+  },
+  "gates_scope": "Apply previous daily project thresholds to both fixed candidates against identity, annual and monthly ratio. Report hurdle separately: candidates exactly equal it on zero MODIS dates and cannot outperform it there. No best model selected from these inspected outcomes. Synthetic, AI-only and unreviewed results can never become qualified even if numerical checks pass.",
+  "support": "Report pooled, seasonal and zero-MODIS-positive-VIIRS metrics with exact counts; unsupported opportunity remains unknown. Comparison does not establish fire truth, platform-independent measurement or continuous observation.",
+  "human_review": "No independent scientific approval has been obtained. Any scientifically qualified evaluation requires prior independent protocol approval, genuinely prospective or properly disclosed validation, separate method review and its own admission path. This experimental software has no admission path.",
+  "source_sha256": {
+    "fireatlas/daily_hybrid_experiment.py": "cea7a1ede5eb70bf5f62a840f95c327a47e8f4dc9b8bef0073e785b803a80b21",
+    "fireatlas/daily_estimates.py": "6e90df67eb06a91412517556e7ac776a4453ffc54731bbed6484f0a8a164c90b",
+    "fireatlas/comparability_v2.py": "943ac08934913540a8a06bcefb7bfb6c7302581b50dd5422bf73f96cfcbe798b",
+    "fireatlas/comparability.py": "a19238e045f9d3169ebc25af5ad87e0cc30ccf00c2be966134b894c3adf6c41a",
+    "fireatlas/calibration.py": "6548fc9525500d47fb9cbcf5a4a8c01f615de41e41864eab3db339dc8640ee96",
+    "fireatlas/qualification.py": "70e3f328a5b3b92822d318187ed1cfb71ae5a1aa9eab0cafc111ee034cd3e824"
+  }
+}

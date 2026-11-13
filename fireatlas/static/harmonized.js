@@ -190,7 +190,7 @@
     $("#harm-mismatch-gap-bar")?.style.setProperty("--mismatch-size", `${Math.max(4, Math.round(48 * bridge.gaps / Math.max(bridge.days.length, 1)))}px`);
     set("#harm-bridge-note", bridge.pairedDays
       ? `${n(bridge.mismatch.both, 0)} common-grid cell-days were reported by both sensors; ${n(bridge.mismatch.modis + bridge.mismatch.viirs, 0)} were sensor-specific. Raw pixels are never added together.`
-      : "No paired clear export is available for this month; mismatch values stay unknown.");
+      : "No paired complete export is available for this month; mismatch values stay unknown.");
     const frpValue = (value) => value === null ? "unknown" : n(value, 1);
     set("#harm-frp-value", `${frpValue(bridge.frp.MODIS_SP)} / ${frpValue(bridge.frp.VIIRS_SNPP_SP)}`);
     set("#harm-frp-unit", "mean MW · paired UTC dates");
@@ -410,7 +410,7 @@
       ? `Start · 15-day peak center · end · ${yearSelect.value} UTC` : `${season.missing_days ?? "—"} unknown days; season dates withheld`;
     const calibration = current.meta.calibration_status;
     const model = current.meta.calibration_model;
-    $("#harm-model").textContent = model ? model.replaceAll("_", " ") : "Not validated";
+    $("#harm-model").textContent = model ? model.replaceAll("_", " ") : "Unavailable";
     const validation = current.meta.calibration_validation || {};
     const nested = validation.nested_selected_pipeline;
     const fixed = validation.models?.[model];

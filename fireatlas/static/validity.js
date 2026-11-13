@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   };
   const viewParams=new URLSearchParams(location.search);
   const liteEarth=viewParams.get('lite')==='1';
-  let caseId=['park-2024','grove-2025'].includes(viewParams.get('case'))?viewParams.get('case'):'park-2024',scene=captureFrame?'timeline':'sensors',selectedDate=null,report=null,request=0,maskSource='all';
+  let caseId=['park-2024','grove-2025'].includes((viewParams.get('native_case')||viewParams.get('case')))?(viewParams.get('native_case')||viewParams.get('case')):'park-2024',scene=captureFrame?'timeline':'sensors',selectedDate=null,report=null,request=0,maskSource='all';
   const cache=new Map();
   const mobile=()=>matchMedia('(max-width: 760px)').matches;
   const staticDataRoot=(document.querySelector('meta[name="fireatlas-static-evidence"]')||document.querySelector('meta[name="fireatlas-static-data"]'))?.content;
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function showMaskCell(cell){
     const detail=$('#validity-record-detail');detail.replaceChildren();
     const heading=document.createElement('strong');heading.textContent=`${sourceNames[cell.source_id]} · grid ${cell.grid_x}, ${cell.grid_y} · ${cell.state}`;detail.append(heading);
-    const counts=document.createElement('p');counts.textContent=`Native classes: ${Object.entries(cell.class_counts).map(([code,count])=>`${code}: ${count}`).join(' · ')}. Centroid sampling does not establish complete coverage of a cell.`;detail.append(counts);
+    const counts=document.createElement('p');counts.textContent=`Native classes: ${Object.entries(cell.class_counts).map(([code,count])=>`${code}: ${count}`).join(' · ')}. Centroid samples.`;detail.append(counts);
     for(const identifier of cell.granules){const p=document.createElement('p');p.textContent=identifier;detail.append(p);}
     $('#validity-inspect').open=true;
   }
@@ -251,14 +251,14 @@ document.addEventListener('DOMContentLoaded',()=>{
       const count=document.createElement('b');count.textContent=`${format(gate.actual)} / ${format(gate.required)}`;
       const state=document.createElement('small');state.textContent=`${gate.unit} · ${gate.status}${gate.target_fraction?' · target ≥98% of available rows':''}`;
       step.append(mark,name,count,state);
-      const explanations={inventory:'Required mask and geolocation inputs were processed.',reconciliation:'Available FIRMS rows are matched to native fire samples. This does not measure source completeness.',samples:'A reviewer must check native classes, coordinates and grid assignments.',review:'An independent reviewer must record a signed interpretation.'};
+      const explanations={inventory:'Check mask and geolocation inputs.',reconciliation:'Match available FIRMS rows to native fire samples.',samples:'Review native classes, coordinates and grid assignments.',review:'Record the interpretation review.'};
       const explanation=document.createElement('p');explanation.textContent=explanations[gate.id]||'Recorded check for this evidence scope.';step.append(explanation);path.append(step);
     }
     target.append(path);
     const masks=report.native_masks;
     const summary=document.createElement('p');summary.textContent=masks?.processed_fire_granules
-      ?`${format(masks.clipped_native_pixels)} native centroid samples · ${format(masks.paired_observations.sample_size)} usable pairs within 90 minutes. Raw masks and interpretation still require independent review.`
-      :'Native files are not loaded. Download the exact files from NASA with Earthdata Login; detection CSVs alone cannot establish clear or cloud observations.';
+      ?`${format(masks.clipped_native_pixels)} native centroid samples · ${format(masks.paired_observations.sample_size)} usable pairs within 90 minutes.`
+      :'Native files are not loaded. Download the exact files from NASA with Earthdata Login to inspect mask states.';
     target.append(summary);
     if(masks?.processed_fire_granules){
       const limits=document.createElement('p');limits.textContent=`${format(masks.reconciliation.total_firms_pixels-masks.reconciliation.matched)} unreconciled rows · ${format(masks.reconciliation.confidence_disagreements)} confidence disagreements. The match target applies only to available FIRMS rows; it is not a completeness claim. All exceptions and the 30-cell review queue are included in the ZIP. No-pass and full footprint coverage remain unknown.`;target.append(limits);
@@ -273,11 +273,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       const checked=(report.validation_gates||[]).filter(g=>g.status==='passed').length;
       const allChecked=checked===(report.validation_gates||[]).length && checked>0;
       title.textContent=report.title;
-      $('#validity-overview-state').textContent=allChecked?'Recorded checks passed':'Independent review pending';
+      $('#validity-overview-state').textContent=allChecked?'Recorded checks passed':'Checks incomplete';
       $('#validity-overview-state').dataset.state=allChecked?'passed':'pending';
       $('#validity-overview-summary').textContent=masks?.processed_fire_granules
-        ? allChecked ? 'All recorded native checks passed. Whole-area observation opportunity remains a separate requirement.' : `${checked} of ${(report.validation_gates||[]).length} recorded checks passed. Native inputs and reconciliation can be checked here; human review and whole-area observation opportunity remain separate requirements.`
-        :'Native inputs are unavailable for this case. Source counts remain inspectable; the native review gates cannot be assumed passed.';
+        ? allChecked ? 'All recorded native checks passed.' : `${checked} of ${(report.validation_gates||[]).length} recorded checks passed. Explore native inputs and reconciliation below.`
+        :'Native inputs are unavailable for this case. Source counts remain available.';
       $('#validity-overview-scope').textContent=`${report.start_utc} → ${report.end_utc} UTC · Bounds [${report.bbox.join(', ')}] · ${report.grid}`;
       const facts=$('#validity-audit-facts');facts.replaceChildren();
       const values=[['Native centroid samples',masks?.clipped_native_pixels],['Descriptive paired samples',masks?.paired_observations?.sample_size],['Confidence disagreements',masks?.reconciliation?.confidence_disagreements]];
@@ -434,8 +434,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(reviewUi)reviewUi.href=`/review.html?case=${encodeURIComponent(caseId)}`;
     const first=report.first_detection_within_5km_after_reported_start;
     $('#validity-detail-summary').textContent=first
-      ?`The official record gives a local start time of ${report.official_reference.start_local.replace('T',' ')}. The first imported detection within 5 km after that interpreted time was ${first.acquisition_utc} (${sourceNames[first.source_id]}, ${first.distance_km} km from the reported start). This is a spatial and temporal association, not proof of the fire perimeter.`
-      :'No imported detection within 5 km after the interpreted official start was found in this fixed case window. This does not prove that no fire occurred.';
+      ?`The official record gives a local start time of ${report.official_reference.start_local.replace('T',' ')}. The first imported detection within 5 km after that interpreted time was ${first.acquisition_utc} (${sourceNames[first.source_id]}, ${first.distance_km} km from the reported start). This is a spatial and temporal association.`
+      :'No imported detection within 5 km after the interpreted official start was found in this fixed case window.';
     const detail=$('#validity-record-detail');detail.replaceChildren();
     const p=document.createElement('p');p.textContent='Select a detection circle in the graphic to inspect its original acquisition times and source fields.';detail.append(p);
     renderSensitivity();
@@ -481,6 +481,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   document.querySelectorAll('[data-validity-case]').forEach(button=>button.addEventListener('click',()=>load(button.dataset.validityCase)));
   document.querySelectorAll('[data-validity-scene]').forEach(button=>button.addEventListener('click',()=>{scene=button.dataset.validityScene;render();}));
+  window.addEventListener('fireatlas:select-validity-case',event=>{if(['park-2024','grove-2025'].includes(event.detail.id))load(event.detail.id);});
   window.addEventListener('fireatlas:select-validity-day',event=>load(caseId,event.detail.date,true));
   $('#validity-mask-source')?.addEventListener('change',event=>{maskSource=event.target.value;render();});
   const inspect=$('#validity-inspect'),media=$('#validity-evidence-media');

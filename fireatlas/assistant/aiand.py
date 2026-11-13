@@ -8,9 +8,9 @@ import time
 
 BASE_URL = 'https://api.aiand.com/v1'
 EFFICIENT_MODEL = 'zai-org/glm-5.3-flash'
-EFFICIENT_VISION_MODEL = 'deepseek-ai/deepseek-v4.1-flash'
+EFFICIENT_VISION_MODEL = 'zai-org/glm-5.3-flash'
 DEEP_MODEL = 'deepseek-ai/deepseek-v4-pro'
-DEEP_VISION_MODEL = 'deepseek-ai/deepseek-v4.1-flash'
+DEEP_VISION_MODEL = 'zai-org/glm-5.3-flash'
 STORY_MODEL = 'zai-org/glm-5.3'
 _lock = threading.Lock()
 _cache = None

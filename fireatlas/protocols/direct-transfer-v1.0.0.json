@@ -1,0 +1,55 @@
+{
+  "schema": "fireatlas-direct-transfer-protocol-v1",
+  "id": "direct-transfer-v1.0.0",
+  "state": "frozen-proposal-awaiting-human-approval",
+  "target": "direct-collection-or-platform-transfer",
+  "units": "occupied target-product common-grid centroid cell-days per complete UTC month",
+  "cohorts": "Two distinct explicit standard source/version cohorts; no NRT, relabelling or chained factor.",
+  "count_basis": "Union of authentic stored exact-cohort observations; request-backed exports establish UTC completeness rather than exclusive batch ownership. Same-version stored snapshots may be combined; latest-single-export authentication is not claimed.",
+  "partition": {
+    "training_years": 3,
+    "training_months": 36,
+    "calibration_months": 18,
+    "test_months": 8,
+    "test_groups": 3,
+    "required_quarters": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "selection": "Training-only nested leave-one-year-out ratio selection; fixed identity, annual and calendar-month ratios. Annual fallback when monthly source denominator<30.",
+  "chronology": "Forward:train<Y-2,calY-2/Y-1,testY. Backward:train>Y+2,calY+1/Y+2,testY; historical retrospective estimation only.",
+  "interval": "Nominal90%,absolute log1p residual order statistic ceil((n+1)*.9), no temporal/conditional guarantee. Fixed baselines calibrated on same dates.",
+  "admission_rules": {
+    "minimum_log_improvement": 0.1,
+    "minimum_coverage": 0.85,
+    "maximum_wape_ratio": 1.0,
+    "maximum_interval_score_ratio": 1.0,
+    "authority": "Proposed project research gates, not NASA standards. Signed human protocol/conclusion and opportunity-change evidence separately required."
+  },
+  "ai_audit_scope": [
+    "Direct source/version identity, frozen sensor notices, date completeness and raw-cell recount.",
+    "Training/calibration/test partitions disjoint within each fold. Backward evaluation uses later records explicitly.",
+    "No qualified transfer from AI-only mode, smoothness, factor chaining or manual passed booleans.",
+    "Unmeasured opportunity changes, stored-snapshot heterogeneity and numerical transport remain limitations."
+  ],
+  "claims_excluded": [
+    "fire truth",
+    "burned area",
+    "historical VIIRS observation",
+    "operational forecast",
+    "validated observation opportunity"
+  ],
+  "source_sha256": {
+    "fireatlas/transfer.py": "320135de0163eded3cdf3b0d517d8f397596e17ebcfdbcce79f7b79473c259e7",
+    "fireatlas/continuity.py": "435d55d7c382c0c7bba9c44b9d555264e6adf6ec4dd5a64bf4c7fcf148a0dc60",
+    "fireatlas/comparability_v2.py": "943ac08934913540a8a06bcefb7bfb6c7302581b50dd5422bf73f96cfcbe798b",
+    "fireatlas/comparability.py": "a19238e045f9d3169ebc25af5ad87e0cc30ccf00c2be966134b894c3adf6c41a",
+    "fireatlas/calibration.py": "6548fc9525500d47fb9cbcf5a4a8c01f615de41e41864eab3db339dc8640ee96",
+    "fireatlas/core.py": "f429dae254cc414f2b0d436e91d9f2d7136e52004d7507ce7ba0b9b1ef347108",
+    "fireatlas/availability.py": "8fa15aef3ec8c67265257f4b29bea32b433016786f55e9564ae1e1cba75b14ea",
+    "fireatlas/regions.py": "b56e10da7815f05f788591bc8baa2e75162637f17586ad5ef72d4759c90be005"
+  }
+}

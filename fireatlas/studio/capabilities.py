@@ -51,12 +51,9 @@ def video(node=None):
     node = node or shutil.which("node")
     from .aiand_video import selected_engine, MODEL
     if selected_engine() == 'aiand':
-        from ..assistant.aiand import configured_keys
-        browser = any(shutil.which(name) for name in ('chromium', 'chromium-browser', 'google-chrome'))
-        available = bool(configured_keys()) and bool(node and browser and shutil.which('ffmpeg') and shutil.which('ffprobe'))
-        return {'available': available, 'reason': None if available else 'AI& native video needs server-side keys, Node.js, Chromium, ffmpeg and ffprobe.',
-                'engine': 'aiand-native-video', 'model': os.getenv('FIREATLAS_AIAND_VIDEO_MODEL', MODEL),
-                'disclosure': 'AI& generates video clips with sound; authentic frozen graphics and checked narration are composed into the film. Account video access is verified before submission.'}
+        return {'available': False, 'engine': 'aiand-native-video',
+                'reason': 'Generative footage is retired from scientific presentations. Choose a deterministic local or Remotion render of frozen evidence.',
+                'disclosure': 'No generated fire motion or inferred between-overpass activity is admitted.'}
     from .resources import monitor_available
     if not monitor_available():
         return {"available": False, "reason": "Local video needs the Linux process-resource monitor. Story editing and reader exports remain available."}

@@ -22,6 +22,17 @@ from fireatlas.assistant.service import AssistantService
 from fireatlas.assistant.agent import fact,run_agent
 
 class AssistantTests(unittest.TestCase):
+    def test_whiteboard_input_allowance_covers_multiple_source_calls(self):
+        from fireatlas.assistant.agent import input_token_limit
+        self.assertEqual(input_token_limit(False, [], {'whiteboard': True}), 45000)
+        self.assertEqual(input_token_limit(True, [], {'whiteboard': True}), 20000)
+        self.assertEqual(input_token_limit(False, [], None), 20000)
+
+    def test_csv_claim_uses_column_and_row_label_without_inventing_units(self):
+        receipt={'id':'table-result','operation':'csv_table','payload':{'columns':['UTC date','MODIS'], 'offset':4, 'rows':[['2024-07-25','603']]},'method':{'id':'imported-csv-v1','unit':'reported value'},'release_id':'table-hash'}
+        claim=fact(receipt,'/rows/0/1')
+        self.assertEqual((claim['label'],claim['value'],claim['unit']),('MODIS · CSV record 6','603','reported value'))
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
         self.database=self.root/'study.sqlite3'
@@ -31,6 +42,30 @@ class AssistantTests(unittest.TestCase):
         self.cfg=normalize_context({'year':2015,'month':7,'bbox':list(BBOX),'revision':1})
         self.owner=self.service.store.create_session(self.cfg)
         self.service.store.update_session(self.owner,self.cfg,{'instance':'tab-one'})
+
+    def test_whiteboard_followup_history_is_scoped_to_its_board(self):
+        from fireatlas.assistant.agent import recent_investigations
+        self.service.store.artifact(self.owner, 'answer', {'question':'Earlier A', 'title':'A', 'summary':'A conclusion', 'conversation_board_id':'board-a'})
+        self.service.store.artifact(self.owner, 'answer', {'question':'Private B', 'title':'B', 'summary':'B conclusion', 'conversation_board_id':'board-b'})
+        self.service.store.artifact(self.owner, 'answer', {'question':'Old unscoped', 'title':'Old'})
+        for index in range(7):
+            self.service.store.artifact(self.owner, 'answer', {'question':f'B {index}', 'conversation_board_id':'board-b'})
+        view={'studio':{'whiteboard':True, 'document_id':'board-a'}}
+        history=recent_investigations(self.service.store,self.owner,view)
+        self.assertEqual([item['question'] for item in history],['Earlier A'])
+        self.assertEqual(history[0]['summary'],'A conclusion')
+        self.assertEqual([item['question'] for item in recent_investigations(self.service.store,self.owner,{})],['Old unscoped'])
+
+    def test_finished_whiteboard_answer_records_its_board_for_followups(self):
+        view={'instance':'tab-one','studio':{'whiteboard':True,'document_id':'board-a'}}
+        run,_=self.service.store.create_run(self.owner,'history-test',{})
+        with patch('fireatlas.assistant.service.run_agent',return_value={'title':'Answer','summary':'Selected evidence','claims':[]}):
+            self.service._run(self.owner,run,self.cfg,view,'What changed?',None,{},threading.Event(),[])
+        stored=self.service.store.artifacts(self.owner,'answer')[0]['body']
+        self.assertEqual(stored['conversation_board_id'],'board-a')
+        self.assertEqual(stored['question'],'What changed?')
+        self.assertEqual(self.service.store.run(self.owner,run)['status'],'completed')
+
     def test_scientific_parity_and_source_units(self):
         evidence=self.service.science.call(self.owner,'research',self.cfg)
         with readonly(self.database) as db:expected=research.report(db,year=2015,month=7,bbox=BBOX)
@@ -680,6 +715,55 @@ class AssistantTests(unittest.TestCase):
                 self.assertNotIn(self.owner,json.dumps(events))
                 self.assertEqual(client.get('/assistant.html').status_code,200)
 
+    def test_gateway_owned_whiteboard_save_retry_export_and_cross_origin_boundary(self):
+        from starlette.testclient import TestClient
+        from fireatlas.assistant.gateway import create_app
+        with patch.dict('os.environ',{'FIREATLAS_STUDIO_ORIGIN':'http://testserver'}):
+            with TestClient(create_app(self.database,'http://testserver')) as client:
+                headers={'Origin':'http://testserver'}
+                self.assertEqual(client.post('/api/studio/principals',json={},headers=headers).status_code,201)
+                self.assertEqual(client.post('/api/studio/documents',json={'title':'Denied'},headers={'Origin':'https://other.example'}).status_code,403)
+                create_headers={**headers,'Idempotency-Key':'gateway-board-retry'}
+                first=client.post('/api/studio/documents',json={'title':'Submission demo'},headers=create_headers)
+                self.assertEqual(first.status_code,201,first.text)
+                doc=first.json()
+                repeated=client.post('/api/studio/documents',json={'title':'Submission demo'},headers=create_headers)
+                self.assertEqual(repeated.json()['id'],doc['id'])
+                path='/api/studio/documents/'+doc['id']
+                body={'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':[{'kind':'element','id':'submission-note','value':{'id':'submission-note','type':'text','text':'Checked source demo','x':0,'y':0,'width':180,'height':30,'version':1,'versionNonce':1,'isDeleted':False},'position':0}]}]}
+                save_headers={**headers,'Idempotency-Key':'gateway-save-retry'}
+                saved=client.post(path+'/transactions',json=body,headers=save_headers)
+                self.assertEqual(saved.status_code,200,saved.text)
+                retry=client.post(path+'/transactions',json=body,headers=save_headers)
+                self.assertEqual(retry.status_code,200,retry.text)
+                self.assertEqual(saved.json()['revision'],retry.json()['revision'])
+                loaded=client.get(path+'/whiteboard')
+                self.assertEqual(loaded.status_code,200,loaded.text)
+                self.assertEqual(loaded.json()['elements'][0]['text'],'Checked source demo')
+                with TestClient(create_app(self.database,'http://testserver')) as other:
+                    self.assertEqual(other.post('/api/studio/principals',json={},headers=headers).status_code,201)
+                    self.assertIn(other.get(path).status_code,(403,404))
+                with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+                    exported=client.post(path+'/exports',json={'format':'native'},headers=headers)
+                self.assertEqual(exported.status_code,202,exported.text)
+                job=exported.json()
+                for _ in range(100):
+                    result=client.get('/api/studio/exports/'+job['id']).json()
+                    if result['status'] in {'completed','failed'}:break
+                    time.sleep(.02)
+                self.assertEqual(result['status'],'completed',result)
+                download=client.get('/api/studio/exports/'+job['id']+'/download')
+                self.assertEqual(download.status_code,200,download.text[:100] if download.status_code!=200 else '')
+                self.assertTrue(download.content.startswith(b'PK'))
+                restored=client.post('/api/studio/imports',content=download.content,headers={**headers,'Content-Type':'application/zip'})
+                self.assertEqual(restored.status_code,201,restored.text)
+                restored_id=restored.json()['document']['id']
+                self.assertNotEqual(restored_id,doc['id'])
+                self.assertEqual(client.get('/api/studio/documents/'+restored_id+'/whiteboard').json()['elements'][0]['text'],'Checked source demo')
+                deleted=client.request('DELETE','/api/studio/documents/'+restored_id,json={'expected_revision':restored.json()['document']['revision']},headers=headers)
+                self.assertEqual(deleted.status_code,200,deleted.text)
+                self.assertEqual(client.post('/api/data/sync',json={},headers=headers).status_code,403)
+
     def test_openai_responses_transport_tool_claim_and_image_contract(self):
         try:
             import httpx
@@ -695,7 +779,7 @@ class AssistantTests(unittest.TestCase):
             else:
                 returned=next(v for v in body['input'] if v.get('type')=='function_call_output')
                 evidence=json.loads(returned['output'])
-                output=next(t['name'] for t in body['tools'] if t['name'] not in {'investigate','saved_evidence','annotate_evidence','resolve_study_place','inspect_selection','annotate_figure'})
+                output=next(t['name'] for t in body['tools'] if t['name']=='final_result')
                 part={'type':'function_call','id':'fc_2','call_id':'call_2','name':output,'arguments':json.dumps({'title':'Checked overlap','interpretation':'The calculation preserves both sensor sources.','claims':[{'result_id':evidence['id'],'path':'/overlap/totals/union','label':'union'}],'actions':[]})}
             return httpx.Response(200,json={'id':'resp_'+str(len(calls)),'object':'response','created_at':1,'model':'gpt-6-luna','status':'completed','output':[part],'usage':{'input_tokens':100,'output_tokens':40,'total_tokens':140}})
         client=AsyncOpenAI(api_key='not-real',max_retries=0,http_client=httpx.AsyncClient(transport=httpx.MockTransport(transport)))
@@ -728,7 +812,7 @@ class AssistantTests(unittest.TestCase):
             if len(calls)==1:name,args='investigate',{'operation':'research'}
             else:
                 evidence=json.loads(next(m['content'] for m in body['messages'] if m['role']=='tool'))
-                name=next(t['function']['name'] for t in body['tools'] if t['function']['name'] not in {'investigate','saved_evidence','annotate_evidence','resolve_study_place','inspect_selection','annotate_figure'})
+                name=next(t['function']['name'] for t in body['tools'] if t['function']['name']=='final_result')
                 args={'title':'Checked overlap','interpretation':'Sources stay separate.','claims':[{'result_id':evidence['id'],'path':'/overlap/totals/union','label':'union'}]}
             return httpx.Response(200,json={'id':'free_'+str(len(calls)),'provider':'test-provider','object':'chat.completion','created':1,'model':VISION_MODEL,'choices':[{'index':0,'finish_reason':'tool_calls','message':{'role':'assistant','content':None,'tool_calls':[{'id':'call_'+str(len(calls)),'type':'function','function':{'name':name,'arguments':json.dumps(args)}}]}}],'usage':{'prompt_tokens':100,'completion_tokens':40,'total_tokens':140,'cost':0}})
         client=AsyncOpenAI(api_key='not-real',base_url='https://openrouter.ai/api/v1',max_retries=0,http_client=httpx.AsyncClient(transport=httpx.MockTransport(transport)))
@@ -778,7 +862,7 @@ class AssistantTests(unittest.TestCase):
                 if len(calls)==1:name,args='investigate',{'operation':'research'}
                 else:
                     evidence=json.loads(next(m['content'] for m in body['messages'] if m['role']=='tool'))
-                    name=next(t['function']['name'] for t in body['tools'] if t['function']['name'] not in {'investigate','saved_evidence','annotate_evidence','resolve_study_place','inspect_selection','annotate_figure'})
+                    name=next(t['function']['name'] for t in body['tools'] if t['function']['name']=='final_result')
                     args={'title':'Checked overlap','interpretation':'Sources stay separate.','claims':[{'result_id':evidence['id'],'path':'/overlap/totals/union','label':'Distinct union'}]}
                 return httpx.Response(200,json={'id':'paid_'+str(len(calls)),'object':'chat.completion','created':1,'model':model,'choices':[{'index':0,'finish_reason':'tool_calls','message':{'role':'assistant','content':None,'tool_calls':[{'id':'call_'+str(len(calls)),'type':'function','function':{'name':name,'arguments':json.dumps(args)}}]}}],'usage':{'prompt_tokens':11000 if images else 100,'completion_tokens':40,'total_tokens':11040 if images else 140}})
             config={'model':model,'input_price':0.15,'output_price':0.5,'reasoning_effort':'high' if depth=='deep' else 'none' if images else 'low','max_tokens':2400 if depth=='deep' else 1600,'analysis_depth':depth,'vision':bool(images),'price_basis':'test catalog'}

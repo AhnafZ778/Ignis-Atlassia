@@ -1,0 +1,14 @@
+{
+ "schema":"fireatlas-research-protocol-v1", "id":"daily-v2.0.0", "state":"frozen-proposal-awaiting-human-approval",
+ "target":"Expected observed S-NPP daily centroid cell-days; never synthetic detection locations",
+ "regions":{"norcal":"primary qualification","punjab-haryana":"independent replication"},
+ "cohort":"Explicit exact standard-product pair, verified complete UTC dates without processing gaps",
+ "candidates":["no_harmonization","annual_ratio","hurdle_poisson"],
+ "prediction_inputs":["MODIS daily occupied cells","Terra and Aqua occupied cells","sin and cos of UTC day of year"],
+ "partition":{"outer":"chronological test year Y","calibration_years":"Y-2 and Y-1","training":"years before Y-2","minimum_training_years":3,"minimum_training_days":730,"minimum_calibration_days":365,"minimum_test_groups":3,"minimum_test_days":180,"required_test_quarters":[1,2,3,4]},
+ "interval":{"nominal":0.9,"method":"absolute log1p calibration residuals, same as monthly; no guaranteed dependent coverage"},
+ "gates":{"minimum_log_error_improvement":0.1,"maximum_wape_ratio":1.0,"minimum_coverage":0.85,"maximum_interval_score_ratio":1.0,"minimum_zero_recovery_improvement":0.1,"maximum_seasonal_wape_degradation":0.1,"authority":"proposed project gates requiring human scientific approval before fitting"},
+ "dependency":"statsmodels==0.15.0 optional research extra; missing dependency or failed fit leaves estimates unavailable",
+ "claims_excluded":["fire truth","continuous observation","synthetic locations","hourly interpolation","automatic monthly qualification transfer"],
+ "amendment":"New protocol ID and human approval required for any method or threshold amendment."
+}

@@ -32,12 +32,6 @@ def _state_of(evidence, path, label=None):
     except ValueError as error:
         return {"path": path, "state": "unavailable", "value": None, "unit": evidence["method"]["unit"],
                 "label": label or path.rsplit("/", 1)[-1], "reason": str(error)}
-    # Guided results carry operation-specific units (for example replay's
-    # aggregate cell-days and missingness's explicit UTC date lists). Freeze
-    # and verify the same authoritative presentation contract.
-    guided = next((c for c in guided_answer(evidence)['claims'] if c['path'] == path), None)
-    if guided:
-        card['unit'] = guided['unit']
     return {"path": path, "state": "observed", "value": card["value"], "unit": card["unit"], "label": card["label"],
             "method_id": card["method_id"]}
 

@@ -29,11 +29,19 @@ class AssistantService:
         from .connectors import catalog
         config=provider_config()
         installed=importlib.util.find_spec("pydantic_ai") is not None
+        local_ready,local_reason=True,None
+        if config.get('local'):
+            from .local import readiness
+            local_ready,local_reason=readiness(config)
         try:
             voice_available=bool(os.getenv('OPENAI_API_KEY')) and importlib.util.find_spec('openai') is not None and all(math.isfinite(float(os.getenv(k,'0'))) and float(os.getenv(k,'0'))>0 for k in ('FIREATLAS_STT_MAX_REQUEST_USD','FIREATLAS_TTS_MAX_REQUEST_USD'))
         except ValueError:voice_available=False
-        if config.get('free_only'):voice_available=False
-        return {"schema":"fireatlas-assistant-capabilities-v1","ai_available":config["configured"] and installed,"provider":config["provider"],"model":config["model"],"vision_model":config.get("vision_model"),"model_routes":config.get("models",{}),"analysis_modes":["efficient","deep"] if config["provider"]=="aiand" else [],"free_only":config.get("free_only",False),"reason":None if config["configured"] and installed else "Provider key, verified prices and optional assistant dependencies are required for conversational AI. Stored-data investigation tools are available.","operations":OPERATIONS,"destinations":DESTINATIONS,"methods":METHODS,"voice":{"available":voice_available,"disclosure":"AI-generated voice, not an eyewitness", "mode":"bounded transcription → checked science → narration"},"connectors":[{"id":"fireatlas","status":"available","scope":"stored scientific data, read-only"},{"id":"references","status":"available","scope":"curated local documentation"}]+[{"id":c["id"],"scope":c["scope"],"status":"configured","tools":c["tools"]} for c in catalog()],"release":{k:v for k,v in self.science.release().items() if k!="manifest"}}
+        if config.get('free_only') or config.get('local'):voice_available=False
+        try:
+            release={k:v for k,v in self.science.release().items() if k!='manifest'}
+        except Exception:  # An unavailable science archive must not block private authoring.
+            release=None
+        return {"schema":"fireatlas-assistant-capabilities-v1","ai_available":config["configured"] and installed and local_ready,"provider":config["provider"],"model":config["model"],"vision_model":config.get("vision_model"),"model_routes":config.get("models",{}),"analysis_modes":["efficient","deep"] if config["provider"]=="aiand" else [],"free_only":config.get("free_only",False),"reason":local_reason if not local_ready else None if config["configured"] and installed else "Provider key, verified prices and optional assistant dependencies are required for conversational AI. Stored-data investigation tools are available.","operations":OPERATIONS,"destinations":DESTINATIONS,"methods":METHODS,"voice":{"available":voice_available,"disclosure":"AI-generated voice, not an eyewitness", "mode":"bounded transcription → checked science → narration"},"connectors":[{"id":"fireatlas","status":"available" if release else "unavailable","scope":"stored scientific data, read-only"},{"id":"references","status":"available","scope":"curated local documentation"},{"id":"public-references","status":"available","scope":"explicit Investigation web queries, read-only"}]+[{"id":c["id"],"scope":c["scope"],"status":"configured","tools":c["tools"]} for c in catalog()],"release":release}
 
     def start(self,owner,request):
         if not isinstance(request,dict): raise ValueError("Investigation needs an object.")
@@ -55,7 +63,15 @@ class AssistantService:
         if not isinstance(message,str) or len(message)>3000: raise ValueError("Question must be at most 3,000 characters.")
         operation=request.get("operation")
         if operation and operation not in OPERATIONS: raise ValueError("Unsupported scientific operation.")
-        if not operation and not self.capabilities()["ai_available"]:
+        from .board_views import choose_archived_heatmap, requested_kinds, requests_heatmap_catalog, requests_reading_catalog
+        from .firms_country import request_candidate
+        from .regional_fire import requests_sundarbans_heatmap
+        studio = view.get('studio') or {}
+        from .comparison_research import research_question
+        from .web_references import requested_query
+        direct = not research_question(message) and studio.get('whiteboard') and not studio.get('challenge') and (requests_heatmap_catalog(message) or requests_reading_catalog(message) or requested_kinds(message) or request_candidate(message) or choose_archived_heatmap(message) or requests_sundarbans_heatmap(message))
+        direct=direct or bool(studio.get('whiteboard') and not studio.get('challenge') and requested_query(message))
+        if not operation and not direct and not self.capabilities()["ai_available"]:
             raise ValueError(self.capabilities()["reason"])
         nonce=request.get("nonce") or secrets.token_urlsafe(16)
         if not isinstance(nonce,str) or len(nonce)>100: raise ValueError("Invalid request ID.")
@@ -68,13 +84,103 @@ class AssistantService:
         return {"id":run,"status":self.store.run(owner,run)["status"]}
 
     def _run(self,owner,run,context,view,message,operation,args,cancel,image_ids):
-        deadline=time.monotonic()+(300 if operation=="sensitivity" else 120)
+        deadline=time.monotonic()+(480 if (view.get('studio') or {}).get('whiteboard') else 300 if operation=='sensitivity' else 120)
         def progress(stage):
-            self.store.event(owner,run,{"type":"STEP_STARTED","name":stage,"message":"Checking imported records: "+{"replay":"daily detection map","missingness":"export status by date","research":"MODIS and VIIRS overlap","availability":"source inventory","persistence":"repeatedly observed cells","observations":"original detection records","resolve_study_place":"named study location"}.get(stage,stage.replace("_"," "))})
+            special={'searching public references':'Searching public scientific references…',
+                     'research_team_observations':'Observation analyst reviewing checked evidence…',
+                     'research_team_skeptic':'Scientific skeptic checking alternative explanations…',
+                     'research_team_experiment':'Experiment designer proposing the next test…'}
+            self.store.event(owner,run,{"type":"STEP_STARTED","name":stage,"at":time.time(),"message":special.get(stage) or "Checking imported records: "+{"replay":"daily detection map","missingness":"export status by date","research":"MODIS and VIIRS overlap","availability":"source inventory","persistence":"repeatedly observed cells","observations":"original detection records","resolve_study_place":"named study location"}.get(stage,stage.replace("_"," "))})
         try:
             self.store.finish(owner,run,"running",{"context":context,"question":message})
             self.store.event(owner,run,{"type":"RUN_STARTED"})
-            if operation:
+            from .board_views import (
+                archive_bundle_answer, archived_heatmap_answer, choose_archived_heatmap, explicit_board_bundle, FIRMS_VIEWS,
+                heatmap_catalog, reading_catalog, requested_kinds, requests_heatmap_catalog, requests_reading_catalog,
+                selected_firms_answer, selected_reading_requested, area_reading_views, normalize_board_prompt, positive_view_request, AREA_VIEW_PATTERN,
+            )
+            from . import firms_country, place_fire, regional_fire
+            from .firms_history import historical_period, requests_peak_month
+            from datetime import datetime, timezone
+            import re
+            studio = view.get('studio') or {}
+            from .comparison_research import research_question
+            eligible_whiteboard=studio.get('whiteboard') and not studio.get('challenge') and not operation and not image_ids
+            whiteboard_question = eligible_whiteboard and not research_question(message)
+            from .web_references import requested_query, search_answer
+            web_query=requested_query(message) if eligible_whiteboard else None
+            normalized_request=normalize_board_prompt(message)
+            map_request=positive_view_request(normalized_request)
+            declined_views=whiteboard_question and not map_request and re.search(AREA_VIEW_PATTERN,normalized_request,re.I)
+            archived_scope = choose_archived_heatmap(map_request) if whiteboard_question else None
+            sundarbans = whiteboard_question and regional_fire.requests_sundarbans_heatmap(map_request)
+            if whiteboard_question and not web_query and map_request and not requests_peak_month(map_request) and not requested_kinds(message) and not firms_country.request_candidate(message) and isinstance(studio.get('document_id'),str) and getattr(self, 'studio_bridge', None):
+                history=self.studio_bridge.conversation(owner,studio['document_id'])
+                if history:
+                    map_request=place_fire.place_followup_from_history(message,history) or map_request
+            kinds=requested_kinds(map_request)
+            if whiteboard_question and not kinds and requests_peak_month(map_request):
+                map_request=place_fire.peak_calendar_question(map_request)
+                kinds=requested_kinds(map_request)
+            saved_answer = (selected_firms_answer(self.store,owner,studio,kinds)
+                            if whiteboard_question and kinds and selected_reading_requested(message) else None)
+            peak=whiteboard_question and bool(kinds) and requests_peak_month(map_request)
+            archive_specs=explicit_board_bundle(map_request,has_study=not studio.get('unscoped')) if whiteboard_question and not (web_query or archived_scope or sundarbans or saved_answer or peak) else None
+            resolve_area=whiteboard_question and not (web_query or archived_scope or sundarbans or archive_specs or saved_answer)
+            place=place_fire.place_request(map_request) if resolve_area else None
+            conflict=resolve_area and kinds and place_fire.conflicting_places(map_request)
+            country=(firms_country.resolve(map_request,place) if resolve_area and not conflict and (not place or ',' not in place)
+                     and (not kinds or any(kind in FIRMS_VIEWS['firms_country'] for kind in kinds)) else None)
+            if web_query:
+                progress('searching public references')
+                answer=search_answer(message,web_query,cancel=cancel,deadline=deadline)
+                identifier=self.store.artifact(owner,'public_research',answer['web_search'])
+                answer['web_search_receipts']=[identifier]
+                answer['web_sources']=[{**source,'id':f'R{index+1}'} for index,source in enumerate(answer['web_sources'])]
+            elif whiteboard_question and requests_heatmap_catalog(message):
+                answer = heatmap_catalog()
+            elif whiteboard_question and requests_reading_catalog(message):
+                answer = reading_catalog()
+            elif conflict:
+                answer={'title':'Choose one location','kind':'Study clarification','claims':[],
+                        'summary':'You requested views for different locations. Ask for each location separately to keep their sources distinct.'}
+            elif declined_views:
+                answer={'title':'No view requested','kind':'Study clarification','claims':[],
+                        'summary':'No satellite view was fetched.'}
+            elif saved_answer:
+                answer = saved_answer
+            elif archive_specs:
+                progress('retrieving scoped archive readings')
+                answer = archive_bundle_answer(self,owner,archive_specs,message,context,cancel,deadline)
+            elif archived_scope:
+                progress('replay')
+                answer = archived_heatmap_answer(self, owner, archived_scope, cancel, deadline,message=message)
+            elif sundarbans:
+                progress('historical NASA FIRMS readings near Amurbunia')
+                answer = regional_fire.sundarbans_answer(self, owner, cancel, deadline,kinds=kinds or ('heatmap',))
+            elif country:
+                historical=not isinstance(country[1],int)
+                if historical:
+                    deadline=max(deadline,time.monotonic()+160)
+                progress('NASA FIRMS archive by country' if historical else 'live NASA FIRMS country readings')
+                answer = firms_country.answer(self, owner, country, cancel, deadline,kinds=area_reading_views(map_request,kinds) or ('coordinates',),
+                                             products=firms_country.requested_products(map_request),message=map_request)
+            elif place:
+                historical=peak or historical_period(map_request,datetime.now(timezone.utc).date())
+                if historical:
+                    deadline=max(deadline,time.monotonic()+160)
+                progress('ranking monthly NASA FIRMS observations' if peak else 'NASA FIRMS archive by location' if historical else 'resolving place and checking NASA FIRMS')
+                answer = place_fire.place_answer(self, owner, place, map_request, cancel, deadline,kinds=area_reading_views(map_request,kinds))
+            elif peak:
+                answer={'title':'Name the peak search area','kind':'Study clarification','claims':[],
+                        'summary':'Give a place and year so I can rank complete UTC months. For example, “Show the peak fire month for the Sundarbans in 2025.”'}
+            elif resolve_area and kinds and set(kinds)<=FIRMS_VIEWS['firms_region'].keys() and place_fire.missing_place(map_request):
+                answer={'title':'Which location?','kind':'Study clarification','claims':[],
+                        'summary':'Name a city, country, or saved study. For example, “Show a heatmap and readings for Dhaka.”'}
+            elif whiteboard_question and kinds and set(kinds)<={'harmonized','comparability'}:
+                answer={'title':'Choose an evaluated region','kind':'Study clarification','claims':[],
+                        'summary':'Monthly comparability is available for Northern California and Punjab–Haryana. For Rajshahi or another custom area, ask for raw FIRMS readings.'}
+            elif operation:
                 progress(operation)
                 evidence=self.science.call(owner,operation,context,args,cancel,deadline)
                 answer=guided_answer(evidence)
@@ -88,8 +194,35 @@ class AssistantService:
                         raise ValueError("Selected figure is stale. Capture the current visualization again.")
                     images.append((base64.b64decode(attachment["data"]),attachment["mime"]))
                 answer=run_agent(self,owner,message,context,view,cancel,deadline,progress,images)
+            if studio.get('web_sources'):
+                answer['web_sources']=studio['web_sources']
+                answer['web_search_receipts']=studio.get('public_search_receipts',[])
+            if studio.get('public_readings'):
+                answer['public_readings']=studio['public_readings']
+            if studio.get('nasa_discoveries'):
+                answer['nasa_discoveries']=studio['nasa_discoveries']
+            if view.get('research_team') is True:
+                if not studio.get('whiteboard') or studio.get('challenge'):
+                    answer['research_team']={'status':'unavailable','specialists':[],'note':'Start research team outside a frozen challenge.'}
+                else:
+                    from .research_team import review
+                    try:answer['research_team']=review(self,owner,message,answer,view,cancel,deadline,progress)
+                    except InterruptedError:
+                        if cancel.is_set():raise
+                        answer['research_team']={'status':'unavailable','specialists':[],'note':'The optional review reached its time limit. Your main investigation is available.'}
+                    except (ValueError,PermissionError) as error:
+                        answer['research_team']={'status':'unavailable','specialists':[],'note':str(error)}
+                    except Exception:
+                        answer['research_team']={'status':'unavailable','specialists':[],'note':'The optional research team could not finish. Your main investigation is available.'}
             if cancel.is_set(): raise InterruptedError("Investigation stopped.")
             answer.update({"context":context,"context_revision":context["revision"],"view_instance":view.get("instance"),"question":message,"run_id":run})
+            studio = view.get('studio') if isinstance(view.get('studio'), dict) else {}
+            if studio.get('whiteboard') and isinstance(studio.get('document_id'), str):
+                if studio.get('requested_board_views'):
+                    answer['data_views'] = studio['requested_board_views']
+                answer['conversation_board_id'] = studio['document_id']
+                if getattr(self, 'studio_bridge', None):
+                    self.studio_bridge.save_conversation_turn(owner, studio['document_id'], run, message, answer)
             notebook=self.store.artifact(owner,"answer",answer)
             answer["notebook_id"]=notebook
             self.store.finish(owner,run,"completed",answer)

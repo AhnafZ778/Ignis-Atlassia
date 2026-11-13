@@ -14,6 +14,16 @@ The model references exact values in authoritative calculation results. The serv
 
 Temporary private notebooks retain findings, notes and annotations; users can export or delete them. Speech is labelled AI-generated narration, never an eyewitness account. No assistant tool imports additional datasets, edits observations or forecasts fire spread. See [the architecture plan](SCIENTIFIC_ASSISTANT_PLAN.md) and [configuration instructions](SCIENTIFIC_ASSISTANT_SETUP.md).
 
+## Optional Studio authoring and films
+
+Research Studio can use configured providers to propose a storyboard, chapter order, narration and interpretive wording from selected, frozen board evidence. Those proposals do not calculate the scientific results. Evidence cards, result hashes, scope and units remain tied to deterministic Python outputs; generated interpretation is separate from observations.
+
+Current scientific film exports use deterministic local SVG/Chromium/ffmpeg or Remotion renderers of frozen evidence. New AI& generative-footage submissions are retired, and queued generative jobs are refused before speech or provider access. Existing completed exports are retained as historical artifacts; any generated motion in them is illustration, not satellite observation or reconstructed activity. Those historical clips require visual review before reuse. Optional speech is generated narration, not an eyewitness account.
+
+Provider availability, pricing, licenses, owner settings and capability checks govern these optional paths. They are separate from the deterministic monthly comparison in Research Lab (`/research.html?tab=comparison`), which works from stored evidence without model calls. Native diagnostics live in Evidence; old `/harmonization.html` bookmarks redirect into these workspaces. Public static hosting does not provide private authoring or provider execution.
+
+The repository disclosure does not establish that the NASA project submission page includes the required AI credits. The team must verify that external submission separately.
+
 ## Human review of numerical claims
 
-No independent scientific review of the NASA counts or methods is documented in this repository as of 2026-09-29. Reviewer names: none recorded. The reproducibility scripts and tests check code consistency; they do not replace an independent review of source rows, product interpretation, or the scientific conclusions. Keep this gate open until a named reviewer records the date, files or hashes inspected, discrepancies, and conclusion.
+No independent scientific review of the NASA counts or methods is documented in this repository as of 2026-10-27. Reviewer names: none recorded. The reproducibility scripts and tests check code consistency; they do not replace an independent review of source rows, product interpretation, or the scientific conclusions. Keep this gate open until a named reviewer records the date, files or hashes inspected, discrepancies, and conclusion.

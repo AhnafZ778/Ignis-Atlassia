@@ -124,6 +124,246 @@ class OrchestrationTests(StudioCase):
         self.assertEqual(manager.get(self.owner,result['id'])['status'],'awaiting_view_ack')
 
 class PortabilityTests(StudioCase):
+    def test_native_package_retains_nasa_catalog_scope_and_original_response_hashes(self):
+        from fireatlas.assistant import nasa_discovery as nasa
+        from tests.test_nasa_discovery import C,V,BBOX,catalog,granules,variables
+        doc=self.add_card(self.board(),'synthetic-nasa-note',kind='text')
+        with patch.object(nasa,'fetch',side_effect=[catalog([V]),granules(),variables()]):
+            report=nasa.discover(collection_id=C,bbox=BBOX,start='2025-04-01',end='2025-04-01')
+        source={**nasa.source_cards(report)[0],'id':'R1'}
+        report['collections']['items'][0]['reference_id']='R1';nasa.finish(report)
+        turn={'question':'Synthetic NASA catalog inspection','title':'Catalog only','summary':'No files downloaded.','claims':[],
+              'web_sources':[source],'nasa_discoveries':[report]}
+        self.service.store.artifact(self.owner,'whiteboard_conversation',dict(turn,document_id=doc['id'],run_id='synthetic-nasa'))
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        with zipfile.ZipFile(path) as archive:self.assertEqual(json.loads(archive.read('conversation.json')),[turn])
+        restored=self.service.portability.restore(self.other,path)['document']
+        with self.service.store.connection() as db:
+            row=db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=?",(self.other,restored['id'])).fetchone()
+        actual=json.loads(row['body']);self.assertEqual(actual['nasa_discoveries'],[report])
+        self.assertIsNone(actual['nasa_discoveries'][0]['variables']['items'][0]['units'])
+        self.assertEqual(actual['nasa_discoveries'][0]['download_access'],'not_checked')
+        from fireatlas.studio.portability import clean_conversation
+        corrupt=copy.deepcopy(turn);corrupt['nasa_discoveries'][0]['collections']['items'][0]['reference_id']='R99';nasa.finish(corrupt['nasa_discoveries'][0])
+        with self.assertRaisesRegex(StudioError,'NASA catalog'):clean_conversation([corrupt])
+
+    def test_native_package_preserves_only_exporters_conversation(self):
+        doc=self.add_card(self.board(),'finding',kind='text');other=self.other
+        self.service.store.artifact(self.owner,'whiteboard_conversation',{'document_id':doc['id'],'run_id':'one','question':'Why?','title':'Answer','summary':'A finding.','claims':[{'label':'Count','value':3,'unit':'cells'}]})
+        self.service.store.artifact(other,'whiteboard_conversation',{'document_id':doc['id'],'run_id':'private','question':'Private','title':'','summary':'','claims':[]})
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        with zipfile.ZipFile(path) as archive:
+            conversation=json.loads(archive.read('conversation.json'))
+            self.assertEqual([item['question'] for item in conversation],['Why?'])
+            self.assertEqual(conversation[0]['claims'][0]['value'],3)
+        restored=self.service.portability.restore(other,path)['document']
+        with self.service.store.connection() as db:
+            rows=db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=?",(other,restored['id'])).fetchall()
+        self.assertEqual(json.loads(rows[0]['body'])['question'],'Why?')
+        self.assertEqual(json.loads(rows[0]['body'])['claims'][0]['value'],3)
+
+    def test_native_reading_roundtrip_retains_article_abstract_and_unavailable_states(self):
+        from fireatlas.assistant.public_reading import read_reference
+        doc=self.add_card(self.board(),'note',kind='text')
+        turns=[]
+        for index,state in enumerate(('article','abstract','unavailable')):
+            source={'id':'R1','title':'Synthetic original methods','url':f'https://doi.org/10.1234/{state}','snippet':'Synthetic fixture','provider':'Test'}
+            record={'doi':f'10.1234/{state}','pmcid':'PMC123','isOpenAccess':'Y','abstractText':'Original synthetic abstract.'}
+            metadata=json.dumps({'resultList':{'result':[] if state=='unavailable' else [record]}}).encode()
+            article=f'<article><front><article-meta><article-id pub-id-type="doi">10.1234/{state}</article-id></article-meta></front><body><sec><title>Methods</title><p>Original synthetic methods paragraph.</p></sec></body></article>'.encode()
+            with patch('fireatlas.assistant.public_reading.fetch',side_effect=[metadata,article if state=='article' else OSError()]):report=read_reference(source)
+            turn={'question':state,'title':'Original source','summary':'Only displayed passages were read.','claims':[],'web_sources':[source],'public_readings':[report]}
+            turns.append(turn)
+            self.service.store.artifact(self.owner,'whiteboard_conversation',dict(turn,document_id=doc['id'],run_id=str(index)))
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        with zipfile.ZipFile(path) as archive:self.assertEqual(json.loads(archive.read('conversation.json')),turns)
+        restored=self.service.portability.restore(self.other,path)['document']
+        with self.service.store.connection() as db:rows=db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=? ORDER BY created,rowid",(self.other,restored['id'])).fetchall()
+        self.assertEqual([json.loads(row['body'])['public_readings'] for row in rows],[turn['public_readings'] for turn in turns])
+
+    def test_native_package_retains_public_research_and_team_after_restore(self):
+        from fireatlas.studio.portability import clean_conversation
+        from fireatlas.studio.errors import StudioError
+        doc=self.add_card(self.board(),'finding',kind='text')
+        source={'title':'Public VIIRS methods','url':'https://doi.org/10.1234/viirs','snippet':'Metadata only','provider':'Crossref'}
+        receipt={'query':'VIIRS','sources':[source],'scope':'Metadata only','sha256':'original-hash'}
+        team={'status':'completed','specialists':[{'role':'skeptic','label':'Scientific skeptic','status':'completed','insight':'Match observation opportunity.','next_test':'Compare acquisition times.','sources':[dict(source,id='R1')]}],'ceiling_usd':.02,'estimated_cost_usd':.0004,'note':'AI proposed test.'}
+        brief={'synthesis':'Review original methods.','hypothesis':'Fuel conditions may matter.','proposed_test':'Match acquisition conditions.','source_ids':['R1']}
+        source['id']='R1'
+        turn={'question':'Find papers on VIIRS','title':'References','summary':'Read original methods.','claims':[], 'web_sources':[source],'web_search':receipt,'public_research_receipts':[receipt],'research_team':team,'research_answer':brief}
+        self.service.store.artifact(self.owner,'whiteboard_conversation',dict(turn,document_id=doc['id'],run_id='research'))
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        with zipfile.ZipFile(path) as archive:self.assertEqual(json.loads(archive.read('conversation.json')),[turn])
+        restored=self.service.portability.restore(self.other,path)['document']
+        with self.service.store.connection() as db:body=json.loads(db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=?",(self.other,restored['id'])).fetchone()['body'])
+        self.assertEqual(body['research_team'],team);self.assertEqual(body['public_research_receipts'],[receipt]);self.assertEqual(body['research_answer'],brief)
+        import copy
+        bad=copy.deepcopy(turn);bad['research_team']['specialists'][0]['sources'][0]['url']='javascript:alert(1)'
+        with self.assertRaises(StudioError):clean_conversation([bad])
+        bad=copy.deepcopy(turn);bad['research_answer']['synthesis']='  '
+        with self.assertRaises(StudioError):clean_conversation([bad])
+        bad=copy.deepcopy(turn);bad['web_sources'][0]['id']=[]
+        with self.assertRaises(StudioError):clean_conversation([bad])
+        bad=copy.deepcopy(turn);bad['research_team']['ceiling_usd']='0.02'
+        with self.assertRaises(StudioError):clean_conversation([bad])
+
+    def test_export_retry_refuses_changed_conversation(self):
+        doc=self.add_card(self.board(),'finding',kind='text')
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        with self.service.store.connection(write=True) as db:
+            db.execute("UPDATE export_jobs SET status='failed' WHERE id=?",(job['id'],))
+        self.service.store.artifact(self.owner,'whiteboard_conversation',{'document_id':doc['id'],'run_id':'new','question':'New','title':'','summary':'','claims':[]})
+        with self.assertRaisesRegex(Conflict,'conversation changed'):
+            self.service.portability.retry(self.owner,job['id'])
+
+    def test_restored_conversation_orders_new_turn_after_import_with_equal_clock(self):
+        doc=self.add_card(self.board(),'finding',kind='text')
+        with patch.object(self.service.store,'clock',return_value=1000), patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            for index in range(7):self.service.store.artifact(self.owner,'whiteboard_conversation',{'document_id':doc['id'],'run_id':str(index),'question':str(index),'title':'','summary':'','claims':[]})
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native'},background=False)
+            self.assertEqual(job['status'],'completed',job)
+            path,_=self.service.portability.download(self.owner,job['id'])
+            restored=self.service.portability.restore(self.other,path)['document']
+            self.service.store.artifact(self.other,'whiteboard_conversation',{'document_id':restored['id'],'run_id':'new','question':'new','title':'','summary':'','claims':[]})
+            with self.service.store.connection() as db:
+                rows=db.execute("SELECT body FROM science_results WHERE principal_id=? AND kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=? ORDER BY created DESC,rowid DESC LIMIT 6",(self.other,restored['id'])).fetchall()
+        self.assertEqual(json.loads(rows[0]['body'])['question'],'new')
+
+    def test_native_roundtrip_preserves_whiteboard_and_remaps_evidence(self):
+        doc,snap=self.bound_board(operation='replay',kind='map')
+        card=doc['state']['order'][0]
+        element={'id':'drawing-one','type':'text','text':'My finding','x':10,'y':20,'width':80,'height':30,
+                 'link':'./studio.html?board='+doc['id'],
+                 'customData':{'fireatlas':{'documentId':doc['id'],'cardId':card,'snapshotId':snap['id'],'snapshotHash':snap['snapshot_sha256'],
+                                           'originalElementIds':['drawing-one','deleted-object'],
+                                           'claims':[{'result_id':'ephemeral-assistant-result','path':'/value'}]}}}
+        doc=self.service.transact(self.owner,doc['id'],{'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':[{'kind':'element','id':element['id'],'position':0,'value':element}]}]})
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native','revision':doc['revision']},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        with zipfile.ZipFile(path) as archive:
+            self.assertIn('whiteboard.json',archive.namelist())
+            self.assertEqual(json.loads(archive.read('interop/whiteboard.excalidraw'))['elements'][0]['text'],'My finding')
+        imported=self.service.portability.restore(self.other,path)
+        restored=imported['document']; scene=self.service.store.whiteboard(self.other,restored['id'])
+        element=scene['elements'][0];meta=element['customData']['fireatlas']
+        self.assertNotEqual(element['id'],'drawing-one')
+        self.assertEqual(meta['documentId'],restored['id'])
+        self.assertEqual(meta['cardId'],imported['id_map'][card])
+        self.assertEqual(meta['snapshotId'],imported['id_map'][snap['id']])
+        self.assertEqual(meta['snapshotHash'],restored['snapshots'][meta['snapshotId']]['snapshot_sha256'])
+        self.assertEqual(meta['originalElementIds'],[element['id']])
+        self.assertEqual(meta['reference_state'],'unavailable-after-import')
+        self.assertIsNone(meta['claims'][0]['result_id'])
+        self.assertEqual(meta['claims'][0]['reference_state'],'unavailable-after-import')
+        self.assertEqual(element['link'],'./studio.html?board='+restored['id'])
+
+    def test_diagram_note_references_survive_native_roundtrip(self):
+        doc=self.board()
+        note={'id':'original-note','type':'text','text':'Compare the sensors','x':0,'y':0,'width':100,'height':20}
+        diagram={'id':'diagram-node','type':'rectangle','x':200,'y':0,'width':150,'height':80,
+                 'customData':{'fireatlas':{'documentId':doc['id'],'kind':'assistant-diagram','originalElementIds':['original-note']}}}
+        changes=[{'kind':'element','id':item['id'],'position':index,'value':item} for index,item in enumerate((note,diagram))]
+        doc=self.service.transact(self.owner,doc['id'],{'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':changes}]})
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native','revision':doc['revision']},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        restored=self.service.portability.restore(self.other,path)['document']
+        items=self.service.store.whiteboard(self.other,restored['id'])['elements']
+        restored_note=next(item for item in items if item['type']=='text')
+        restored_diagram=next(item for item in items if item['type']=='rectangle')
+        meta=restored_diagram['customData']['fireatlas']
+        self.assertNotEqual(restored_note['id'],note['id'])
+        self.assertEqual(meta['documentId'],restored['id'])
+        self.assertEqual(meta['originalElementIds'],[restored_note['id']])
+        self.assertNotIn('reference_state',meta)
+
+    def test_group_chart_and_challenge_reopen_against_restored_dataset(self):
+        from fireatlas.studio.datasets import add,group_summary
+        doc=self.board()
+        table=add(self.service.store,self.owner,doc['id'],'groups.csv',b'area,count\nA,3\nA,5\nB,9\n')
+        ref={'documentId':doc['id'],'datasetId':table['id'],'datasetHash':table['sha256'],
+             'groupColumn':'area','valueColumn':'count','groupName':'A','groupMetric':'mean'}
+        bar={'id':'bar','type':'rectangle','x':0,'y':0,'width':100,'height':20,'frameId':'chart',
+             'customData':{'fireatlas':{**ref,'kind':'dataset-group-chart'}}}
+        chart={'id':'chart','type':'frame','x':0,'y':0,'width':200,'height':120,
+               'customData':{'fireatlas':{**ref,'kind':'dataset-group-chart'}}}
+        challenge={'id':'challenge','type':'text','text':'Could the average hide variation?','x':240,'y':0,'width':200,'height':30,
+                   'customData':{'fireatlas':{**ref,'kind':'assistant-challenge','originalElementIds':['bar']}}}
+        changes=[{'kind':'element','id':item['id'],'position':i,'value':item} for i,item in enumerate((bar,chart,challenge))]
+        doc=self.service.transact(self.owner,doc['id'],{'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':changes}]})
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native','revision':doc['revision']},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        restored=self.service.portability.restore(self.other,path)['document']
+        items=self.service.store.whiteboard(self.other,restored['id'])['elements']
+        newbar=next(item for item in items if item['type']=='rectangle')
+        newframe=next(item for item in items if item['type']=='frame')
+        newchallenge=next(item for item in items if item['type']=='text')
+        self.assertEqual(newbar['frameId'],newframe['id'])
+        meta=newchallenge['customData']['fireatlas']
+        self.assertEqual(meta['originalElementIds'],[newbar['id']])
+        self.assertEqual(meta['documentId'],restored['id'])
+        self.assertNotEqual(meta['datasetId'],table['id'])
+        result=group_summary(self.service.store,self.other,restored['id'],meta['datasetId'],meta['groupColumn'],meta['valueColumn'])
+        self.assertEqual(result['sha256'],table['sha256'])
+        self.assertEqual(next(group['mean'] for group in result['groups'] if group['group']==meta['groupName']),4)
+
+    def test_assistant_connector_bindings_survive_native_roundtrip(self):
+        doc=self.board()
+        first={'id':'first','type':'text','text':'First note','x':0,'y':0,'width':100,'height':20,
+               'boundElements':[{'id':'connector','type':'arrow'}]}
+        second={'id':'second','type':'text','text':'Second note','x':300,'y':0,'width':100,'height':20,
+                'boundElements':[{'id':'connector','type':'arrow'}]}
+        arrow={'id':'connector','type':'arrow','x':100,'y':10,'width':200,'height':0,'points':[[0,0],[200,0]],
+               'startBinding':{'elementId':'first','focus':0,'gap':1},'endBinding':{'elementId':'second','focus':0,'gap':1},
+               'boundElements':[{'id':'label','type':'text'}],
+               'customData':{'fireatlas':{'documentId':doc['id'],'kind':'assistant-connector','relation':'related','originalElementIds':['first','second']}}}
+        label={'id':'label','type':'text','text':'related','x':180,'y':0,'width':50,'height':20,'containerId':'connector'}
+        changes=[{'kind':'element','id':item['id'],'position':i,'value':item} for i,item in enumerate((first,second,arrow,label))]
+        doc=self.service.transact(self.owner,doc['id'],{'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':changes}]})
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native','revision':doc['revision']},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        restored=self.service.portability.restore(self.other,path)['document']
+        items=self.service.store.whiteboard(self.other,restored['id'])['elements']
+        new_arrow=next(item for item in items if item['type']=='arrow')
+        new_first=next(item for item in items if item.get('text')=='First note')
+        new_second=next(item for item in items if item.get('text')=='Second note')
+        new_label=next(item for item in items if item.get('text')=='related')
+        self.assertEqual(new_arrow['startBinding']['elementId'],new_first['id'])
+        self.assertEqual(new_arrow['endBinding']['elementId'],new_second['id'])
+        self.assertEqual(new_label['containerId'],new_arrow['id'])
+        self.assertEqual(new_arrow['customData']['fireatlas']['originalElementIds'],[new_first['id'],new_second['id']])
+        for item in (new_first,new_second):self.assertEqual(item['boundElements'][0]['id'],new_arrow['id'])
+
+    def test_drawing_only_native_board_can_be_restored(self):
+        doc=self.board()
+        element={'id':'doodle','type':'text','text':'A drawing','x':0,'y':0,'width':20,'height':20}
+        doc=self.service.transact(self.owner,doc['id'],{'base_revision':doc['revision'],'ops':[{'op':'patch_whiteboard','changes':[{'kind':'element','id':'doodle','position':0,'value':element}]}]})
+        with self.assertRaises(StudioError):self.service.portability.submit(self.owner,doc['id'],{'format':'svg','revision':doc['revision']},background=False)
+        with patch('fireatlas.studio.portability.StorageBudget.check',return_value={}):
+            job=self.service.portability.submit(self.owner,doc['id'],{'format':'native','revision':doc['revision']},background=False)
+        self.assertEqual(job['status'],'completed',job)
+        path,_=self.service.portability.download(self.owner,job['id'])
+        restored=self.service.portability.restore(self.other,path)['document']
+        self.assertEqual(self.service.store.whiteboard(self.other,restored['id'])['elements'][0]['text'],'A drawing')
+
     def test_export_retry_reuses_saved_revision_and_rejects_another_intent(self):
         doc=self.add_card(self.board(),'note',kind='text',text='Frozen first revision')
         body={'format':'svg','revision':doc['revision']}

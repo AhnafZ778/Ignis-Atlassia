@@ -48,11 +48,39 @@ EARTH_MODEL = PROJECT_ROOT / "earth.html"
 NATIVE_MASK_ROOT = PROJECT_ROOT / "NASA_data" / "fire_masks"
 NATIVE_MASK_INVENTORY = NATIVE_MASK_ROOT / "local_asset_inventory.csv"
 DOC_ASSETS = {
+    '/demo/rajshahi-peak-days.fireatlas.zip': (PROJECT_ROOT/'deployment/demo/rajshahi-peak-days.fireatlas.zip', 'application/zip'),
+    **{('/data/environment-analogues/v1/'+name):(PROJECT_ROOT/'site/data/environment-analogues/v1'/name, 'application/json') for name in ('manifest.json','park.json','matches.json')},
+    **{('/data/park-platforms/v1/'+name):(PROJECT_ROOT/'site/data/park-platforms/v1'/name, 'application/json' if name.endswith('.json') else 'application/gzip') for name in ('manifest.json','2024-07-25.json.gz','2024-07-26.json.gz','2024-07-27.json.gz','2024-07-28.json.gz')},
+    **{("/data/finding-comparisons/v1/"+name): (PROJECT_ROOT / "site/data/finding-comparisons/v1" / name, "application/json; charset=utf-8") for name in ("norcal.json", "punjab-haryana.json", "manifest.json")},
+    **{('/docs/qualification/'+name):(PROJECT_ROOT/'docs/qualification'/name,'application/json' if name.endswith('.json') else 'text/markdown; charset=utf-8') for name in ('REVIEWER_PACKET.md','IMPLEMENTATION.md','monthly-review-template.json','daily-review-template.json','task-study-template.json','AI_EXPLORATION.md','AUTOMATED_METHOD_AUDIT.md','automated-method-audit.json','research-runtime.json','research-environment.lock.txt')},
+    "/docs/MENTOR_CRITERIA_STATUS.md": (PROJECT_ROOT / "docs" / "MENTOR_CRITERIA_STATUS.md", "text/markdown; charset=utf-8"),
+    "/docs/MENTOR_GAP_ASSESSMENT.md": (PROJECT_ROOT / "docs" / "MENTOR_GAP_ASSESSMENT.md", "text/markdown; charset=utf-8"),
+    "/docs/mentor-gap-evidence.json": (PROJECT_ROOT / "docs" / "mentor-gap-evidence.json", "application/json"),
     "/docs/NASA_DATA_IMPORT.md": (PROJECT_ROOT / "docs" / "NASA_DATA_IMPORT.md", "text/markdown; charset=utf-8"),
     "/docs/DATA.md": (PROJECT_ROOT / "docs" / "DATA.md", "text/markdown; charset=utf-8"),
     "/docs/AI_USE.md": (PROJECT_ROOT / "docs" / "AI_USE.md", "text/markdown; charset=utf-8"),
 }
 ASSETS = {
+    "/environment-analogues.js": ("environment-analogues.js", "text/javascript; charset=utf-8"),
+    "/environment-analogues.css": ("environment-analogues.css", "text/css; charset=utf-8"),
+    "/park-comparison.js": ("park-comparison.js", "text/javascript; charset=utf-8"),
+    "/park-comparison.css": ("park-comparison.css", "text/css; charset=utf-8"),
+    "/finding-comparison.js": ("finding-comparison.js", "text/javascript; charset=utf-8"),
+    "/finding-comparison.css": ("finding-comparison.css", "text/css; charset=utf-8"),
+    "/sensor-maps.css": ("sensor-maps.css", "text/css; charset=utf-8"),
+    "/area-availability.js": ("area-availability.js", "text/javascript; charset=utf-8"),
+    "/comparison-map.js": ("comparison-map.js", "text/javascript; charset=utf-8"),
+    "/clean-workflow.css": ("clean-workflow.css", "text/css; charset=utf-8"),
+    "/assistant-static.js": ("assistant-static.js", "text/javascript; charset=utf-8"),
+    "/qualification.js": ("qualification.js", "text/javascript; charset=utf-8"),
+    "/qualification-data.js": ("qualification-data.js", "text/javascript; charset=utf-8"),
+    "/qualification.css": ("qualification.css", "text/css; charset=utf-8"),
+    "/harmonization.html": ("harmonization.html", "text/html; charset=utf-8"),
+    "/comparability.css": ("comparability.css", "text/css; charset=utf-8"),
+    "/comparison-route.js": ("comparison-route.js", "text/javascript; charset=utf-8"),
+    "/comparability.js": ("comparability.js", "text/javascript; charset=utf-8"),
+    "/explore-static.js": ("explore-static.js", "text/javascript; charset=utf-8"),
+    "/explore.css": ("explore.css", "text/css; charset=utf-8"),
     "/combined-static.js": ("combined-static.js", "text/javascript; charset=utf-8"),
     "/investigate.html": ("investigate.html", "text/html; charset=utf-8"),
     "/evidence.html": ("evidence.html", "text/html; charset=utf-8"),
@@ -145,6 +173,8 @@ ASSETS = {
     "/assistant-map.js": ("assistant-map.js", "text/javascript; charset=utf-8"),
     "/assistant-workspace.js": ("assistant-workspace.js", "text/javascript; charset=utf-8"),
     "/studio-excalidraw.html": ("studio-excalidraw.html", "text/html; charset=utf-8"),
+    "/park-example.html": ("park-example.html", "text/html; charset=utf-8"),
+    "/park-example.csv": ("park-example.csv", "text/csv; charset=utf-8"),
     "/jarvis-orchestration.js": ("jarvis-orchestration.js", "text/javascript; charset=utf-8"),
     "/jarvis-orchestration.css": ("jarvis-orchestration.css", "text/css; charset=utf-8"),
     "/studio.html": ("studio.html", "text/html; charset=utf-8"),
@@ -243,6 +273,8 @@ def handler_factory(database: Path):
         except (BrokenPipeError, ConnectionResetError):
             pass
         return True
+    comparison_lock = threading.Lock()
+    comparison_cache = {}
     globe_lock = threading.Lock()
     globe_cache = {}
     calendar_cache_lock = threading.Lock()
@@ -450,6 +482,16 @@ def handler_factory(database: Path):
                 except OSError:
                     pass
                 return
+            if url.path == "/api/mask-map":
+                from .mask_map import samples
+                try:
+                    params = parse_qs(url.query)
+                    self._json(samples(params.get("date", [""])[0], _bbox(params)))
+                except (ValueError, TypeError) as exc:
+                    self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+                except (OSError, sqlite3.Error):
+                    self._json({"error": "Native mask samples could not be read."}, HTTPStatus.SERVICE_UNAVAILABLE)
+                return
             if url.path in ("/earth.html", "/Globe.html", "/globe.html"):
                 target = (PROJECT_ROOT / "Globe.html") if url.path in ("/Globe.html", "/globe.html") else EARTH_MODEL
                 if target.is_file():
@@ -470,13 +512,82 @@ def handler_factory(database: Path):
                 file, kind = ASSETS[url.path]
                 self._respond((STATIC / file).read_bytes(), kind)
                 return
+            if url.path.startswith('/data/qualification/') or url.path in {'/api/v2/comparability','/api/v2/comparability-inputs','/api/v2/daily','/api/v2/daily-cohorts','/api/v2/readiness','/api/v2/availability','/api/v2/campaign','/api/v2/acquisition','/api/v2/opportunity','/api/v2/native','/api/v2/native-summary','/api/v2/native-inputs','/api/v2/coverage','/api/v2/coverage-summary','/api/v2/disagreement','/api/v2/disagreement-summary','/api/v2/native-context','/api/v2/native-context-summary','/api/v2/transfer','/api/v2/transfer-summary','/api/v2/transfer-cohorts','/api/v2/footprint-summary','/api/v2/footprint-campaign','/api/v2/transfer-opportunity','/api/v2/transfer-opportunity-summary','/api/v2/opportunity-packet','/api/v2/footprint-part','/api/v2/transfer-provenance','/api/v2/monthly-provenance','/api/v2/daily-hybrid','/api/v2/daily-neighbors','/api/v2/daily-diagnostics','/api/v2/collection-pilot'}:
+                from .qualification_publication import read as read_qualification
+                try:
+                    query=parse_qs(url.query)
+                    release=None
+                    if url.path.startswith('/data/qualification/'):
+                        part=url.path[len('/data/qualification/'):]
+                        if part=='current.json':name=part
+                        else:
+                            match=re.fullmatch(r'releases/([0-9a-f]{64})/(.+)',part)
+                            if not match:raise ValueError('Unsupported qualification artifact.')
+                            release,name=match.groups()
+                    else:
+                        release=query.get('release',[None])[0]
+                        family=url.path[len('/api/v2/'):]
+                        if family in ('readiness','availability','campaign','collection-pilot'):name=family+'.json'
+                        elif family in ('comparability','comparability-inputs','daily','daily-cohorts','transfer','transfer-summary','transfer-cohorts','transfer-opportunity-summary'):
+                            region=query.get('region',['norcal'])[0]
+                            if region not in REGIONS:raise ValueError('Unsupported fixed region.')
+                            name=({'comparability':'monthly','comparability-inputs':'monthly-inputs','daily':'daily','daily-cohorts':'daily-cohorts','transfer':'transfer','transfer-summary':'transfer-summary','transfer-cohorts':'transfer-cohorts','transfer-opportunity-summary':'transfer-opportunity-summary'}[family])+'/'+region+'.json'+('.gz' if family=='transfer' else '')
+                        elif family in ('acquisition','opportunity','native','native-summary','native-inputs','coverage','coverage-summary','disagreement','disagreement-summary','native-context','native-context-summary','footprint-summary','footprint-campaign'):
+                            case=query.get('case',['park-2024'])[0]
+                            if case not in VALIDITY_CASES:raise ValueError('Unsupported fixed case.')
+                            name=family+'/'+case+'.json'+('.gz' if family in ('native','native-inputs','native-context','coverage','disagreement','footprint-campaign') else '')
+                        elif family in ('transfer-opportunity','transfer-provenance','monthly-provenance','daily-hybrid','daily-neighbors','daily-diagnostics','opportunity-packet','footprint-part'):
+                            short_id=family in ('transfer-opportunity','transfer-provenance','monthly-provenance','daily-hybrid','daily-neighbors','daily-diagnostics')
+                            identity=query.get('id' if short_id else 'sha256',[''])[0]
+                            if not re.fullmatch('[0-9a-f]{16}' if short_id else '[0-9a-f]{64}',identity):raise ValueError('Invalid scientific evidence identity.')
+                            name=family+'/'+identity+'.json'+('' if family in ('transfer-provenance','monthly-provenance','daily-diagnostics') else '.gz')
+                        else:raise ValueError('Unsupported versioned API.')
+                    body=read_qualification(PROJECT_ROOT/'site/data/qualification',name,release)
+                    self._respond(body,'application/gzip' if name.endswith('.gz') else 'application/json; charset=utf-8')
+                except (ValueError,OSError,KeyError,TypeError):
+                    self._json({'error':'Qualification evidence unavailable or invalid. Original v1 evidence remains separate.'},HTTPStatus.SERVICE_UNAVAILABLE)
+                return
             if not url.path.startswith("/api/"):
                 self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
                 return
             try:
                 params = parse_qs(url.query)
+                if url.path == "/api/park-platforms":
+                    from .park_platforms import read_park_day
+                    try:
+                        self._json(read_park_day(params.get('date', ['2024-07-25'])[0]))
+                    except (OSError, sqlite3.Error):
+                        self._json({'error':'NOAA campaign archive is unavailable.'}, HTTPStatus.SERVICE_UNAVAILABLE)
+                    return
                 if "demo" in params:
                     raise ValueError("The synthetic showcase has been retired; remove the demo parameter.")
+                if url.path in ("/api/comparability", "/api/comparability/case"):
+                    from .comparability import build as build_comparison
+                    from .comparison_evidence import build_case as build_comparison_case, CASES as COMPARISON_CASES
+                    is_case = url.path.endswith("/case")
+                    selection = params.get("case" if is_case else "region", ["park-2024" if is_case else "norcal"])[0]
+                    if selection not in (COMPARISON_CASES if is_case else REGIONS):
+                        raise ValueError("Choose a supported fixed case or region.")
+                    dependencies = ([PROJECT_ROOT / "site/data/v2/validity" / (selection + ".zip")] if is_case
+                                    else [database, Path(str(database) + "-wal"), NOTICE_FILE])
+                    stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None for p in dependencies)
+                    key = (is_case, selection, stamps)
+                    with comparison_lock:
+                        if key not in comparison_cache:
+                            if is_case:
+                                result = build_comparison_case(selection)
+                            else:
+                                with contextlib.closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True)) as db:
+                                    db.row_factory = sqlite3.Row
+                                    db.execute("PRAGMA query_only=ON")
+                                    db.execute("BEGIN")
+                                    result = build_comparison(db, selection)
+                            if len(comparison_cache) >= 8:
+                                comparison_cache.clear()
+                            comparison_cache[key] = result
+                        result = comparison_cache[key]
+                    self._json(result)
+                    return
                 if url.path in ("/api/replay", "/api/replay/catalog"):
                     stamps = tuple((p.stat().st_mtime_ns, p.stat().st_size) if p.exists() else None
                                    for p in (database, Path(str(database) + "-wal")))

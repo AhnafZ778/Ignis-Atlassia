@@ -1,0 +1,43 @@
+{
+  "schema": "fireatlas-native-opportunity-protocol-v2",
+  "id": "native-opportunity-v2.0.0",
+  "state": "frozen-proposal-awaiting-human-approval",
+  "target": "fixed-region-or-pilot-native-footprint-opportunity",
+  "grid": "EPSG:6933 1000m tiles clipped to the fixed geographic ROI",
+  "inventory": "Original UTF-8 CMR page bytes, hashes, stable CMR-Hits and continuous SearchAfter tokens for every explicit standard mask/geolocation product/version. Zero-hit verified searches differ from missing searches. Inventory is candidate geometry, not pixel support. Companion-only candidates without matching mask acquisitions retain unknown evidence rather than no-candidate/no-pass.",
+  "geometry": "Explicit source-hash-bound provider-boundary transcription; no centre interpolation. Independent reviewer verifies provider origin and completeness of all intersecting native boundaries. Polygon calculations alone do not establish authenticity.",
+  "quality": "Original aligned class, latitude/longitude, raw flag, fill metadata, file hashes and dimensions re-extracted. Only raw zero flag excluding known fill supports experimental known geometric states; unknown fill, nonzero flags, partial/overlapping/conflicting support and UTC date ambiguity stay unknown. Independent processing/geometry review is required for validated opportunity.",
+  "review": "Human processing/geometry reviewer, owner-verified identity, exact frame hashes and explicit native/FIRMS collection mapping. Positive, clear, cloud, unusable and missing/unknown examples across the reviewed campaign. Disagree/unresolved outcomes retain the closed gate. AI and synthetic review never qualify opportunity.",
+  "no_pass": "No-candidate remains unknown unless a separate independently checked no-pass example, complete original inventory and adequate candidate geometry are all supported.",
+  "regional": "Every UTC date and clipped ROI grid cell accounted for without overlapping tiles; missing tiles/dates add unknown area. Pilot scope never qualifies a region. Area-weighted known/unknown categories; no independent-cell uncertainty assumption.",
+  "transfer": "Regional report documents measured opportunity changes only. A separate versioned direct-transfer protocol and independent conclusions must assess applicability, unknown support, seasons and platforms. No historical bridge admitted by this protocol.",
+  "limits": {
+    "cells_per_frame": 20000,
+    "daily_rows_per_frame": 200000,
+    "mask_granules": 500,
+    "pixels": 200000,
+    "vertices": 1000000,
+    "contacts": 2000000,
+    "frames_per_campaign": 256,
+    "daily_rows_per_campaign": 8000000,
+    "expanded_artifact_bytes": 512000000,
+    "compressed_artifact_bytes": 128000000,
+    "additional_work_bytes": 10000000000,
+    "minimum_free_bytes": 20000000000
+  },
+  "references": [
+    "https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html",
+    "https://modis.gsfc.nasa.gov/data/dataprod/mod03.php",
+    "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/1/VNP03IMG"
+  ],
+  "source_sha256": {
+    "fireatlas/opportunity_frames.py": "c7225af45d77284a4adb83092b994f859c89442b53918acea2f451b18d0cc37d",
+    "fireatlas/opportunity_review.py": "a002de7fb6d68d6fb755ee818f16b543311ca00ebe285035a471df691d7b7706",
+    "fireatlas/coverage.py": "f29c8df5965d71bb39d21e07274dc3a1b8f69cf9a38f550fc40c5c309322ccdb",
+    "fireatlas/masks.py": "2a2877024074df24eb64727c8c603a6d737e0654bd763782cee8f33195140455",
+    "fireatlas/native_context.py": "e2c4d9725750df01eaf6400395d567b9b5b6cc9c419bb9886ebb8e926ad7b476",
+    "fireatlas/core.py": "f429dae254cc414f2b0d436e91d9f2d7136e52004d7507ce7ba0b9b1ef347108",
+    "fireatlas/regions.py": "b56e10da7815f05f788591bc8baa2e75162637f17586ad5ef72d4759c90be005",
+    "fireatlas/validity.py": "25a0cfb678bf7fbe61ca707da387332adf407bda7ca384fb75ce25375aff31b0"
+  }
+}

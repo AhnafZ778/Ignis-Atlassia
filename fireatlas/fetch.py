@@ -24,13 +24,19 @@ AVAILABILITY_URL = API_HOSTS[0] + "/api/data_availability/csv"
 FIRMS_SOURCES = {source for source in SOURCES if source != "NOAA_HMS_VIIRS"}
 
 
-def _download(url: str, label: str) -> str:
+def _download(url: str, label: str, *, limit: int | None = None) -> str:
     """Try NASA's documented secondary server for transport and server failures."""
     for index, host in enumerate(API_HOSTS):
         candidate = url.replace(API_HOSTS[0], host, 1)
         try:
             with urlopen(candidate, timeout=15) as response:
-                return response.read().decode("utf-8-sig")
+                raw = response.read() if limit is None else response.read(limit + 1)
+                if limit is not None and len(raw) > limit:
+                    raise ValueError(f"FIRMS response is too large for {label}. Try a shorter window.")
+                try:
+                    return raw.decode("utf-8-sig")
+                except UnicodeDecodeError:
+                    raise ValueError(f"FIRMS returned invalid text for {label}.") from None
         except HTTPError as exc:
             # A rejected key, bad request or rate limit will not improve by
             # repeating the same request on another server.

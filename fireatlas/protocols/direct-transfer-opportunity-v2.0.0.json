@@ -1,0 +1,28 @@
+{
+  "schema": "fireatlas-transfer-opportunity-protocol-v2",
+  "id": "direct-transfer-opportunity-v2.0.0",
+  "state": "frozen-proposal-awaiting-human-approval",
+  "target": "direct-retrospective-source-collection-platform-comparability-with-regional-opportunity",
+  "count_method": "Unchanged direct-transfer-v1.0.0; fixed baselines, chronological forward/backward evaluation and independent count protocol approval. AI/synthetic results cannot qualify.",
+  "opportunity_method": "Unchanged native-opportunity-v2.0.1 regional reports reconstructed from exact reviewed campaigns and original file binding. Required dates include every day of every eligible comparison month; exact ordered source/target cohorts, fixed region, no duplicate reports.",
+  "support_rules": "Complete requested ROI/date/cohort support, independent processing/geometry review, and nonzero known AND usable area in every season and exact cohort. This is minimum support, not a claim that opportunity differences are negligible or that unknown area is acceptable. Each explicit standard-cohort native platform also needs measured known/usable acquisition-cell support in every season, with shared mask/companion group identities deduplicated and invalid geometry groups retained explicitly. Acquisition-cell area is not a regional daily denominator. Platform evidence is restricted to the exact report region and cohorts; lack of positive detections cannot remove a platform from the gate.",
+  "conclusions": "Separate owner-verified independent conclusions bind evaluation hash and explicitly assess target/partitions, measured opportunity changes, unknown support with rationale, seasons/platforms, permitted claims and limitations. No manually supplied passed summary replaces recount.",
+  "permitted_scope": "Retrospective direct overlap comparability only; no new blind-confirmation claim for inspected records. Qualified historical deployment needs separate source-era opportunity/applicability protocol and evidence; pre-VIIRS observations are never invented. No forecasts, factor chains, observation overwrite or synthetic detection locations.",
+  "streaming_limits": {
+    "maximum_packets": 12400,
+    "maximum_date_cohort_rows": 25000,
+    "packet_expanded_bytes": 512000000,
+    "packet_compressed_bytes": 128000000,
+    "native_acquisition_cell_samples_per_packet": 2000000,
+    "native_acquisition_groups_total": 500000
+  },
+  "source_sha256": {
+    "fireatlas/transfer_opportunity.py": "0f32c8011cf778681e4ced85e9667c50f0203cfa30977eeac83d8088a552be32",
+    "fireatlas/transfer.py": "320135de0163eded3cdf3b0d517d8f397596e17ebcfdbcce79f7b79473c259e7",
+    "fireatlas/continuity.py": "435d55d7c382c0c7bba9c44b9d555264e6adf6ec4dd5a64bf4c7fcf148a0dc60",
+    "fireatlas/opportunity_frames.py": "aec4430d2de67c82d61b7695f1a111fc595be3aa2e56f578859a3c1ebe68c2a3",
+    "fireatlas/opportunity_review.py": "820cab12f1f17561fe843b43a2acf31626465a8fdd7624742c4c841a3389b6d3",
+    "fireatlas/protocols/direct-transfer-v1.0.0.json": "029f189c6a32c1e4da434bd41263fd739e7014e2dc6d92f7d508998ff72a9528",
+    "fireatlas/protocols/native-opportunity-v2.0.1.json": "357ee1aa36dffb3569dce507e179a95c8cca3319552a6d25dd3687a862f69dc4"
+  }
+}

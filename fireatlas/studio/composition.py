@@ -11,7 +11,8 @@ def presentation_entries(operation, snapshot, snapshots, source):
     if operation=='replay':
         entries += [('chart','MODIS · daily occupied cells',snapshot,'MODIS_SP'),('chart','S-NPP VIIRS · daily occupied cells',snapshot,'VIIRS_SNPP_SP')]
     entries += [('timeline','Collected-export availability',sid,'joint') for sid in snapshots[1:]]
-    entries += [('finding','Checked findings and interpretation',snapshot,source)]
+    if operation != 'comparability':
+        entries += [('finding','Checked findings and interpretation',snapshot,source)]
     if operation in {'replay','research'}:entries.append(('observation','Original source records',snapshot,source))
     entries += [('note-question','Question and evidence boundary',None,'joint'),('chapter-frame','Editable presentation and workflow',None,'joint')]
     return entries
@@ -40,7 +41,7 @@ def decorate(ops, entries, context, payload, top, identifier):
         group=maps if kind in {'map','calendar'} else charts if kind=='chart' else ending if kind in {'note-question','chapter-frame'} else evidence
         group.append(card['id'])
     for name,title,ids in [('views','01 / Captured view and sensor maps',maps),('activity','02 / Activity through time',charts),('evidence','03 / Evidence, availability and findings',evidence),('story','04 / Questions, story and workflow',ending)]:
-        if ids:ops.append({'op':'set_group','group':{'id':identifier('group-'+name),'title':title,'card_ids':ids}})
+        if len(ids)>=2:ops.append({'op':'set_group','group':{'id':identifier('group-'+name),'title':title,'card_ids':ids}})
     return day
 
 

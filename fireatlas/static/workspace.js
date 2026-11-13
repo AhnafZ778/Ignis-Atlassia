@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Display tools remain a single row on desktop and an optional disclosure on mobile.
 document.addEventListener('DOMContentLoaded',()=>{
  const settings=document.querySelector('.mission-display-settings');
- if(settings){const phone=matchMedia('(max-width:760px)');const apply=()=>{settings.open=!phone.matches;};apply();phone.addEventListener('change',apply);}
+ if(settings&&!settings.hasAttribute('data-compact')){const phone=matchMedia('(max-width:760px)');const apply=()=>{settings.open=!phone.matches;};apply();phone.addEventListener('change',apply);}
 });
 
 document.addEventListener('DOMContentLoaded',()=>{

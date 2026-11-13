@@ -1,0 +1,23 @@
+{
+  "citation": "NASA FIRMS / NASA Land, Atmosphere Near real-time Capability for EOS (LANCE), standard VIIRS active fire products; NASA LAADS DAAC open-data policy.",
+  "data_policy": "https://ladsweb.modaps.eosdis.nasa.gov/learn",
+  "files": {
+    "2024-07-25.json.gz": {
+      "bytes": 213093,
+      "sha256": "e8c95a8e47f6b7195922aef5480f2e809196ad5efc39bba13c943d89d63b557f"
+    },
+    "2024-07-26.json.gz": {
+      "bytes": 213671,
+      "sha256": "1a5011f4c7978890537c656f763b4a9b1b2866a18ea79b0a22657fc987a35933"
+    },
+    "2024-07-27.json.gz": {
+      "bytes": 208157,
+      "sha256": "286a525632c06fa6db6b1f5b4c7ed5629dab1132434a19a0c9b743af429aa3ad"
+    },
+    "2024-07-28.json.gz": {
+      "bytes": 57080,
+      "sha256": "5cdd2a4b0b7342b1a7b8fcee0257ce8fe71323cbcebdf74cc7afff53f566cfa7"
+    }
+  },
+  "schema": "fireatlas-park-platform-publication-v1"
+}

@@ -79,6 +79,100 @@ class StudioHttpTests(unittest.TestCase):
         self.assertEqual(status, 201, document)
         return document
 
+    def test_whiteboard_http_preserves_ownership_and_same_origin(self):
+        document = self.board()
+        path = '/api/studio/documents/' + document['id']
+        body = {'base_revision': document['revision'], 'ops': [{'op': 'patch_whiteboard', 'changes': [
+            {'kind': 'element', 'id': 'shape', 'value': {'id': 'shape', 'type': 'rectangle'}, 'position': 0}
+        ]}]}
+        self.assertEqual(self.bob.call('GET', path + '/whiteboard')[0], 404)
+        self.assertEqual(self.alice.call('POST', path + '/transactions', body, origin=False)[0], 403)
+        self.assertEqual(self.alice.call('POST', path + '/transactions', body)[0], 200)
+        status, drawing, _ = self.alice.call('GET', path + '/whiteboard')
+        self.assertEqual(status, 200)
+        self.assertEqual([element['id'] for element in drawing['elements']], ['shape'])
+
+    def test_whiteboard_conversation_http_is_board_owned(self):
+        document=self.board(); path='/api/studio/documents/'+document['id']+'/assistant/conversation'
+        studio=self.server.RequestHandlerClass.studio
+        with studio.store.connection() as db:
+            principal=db.execute('SELECT owner_id FROM documents WHERE id=?',(document['id'],)).fetchone()['owner_id']
+        owner=studio.assistant_owner(principal)
+        studio.assistant.store.artifact(owner,'studio_access',{'principal':principal,'document_id':document['id']})
+        studio.jarvis.save_conversation_turn(owner,document['id'],'test-run','What changed?',{'title':'Change','summary':'Review the trend.'})
+        status,body,_=self.alice.call('GET',path)
+        self.assertEqual(status,200)
+        self.assertEqual(body['turns'][0]['question'],'What changed?')
+        self.assertEqual(self.bob.call('GET',path)[0],404)
+
+    def test_comparison_receipt_download_retains_float_hash_and_owner_check(self):
+        from types import SimpleNamespace
+        from fireatlas.assistant.comparison_research import publish
+        from fireatlas.assistant.contracts import digest
+        from fireatlas.heatmap_comparison import build_comparison
+        from fireatlas.studio.evidence import build_snapshot
+        from tests.test_heatmap_comparison import study, record
+        document=self.board();studio=self.server.RequestHandlerClass.studio
+        with studio.store.connection() as db:
+            principal=db.execute('SELECT owner_id FROM documents WHERE id=?',(document['id'],)).fetchone()['owner_id']
+        result=publish(SimpleNamespace(store=studio.store),principal,build_comparison([study(rows=[record('2024-05-01')])],mode='annual_peaks'))
+        receipt={k:v for k,v in result.items() if k!='id'}
+        snapshot=build_snapshot(result,{'manifest':{}},{'operation':'regional_comparison','context':result['context']})
+        frozen=studio.store.preserve_assistant_snapshot(principal,document['id'],result['id'],receipt,'snapshot-download',snapshot)
+        path=f"/api/studio/documents/{document['id']}/snapshots/{frozen['id']}/receipt?download=1"
+        status,raw,headers=self.alice.call('GET',path,raw=True)
+        self.assertEqual(status,200);self.assertIn('attachment',headers['Content-Disposition'])
+        downloaded=json.loads(raw)
+        self.assertEqual(downloaded['sha256'],digest({k:v for k,v in downloaded.items() if k not in ('id','sha256')}))
+        self.assertIsInstance(downloaded['context']['distance_km'],float)
+        self.assertEqual(self.bob.call('GET',path)[0],404)
+
+    def test_csv_upload_respects_origin_ownership_and_exact_download(self):
+        document=self.board();path='/api/studio/documents/'+document['id']+'/datasets?name=test.csv'
+        data=b'column,value\n1,0\n'
+        def upload(client,origin=True):
+            headers={'Content-Type':'text/csv','Cookie':client.cookie}
+            if origin:headers['Origin']=self.base
+            request=Request(self.base+path,data=data,method='POST',headers=headers)
+            try:
+                with urlopen(request) as response:return response.status,json.loads(response.read())
+            except HTTPError as error:return error.code,json.loads(error.read())
+        self.assertEqual(upload(self.alice,False)[0],403)
+        self.assertEqual(upload(self.bob)[0],404)
+        status,result=upload(self.alice);self.assertEqual(status,201)
+        url='/api/studio/documents/'+document['id']+'/datasets/'+result['id']
+        self.assertEqual(self.bob.call('GET',url)[0],404)
+        self.assertEqual(self.alice.call('GET',url+'/download',raw=True)[1],data)
+        self.assertEqual(self.bob.call('GET',url+'/scatter?x=column&y=value')[0],404)
+        status,chart,_=self.alice.call('GET',url+'/scatter?x=column&y=value')
+        self.assertEqual(status,200)
+        self.assertEqual(chart['points'],[{'row':2,'x':1.0,'y':0.0}])
+
+    def test_pdf_upload_is_owned_and_downloads_exact_bytes(self):
+        document=self.board();path='/api/studio/documents/'+document['id']+'/source-documents?name=paper.pdf'
+        data=b'%PDF-1.4\nfixture\n%%EOF'
+        def upload(client,origin=True):
+            headers={'Content-Type':'application/pdf','Cookie':client.cookie}
+            if origin:headers['Origin']=self.base
+            try:
+                with urlopen(Request(self.base+path,data=data,method='POST',headers=headers)) as response:return response.status,json.loads(response.read())
+            except HTTPError as error:return error.code,json.loads(error.read())
+        self.assertEqual(upload(self.alice,False)[0],403)
+        self.assertEqual(upload(self.bob)[0],404)
+        status,source=upload(self.alice);self.assertEqual(status,201)
+        url='/api/studio/documents/'+document['id']+'/source-documents/'+source['id']+'/download'
+        self.assertEqual(self.bob.call('GET',url)[0],404)
+        self.assertEqual(self.alice.call('GET',url,raw=True)[1],data)
+
+    def test_park_chart_requires_owned_same_origin_board(self):
+        document=self.board();path='/api/studio/documents/'+document['id']+'/park-timeline'
+        self.assertEqual(self.alice.call('POST',path,{},origin=False)[0],403)
+        self.assertEqual(self.bob.call('POST',path,{})[0],404)
+        status,result,_=self.alice.call('POST',path,{})
+        self.assertEqual(status,201)
+        self.assertEqual(len(result['rows']),4)
+        self.assertIsNone(result['rows'][0]['values']['VIIRS_SNPP_SP'])
+
     def test_delete_requires_owner_origin_and_current_revision(self):
         document = self.board()
         path = '/api/studio/documents/' + document['id']
@@ -107,7 +201,7 @@ class StudioHttpTests(unittest.TestCase):
         self.assertEqual(Client(self.base).call("GET", "/api/studio/prompt-presets")[0], 401)
         status, catalog, _ = self.alice.call("GET", "/api/studio/prompt-presets")
         self.assertEqual(status, 200)
-        self.assertEqual(len(catalog["presets"]), 7)
+        self.assertEqual({item['id'] for item in catalog['presets']}, {'curated-current','curated-park-2024','curated-camp-2018','curated-grove-2025','save-current','checked-charts','source-states','source-rows'})
         mine, other = self.board(), self.board(self.bob)
         body = {"message": catalog["presets"][1]["prompt"], "context": {
             "schema": "fireatlas-jarvis-context-v1", "surface": "studio",

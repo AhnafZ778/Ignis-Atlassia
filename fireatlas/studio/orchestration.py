@@ -75,7 +75,7 @@ def normalize(value):
     if url.fragment and (__import__('re').fullmatch(r'[A-Za-z0-9_./:%-]{1,256}',url.fragment) is None):raise StudioError('Return fragments must name a public section.')
     # URLs contain only public study/display selection, never notebook or owned object IDs.
     from urllib.parse import parse_qsl
-    if any(k not in STUDY_KEYS | {'calendar_metric','scope','split','tab','section','context_version','analysis_month','guide','guide_step','origin_route','geometry'} for k,_ in parse_qsl(url.query)):
+    if any(k not in STUDY_KEYS | {'calendar_metric','scope','split','tab','section','context_version','analysis_month','guide','guide_step','origin_route','geometry','cmp_region','cmp_protocol','cmp_year','cmp_switch','cmp_mode'} for k,_ in parse_qsl(url.query)):
         raise StudioError('Return links contain unsupported private parameters.', code='invalid-context')
     return {'schema':CONTEXT_SCHEMA,'surface':value['surface'],'origin_instance_id':value['origin_instance_id'],
             'origin_tab_id':value['origin_tab_id'],'context_revision':rev,'study_selection':study,
@@ -126,7 +126,7 @@ class Commands:
         context = normalize(body.get('context'))
         args = graph.small_json(body.get('arguments') or {}, 'Recipe arguments', 16000)
         if set(args)-ARGUMENTS[recipe]:raise StudioError('Unknown typed recipe argument.')
-        if 'layout' in args and args['layout'] != 'curated':raise StudioError('Choose the supported curated layout.')
+        if 'layout' in args and args['layout'] not in {'curated','minimal'}:raise StudioError('Choose a supported layout.')
         if 'export_formats' in args and (not isinstance(args['export_formats'],list) or not 1<=len(args['export_formats'])<=5 or len(set(args['export_formats']))!=len(args['export_formats']) or any(f not in {'native','excalidraw','svg','png','pdf'} for f in args['export_formats'])):
             raise StudioError('Choose up to five distinct supported local export formats.')
         if recipe=='continue_investigation' and args.get('action') not in FOLLOW_ACTIONS:raise StudioError('Choose a supported follow-up action.')
@@ -255,14 +255,17 @@ class Commands:
                     receipt=self.service.science.call(principal,primary,context['study_selection'],context['active_view'].get('arguments') or {},flag)
                     receipts=[receipt]
                 expected=context['active_view'].get('arguments',{}).get('expected_result_sha256')
-                if expected and receipts[0]['payload'].get('meta',{}).get('result_sha256')!=expected:
+                actual_hash = receipts[0]['payload'].get('meta',{}).get('result_sha256')
+                if receipts[0]['operation'] == 'comparability':
+                    actual_hash = receipts[0]['payload'].get('result',{}).get('result_sha256')
+                if expected and actual_hash!=expected:
                     raise Conflict('The displayed harmonized result changed. Recapture its current result; the selection was retained.',code='stale-result')
                 operation=receipts[0]['operation']
                 omissions=[]
                 if operation not in {'replay','research','harmonized','calendar','missingness'}:
                     omissions.append({'artifact':'daily activity charts','reason':'This evidence contract does not provide a compatible daily activity series.'})
                 # Availability is a distinct contract; retain its label instead of treating it as fire activity.
-                if operation!='missingness' and recipe!='findings_to_workflow':
+                if operation not in {'missingness','finding_comparison'} and recipe!='findings_to_workflow' and args.get('layout')!='minimal':
                     try:
                         availability=self.service.science.call(principal,'missingness',context['study_selection'],{},flag)
                         if availability['release_id']!=receipts[0]['release_id']:raise StudioError('Availability has another release; frozen source retained.')
@@ -276,6 +279,26 @@ class Commands:
                     snap=evidence.build_snapshot(receipt,release, {'operation':receipt['operation'],'context':receipt['context'],'arguments':{}})
                     if not release.get('manifest'):
                         snap['dependency_hashes']={};snap['dependency_status']='Original dependency manifest unavailable; original receipt and release identity retained.'
+                    selection_view=context['active_view'].get('geometry') or {}
+                    if i == 0 and selection_view.get('type') == 'selected-observations':
+                        from .selected_rows import selection_rows
+                        selection,_=selection_rows(selection_view.get('selection'),receipt,
+                            context['study_selection'].get('day'),context['active_view'].get('source') or 'joint')
+                        snap['selected_observations']=selection
+                    if i == 0 and receipt['operation'] == 'finding_comparison':
+                        from calendar import monthrange
+                        pair=receipt['payload']['comparison']
+                        def month_bounds(value):
+                            y,m=map(int,value.split('-'))
+                            return {'start':value+'-01','end':value+'-'+str(monthrange(y,m)[1]).zfill(2)}
+                        snap['scope']['periods']=[month_bounds(value) for value in pair['dates']]
+                        snap['scope']['period_kind']='disjoint_months'
+                        snap['finding_selection']={'dates':pair['dates'], 'series':receipt['payload']['selected_series']}
+                    if i == 0 and receipt['operation'] == 'comparability':
+                        args=context['active_view'].get('arguments',{})
+                        key='/'.join(str(args.get(k,'')) for k in ('comparison_protocol','comparison_year','comparison_switch'))
+                        if key in receipt['payload'].get('result',{}).get('experiments',{}):
+                            snap['comparison_selection']={'experiment':key,'mode':args.get('comparison_mode') if args.get('comparison_mode') in ('raw','adjusted') else 'adjusted'}
                     snap=self.store.add_snapshot(principal,did,snap,stable(cid,'snapshot-'+str(i))); snaps.append(snap['id'])
                 prepared={'snapshots':snaps,'primary_operation':operation,'omissions':omissions,'trace':[{'operation':r['operation'],'context':r['context'],'result_id':r['id'],'receipt_sha256':r['sha256'],'execution':'saved-result' if i<len(capture['results']) else 'recorded-execution'} for i,r in enumerate(receipts)]}
                 self.checkpoint(cid,'prepared',prepared)
@@ -287,7 +310,7 @@ class Commands:
                     snap=self.store.get_snapshot(principal,did,sid)
                     # Frozen node preserves the old result; operation node reruns on the current board study.
                     nodes += [{'id':f'frozen{i}','type':'evidence_input','label':'Captured evidence','params':{'snapshot_id':sid}},
-                              {'id':f'calculate{i}','type':'operation','label':f"Rerun {snap['operation']}",'params':{'operation':snap['operation'],'context':context['study_selection'],'arguments':{}}},
+                              {'id':f'calculate{i}','type':'operation','label':f"Rerun {snap['operation']}",'params':{'operation':snap['operation'],'context':context['study_selection'],'arguments':context['active_view'].get('arguments',{}) if i==0 else {}}},
                               {'id':f'card{i}','type':'card_output','label':'Prepare checked card','inputs':{'content':f'calculate{i}'},'params':{'card_type':'chart','title':f"{snap['operation']} result"}}]
                 nodes.append({'id':'insert','type':'board_insert','label':'Insert new frozen result cards','inputs':{'items':[f'card{i}' for i in range(len(prepared['snapshots']))]}})
                 nodes.append({'id':'export','type':'portable_export','label':'Prepare whole-board native export','inputs':{'board':'insert'},'params':{'format':'native'}})
@@ -306,14 +329,16 @@ class Commands:
                 source_view=context['active_view']; snapshot=self.store.get_snapshot(principal,did,prepared['snapshots'][0])
                 entries=[]
                 if recipe not in {'selection_to_chart_set','findings_to_workflow'}:
-                    entries.append(('map' if prepared['primary_operation']=='replay' else 'calendar' if prepared['primary_operation']=='harmonized' else 'source-evidence' if prepared['primary_operation']=='validation' else 'chart','Captured visualization',snapshot['id'], source_view.get('source') or context['study_selection']['source']))
-                if prepared['primary_operation'] in {'replay','research','harmonized','calendar','missingness'}:
+                    entries.append(('map' if prepared['primary_operation']=='replay' else 'calendar' if prepared['primary_operation']=='harmonized' else 'source-evidence' if prepared['primary_operation']=='validation' else 'chart','Challenge your finding' if prepared['primary_operation']=='finding_comparison' else 'Environmental analogues' if prepared['primary_operation']=='environment_analogues' else 'Captured visualization',snapshot['id'], source_view.get('source') or context['study_selection']['source']))
+                if prepared['primary_operation'] in {'replay','research','harmonized','calendar','missingness'} and args.get('layout')!='minimal':
                     entries.append(('chart','Daily activity · captured contract',snapshot['id'],context['study_selection']['source']))
-                if prepared['primary_operation']=='replay':
+                if prepared['primary_operation']=='replay' and args.get('layout')!='minimal':
                     for source in ('MODIS_SP','VIIRS_SNPP_SP'): entries.append(('chart',('MODIS' if source=='MODIS_SP' else 'S-NPP VIIRS')+' · daily occupied cells',snapshot['id'],source))
                 for sid in prepared['snapshots'][1:]: entries.append(('timeline','Collected-export availability',sid,'joint'))
-                entries.append(('finding','Checked findings',snapshot['id'],context['study_selection']['source']))
-                entries.append(('note-question','Question to investigate',None,'joint'))
+                if args.get('layout')!='minimal' or prepared['primary_operation']=='calendar':
+                    entries.append(('finding','Checked findings',snapshot['id'],context['study_selection']['source']))
+                if args.get('layout')!='minimal' or prepared['primary_operation'] in {'finding_comparison','environment_analogues'}:
+                    entries.append(('note-question','Your finding',None,'joint'))
                 if args.get('layout')=='curated':
                     from .composition import presentation_entries
                     entries=presentation_entries(prepared['primary_operation'],snapshot['id'],prepared['snapshots'],source_view.get('source') or context['study_selection']['source'])
@@ -326,14 +351,23 @@ class Commands:
                         asset_step=self.service.add_asset(principal,did,base64.b64decode(preview['data']), 'User-approved scientific display preview', 'Captured FireAtlas schematic; original records remain authoritative',identifier=stable(cid,'preview-asset'))
                         self.checkpoint(cid,'preview_asset',asset_step)
                     aid=asset_step['id']
+                finding_x, finding_y = 40, top
+                if prepared['primary_operation']=='finding_comparison':
+                    previous=[c for c in doc['state']['cards'].values() if (c.get('display',{}).get('captured_view') or {}).get('operation')=='finding_comparison']
+                    if previous:
+                        anchor=previous[-1]['transform']; candidate_x=anchor['x']+410; candidate_y=anchor['y']
+                        def overlap(t,x,y):
+                            return x < t['x']+t['w'] and x+380 > t['x'] and y < t['y']+t['h'] and y+270 > t['y']
+                        if not any(overlap(c['transform'],candidate_x,candidate_y) or overlap(c['transform'],candidate_x,candidate_y+310) for c in doc['state']['cards'].values()):
+                            finding_x,finding_y=candidate_x,candidate_y
                 for i,(kind,title,sid,source) in enumerate(entries):
                     view={**source_view,'source':source} if i==0 else {}
-                    card={'id':stable(cid,'card-'+str(i)),'type':kind,'title':title,'text':source_view.get('caption','')[:4000] if i==0 else 'Frozen evidence. Inspect the cited result and its scope.',
+                    card={'id':stable(cid,'card-'+str(i)),'type':kind,'title':title,'text':source_view.get('caption','')[:4000] if i==0 else 'What does this comparison suggest? Add your interpretation here.' if prepared['primary_operation'] in {'finding_comparison','environment_analogues'} and kind=='note-question' else 'Frozen evidence. Inspect the cited result and its scope.',
                           'snapshot_id':sid,'asset_id':aid if i==0 else None,
                           'display':{'day':context['study_selection'].get('day'),'source':source,'captured_view':view, **({'preview':'heat'} if kind=='map' and not aid else {})},
                           'provenance':{'command_id':cid,'workflow_id':workflow['id'],'return_destination':context['return_destination']},
                           'follow':'pinned','pinned_study':{'context':{**context['study_selection'],'source':source}},
-                          'transform':{'x':40+(i%3)*410,'y':top+(i//3)*310,'w':380,'h':270}}
+                          'transform':{'x':finding_x if prepared['primary_operation']=='finding_comparison' else 40+(i%3)*410,'y':finding_y+i*310 if prepared['primary_operation']=='finding_comparison' else top+(i//3)*310,'w':380,'h':270}}
                     ops.append({'op':'add_card','card':card})
                 if args.get('layout')=='curated':
                     from .composition import decorate

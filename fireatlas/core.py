@@ -33,6 +33,7 @@ SOURCES = {
     "VIIRS_SNPP_NRT": ("VIIRS", "NRT"),
     "VIIRS_NOAA20_SP": ("VIIRS", "SP"),
     "VIIRS_NOAA20_NRT": ("VIIRS", "NRT"),
+    "VIIRS_NOAA21_SP": ("VIIRS", "SP"),
     "VIIRS_NOAA21_NRT": ("VIIRS", "NRT"),
     "NOAA_HMS_VIIRS": ("VIIRS", "NOAA HMS"),
 }
@@ -43,6 +44,7 @@ SERIES = {
     "hms-viirs": ("NOAA_HMS_VIIRS",),
     "viirs-noaa20": ("VIIRS_NOAA20_SP",),
     "viirs-noaa20-nrt": ("VIIRS_NOAA20_NRT",),
+    "viirs-noaa21": ("VIIRS_NOAA21_SP",),
     "viirs-noaa21-nrt": ("VIIRS_NOAA21_NRT",),
     "viirs-snpp-nrt": ("VIIRS_SNPP_NRT",),
     "modis-nrt": ("MODIS_NRT",),

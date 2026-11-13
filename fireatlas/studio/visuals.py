@@ -74,6 +74,31 @@ def prepared(card, snapshots, receipts, chapter):
         selection = chapter.get("selection") or {}
         day, interval_start, interval_end, has_interval = selected_dates(scope, chapter)
         frames = payload.get("frames", [])
+        if card and card['type'] == 'chart' and receipt.get('operation') == 'finding_comparison':
+            pair=payload['comparison']; series=pair['series']
+            rows=[{'date':date,'modis':series['modis'][key], 'reference':series['viirs'][key],
+                   'prediction':series['adjusted'][key]} for date,key in zip(pair['dates'],('first','second'))]
+            return {'kind':'monthly-comparison','scope':scope,'day':day,'rows':rows,
+                    'interval':{'start':interval_start,'end':interval_end},'unit':payload['unit'],
+                    'mode':'adjusted','selected_series':payload['selected_series'],'label':'Two selected months; highlighted interpretation: '+payload['selected_series']+'. Observations and estimates are distinct.'}
+        if card and card['type'] == 'chart' and receipt.get('operation') == 'comparability':
+            selected = snapshot.get('comparison_selection') or {}
+            item = payload.get('result', {}).get('experiments', {}).get(selected.get('experiment'))
+            if item:
+                rows = [{k: row.get(k) for k in ('date', 'modis', 'reference', 'prediction', 'raw_switch', 'adjusted_switch')} for row in item.get('rows', [])]
+                return {'kind': 'monthly-comparison', 'scope': scope, 'day': day, 'rows': rows,
+                        'interval': {'start': interval_start, 'end': interval_end},
+                        'unit': 'occupied 1 km centroid cell-days', 'mode': selected.get('mode', 'adjusted'),
+                        'label': 'Held-out monthly values from the saved sensor comparison; estimates and observations retain their original columns.'}
+        if card and card['type'] in ('calendar', 'chart') and receipt.get('operation') == 'calendar' and payload.get('daily'):
+            days = [{'date': d['date_utc'], 'value': d.get('detected_cell_days'),
+                     'evidence_state': 'observed' if d.get('detected_cell_days') is not None else 'unknown',
+                     'estimate_type': None, 'coverage_state': d.get('satellite_observation_coverage')}
+                    for d in payload['daily'] if interval_start <= d['date_utc'] <= interval_end]
+            return {'kind': 'calendar', 'scope': scope, 'day': day, 'days': days,
+                    'interval': {'start': interval_start, 'end': interval_end}, 'highlight_dates': selection.get('highlight_dates') or [],
+                    'unit': snapshot['method']['unit'], 'domain': [0, max((d['value'] for d in days if d['value'] is not None), default=0)],
+                    'label': 'Observed occupied cells per UTC date. Unknown exports remain unknown.'}
         if card and card['type'] in ('calendar', 'chart') and payload.get('days') and 'value' in payload['days'][0]:
             days = [{k: d.get(k) for k in ('date', 'value', 'evidence_state', 'estimate_type', 'coverage_state')}
                     for d in payload['days'] if interval_start <= d['date'] <= interval_end]
@@ -218,7 +243,9 @@ def svg(scene):
             text(x + 7, y + 16, f'{view.get("type", "card")}: {view.get("title", "")}'[:22], 10, "#24414a")
     scope = visual.get("scope") or fb.get("scope")
     if scope:
-        text(32, 72, f'UTC {scope["start"]} – {scope["end"]}', 16, "#46606a")
+        periods=scope.get('periods') or []
+        label='UTC selected months '+ ' / '.join(p['start'][:7] for p in periods) if periods else f'UTC {scope["start"]} – {scope["end"]}'
+        text(32, 72, label, 16, "#46606a")
     kind = visual.get("kind")
     if kind == 'image':
         out.append(f'<image x="60" y="88" width="840" height="350" preserveAspectRatio="xMidYMid meet" href="data:{visual["mime"]};base64,{visual["data"]}"/>')
@@ -265,6 +292,32 @@ def svg(scene):
         text(90, 97, 'Animated display crop within the frozen study' if map_camera and visual.get('camera_transition') else f'{n}°N', 13)
         if not map_camera or not visual.get('camera_transition'):
             text(90, 478, f'{w}° longitude → {e}°', 12)
+    elif kind == 'monthly-comparison':
+        text(32, 104, visual['unit'], 14)
+        if visual.get('selected_series') and len(visual['rows']) == 2:
+            rows=visual['rows']; values=[r.get(k) for r in rows for k in ('modis','reference','prediction') if isinstance(r.get(k),(int,float))]
+            maximum=max([1]+values); x=(140,790)
+            out.append('<line x1="140" y1="340" x2="790" y2="340" stroke="#9aaca5"/>')
+            for i,row in enumerate(rows): text(x[i]-20,365,row.get('date',''),14)
+            text(80,345,'0',12); text(45,155,f'{maximum:.2f}',12)
+            for key,focus,color in (('modis','modis','#aa6500'),('reference','viirs','#087b99'),('prediction','adjusted','#514bbb')):
+                a,b=(r.get(key) for r in rows)
+                if a is None or b is None: continue
+                ya,yb=(340-180*a/maximum,340-180*b/maximum)
+                active=visual['selected_series']==focus
+                out.append(f'<line x1="140" y1="{ya:.2f}" x2="790" y2="{yb:.2f}" stroke="{color}" stroke-width="{6 if active else 2}" opacity="{1 if active else .35}"/>')
+                for xx,yy in zip(x,(ya,yb)): out.append(f'<circle cx="{xx}" cy="{yy:.2f}" r="{7 if active else 4}" fill="{color}" opacity="{1 if active else .35}"/>')
+            text(32,408,'Series                     '+str(rows[0].get('date',''))+'                  '+str(rows[1].get('date','')),14)
+            for i,(key,name) in enumerate((('modis','MODIS observed'),('reference','S-NPP observed'),('prediction','MODIS estimate'))):
+                def val(row): return 'unavailable' if row.get(key) is None else f"{row[key]:.2f}"
+                text(32,435+i*23,f"{name:25} {val(rows[0]):>12}                 {val(rows[1]):>12}",13)
+        else:
+            text(32, 135, 'Month                 MODIS            VIIRS observed         MODIS estimate', 14)
+            for index, row in enumerate(visual['rows'][:12]):
+                def value(key):
+                    return 'unknown' if row.get(key) is None else f"{row[key]:.2f}"
+                text(32, 166 + index * 25, f"{row.get('date', '')}                   {value('modis')}                   {value('reference')}                   {value('prediction')}", 13)
+        text(32, 520, visual['label'], 11)
     elif kind == 'calendar':
         days = visual['days']
         offset = datetime.date.fromisoformat(days[0]['date']).weekday() if days else 0

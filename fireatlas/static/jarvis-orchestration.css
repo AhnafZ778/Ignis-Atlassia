@@ -3,3 +3,5 @@
 .analytical-workspace .jarvis-context-strip{flex-basis:100%;font-size:.85rem;overflow-wrap:anywhere}.analytical-workspace .jarvis-transfer select{max-width:100%;padding:8px;border:1px solid #c6b69a;border-radius:6px}.analytical-workspace .jarvis-transfer label{font-size:.85rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 
 .analytical-workspace .jarvis-prompt-presets,.analytical-workspace .jarvis-destination{flex-basis:100%;display:flex;gap:8px;flex-wrap:wrap}.analytical-workspace .jarvis-destination{padding:16px;border:1px solid #c5d4cb;border-radius:12px;min-width:0}.analytical-workspace .jarvis-destination p{flex-basis:100%}
+
+.analytical-workspace .jarvis-transfer[hidden]{display:none!important}

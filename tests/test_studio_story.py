@@ -37,6 +37,22 @@ def fake_video(job_dir, progress, cancel):
 
 
 class StoryTests(StudioCase):
+    def test_snapshot_heat_uses_verified_owned_replay_and_selected_date(self):
+        from fireatlas.studio.errors import NotFound
+        document,snapshot=self.bound_board('replay',kind='map')
+        receipt=self.service.snapshot_receipt(self.owner,document['id'],snapshot['id'])['receipt']
+        day=receipt['payload']['frames'][0]['date_utc']
+        result=self.service.snapshot_heat(self.owner,document['id'],snapshot['id'],day,'MODIS_SP')
+        self.assertEqual(result['snapshot_sha256'],snapshot['snapshot_sha256'])
+        self.assertEqual((result['visual']['day'],result['visual']['source']),(day,'MODIS_SP'))
+        self.assertEqual(result['visual']['scope']['bbox'],snapshot['scope']['bbox'])
+        self.assertEqual(result['visual']['receipt_sha256'],snapshot['receipt_sha256'])
+        self.assertEqual(result['visual']['count'],len(result['visual']['points']))
+        frame=receipt['payload']['frames'][0]
+        self.assertEqual(result['visual']['points'],[{'longitude':c['longitude'],'latitude':c['latitude']} for c in frame['cells'] if 'MODIS_SP' in c['sources']])
+        with self.assertRaises(StudioError):self.service.snapshot_heat(self.owner,document['id'],snapshot['id'],'1900-01-01','joint')
+        with self.assertRaises(NotFound):self.service.snapshot_heat(self.other,document['id'],snapshot['id'],day,'joint')
+
     def paired_heat_story(self):
         document, snapshot = self.bound_board('replay', kind='map')
         document = self.service.transact(self.owner, document['id'], {'base_revision': document['revision'], 'ops': [
@@ -736,31 +752,35 @@ setInterval(() => {}, 1000);
         with self.assertRaises(StudioError):
             manager.get(self.other, job["id"])
 
-    def test_native_engine_calls_actual_adapter_and_records_provider_identity(self):
+    def test_generative_video_submission_is_retired_before_provider_access(self):
+        from fireatlas.studio.errors import Unavailable
         manager = self.manager(capability=lambda: {'available': True, 'engine': 'aiand-native-video'})
         story = self.ready_story()
-        def native(directory, progress, cancel, cache):
-            (directory/'provider-receipts.json').write_text(json.dumps({'model':'minimaxai/minimax-h3','disclosure':'Generated motion with exact frozen evidence.','clips':[]}))
-            return fake_video(directory, progress, cancel)
-        with patch('fireatlas.studio.aiand_video.verify_access'), patch('fireatlas.studio.aiand_video.run', side_effect=native) as adapter:
-            job = self.service.start_render(self.owner, story['id'])
-            manager.execute(job['id'],self.owner)
-        result = manager.get(self.owner,job['id'])
-        self.assertEqual(result['status'],'completed',result)
-        self.assertEqual(result['manifest']['engine'],'aiand-native-video')
-        self.assertEqual(result['manifest']['provider']['model'],'minimaxai/minimax-h3')
-        adapter.assert_called_once()
+        with patch('fireatlas.studio.aiand_video.verify_access') as access, patch('fireatlas.studio.aiand_video.run') as adapter:
+            with self.assertRaisesRegex(Unavailable, 'retired'):
+                self.service.start_render(self.owner, story['id'])
+        access.assert_not_called()
+        adapter.assert_not_called()
 
-    def test_native_failure_never_invokes_local_renderer(self):
+    def test_preexisting_queued_generative_job_stops_before_speech_or_encoder(self):
         from unittest.mock import Mock
         local = Mock(side_effect=AssertionError('Local fallback must not run.'))
-        manager = self.manager(runner=local,capability=lambda:{'available':True,'engine':'aiand-native-video'})
+        voice = Mock(side_effect=AssertionError('Speech must not run.'))
+        manager = self.manager(runner=local, synthesize=voice, capability=lambda:{'available':True,'engine':'local'})
         story = self.ready_story()
-        with patch('fireatlas.studio.aiand_video.verify_access'), patch('fireatlas.studio.aiand_video.run',side_effect=StudioError('AI& unavailable')):
-            job=self.service.start_render(self.owner,story['id'])
-            manager.execute(job['id'],self.owner)
-        self.assertEqual(manager.get(self.owner,job['id'])['status'],'failed')
+        job = self.service.start_render(self.owner, story['id'])
+        options_path = manager.root / job['id'] / 'options.json'
+        options = json.loads(options_path.read_text())
+        options['engine'] = 'aiand-native-video'
+        options_path.write_text(json.dumps(options))
+        with patch('fireatlas.studio.aiand_video.run') as adapter:
+            manager.execute(job['id'], self.owner)
+        result = manager.get(self.owner, job['id'])
+        self.assertEqual(result['status'], 'failed')
+        self.assertIn('retired', result['error'])
         local.assert_not_called()
+        voice.assert_not_called()
+        adapter.assert_not_called()
 
     def test_narration_is_attempted_and_provider_failure_falls_back_silently(self):
         from fireatlas.studio.story import resolve_story  # noqa: F401 - ensure the module imports

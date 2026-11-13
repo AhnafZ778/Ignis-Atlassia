@@ -1,0 +1,6 @@
+# Vercel hosts only the entry page; the complete app runs on Render.
+**
+!vercel.json
+!scripts/
+scripts/**
+!scripts/build_vercel.mjs

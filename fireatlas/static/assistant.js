@@ -179,6 +179,6 @@
     viewTimer=setInterval(()=>{if(ready&&!document.hidden)register().catch(()=>{});},15000);
     window.addEventListener('pagehide',()=>{clearInterval(viewTimer);if(recorder)recorder.stop();if(audio)audio.pause();});
   }
-  window.FireAtlasAssistant={isBusy:()=>busy,investigate,showEvidence,navigate,context,request:api,refreshNotebook:notebook,isReady:()=>ready,stop,notify:message};
+  window.FireAtlasAssistant={isBusy:()=>busy,investigate,showEvidence,navigate,context,request:api,refreshNotebook:notebook,isReady:()=>ready,takeControl:async()=>{const current=await api('sessions',{context:context()});revision=Math.max(revision,current.context.revision);return register(true);},stop,notify:message};
   document.addEventListener('DOMContentLoaded',init);
 })();

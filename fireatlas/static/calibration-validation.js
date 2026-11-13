@@ -48,9 +48,9 @@ FireAtlasPanels.define('calibration-validation', ({document,window,fetch,setTime
     const annual = document.createElement("div");
     annual.className = "calibration-model-stat annual";
     const annualValue = document.createElement("strong");
-    annualValue.textContent = percent(model.median_annual_absolute_percent_error);
+    annualValue.textContent = "Superseded";
     const annualLabel = document.createElement("small");
-    annualLabel.textContent = `median full-year absolute error · ${(model.annual_error_years || []).length} complete held-out years`;
+    annualLabel.textContent = "Legacy metric allowed partial paired-day months; use the complete-month Harmonize experiment.";
     annual.append(annualValue, annualLabel);
     row.append(heading, track, error, annual);
     holder.append(row);
@@ -133,10 +133,10 @@ FireAtlasPanels.define('calibration-validation', ({document,window,fetch,setTime
     const pair = calibration.versions || {};
     const selected = calibration.selected_model;
     $("#calibration-context").hidden = false;
-    $("#calibration-context").textContent = `${data.region.name} · nested outer evaluation ${yearLabel} (${validation.nested_selected_pipeline?.outer_evaluation_folds || 0} folds) · production calendar choice: ${labels[selected] || "no method selected"} · ${pair.MODIS_SP || "MODIS version unknown"} / ${pair.VIIRS_SNPP_SP || "VIIRS version unknown"}`;
+    $("#calibration-context").textContent = `${data.region.name} · nested outer evaluation ${yearLabel} (${validation.nested_selected_pipeline?.outer_evaluation_folds || 0} folds) · legacy descriptive fit: ${labels[selected] || "no method selected"} · ${pair.MODIS_SP || "MODIS version unknown"} / ${pair.VIIRS_SNPP_SP || "VIIRS version unknown"}`;
     const version = calibration.method_version?.match(/v(\d+)$/)?.[1];
     $("#calibration-status").textContent = calibration.status === "calibrated"
-      ? `${calibration.overlap_months?.length || 0} matched complete months · ${validation.nested_selected_pipeline?.outer_evaluation_folds || 0} nested held-out year folds · calibration method ${version ? `v${version}` : "version unknown"}`
+      ? `${calibration.overlap_months?.length || 0} matched month entries (may contain partial paired days) · ${validation.nested_selected_pipeline?.outer_evaluation_folds || 0} nested held-out year folds · calibration method ${version ? `v${version}` : "version unknown"}`
       : `Scaling is not available: ${calibration.status || "no calibration result"}.`;
     const provenance = data.provenance || {};
     const parents = provenance.parent_files || [];

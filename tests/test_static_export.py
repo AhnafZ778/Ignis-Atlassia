@@ -47,18 +47,24 @@ class StaticCalendarExportTests(unittest.TestCase):
         self.assertEqual(compact["static_export"]["schema"], "fireatlas-validity-static-summary-v1")
         self.assertIn("pairs", source["native_masks"]["paired_observations"])
 
-    def test_evidence_card_exposes_traceable_quality_limit_and_link(self):
-        html = (Path(__file__).parents[1] / "fireatlas/static/atlas.html").read_text(encoding="utf-8")
-        script = (Path(__file__).parents[1] / "fireatlas/static/harmonized.js").read_text(encoding="utf-8")
-        for element in ("harm-share-card-quality", "harm-share-card-limit", "harm-share-card-url"):
-            self.assertIn(element, html)
-        self.assertIn("coverage ${coverageStates.map(readable)", script)
-        self.assertIn("ACTIVE FIRE ONLY · pass/cloud coverage unknown", script)
-        self.assertIn("function evidenceHref()", script)
-        self.assertIn('month.estimate_type === "mixed"', script)
-        self.assertIn("paired UTC dates", script)
+    def test_comparison_exposes_traceable_quality_limits_and_recount(self):
+        root = Path(__file__).parents[1] / "fireatlas/static"
+        atlas = (root / "atlas.html").read_text(encoding="utf-8")
+        html = (root / "research.html").read_text(encoding="utf-8") + (root / "evidence.html").read_text(encoding="utf-8")
+        self.assertIn('href="./research.html?tab=comparison"', atlas)
+        for page in ("atlas.html", "index.html", "research.html", "evidence.html", "investigate.html", "studio.html"):
+            self.assertNotIn('>Harmonize</a>', (root / page).read_text(encoding="utf-8"))
+        self.assertIn('src="./comparison-route.js"', (root / "harmonization.html").read_text(encoding="utf-8"))
+        self.assertNotIn('src="./harmonized.js"', atlas)
+        for element in ("compare-admission", "compare-hash", "compare-download", "compare-training", "native-review", "native-parent"):
+            self.assertIn(f'id="{element}"', html)
+        for disclosure in ("occupied grid cells on UTC dates", "counterfactual handoff",
+                           "Daily", "independent review", "python -m fireatlas.comparability verify comparison.json"):
+            self.assertIn(disclosure.lower(), html.lower())
+        # Original numerical algorithms remain reproducible, while the current
+        # interface exposes monthly research with closed daily-imputation gates.
+        script = (root / "harmonized.js").read_text(encoding="utf-8")
         self.assertIn("prediction interval withheld", script)
-        self.assertIn('id="harm-frp-unit"', html)
 
     def test_release_shell_exposes_persona_paths_and_pages_artifact(self):
         root = Path(__file__).parents[1]
@@ -75,7 +81,8 @@ class StaticCalendarExportTests(unittest.TestCase):
         for route in ("replay.html", "research.html", "method.html"):
             self.assertIn(f'href="./{route}"', atlas)
         self.assertIn(".harm-persona-panel", css)
-        self.assertIn("path: site", workflow)
+        self.assertIn("scripts/prepare_pages_release.py", workflow)
+        self.assertIn("path: ${{ runner.temp }}/fireatlas-pages", workflow)
         self.assertTrue((root / "fireatlas/static/.nojekyll").is_file())
         # Public evidence remains tracked while secret patterns still apply
         # inside the publication tree. An unconditional unignore is unsafe.

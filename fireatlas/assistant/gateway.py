@@ -1,4 +1,8 @@
-"""Same-origin public gateway. Local import/sync and review write routes stay private."""
+"""Same-origin public gateway for owned boards and assistant workspaces.
+
+Scientific archive ingestion and human scientific-review writes stay private.
+Studio's own origin, ownership, revision and upload checks remain authoritative.
+"""
 from __future__ import annotations
 import argparse
 import asyncio
@@ -22,15 +26,22 @@ def create_app(database,origin):
     os.environ['FIREATLAS_ASSISTANT_ORIGIN']=origin.rstrip('/')
     handler=handler_factory(Path(database))
     local=ThreadingHTTPServer(('127.0.0.1',0),handler)
+    async def health(request):
+        ready=handler.studio is not None and handler.studio.portability.capabilities()['native']['available']
+        return JSONResponse({'status':'ok' if ready else 'not_ready','studio_available':handler.studio is not None,'native_export_available':bool(ready)},status_code=200 if ready else 503)
     @contextlib.asynccontextmanager
     async def lifespan(app):
         thread=threading.Thread(target=local.serve_forever,daemon=True);thread.start()
         yield
-        await asyncio.to_thread(local.shutdown);local.server_close();handler.assistant.close()
+        await asyncio.to_thread(local.shutdown);local.server_close()
+        if handler.studio is not None:handler.studio.close()
+        handler.assistant.close()
     async def proxy(request:Request):
         path=request.url.path
-        allowed=request.method=='GET' or path.startswith('/api/assistant/') and request.method in {'POST','DELETE'}
-        if not allowed:return JSONResponse({'error':'This public gateway supports read-only science and private assistant workspaces. Imports and review writes run locally.'},status_code=403)
+        allowed=(request.method=='GET'
+                 or path.startswith('/api/assistant/') and request.method in {'POST','DELETE'}
+                 or path.startswith('/api/studio/') and request.method in {'POST','PATCH','DELETE'})
+        if not allowed:return JSONResponse({'error':'This public gateway supports scientific reads, owned Studio boards and private assistant workspaces. Scientific archive imports and review writes run locally.'},status_code=403)
         pieces=[];size=0
         async for chunk in request.stream():
             size+=len(chunk)
@@ -38,15 +49,15 @@ def create_app(database,origin):
             pieces.append(chunk)
         body=b''.join(pieces)
         url=f'http://127.0.0.1:{local.server_port}{path}'+('?' + request.url.query if request.url.query else '')
-        headers={k:v for k,v in request.headers.items() if k.lower() in {'content-type','origin','cookie'}}
+        headers={k:v for k,v in request.headers.items() if k.lower() in {'content-type','origin','cookie','idempotency-key','range'}}
         def load():
-            req=urllib.request.Request(url,data=body if request.method=='POST' else None,method=request.method,headers=headers)
+            req=urllib.request.Request(url,data=body if request.method in {'POST','PATCH','DELETE'} else None,method=request.method,headers=headers)
             try:r=urllib.request.urlopen(req,timeout=120)
             except urllib.error.HTTPError as error:r=error
             with r:return r.status,dict(r.headers),r.read()
         try:code,head,data=await asyncio.to_thread(load)
         except (OSError,TimeoutError):return JSONResponse({'error':'Analysis service unavailable.'},status_code=503)
-        output={k:v for k,v in head.items() if k.lower() in {'content-type','content-disposition','set-cookie','cache-control','x-content-type-options'}}
+        output={k:v for k,v in head.items() if k.lower() in {'content-type','content-disposition','set-cookie','cache-control','x-content-type-options','content-range','accept-ranges'}}
         return Response(data,status_code=code,headers=output)
     async def stream(request:Request):
         import hashlib,json,time
@@ -81,7 +92,7 @@ def create_app(database,origin):
                 yield ': keepalive\n\n'
                 await asyncio.sleep(.5)
         return StreamingResponse(events(),media_type='text/event-stream',headers={'Cache-Control':'no-store','X-Accel-Buffering':'no'})
-    return Starlette(routes=[Route('/api/assistant/runs/{run_id}/stream',stream),Route('/{path:path}',proxy,methods=['GET','POST','DELETE','PUT','PATCH'])],lifespan=lifespan)
+    return Starlette(routes=[Route('/healthz',health),Route('/api/assistant/runs/{run_id}/stream',stream),Route('/{path:path}',proxy,methods=['GET','POST','DELETE','PUT','PATCH'])],lifespan=lifespan)
 
 
 def main():

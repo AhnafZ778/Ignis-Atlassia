@@ -1,0 +1,23 @@
+/* Focus the public workflow while keeping scientific and historical routes intact. */
+.landing-page #overview,.landing-page .earth-controls a,.landing-page .orbital-note,.landing-page .assistant-launch{display:none!important}
+body:not(.assistant-page) .assistant-launch{display:none!important}
+.analytical-workspace .atlas-intro,.analytical-workspace .atlas-scope-tabs,.analytical-workspace #decision-paths,.analytical-workspace .atlas-coverage-note,.analytical-workspace .atlas-reading-key+.map-note{display:none!important}
+.analytical-workspace .legacy-research-tabs,.analytical-workspace .technical-archive{display:none!important}
+.analytical-workspace #missingness,.analytical-workspace #reproduction,.analytical-workspace .custom-comparison{display:none!important}
+.analytical-workspace #qualification-daily,.analytical-workspace #qualification-monthly details:has(#qualification-transfer-table){display:none!important}
+.analytical-workspace #qualification-acquisitions{display:none!important}
+.assistant-page #investigate-studio-link,.assistant-page #mission-focus,.assistant-page #workspace-notebook,.assistant-page #mission-open-replay,.assistant-page .mission-new-toggle,.assistant-page .mission-replay-controls label:has(#mission-play-speed){display:none!important}
+.compare-settings{align-self:end;min-width:180px}.compare-settings>summary{cursor:pointer;padding:.6rem;border:1px solid #ccd8d5;border-radius:7px;background:white}.compare-settings label{display:block;margin:.6rem 0}
+
+#site-navigation [data-page-link="assistant"]{display:none!important}
+
+.atlas-page .workspace-actions a[href="./"],.atlas-page .workspace-actions a[data-context-link^="evidence"]{display:none!important}.export-menu>summary{cursor:pointer;padding:.55rem .8rem;border:1px solid #ccd8d5;border-radius:7px;background:#fff}.export-menu>div{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+
+.inspection-mode .mission-archive-drawer{display:none!important}
+
+/* Keep primary map controls visible and secondary settings on demand. */
+.assistant-page .mission-display-settings{position:relative;flex:0 1 auto}
+.assistant-page .mission-display-settings>summary{display:list-item;cursor:pointer;white-space:nowrap;padding:8px}
+.assistant-page .mission-display-settings:not([open])>.mission-display-fields{display:none}
+.assistant-page .mission-display-settings[open]>.mission-display-fields{position:absolute;z-index:1000;right:0;top:100%;display:grid;gap:8px;width:260px;max-width:calc(100vw - 40px);padding:12px;background:white;border:1px solid #ccd8d5;border-radius:8px;box-shadow:0 8px 24px #142c3e20}
+.assistant-page .mission-mask-controls{display:block}.assistant-page .mission-mask-controls summary,.assistant-page .mission-landscape summary,.assistant-page .mission-analysis-options summary{cursor:pointer;color:#315ddb;padding:6px 0}.assistant-page .mission-mask-controls label{display:block;margin-top:8px}.assistant-page .mission-analysis-options[open]>*:not(summary){margin:6px}

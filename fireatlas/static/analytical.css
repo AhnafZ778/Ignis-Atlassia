@@ -32,3 +32,6 @@ body.analytical-workspace {background:#f5f7fb;color:#15263c}
 /* Make the primary Studio handoff as visible as the adjacent controls. */
 .analytical-workspace #investigate-studio-link {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border:1px solid #2148b0;border-radius:6px;background:#315ddb;color:#fff;font-size:14px;font-weight:650;line-height:1.4;text-decoration:none;box-shadow:0 2px 5px rgba(32,76,186,.16)}
 .analytical-workspace #investigate-studio-link:hover {background:#244bb9;color:#fff}
+
+/* Compact secondary navigation keeps specialist tools available without crowding the primary workflow. */
+.workspace-advanced{position:relative;align-self:center}.workspace-advanced>summary{cursor:pointer;padding:.65rem 1rem;border:1px solid #ccd8d5;border-radius:8px;background:#fff;color:#234343}.workspace-advanced>div{display:flex;gap:.4rem;flex-wrap:wrap;padding:.5rem}.evidence-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1rem}.evidence-cards article{padding:1rem;border:1px solid #dce5e2;border-radius:10px}.evidence-cards h3{margin-top:0}.evidence-intro{line-height:1.6}

@@ -5,6 +5,7 @@ FireAtlasPanels.define('research-overview', ({document,window,fetch,setTimeout,c
   const $ = id => document.getElementById(id);
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const n = value => value == null ? "—" : Number(value).toLocaleString();
+  const incoming=C.read();if(incoming.start.slice(0,7)!==incoming.end.slice(0,7)&&!incoming.analysis_month){$("overview-status").textContent="Choose a research UTC month intersection above to run the custom daily comparison. The monthly archive experiment remains available.";$("overview-run").disabled=true;$("overview-result").setAttribute("aria-busy","false");return;}
   let report = null, requestVersion=0,scopeStart=C.researchSelection().start_date||null;
   function monthEnd(year, month) { return new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10); }
   function setCutoff() { $("overview-as-of").value = monthEnd(Number($("overview-year").value), Number($("overview-month").value)); }
@@ -28,7 +29,7 @@ FireAtlasPanels.define('research-overview', ({document,window,fetch,setTimeout,c
   }
   function chart(days) {
     const target = $("overview-chart"); target.replaceChildren();
-    if (!days?.length) { target.innerHTML = '<div class="empty-state">No daily records were returned. This is not evidence of zero activity.</div>'; return; }
+    if (!days?.length) { target.innerHTML = '<div class="empty-state">No daily records were returned for this selection.</div>'; return; }
     const max = Math.max(1, ...days.map(day => Number(day.union || 0)));
     const width=1080,height=320,left=62,top=28,bottom=40,plotHeight=height-top-bottom,step=(width-left-18)/days.length;
     const NS='http://www.w3.org/2000/svg';
@@ -62,7 +63,7 @@ FireAtlasPanels.define('research-overview', ({document,window,fetch,setTimeout,c
   function render() {
     const overlap = report.overlap || {}; const totals = overlap.totals || {};
     $("overview-union").textContent = n(totals.union); $("overview-both").textContent = n(totals.both); $("overview-groups").textContent = n(report.candidates?.count);
-    $("overview-status").textContent = `${report.config.start_date||`${report.config.year}-${String(report.config.month).padStart(2, "0")}-01`} through ${report.config.as_of} · ${report.data_status === "empty" ? "No imported pixels" : report.demo_data ? "Synthetic demonstration data" : "Imported observations"}.`;
+    $("overview-status").textContent = `${report.config.start_date||`${report.config.year}-${String(report.config.month).padStart(2, "0")}-01`} through ${report.config.as_of} · ${report.data_status === "empty" ? "No imported pixels" : report.demo_data ? "Synthetic sample data" : "Imported observations"}.`;
     C.status($("overview-state"), report.data_status === "empty" ? "NO IMPORTED PIXELS" : "RESULT READY", report.data_status === "empty" ? "unknown" : "available");
     const complete = Object.values(report.complete_exports || {}).length > 0 && Object.values(report.complete_exports || {}).every(value => value === true);
     C.status($("overview-completeness"), complete ? "STUDY EXPORTS COMPLETE" : "STUDY EXPORTS PARTIAL / UNKNOWN", complete ? "available" : "partial");

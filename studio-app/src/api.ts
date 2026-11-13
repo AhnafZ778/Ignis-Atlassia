@@ -1,3 +1,4 @@
+import type {WhiteboardConversationTurn} from './types';
 import type { Binding, Capabilities, DocumentView, RenderJob, RoomView, SnapshotReport, StoryBody, StoryView, WorkflowDefinition, WorkflowRun, Snapshot } from './types';
 
 export class ApiError extends Error {
@@ -13,17 +14,17 @@ const base = () => new URL('api/studio/', document.baseURI).href;
 export const uid = (prefix: string) => `${prefix}-${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`;
 export const idempotencyKey = () => 'k-' + crypto.randomUUID();
 
-async function request<T>(method: string, path: string, body?: unknown, key?: string): Promise<T> {
+async function request<T>(method: string, path: string, body?: unknown, key?: string, signal?: AbortSignal): Promise<T> {
   const headers: Record<string, string> = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (key) headers['Idempotency-Key'] = key;
-  let response: Response;
+  let response: Response, text: string;
   try {
-    response = await fetch(base() + path, { method, headers, credentials: 'same-origin', body: body === undefined ? undefined : JSON.stringify(body) });
+    response = await fetch(base() + path, { method, headers, credentials: 'same-origin', signal, body: body === undefined ? undefined : JSON.stringify(body) });
+    text = await response.text();
   } catch {
     throw new ApiError(0, { error: 'Studio is not reachable. Your last saved board is kept on the server.', code: 'offline' });
   }
-  const text = await response.text();
   let parsed: any = null;
   try { parsed = text ? JSON.parse(text) : null; } catch { parsed = { error: 'Unexpected response from Studio.' }; }
   if (!response.ok) throw new ApiError(response.status, parsed);
@@ -32,6 +33,25 @@ async function request<T>(method: string, path: string, body?: unknown, key?: st
 
 const enc = encodeURIComponent;
 export const api = {
+  parkTimeline: (id:string) => request<{dataset:{id:string;sha256:string;name:string}; rows:{date:string;values:Record<string,number|null>;states:Record<string,string>}[]; unit:string}>('POST',`documents/${enc(id)}/park-timeline`,{}),
+  uploadSourceDocument: async (id: string, file: File) => {
+    const response = await fetch(base() + `documents/${enc(id)}/source-documents?name=${enc(file.name)}`, { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/pdf'}, body:file });
+    const body=await response.json(); if (!response.ok) throw new ApiError(response.status,body);
+    return body as { id:string; name:string; sha256:string; bytes:number; existing:boolean };
+  },
+  sourceDocuments: (id:string) => request<{documents:{id:string;name:string;sha256:string;bytes:number}[]}>('GET',`documents/${enc(id)}/source-documents`),
+  sourceDocumentUrl: (id:string,sourceId:string) => base()+`documents/${enc(id)}/source-documents/${enc(sourceId)}/download`,
+  uploadDataset: async (id: string, file: File) => {
+    const response = await fetch(base() + `documents/${enc(id)}/datasets?name=${enc(file.name)}`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'text/csv' }, body: file });
+    const body = await response.json(); if (!response.ok) throw new ApiError(response.status, body);
+    return body as { id: string; name: string; sha256: string; columns: string[]; row_count: number; preview: string[][]; existing: boolean };
+  },
+  dataset: (id: string, datasetId: string, offset = 0) => request<{ id: string; name: string; sha256: string; columns: string[]; row_count: number; preview: string[][]; offset: number }>('GET', `documents/${enc(id)}/datasets/${enc(datasetId)}?offset=${offset}&limit=10`),
+  datasets: (id: string) => request<{ datasets: { id: string; name: string; sha256: string; row_count: number }[] }>('GET', `documents/${enc(id)}/datasets`),
+  datasetDownload: (id: string, datasetId: string) => base() + `documents/${enc(id)}/datasets/${enc(datasetId)}/download`,
+  datasetScatter: (id: string, datasetId: string, x: string, y: string) => request<{ dataset_id:string; sha256:string; name:string; x_column:string; y_column:string; points:{row:number;x:number;y:number}[]; skipped_rows:number; total_rows:number }>('GET', `documents/${enc(id)}/datasets/${enc(datasetId)}/scatter?${new URLSearchParams({x,y})}`),
+  datasetSummary: (id:string,datasetId:string,column:string) => request<{sha256:string;name:string;total_rows:number;columns:Record<string,number|string|null>[]}>('GET',`documents/${enc(id)}/datasets/${enc(datasetId)}/summary?${new URLSearchParams({column})}`),
+  datasetGroups: (id:string,datasetId:string,group:string,value:string) => request<{dataset_id:string;sha256:string;group_column:string;value_column:string;total_rows:number;groups:{group:string|null;rows:number;numeric_count:number;missing_count:number;non_numeric_count:number;mean:number|null}[]}>('GET',`documents/${enc(id)}/datasets/${enc(datasetId)}/group-summary?${new URLSearchParams({group,value})}`),
   promptPresets: () => request<{presets: {id:string; title:string; prompt:string; operation?:string}[]}>('GET','prompt-presets'),
   promptCommand: (body: unknown, key = idempotencyKey()) => request<any>('POST','prompt-commands',body,key),
   registerContext: (body: unknown) => request<any>('POST', 'contexts', body),
@@ -56,6 +76,7 @@ export const api = {
   listDocuments: () => request<{ documents: { id: string; title: string; revision: number; updated: number; owner: boolean }[] }>('GET', 'documents'),
   createDocument: (title: string, study?: unknown) => request<DocumentView>('POST', 'documents', { title, study }, idempotencyKey()),
   getDocument: (id: string) => request<DocumentView>('GET', `documents/${enc(id)}`),
+  getWhiteboard: (id: string) => request<{ document: DocumentView; elements: any[]; files: Record<string, any> }>('GET', `documents/${enc(id)}/whiteboard`),
   deleteDocument: (id: string, expectedRevision: number, key = idempotencyKey()) => request<{ id: string; deleted: boolean }>('DELETE', `documents/${enc(id)}`, { expected_revision: expectedRevision }, key),
   projects: (id: string) => request<{ story_generations?: { id: string; status: string; story_id: string | null }[]; stories: { id: string; title: string; revision: number }[]; workflow: { id: string; revision: number; definition: WorkflowDefinition } | null; renders?: import('./types').RenderSummary[]; renders_total?: number }>('GET', `documents/${enc(id)}/projects`),
   transact: (id: string, baseRevision: number, ops: unknown[], extra: Record<string, unknown> = {}) =>
@@ -66,9 +87,11 @@ export const api = {
   studioAction: (id: string, body: unknown) => request<{ action: string; document?: DocumentView; story?: StoryView; workflow_draft?: { id: string; definition: WorkflowDefinition; document_id: string; base_revision: number }; selection?: any; created?: boolean; message?: string }>('POST', `documents/${enc(id)}/actions`, body, idempotencyKey()),
   resolveBinding: (id: string, binding: Binding) => request<{ snapshot: Snapshot; freshness: { fresh: boolean } }>('POST', `documents/${enc(id)}/bindings/resolve`, { binding }),
   snapshotReport: (id: string, sid: string) => request<SnapshotReport>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}`),
-  snapshotReceipt: (id: string, sid: string) => request<{ receipt: { payload: any; operation: string } }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/receipt`),
+  snapshotReceipt: (id: string, sid: string) => request<{ snapshot_id:string;result_id:string;receipt: { payload: any; operation: string } }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/receipt`),
+  snapshotReceiptDownload: (id:string,sid:string) => base()+`documents/${enc(id)}/snapshots/${enc(sid)}/receipt?download=1`,
   snapshotLandscape: (id: string, sid: string, background: string) => request<any>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/landscape?background=${enc(background)}`),
   snapshotPreview: (id: string, sid: string, type: string, day?: string, source = 'joint', selection: { start?: string; end?: string; cell?: string; background?: string } = {}) => request<{ svg: string; visual: any; snapshot_sha256: string }>('GET', `documents/${enc(id)}/snapshots/${enc(sid)}/preview?${new URLSearchParams({ type, source, ...(day ? { day } : {}), ...selection })}`),
+  snapshotHeat: (id:string,sid:string,day?:string,source='joint') => request<{visual:any;snapshot_sha256:string}>('GET',`documents/${enc(id)}/snapshots/${enc(sid)}/heat?${new URLSearchParams({source,...(day?{day}:{})})}`),
   uploadAsset: (id: string, data: string, license: string, attribution: string) =>
     request<{ id: string; sha256: string; mime: string }>('POST', `documents/${enc(id)}/assets`, { data, license, attribution }),
   assetUrl: (assetId: string) => base() + `assets/${enc(assetId)}`,
@@ -95,7 +118,9 @@ export const api = {
   cancelRun: (id: string) => request<WorkflowRun>('POST', `runs/${enc(id)}/cancel`, {}),
   applyRun: (id: string, nodeId: string, expectedRevision: number) => request<{ document: DocumentView; story?: StoryView }>('POST', `runs/${enc(id)}/apply`, { node_id: nodeId, expected_revision: expectedRevision }),
   jarvisStart: (id: string, body: unknown) => request<{ id: string; status: string }>('POST', `documents/${enc(id)}/assistant/start`, body),
-  jarvisRun: (id: string, run: string) => request<any>('GET', `documents/${enc(id)}/assistant/runs/${enc(run)}`),
+  jarvisConversation: (id: string) => request<{turns:WhiteboardConversationTurn[]}>('GET', `documents/${enc(id)}/assistant/conversation`),
+  jarvisRun: (id: string, run: string, signal?:AbortSignal) => request<any>('GET', `documents/${enc(id)}/assistant/runs/${enc(run)}`,undefined,undefined,signal),
+  jarvisPreserveClaims: (id:string, run:string) => request<{bindings:Record<string,{documentId:string;snapshotId:string;snapshotHash:string;resultId:string}>}>('POST', `documents/${enc(id)}/assistant/runs/${enc(run)}/preserve-claims`, {}),
   jarvisCancel: (id: string, run: string) => request<any>('POST', `documents/${enc(id)}/assistant/runs/${enc(run)}/cancel`, {}),
   jarvisApply: (id: string, proposal: string) => request<any>('POST', `documents/${enc(id)}/assistant/proposals/${enc(proposal)}/apply`, {}),
   createRoom: (id: string) => request<RoomView>('POST', `documents/${enc(id)}/room`, {}),

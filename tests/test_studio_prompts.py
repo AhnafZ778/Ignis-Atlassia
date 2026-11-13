@@ -73,7 +73,26 @@ class PromptTests(StudioCase):
         self.assertEqual(resolve(PRESETS[1]['prompt'])['case'],'park-2024')
         with self.assertRaises(StudioError):resolve('Edited selection','curated-current')
 
+    def test_compact_save_keeps_the_evidence_without_presentation_cards(self):
+        body=self.request()
+        body['message']='Save this study on Canvas.'
+        body['destination']={'intent':'new-board'}
+        command=submit(self.service,self.owner,body,'compact-save',background=False)['command']
+        self.assertEqual(command['status'],'awaiting_view_ack',command)
+        doc=self.service.get_document(self.owner,command['outputs']['document_id'])
+        self.assertEqual([card['type'] for card in doc['state']['cards'].values()],['map'])
+        self.assertTrue(doc['snapshots'])
+
     def test_data_presets_select_real_operations(self):
         for preset in PRESETS:
             if preset.get('operation'):
                 self.assertEqual(submit(self.service,self.owner,{'message':preset['prompt']},'operation')['operation'],preset['operation'])
+
+    def test_monthly_comparison_layout_does_not_group_single_cards(self):
+        from fireatlas.studio.composition import decorate, presentation_entries
+        entries=presentation_entries('comparability','snapshot',['snapshot','availability'],'joint')
+        ops=[{'card':{'id':f'card-{i}','type':kind,'display':{},'transform':{}}} for i,(kind,*_) in enumerate(entries)]
+        decorate(ops,entries,{'study_selection':{},'active_view':{}},{},0,lambda role:role)
+        groups=[op['group'] for op in ops if op.get('op')=='set_group']
+        self.assertTrue(groups)
+        self.assertTrue(all(len(group['card_ids']) >= 2 for group in groups))

@@ -185,8 +185,8 @@
   }
   function renderCoverage() {
     const coverage = state.report.coverage;
-    $("coverage-state").textContent = coverage.status === "unavailable" ? "MASK REQUIRED" : coverage.status === "synthetic" ? "SYNTHETIC EXPOSURE" : "USER MASK · UNVALIDATED";
-    $("mask-message").textContent = state.mask ? `${state.mask.synthetic ? "Synthetic demonstration" : "User-supplied mask"} · ${state.mask.cells.length} source/cell/day rows. ${coverage.provenance}` : "No mask supplied. Observation coverage remains unknown. Changing the AOI or date range clears the mask.";
+    $("coverage-state").textContent = coverage.status === "unavailable" ? "MASK REQUIRED" : coverage.status === "synthetic" ? "SYNTHETIC EXPOSURE" : "USER-SUPPLIED MASK";
+    $("mask-message").textContent = state.mask ? `${state.mask.synthetic ? "Synthetic sample" : "User-supplied mask"} · ${state.mask.cells.length} source/cell/day rows. ${coverage.provenance}` : "No mask supplied. Observation coverage remains unknown. Changing the AOI or date range clears the mask.";
     const target = $("coverage-output"); target.replaceChildren();
     if (coverage.status === "unavailable") {
       const empty = el("div", "coverage-empty"); empty.append(el("span", "", "—"), el("h3", "", "Exposure is unknown"), el("p", "", coverage.note)); target.append(empty); return;
@@ -205,7 +205,7 @@
   }
   function render() {
     const report = state.report, overlap = report.overlap, complete = Object.values(report.complete_exports).every(Boolean);
-    $("study-kind").textContent = report.demo_data ? "SYNTHETIC DEMO DATA" : report.raw_pixels ? "IMPORTED OBSERVATIONS" : "NO IMPORTED PIXELS";
+    $("study-kind").textContent = report.demo_data ? "SYNTHETIC SAMPLE DATA" : report.raw_pixels ? "IMPORTED OBSERVATIONS" : "NO IMPORTED PIXELS";
     $("study-status-text").textContent = `${report.config.year}-${String(report.config.month).padStart(2,"0")} through ${report.config.as_of} · ${complete ? "Both source exports complete" : "Incomplete source exports; descriptive imported counts only"} · No calibrated sensitivity estimate.`;
     $("research-pixels").textContent = number(report.raw_pixels);
     $("research-shared").textContent = number(overlap.totals.both);

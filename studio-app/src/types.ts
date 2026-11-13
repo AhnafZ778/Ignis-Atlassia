@@ -54,7 +54,7 @@ export interface DocumentView {
 export interface Fact { path: string; label: string; value: number | string | null; unit: string; state: 'observed' | 'unknown' | 'unavailable' }
 export interface Snapshot {
   id: string; result_id: string; receipt_sha256: string; snapshot_sha256: string; release_id: string; release_frozen: boolean; operation: string;
-  method: { id: string; unit: string; [k: string]: unknown }; unit: string; facts: Fact[]; scope: { bbox: number[]; start: string; end: string; day?: string | null };
+  method: { id: string; unit: string; [k: string]: unknown }; unit: string; facts: Fact[]; scope: { bbox: number[]; start: string; end: string; source?: string; day?: string | null; period_kind?: string; periods?: { start: string; end: string }[] };
   context: StudyContext; limitations: string[]; captured_utc: string;
 }
 export interface SnapshotReport {
@@ -104,3 +104,15 @@ export interface WorkflowNode { id: string; type: string; label?: string; params
 export interface WorkflowDefinition { nodes: WorkflowNode[] }
 export interface WorkflowRun { id: string; workflow_id: string; status: string; outputs: Record<string, any>; receipts: { node: string; cache_hit: boolean; output_sha256: string }[]; error: string | null }
 export interface RoomView { id: string; document_id: string; adapter: string; members: { principal: string; role: string; you: boolean }[]; adapter_state?: { available: boolean; reason?: string } }
+
+
+export type ResearchTeamReport = {
+  status:string; note?:string; ceiling_usd?:number; estimated_cost_usd?:number|null; usage_status?:string;
+  specialists:{role:string;label:string;status:string;insight?:string;next_test?:string;reason?:string;sources?:{id:string;title:string;url:string}[]}[];
+};
+
+export type ResearchAnswer = {synthesis:string;hypothesis:string;proposed_test:string;source_ids:string[]};
+export type PublicReadingReport = {source_id:string;title:string;url:string;status:'article_passages'|'abstract'|'unavailable';reason:string;license:string|null;scope:string;passages:{id:string;section:string;location:string;text:string;truncated:boolean;paragraph_sha256:string}[]};
+export type PublicResearchSource = {id?:string;title:string;url:string;snippet:string;provider:string};
+
+export type WhiteboardConversationTurn = {question:string;title:string;summary:string;claims?:{label:string;value:string|number;unit:string}[];web_sources?:PublicResearchSource[];research_team?:ResearchTeamReport;research_answer?:ResearchAnswer;public_readings?:PublicReadingReport[]};

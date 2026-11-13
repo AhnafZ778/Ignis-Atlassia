@@ -1,0 +1,106 @@
+{
+  "schema": "fireatlas-research-protocol-v1",
+  "id": "monthly-v2.0.4",
+  "state": "frozen-proposal-awaiting-human-approval",
+  "target": "Observed S-NPP VIIRS equivalent monthly common-grid centroid cell-days, not fire truth",
+  "units": "VIIRS-equivalent centroid cell-days per complete UTC calendar month",
+  "grid": "EPSG:6933 1000 m",
+  "regions": {
+    "norcal": "primary qualification",
+    "punjab-haryana": "independent replication"
+  },
+  "sources": [
+    "MODIS_SP",
+    "VIIRS_SNPP_SP"
+  ],
+  "cohort": "Explicit exact source/product-version pair per regional experiment; never pooled or relabelled",
+  "eligibility": "Every UTC date has both request-verified exports, known totals, one exact product-version pair and no documented processing gaps",
+  "candidates": [
+    "no_harmonization",
+    "annual_ratio",
+    "monthly_ratio"
+  ],
+  "training_inputs": [
+    "eligible monthly MODIS and S-NPP counts",
+    "calendar month"
+  ],
+  "partition": {
+    "outer": "chronological test year Y",
+    "calibration_years": "Y-2 and Y-1",
+    "training": "years strictly earlier than Y-2",
+    "nested_selection": "inner leave-one-training-year-out",
+    "forward_selection": "inner earlier-training-years-only; at least two earlier years",
+    "minimum_training_years": 3,
+    "minimum_training_months": 36,
+    "minimum_calibration_months": 18,
+    "minimum_test_groups": 3,
+    "minimum_test_months": 8,
+    "required_test_quarters": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "required_calibration_quarters": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "interval": {
+    "nominal": 0.9,
+    "method": "symmetric absolute log1p residuals; finite-sample upper order statistic ceil((n+1)*0.9); clip lower count at zero",
+    "warning": "Empirical calibration, not guaranteed coverage under temporal dependence; baseline separately calibrated on same dates"
+  },
+  "gates": {
+    "minimum_log_error_improvement": 0.1,
+    "maximum_wape_ratio": 1.0,
+    "minimum_coverage": 0.85,
+    "maximum_interval_score_ratio": 1.0,
+    "applies_to": [
+      "nested",
+      "forward"
+    ],
+    "authority": "proposed project gates; not NASA standards; approval required before fitting"
+  },
+  "report": [
+    "median absolute log error",
+    "WAPE",
+    "signed and seasonal bias",
+    "zero and small-count subsets",
+    "all twelve complete-month annual errors only",
+    "raw and adjusted source-switch error",
+    "interval coverage,width,score",
+    "support and exclusion reasons"
+  ],
+  "claims_excluded": [
+    "ground-truth fire accuracy",
+    "burned area",
+    "continuous observation",
+    "daily reconstruction",
+    "historical collection transfer",
+    "operational forecasting",
+    "blind confirmation from previously inspected periods"
+  ],
+  "amendment": "Any methodological or gate change requires a new immutable protocol ID, new human approval and reevaluation. Previously inspected inputs remain retrospective.",
+  "supersedes": "monthly-v2.0.3 (unapproved proposal retained)",
+  "method_annex": {
+    "source_sha256": {
+      "fireatlas/comparability_v2.py": "943ac08934913540a8a06bcefb7bfb6c7302581b50dd5422bf73f96cfcbe798b",
+      "fireatlas/comparability.py": "a19238e045f9d3169ebc25af5ad87e0cc30ccf00c2be966134b894c3adf6c41a",
+      "fireatlas/calibration.py": "6548fc9525500d47fb9cbcf5a4a8c01f615de41e41864eab3db339dc8640ee96",
+      "fireatlas/qualification.py": "70e3f328a5b3b92822d318187ed1cfb71ae5a1aa9eab0cafc111ee034cd3e824"
+    },
+    "ratio_fit": "annual=sum(reference)/sum(MODIS); zero denominator unavailable. Month-specific ratio requires monthly MODIS denominator >=30; otherwise use annual ratio.",
+    "selection": "Monthly minimizes median absolute log1p prediction error, with lexical model-name tie break; inner nested leave-one-training-year-out or inner forward using at least two earlier years. Outer train strictly beforeY-2; calibrationY-2/Y-1; testY.",
+    "metrics": "WAPE=sum(abs(error))/sum(reference); signed relative bias=sum(error)/sum(reference), undefined if denominatorzero. Interval score width+20*miss distance for nominal90%. Log error uses log((prediction+1)/(reference+1)).",
+    "intervals": "Sorted absolute log1p calibration residual, rankceil((n+1)*0.9); require rank<=n. expm1(log1p(point)\u00b1radius), lower clippedzero; zero radius preserves exact point; nonzero boundaries rounded outward by nextafter.",
+    "qualification": "All declared project gates apply to both monthly selection strategies; no post-test candidate choice. Synthetic input cannot enter authentic admission. Previously inspected periods are retrospective. Human conclusion/native/task-study gates remain separate.",
+    "subgroup_interval_reporting": "Report exact covered_count and interval_count per test year and season; pooled85%floor is not proof of90%temporal/seasonal/conditional coverage. Calibration requires all four calendar quarters. Zero/small-count support remains explicit."
+  },
+  "execution_modes": {
+    "human_reviewed": "Signed independent protocol approval before authentic qualification evaluation.",
+    "ai_experimental": "Explicit user-authorized exploration under ai-exploration-v2; no human approval or scientific qualification. Synthetic inputs cannot enter this mode."
+  }
+}

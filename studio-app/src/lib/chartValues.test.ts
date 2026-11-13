@@ -14,6 +14,11 @@ describe('frozen chart alternatives', () => {
     expect(chartCsv(table)).toContain('"partial","\'=malicious"');
     expect(chartTable({ kind: 'map', points: [] })).toBeNull();
   });
+  it('exports the exact selected monthly comparison values', () => {
+    const table = chartTable({ kind: 'monthly-comparison', unit: 'cell-days', rows: [{ date: '2025-07', modis: 10, reference: 12, prediction: 11.5, raw_switch: 10, adjusted_switch: 11.5 }] })!;
+    expect(table.rows[0]).toEqual(['2025-07', 10, 12, 11.5, 10, 11.5]);
+    expect(chartCsv(table)).toContain('\"2025-07\",\"10\",\"12\",\"11.5\"');
+  });
   it('creates a connected typed presentation recipe without invented numeric nodes', () => {
     const graph = presentationWorkflow(); expect(parseDraft(graph)).toEqual(graph);
     expect(graph.nodes.filter((n) => n.type === 'operation').map((n) => n.params?.operation)).toEqual(['replay', 'missingness']);

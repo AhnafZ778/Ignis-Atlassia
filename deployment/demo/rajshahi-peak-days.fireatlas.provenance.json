@@ -1,0 +1,13 @@
+{
+  "schema": "fireatlas-public-starter-v1",
+  "source_package_sha256": "d3402873655e5a04c6e03d8f3a4393be4a81cef73446cc672bb455c031079a6a",
+  "public_package_sha256": "627cc35639569c79e43494673cfafaafdcff4ee5176db277f9ddad3f59829985",
+  "removed": [
+    "AI conversation",
+    "board discussion"
+  ],
+  "preserved_result_sha256": {
+    "results/res_614f06c4afcb43d4ddcbfea4cb2a2b6e.json": "106f86ae6cbc33c795657dea53271b50c426897cf94ca50da9cbfa34136a7e83",
+    "results/index.json": "514f7ab6d141dd0ae399a5861ed0367b47613f52d4065a944c22cafca5f45aec"
+  }
+}

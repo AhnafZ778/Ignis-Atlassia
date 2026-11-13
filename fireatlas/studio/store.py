@@ -17,7 +17,7 @@ from pathlib import Path
 from . import graph
 from .errors import Conflict, Forbidden, LimitExceeded, NotFound, StoreVersionError, StudioError, Throttled, Unauthorized
 
-STORE_VERSION = 7
+STORE_VERSION = 11
 SESSION_SECONDS = 365 * 86400
 MAX_STATE_BYTES = 1_000_000
 ROLES = ("viewer", "editor", "owner")
@@ -106,6 +106,23 @@ MIGRATIONS = [
         status TEXT NOT NULL, phase TEXT NOT NULL, progress REAL NOT NULL, capture TEXT NOT NULL,
         story_id TEXT, render_id TEXT, receipt TEXT, error TEXT, cancel INTEGER NOT NULL DEFAULT 0,
         created REAL NOT NULL, updated REAL NOT NULL);
+    """),
+    (8, "whiteboard-objects", """
+    CREATE TABLE whiteboard_objects(document_id TEXT NOT NULL REFERENCES documents(id), kind TEXT NOT NULL,
+        object_id TEXT NOT NULL, body TEXT NOT NULL, position INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(document_id, kind, object_id));
+    """),
+    (9, "private-datasets", """
+    CREATE TABLE datasets(id TEXT PRIMARY KEY, document_id TEXT NOT NULL REFERENCES documents(id), owner_id TEXT NOT NULL,
+        name TEXT NOT NULL, sha256 TEXT NOT NULL, content BLOB NOT NULL, row_count INTEGER NOT NULL,
+        columns_json TEXT NOT NULL, created REAL NOT NULL, UNIQUE(document_id,sha256));
+    """),
+    (10, "private-documents", """
+    CREATE TABLE source_documents(id TEXT PRIMARY KEY, document_id TEXT NOT NULL REFERENCES documents(id), owner_id TEXT NOT NULL,
+        name TEXT NOT NULL, sha256 TEXT NOT NULL, content BLOB NOT NULL, created REAL NOT NULL, UNIQUE(document_id,sha256));
+    """),
+    (11, "redo-lineage", """
+    CREATE TABLE history_redos(redo_id TEXT PRIMARY KEY REFERENCES transactions(id), undo_id TEXT NOT NULL UNIQUE REFERENCES transactions(id));
     """),
 ]
 
@@ -285,6 +302,15 @@ class StudioStore:
             self.require(db, principal, document_id)
             return self._view(db, document_id, principal)
 
+    def whiteboard(self, principal, document_id):
+        """Read the drawing belonging to an owned Studio document."""
+        with self.connection() as db:
+            self.require(db, principal, document_id)
+            document = self._view(db, document_id, principal)
+            rows = db.execute("SELECT kind,object_id,body FROM whiteboard_objects WHERE document_id=? ORDER BY position,object_id", (document_id,)).fetchall()
+            return {"document": document, "elements": [json.loads(row["body"]) for row in rows if row["kind"] == "element"],
+                    "files": {row["object_id"]: json.loads(row["body"]) for row in rows if row["kind"] == "file"}}
+
     def list_documents(self, principal):
         with self.connection() as db:
             rows = db.execute("""SELECT d.id,d.title,d.revision,d.updated,d.owner_id FROM documents d WHERE d.deleted=0 AND (d.owner_id=? OR EXISTS
@@ -302,6 +328,7 @@ class StudioStore:
             if type(expected_revision) is not int or expected_revision != row['revision']:
                 raise Conflict('This investigation changed. Reload it before deleting.', code='revision-conflict')
             db.execute('UPDATE documents SET deleted=1,updated=? WHERE id=?', (self.clock(), document_id))
+            db.execute("DELETE FROM science_results WHERE kind='whiteboard_conversation' AND json_extract(body,'$.document_id')=?", (document_id,))
             db.execute("UPDATE workflow_runs SET cancel=1 WHERE workflow_id IN (SELECT id FROM workflows WHERE document_id=?) AND status IN ('queued','running')", (document_id,))
             db.execute("UPDATE renders SET cancel=1 WHERE document_id=? AND status IN ('queued','running')", (document_id,))
             response = {'id': document_id, 'deleted': True}
@@ -335,7 +362,7 @@ class StudioStore:
             return value
 
     # -- transactions -------------------------------------------------------------
-    def apply_transaction(self, principal, document_id, request, key=None, _internal=None, _command=None, _workflow=None):
+    def apply_transaction(self, principal, document_id, request, key=None, _internal=None, _command=None, _workflow=None, _redo_of=None):
         if not isinstance(request, dict) or not isinstance(request.get("ops"), list) or not 1 <= len(request["ops"]) <= 50:
             raise StudioError("A transaction has 1–50 operations and a base_revision.", code="invalid-transaction")
         base = request.get("base_revision")
@@ -343,6 +370,14 @@ class StudioStore:
             raise StudioError("A transaction needs the integer base_revision it was authored against.", code="invalid-transaction")
         with self.connection(write=True) as db:
             self.require(db, principal, document_id, "editor")
+            if _internal:
+                target=db.execute('SELECT author_id,document_id,undone FROM transactions WHERE id=?',(_internal,)).fetchone()
+                if not target or target['author_id']!=principal or target['document_id']!=document_id or target['undone']:
+                    raise Conflict('This edit was already undone or is unavailable.',code='undo-conflict')
+            if _redo_of:
+                target=db.execute('SELECT author_id,document_id,undoes,undone FROM transactions WHERE id=?',(_redo_of,)).fetchone()
+                if not target or target['author_id']!=principal or target['document_id']!=document_id or not target['undoes'] or target['undone']:
+                    raise Conflict('This redo is no longer available.',code='redo-conflict')
             if _workflow:
                 run=db.execute('SELECT owner_id,cancel,status FROM workflow_runs WHERE id=?',(_workflow,)).fetchone()
                 if not run or run['owner_id']!=principal or run['cancel'] or run['status']!='running':raise Conflict('Workflow stopped before insertion.')
@@ -399,6 +434,11 @@ class StudioStore:
             db.execute("INSERT INTO transactions VALUES(?,?,?,?,?,?,?,?,?,?,0,?)",
                        (tx, document_id, principal, base, revision, group[:100], dumps(ops), dumps(list(reversed(inverse))), dumps(touched),
                         _internal, now))
+            if _internal:
+                db.execute('UPDATE transactions SET undone=1 WHERE id=?',(_internal,))
+            if _redo_of:
+                db.execute('INSERT INTO history_redos(redo_id,undo_id) VALUES(?,?)',(tx,_redo_of))
+                db.execute('UPDATE transactions SET undone=1 WHERE id=?',(_redo_of,))
             response = {**self._view(db, document_id, principal), "transaction_id": tx, "changed": True,
                         "merged": base != row["revision"], "touched": touched}
             self.remember(db, principal, "tx:" + document_id, key, response)
@@ -436,7 +476,9 @@ class StudioStore:
         restore = {"restore_card", "restore_connection", "restore_field", "restore_order", "restore_group"}
         if name in restore and not internal:
             raise StudioError("Restore operations are reserved for undo.", code="invalid-operation")
-        if name == "add_card":
+        if name == "patch_whiteboard":
+            self._patch_whiteboard(state, op, touched, inverse, db, document_id)
+        elif name == "add_card":
             card = graph.clean_card(op.get("card"))
             if card["id"] in cards:
                 raise StudioError("A card with that ID already exists.", code="duplicate-card")
@@ -586,6 +628,55 @@ class StudioStore:
         else:
             raise StudioError("Unsupported operation: " + name[:40], code="invalid-operation")
 
+    def _patch_whiteboard(self, state, op, touched, inverse, db, document_id):
+        changes = op.get("changes")
+        if set(op) != {"op", "changes"} or not isinstance(changes, list) or not 1 <= len(changes) <= 500:
+            raise StudioError("A whiteboard change needs 1–500 objects.", code="invalid-whiteboard")
+        undo = []
+        seen = set()
+        for change in changes:
+            if not isinstance(change, dict) or set(change) != {"kind", "id", "value", "position"}:
+                raise StudioError("Invalid whiteboard object.", code="invalid-whiteboard")
+            kind, oid, value, position = change["kind"], graph.check_id(change["id"], "whiteboard object ID"), change["value"], change["position"]
+            if kind not in ("element", "file") or (kind, oid) in seen or type(position) is not int or not 0 <= position <= 100000:
+                raise StudioError("Invalid or duplicate whiteboard object.", code="invalid-whiteboard")
+            seen.add((kind, oid))
+            previous = db.execute("SELECT body,position FROM whiteboard_objects WHERE document_id=? AND kind=? AND object_id=?", (document_id, kind, oid)).fetchone()
+            old = json.loads(previous["body"]) if previous else None
+            if value is not None:
+                if not isinstance(value, dict) or value.get("id") != oid:
+                    raise StudioError("Whiteboard object identity does not match.", code="invalid-whiteboard")
+                encoded = dumps(value)
+                if len(encoded.encode()) > (1_500_000 if kind == "file" else 100_000):
+                    raise LimitExceeded("A whiteboard object is too large.", code="whiteboard-limit")
+                if kind == "file":
+                    import base64
+                    import binascii
+                    import re
+                    data = value.get("dataURL", "")
+                    match = re.fullmatch(r"data:image/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)", data) if isinstance(data, str) else None
+                    if not match:
+                        raise StudioError("Use a PNG, JPEG or WebP image on a saved board.", code="invalid-whiteboard-image")
+                    try:
+                        raw = base64.b64decode(match.group(2), validate=True)
+                    except (ValueError, binascii.Error):
+                        raise StudioError("The whiteboard image is invalid.", code="invalid-whiteboard-image") from None
+                    signatures = {"png": b"\x89PNG\r\n\x1a\n", "jpeg": b"\xff\xd8\xff", "webp": b"RIFF"}
+                    if not raw.startswith(signatures[match.group(1)]) or (match.group(1) == "webp" and raw[8:12] != b"WEBP"):
+                        raise StudioError("The whiteboard image does not match its type.", code="invalid-whiteboard-image")
+                db.execute("INSERT OR REPLACE INTO whiteboard_objects VALUES(?,?,?,?,?)", (document_id, kind, oid, encoded, position))
+            else:
+                db.execute("DELETE FROM whiteboard_objects WHERE document_id=? AND kind=? AND object_id=?", (document_id, kind, oid))
+            if old != value or (previous and previous["position"] != position):
+                undo.append({"kind": kind, "id": oid, "value": old, "position": previous["position"] if previous else position})
+                touched.append("whiteboard-" + kind + ":" + oid)
+        if undo:
+            size = db.execute("SELECT COALESCE(SUM(LENGTH(CAST(body AS BLOB))),0) FROM whiteboard_objects WHERE document_id=?", (document_id,)).fetchone()[0]
+            if size > 10_000_000:
+                raise LimitExceeded("This whiteboard exceeds the 10 MB saved-board limit.", code="whiteboard-limit")
+            inverse.append({"op": "patch_whiteboard", "changes": undo})
+            state["whiteboard_change"] = state.get("whiteboard_change", 0) + 1
+
     def _snapshot_index(self, db, document_id, cards):
         ids = [c["snapshot_id"] for c in cards.values() if c.get("snapshot_id")]
         index = {}
@@ -607,8 +698,14 @@ class StudioStore:
                 raise StudioError("There is nothing of yours to undo.", code="nothing-to-undo")
             checked_revision = db.execute("SELECT revision FROM documents WHERE id=?", (document_id,)).fetchone()["revision"]
             touched = json.loads(row["touched"])
-            later = db.execute("SELECT touched,author_id FROM transactions WHERE document_id=? AND revision>?", (document_id, row["revision"])).fetchall()
-            blocked = sorted({obj for item in later for obj in json.loads(item["touched"]) if obj in touched})
+            later = db.execute("SELECT id,undoes,undone,touched FROM transactions WHERE document_id=? AND revision>?", (document_id, row["revision"])).fetchall()
+            # A later edit and its recorded inverse cancel each other. Excluding
+            # both permits stepping back through successive edits of one object;
+            # an independent later edit (including a redo) still blocks undo.
+            by_id = {item['id']: item for item in later}
+            cancelled = {item['undoes'] for item in later if item['undoes'] in by_id and by_id[item['undoes']]['undone']}
+            blocked = sorted({obj for item in later if item['id'] not in cancelled and item['undoes'] not in cancelled
+                              for obj in json.loads(item["touched"]) if obj in touched})
             if blocked:
                 raise Conflict("Another change touched the same objects after yours.", code="undo-conflict", details={"conflicts": blocked})
         # The inverse is applied as a new transaction group so history stays append-only.
@@ -616,7 +713,6 @@ class StudioStore:
         result = self.apply_transaction(principal, document_id, {"base_revision": checked_revision, "ops": json.loads(row["inverse"]),
                                                                "group_id": row["group_id"]}, None, _internal=row["id"])
         with self.connection(write=True) as db:
-            db.execute("UPDATE transactions SET undone=1 WHERE id=?", (row["id"],))
             result = {**result, "undid": row["id"]}
             self.remember(db, principal, "undo:" + document_id, key, result)
         return result
@@ -632,16 +728,38 @@ class StudioStore:
                 AND u.undone=0 AND t.undone=1 ORDER BY u.revision DESC LIMIT 1""", (document_id, principal)).fetchone()
             if not row:
                 raise StudioError("There is nothing of yours to redo.", code="nothing-to-redo")
-            if db.execute("SELECT 1 FROM transactions WHERE document_id=? AND revision>?", (document_id, row["revision"])).fetchone():
+            checked_revision=db.execute('SELECT revision FROM documents WHERE id=?',(document_id,)).fetchone()['revision']
+            later=db.execute('''SELECT t.id,t.author_id,t.undoes,t.undone,h.undo_id AS redoes
+                                FROM transactions t LEFT JOIN history_redos h ON h.redo_id=t.id
+                                WHERE t.document_id=? AND t.revision>? ORDER BY t.revision''',(document_id,row['revision'])).fetchall()
+            later_by_id={item['id']:item for item in later}
+            paired={item['redoes'] for item in later if item['author_id']==principal and item['redoes'] in later_by_id
+                    and later_by_id[item['redoes']]['author_id']==principal and later_by_id[item['redoes']]['undoes'] and later_by_id[item['redoes']]['undone']}
+            if any(item['id'] not in paired and item['redoes'] not in paired for item in later):
                 raise Conflict("The board changed after undo. Redo would overwrite a newer edit.", code="redo-conflict")
-        current = self.get_document(principal, document_id)
-        result = self.apply_transaction(principal, document_id, {"base_revision": row["revision"], "ops": json.loads(row["ops"]), "group_id": row["group_id"]})
+        result = self.apply_transaction(principal, document_id, {"base_revision": checked_revision, "ops": json.loads(row["ops"]), "group_id": row["group_id"]}, _redo_of=row['id'])
         with self.connection(write=True) as db:
-            db.execute("UPDATE transactions SET undone=1 WHERE id=?", (row["id"],))
             self.remember(db, principal, "redo:" + document_id, key, result)
         return result
 
     # -- snapshots, results and assets ----------------------------------------------
+    def preserve_assistant_snapshot(self, principal, document_id, result_id, receipt, snapshot_id, snapshot):
+        """Atomically retain an already checked assistant receipt and its snapshot."""
+        with self.connection(write=True) as db:
+            self.require(db, principal, document_id, 'editor')
+            previous = db.execute('SELECT body FROM snapshots WHERE id=? AND document_id=?', (snapshot_id, document_id)).fetchone()
+            if previous:
+                return json.loads(previous['body'])
+            existing = db.execute('SELECT body FROM science_results WHERE id=?', (result_id,)).fetchone()
+            if existing and json.loads(existing['body']) != receipt:
+                raise Conflict('The saved assistant receipt has changed.', code='receipt-mismatch')
+            if not existing:
+                db.execute('INSERT INTO science_results VALUES(?,?,?,?,?,?)', (result_id, principal, 'evidence', receipt['sha256'], dumps(receipt), self.clock()))
+            body = {**snapshot, 'id': snapshot_id}
+            body['snapshot_sha256'] = sha256_text(dumps({k:v for k,v in body.items() if k != 'snapshot_sha256'}))
+            db.execute('INSERT INTO snapshots VALUES(?,?,?,?,?,?)', (snapshot_id, document_id, principal, body['snapshot_sha256'], dumps(body), self.clock()))
+            return body
+
     def add_snapshot(self, principal, document_id, snapshot, identifier=None):
         with self.connection(write=True) as db:
             self.require(db, principal, document_id, "editor")

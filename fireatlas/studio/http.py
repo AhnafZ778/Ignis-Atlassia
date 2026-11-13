@@ -67,13 +67,15 @@ def _cookie(handler):
     return jar[COOKIE].value if COOKIE in jar else ""
 
 
-def _send(handler, value, status=HTTPStatus.OK, token=None):
+def _send(handler, value, status=HTTPStatus.OK, token=None, filename=None):
     encoded = json.dumps(sanitize_public_payload(value)).encode()
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json; charset=utf-8")
     handler.send_header("Content-Length", str(len(encoded)))
     handler.send_header("Cache-Control", "no-store")
     handler.send_header("X-Content-Type-Options", "nosniff")
+    if filename:
+        handler.send_header('Content-Disposition', f'attachment; filename="{filename}"')
     if token:
         secure = "; Secure" if (_origin_configured_https()) else ""
         handler.send_header("Set-Cookie", f"{COOKIE}={token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=31536000{secure}")
@@ -206,7 +208,9 @@ def _dispatch(handler, service, url):
         return _send(handler, service.capabilities())
     if method != "GET":
         _check_origin(handler)
-    body = _body(handler) if method in ("POST", "PATCH", "DELETE") and route != 'imports' else {}
+    csv_upload = len(parts)==3 and parts[0]=='documents' and parts[2]=='datasets' and method=='POST'
+    pdf_upload = len(parts)==3 and parts[0]=='documents' and parts[2]=='source-documents' and method=='POST'
+    body = _body(handler) if method in ("POST", "PATCH", "DELETE") and route != 'imports' and not csv_upload and not pdf_upload else {}
     key = handler.headers.get("Idempotency-Key")
     store = service.store
 
@@ -302,6 +306,61 @@ def _dispatch(handler, service, url):
     if parts[:1] == ["documents"] and len(parts) >= 2:
         document_id = parts[1]
         tail = parts[2:]
+        if tail == ['park-timeline'] and method == 'POST':
+            from .park_chart import save_timeline
+            with store.connection() as db:store.require(db,principal,document_id,'editor')
+            return _send(handler,save_timeline(store,principal,document_id),HTTPStatus.CREATED)
+        if tail == ['source-documents'] and method == 'GET':
+            from .source_documents import list_documents
+            return _send(handler, {'documents': list_documents(store,principal,document_id)})
+        if tail == ['source-documents'] and method == 'POST':
+            from .source_documents import MAX_BYTES, add
+            with store.connection() as db:store.require(db,principal,document_id,'editor')
+            if handler.headers.get('Content-Type','').split(';')[0] != 'application/pdf':raise StudioError('Upload a PDF file.',code='invalid-document')
+            try:size=int(handler.headers.get('Content-Length','0'))
+            except ValueError:raise StudioError('Invalid upload length.',code='invalid-document') from None
+            if not 0<size<=MAX_BYTES:raise StudioError('Choose a PDF up to 10 MiB.',status=413,code='document-limit')
+            data=handler.rfile.read(size)
+            if len(data)!=size:raise StudioError('The PDF upload was interrupted.',code='invalid-document')
+            return _send(handler,add(store,principal,document_id,params.get('name',['document.pdf'])[0],data),HTTPStatus.CREATED)
+        if len(tail)==3 and tail[0]=='source-documents' and tail[2]=='download' and method=='GET':
+            from .source_documents import read
+            _,data=read(store,principal,document_id,tail[1])
+            handler.send_response(HTTPStatus.OK);handler.send_header('Content-Type','application/pdf');handler.send_header('Content-Disposition','attachment; filename="document.pdf"');handler.send_header('Content-Length',str(len(data)));handler.send_header('Cache-Control','no-store');handler.send_header('X-Content-Type-Options','nosniff');handler.end_headers();handler.wfile.write(data);return
+        if tail == ['datasets'] and method == 'GET':
+            from .datasets import list_datasets
+            return _send(handler,{'datasets':list_datasets(store,principal,document_id)})
+        if tail == ['datasets'] and method == 'POST':
+            from .datasets import MAX_BYTES, add
+            with store.connection() as db:store.require(db,principal,document_id,'editor')
+            if handler.headers.get('Content-Type','').split(';')[0] != 'text/csv':raise StudioError('Upload a CSV file.',code='invalid-csv')
+            try:size=int(handler.headers.get('Content-Length','0'))
+            except ValueError:raise StudioError('Invalid upload length.',code='invalid-csv') from None
+            if not 0<size<=MAX_BYTES:raise StudioError('Choose a CSV up to 5 MiB.',status=413,code='dataset-limit')
+            data=handler.rfile.read(size)
+            if len(data)!=size:raise StudioError('The CSV upload was interrupted.',code='invalid-csv')
+            return _send(handler,add(store,principal,document_id,params.get('name',['dataset.csv'])[0],data),HTTPStatus.CREATED)
+        if len(tail)==2 and tail[0]=='datasets' and method=='GET':
+            from .datasets import read
+            try:offset=int(params.get('offset',['0'])[0]);limit=int(params.get('limit',['10'])[0])
+            except ValueError:raise StudioError('Choose a valid row range.',code='invalid-csv') from None
+            info,_=read(store,principal,document_id,tail[1],offset,limit)
+            return _send(handler,info)
+        if len(tail)==3 and tail[0]=='datasets' and tail[2]=='download' and method=='GET':
+            from .datasets import read
+            _,data=read(store,principal,document_id,tail[1])
+            handler.send_response(HTTPStatus.OK);handler.send_header('Content-Type','text/csv; charset=utf-8');handler.send_header('Content-Disposition','attachment; filename="dataset.csv"');handler.send_header('Content-Length',str(len(data)));handler.send_header('Cache-Control','no-store');handler.send_header('X-Content-Type-Options','nosniff');handler.end_headers();handler.wfile.write(data);return
+        if len(tail)==3 and tail[0]=='datasets' and tail[2]=='scatter' and method=='GET':
+            from .datasets import scatter
+            return _send(handler,scatter(store,principal,document_id,tail[1],params.get('x',[''])[0],params.get('y',[''])[0]))
+        if len(tail)==3 and tail[0]=='datasets' and tail[2]=='summary' and method=='GET':
+            from .datasets import summarize
+            return _send(handler,summarize(store,principal,document_id,tail[1],params.get('column',[])))
+        if len(tail)==3 and tail[0]=='datasets' and tail[2]=='group-summary' and method=='GET':
+            from .datasets import group_summary
+            return _send(handler,group_summary(store,principal,document_id,tail[1],params.get('group',[''])[0],params.get('value',[''])[0]))
+        if tail == ['whiteboard'] and method == 'GET':
+            return _send(handler, store.whiteboard(principal, document_id))
         if tail == ['exports'] and method == 'POST':
             return _send(handler, service.portability.submit(principal, document_id, body, key=key), HTTPStatus.ACCEPTED)
         if tail == ['miro-transfers'] and method == 'POST':
@@ -324,9 +383,14 @@ def _dispatch(handler, service, url):
             state, digest = store.revision_state(principal, document_id, int(tail[1]))
             return _send(handler, {"revision": int(tail[1]), "state": state, "state_sha256": digest})
         if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "receipt" and method == "GET":
-            return _send(handler, service.snapshot_receipt(principal, document_id, tail[1]))
+            saved=service.snapshot_receipt(principal, document_id, tail[1])
+            if params.get('download')==['1']:
+                return _send(handler, saved['receipt'], filename='comparison-evidence.json')
+            return _send(handler, saved)
         if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "landscape" and method == "GET":
             return _send(handler, service.snapshot_landscape(principal, document_id, tail[1], params.get('background', ['auto'])[0]))
+        if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "heat" and method == "GET":
+            return _send(handler, service.snapshot_heat(principal, document_id, tail[1], params.get('day', [None])[0], params.get('source', ['joint'])[0]))
         if len(tail) == 3 and tail[0] == "snapshots" and tail[2] == "preview" and method == "GET":
             return _send(handler, service.snapshot_preview(principal, document_id, tail[1], params.get("type", ["table"])[0], params.get("day", [None])[0], params.get("source", ["joint"])[0],
                 params.get("start", [None])[0], params.get("end", [None])[0], params.get("cell", [None])[0], params.get('background', ['auto'])[0]))
@@ -338,12 +402,16 @@ def _dispatch(handler, service, url):
             from .errors import Unavailable
             if service.jarvis is None:
                 raise Unavailable("The existing JARVIS runtime is unavailable; deterministic Studio actions still work.")
+            if tail == ["assistant", "conversation"] and method == "GET":
+                return _send(handler, {'turns':service.jarvis.conversation_for_principal(principal, document_id)})
             if tail == ["assistant", "start"] and method == "POST":
                 return _send(handler, service.jarvis.start(principal, document_id, body), HTTPStatus.ACCEPTED)
             if len(tail) == 3 and tail[1] == "runs" and method == "GET":
                 return _send(handler, service.jarvis.run(principal, document_id, tail[2]))
             if len(tail) == 4 and tail[1] == "runs" and tail[3] == "cancel" and method == "POST":
                 return _send(handler, service.jarvis.run(principal, document_id, tail[2], cancel=True))
+            if len(tail) == 4 and tail[1] == "runs" and tail[3] == "preserve-claims" and method == "POST":
+                return _send(handler, service.jarvis.preserve_claims(principal, document_id, tail[2]))
             if len(tail) == 4 and tail[1] == "proposals" and tail[3] == "apply" and method == "POST":
                 return _send(handler, service.jarvis.apply(principal, document_id, tail[2]))
         if tail == ["stories"] and method == "POST":

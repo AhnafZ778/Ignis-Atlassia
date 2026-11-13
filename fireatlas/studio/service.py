@@ -257,8 +257,27 @@ class StudioService:
         snapshot = self.store.get_snapshot(principal, document_id, snapshot_id)
         return landscape(snapshot['scope'], background)
 
+    def snapshot_heat(self, principal, document_id, snapshot_id, day=None, source='joint'):
+        """Render the bounded frozen replay heat using the existing scientific display contract."""
+        from . import heat
+        snapshot = self.store.get_snapshot(principal, document_id, snapshot_id)
+        receipt = self.snapshot_receipt(principal, document_id, snapshot_id)['receipt']
+        if receipt['operation'] in ('firms_region','firms_country'):
+            return {'visual':heat.prepare_area(snapshot,receipt),'snapshot_sha256':snapshot['snapshot_sha256']}
+        visual = heat.prepare(snapshot, receipt, {'day':day}, source)
+        frame = next(frame for frame in receipt['payload']['frames'] if frame['date_utc'] == visual['day'])
+        visual['points'] = [{'longitude':cell['longitude'], 'latitude':cell['latitude']} for cell in frame['cells']
+                            if source == 'joint' or source in cell['sources']]
+        return {'visual':visual, 'snapshot_sha256':snapshot['snapshot_sha256']}
+
     # -- stories ----------------------------------------------------------------------
     def snapshot_preview(self, principal, document_id, snapshot_id, kind, day=None, source="joint", start=None, end=None, cell=None, background='auto'):
+        from ..assistant.board_views import VIEW_OPERATIONS
+        if kind in VIEW_OPERATIONS and kind not in ('heatmap','calendar'):
+            from .board_views import render
+            snapshot=self.store.get_snapshot(principal,document_id,snapshot_id)
+            receipt=self.snapshot_receipt(principal,document_id,snapshot_id)['receipt']
+            return render(snapshot,receipt,kind)
         if kind not in ("map", "chart", "timeline", "observation", "finding", "calendar", "table"):
             raise StudioError("Choose a registered analytical preview.", code="invalid-preview")
         snapshot = self.store.get_snapshot(principal, document_id, snapshot_id)
@@ -279,7 +298,11 @@ class StudioService:
             context = landscape(snapshot['scope'], background)
             scene['visual']['context_layers'] = context['layers']
             scene['visual']['background'] = {k: v for k, v in context.items() if k != 'layers'}
-        return {"svg": visuals.svg(scene), "visual": scene["visual"], "snapshot_sha256": snapshot["snapshot_sha256"]}
+        svg=None
+        if kind=='calendar' and receipt['operation']=='calendar' and scene['visual'] and scene['visual'].get('days'):
+            from .board_views import month_calendar
+            svg=month_calendar('Observed-cell calendar',scene['visual']['days'],'Occupied 1 km cells')
+        return {"svg": svg or visuals.svg(scene), "visual": scene["visual"], "snapshot_sha256": snapshot["snapshot_sha256"]}
 
     def _story_row(self, db, principal, story_id, minimum="viewer"):
         row = db.execute("SELECT * FROM stories WHERE id=?", (story_id,)).fetchone()
